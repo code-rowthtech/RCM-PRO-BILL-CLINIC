@@ -11,6 +11,7 @@ import { CiCircleMinus } from 'react-icons/ci';
 import us from '../../../assets/images/flags/us.jpg';
 import {
     getCities2Action,
+    getCities3Action,
     getCitiesAction,
     getClinicAction,
     getClinicTypeAction,
@@ -20,6 +21,7 @@ import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdVerified } from 'react-icons/md';
 import EmailToDoctorModal from './EmailToSubClinicModal';
+import AddressForm from '../Common Pages/AddressForm';
 const SubUpdateClinic = () => {
     const [searchParams] = useSearchParams();
     const idUpdateDataSubClinics = searchParams.get('id');
@@ -31,7 +33,9 @@ const SubUpdateClinic = () => {
     const [showModal, setShowModal] = useState(false);
     const closeModal = () => setShowModal(false);
     const [showModalPic, setShowModalPic] = useState(false); // State to control modal visibility
-
+    const [updatePracticeAddresses, setUpdatePracticeAddresses] = useState([
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+    ]);
     const [modalFileUrl, setModalFileUrl] = useState(''); // State to store file URL for modal
 
     const handleShowModal = (url) => {
@@ -275,9 +279,9 @@ const SubUpdateClinic = () => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]
                         ? {
-                              url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0]?.url?.split('/').pop(), // Extract filename from URL
-                          }
+                            url: data?.documents?.[0], // Store URL
+                            name: data?.documents?.[0]?.url?.split('/').pop(), // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -316,9 +320,10 @@ const SubUpdateClinic = () => {
             setConstantContact(contacts);
 
             // ✅ Set Addresses
-            setAddresses(
+            setUpdatePracticeAddresses(
                 subClinicsDetailsGet?.address?.map((addr) => ({
                     use: addr.use || '',
+                    type: addr.type || '',
                     line: addr.line && Array.isArray(addr.line) ? addr.line : [''], // Ensure array
                     city: addr.city || '',
                     state: addr.state || '',
@@ -326,7 +331,6 @@ const SubUpdateClinic = () => {
                     country: addr.country || '',
                 })) || [{ use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]
             );
-
             // ✅ Set POCs (Point of Contacts)
             setPocs(
                 subClinicsDetailsGet?.poc?.map((pocs) => ({
@@ -362,7 +366,7 @@ const SubUpdateClinic = () => {
                 ]
             );
         }
-    }, [subClinicsDetailsGet, setValue]);
+    }, [subClinicsDetailsGet, setValue, clinectypes]);
 
     const handleAddAccreditation = () => {
         const isIncomplete = accreditationDetails.some(
@@ -449,7 +453,7 @@ const SubUpdateClinic = () => {
                 identifierType: item.type,
                 use: item.use,
                 value: item.number,
-                documents: [item?.file?.url],
+                ...(item?.file && { documents: { url: item.file.url, fileName: item.file.name || '' } }),
                 expirationDate: item.expiry,
                 status: 'active',
                 system: 'urn:oid:2.16.840.1.113883.4.7',
@@ -457,7 +461,7 @@ const SubUpdateClinic = () => {
                 issuingAuthority: item.issuingAuthority,
             })),
             telecom: constantContact,
-            address: addresses,
+            address: updatePracticeAddresses,
             poc: pocs,
             flag: 'subClinic',
             ...(posDetails && { pos: posDetails }),
@@ -633,6 +637,7 @@ const SubUpdateClinic = () => {
 
     const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
+
     const [constantContact, setConstantContact] = useState([]);
     const [name, setName] = useState({
         use: '',
@@ -943,11 +948,10 @@ const SubUpdateClinic = () => {
                                                     />
                                                     <span
                                                         style={{ right: '2%', top: '43%' }}
-                                                        className={`${
-                                                            subClinicsDetailsGet?.userId?.email
-                                                                ? 'text-success position-absolute fs-4'
-                                                                : 'd-none'
-                                                        }`}>
+                                                        className={`${subClinicsDetailsGet?.userId?.email
+                                                            ? 'text-success position-absolute fs-4'
+                                                            : 'd-none'
+                                                            }`}>
                                                         <MdVerified />
                                                     </span>
                                                     {errors.email && (
@@ -960,16 +964,15 @@ const SubUpdateClinic = () => {
                                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                                 <div
                                                     onClick={handleLogoClick}
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                        logoName || logoUploading
-                                                            ? 'form-control'
-                                                            : 'custom-form-fields'
-                                                    }`}>
+                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading
+                                                        ? 'form-control'
+                                                        : 'custom-form-fields'
+                                                        }`}>
                                                     {logoName
                                                         ? logoName.split('/').pop().slice(0, 30) + '...'
                                                         : logoUploading
-                                                          ? 'Uploading...'
-                                                          : 'Upload Logo'}
+                                                            ? 'Uploading...'
+                                                            : 'Upload Logo'}
                                                     <div className="d-flex align-items-center gap-2">
                                                         <FiEye
                                                             onClick={(e) => {
@@ -1078,8 +1081,8 @@ const SubUpdateClinic = () => {
                                                                         item.type === 'NPI' || item.type === 'CLIA'
                                                                             ? 10
                                                                             : item.type === 'NAIC'
-                                                                              ? 5
-                                                                              : undefined
+                                                                                ? 5
+                                                                                : undefined
                                                                     }
                                                                     {...register(`identifiers[${index}].number`, {
                                                                         // required: defaultIdentifiers.includes(item.type)
@@ -1142,37 +1145,36 @@ const SubUpdateClinic = () => {
                                                                             )
                                                                             .click()
                                                                     }
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                                        item.file
-                                                                            ? 'form-control'
-                                                                            : 'custom-form-fields'
-                                                                    }`}>
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${item.file
+                                                                        ? 'form-control'
+                                                                        : 'custom-form-fields'
+                                                                        }`}>
                                                                     {item.file?.name
                                                                         ? (() => {
-                                                                              const decodedName = decodeURIComponent(
-                                                                                  item.file.name
-                                                                              );
-                                                                              return decodedName.length > 30
-                                                                                  ? decodedName.slice(0, 25) + '...'
-                                                                                  : decodedName;
-                                                                          })()
+                                                                            const decodedName = decodeURIComponent(
+                                                                                item.file.name
+                                                                            );
+                                                                            return decodedName.length > 30
+                                                                                ? decodedName.slice(0, 25) + '...'
+                                                                                : decodedName;
+                                                                        })()
                                                                         : 'Upload Document'}
                                                                     <div className="d-flex align-items-center gap-2">
                                                                         {(item?.file?.url ||
                                                                             subClinicsDetailsGet?.orgLogo?.url) && (
-                                                                            <FiEye
-                                                                                className="cursor-pointer"
-                                                                                onClick={(e) => {
-                                                                                    e.preventDefault();
-                                                                                    e.stopPropagation();
-                                                                                    handleShowModal(
-                                                                                        item?.file?.url ||
+                                                                                <FiEye
+                                                                                    className="cursor-pointer"
+                                                                                    onClick={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        e.stopPropagation();
+                                                                                        handleShowModal(
+                                                                                            item?.file?.url ||
                                                                                             subClinicsDetailsGet
                                                                                                 ?.orgLogo?.url
-                                                                                    );
-                                                                                }}
-                                                                            />
-                                                                        )}
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            )}
                                                                         <p className="mb-0">
                                                                             <FiDownloadCloud />
                                                                         </p>
@@ -1407,230 +1409,10 @@ const SubUpdateClinic = () => {
                                                 </Col>
                                             </Row>
                                             <hr className="mb-1" />
-                                            <Row>
-                                                <Col sm={12}>
-                                                    <h5>
-                                                        Address Details
-                                                        <span
-                                                            className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                            onClick={addAddress}></span>
-                                                    </h5>
-                                                </Col>
-                                            </Row>
-                                            {addresses.map((item, index) => (
-                                                <Row key={index} className="mb-2">
-                                                    <Col sm={4} className="mb-2">
-                                                        <Form.Label className="mb-1">Use</Form.Label>
-                                                        <Form.Select
-                                                            value={item.use}
-                                                            className="text-capitalize"
-                                                            data-has-value={!!watch(`address[${index}].use`)}
-                                                            {...register(`address[${index}].use`)}
-                                                            onChange={(e) =>
-                                                                handleAddressChange(index, 'use', e.target.value)
-                                                            }>
-                                                            <option value="">Select</option>
-                                                            {addressUses.map((use) => (
-                                                                <option
-                                                                    key={use}
-                                                                    className="text-capitalize"
-                                                                    value={use}>
-                                                                    {use}
-                                                                </option>
-                                                            ))}
-                                                        </Form.Select>
-                                                    </Col>
-                                                    <Col sm={4} className="mb-2 position-relative">
-                                                        <Form.Label className="mb-1">Address</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            placeholder="Street Address"
-                                                            value={item.line[0]}
-                                                            onChange={(e) => {
-                                                                handleAddressChange(index, 'line', e.target.value);
-                                                                // Set active index so suggestions appear for this address
-                                                                setActiveAddressIndex(index);
-                                                                setAddressFocused(true);
-                                                                // Call your geolocation API with the current input value
-                                                                getGeolocation(e)?.then((data) => {
-                                                                    // Expecting your getGeolocation to return an object with results
-                                                                    if (data && data.results) {
-                                                                        setSearchedLocations(data.results);
-                                                                    }
-                                                                });
-                                                            }}
-                                                            onFocus={() => {
-                                                                setActiveAddressIndex(index);
-                                                                setAddressFocused(true);
-                                                            }}
-                                                            onBlur={() => {
-                                                                setTimeout(() => setAddressFocused(false), 200);
-                                                            }}
-                                                        />
-                                                        {activeAddressIndex === index &&
-                                                            addressFocused &&
-                                                            searchedLocations?.length > 0 && (
-                                                                <div
-                                                                    style={{
-                                                                        position: 'absolute',
-                                                                        top: '100%',
-                                                                        left: 0,
-                                                                        width: '100%',
-                                                                        maxHeight: '150px',
-                                                                        overflowY: 'auto',
-                                                                        zIndex: 111,
-                                                                        backgroundColor: '#fff',
-                                                                        border: '1px solid #ced4da',
-                                                                        borderTop: 'none',
-                                                                    }}>
-                                                                    {searchedLocations.map((data, suggestionIndex) => (
-                                                                        <p
-                                                                            key={suggestionIndex}
-                                                                            onMouseEnter={() =>
-                                                                                setActiveSuggestionIndex(
-                                                                                    suggestionIndex
-                                                                                )
-                                                                            }
-                                                                            onClick={() => {
-                                                                                // Extract the necessary fields from the API response
-                                                                                const formatted = data.formatted || '';
-                                                                                const components =
-                                                                                    data.components || {};
-                                                                                // Build the new address object with auto-populated fields
-                                                                                const newAddress = {
-                                                                                    use: item.use, // preserve existing use
-                                                                                    line: [
-                                                                                        components.road || formatted,
-                                                                                    ],
-                                                                                    city:
-                                                                                        components.city ||
-                                                                                        components.town ||
-                                                                                        components.village ||
-                                                                                        '',
-                                                                                    state:
-                                                                                        components.state ||
-                                                                                        components.state_code ||
-                                                                                        '',
-                                                                                    postalCode:
-                                                                                        data?.components.postcode ||
-                                                                                        item.postalCode ||
-                                                                                        '', // Auto-fill or keep user input
-                                                                                    country: components.country || '',
-                                                                                };
-                                                                                // Update the specific address entry
-                                                                                const updatedAddresses = [...addresses];
-                                                                                updatedAddresses[index] = newAddress;
-                                                                                setAddresses(updatedAddresses);
-                                                                                // Clear suggestions and remove focus
-                                                                                setSearchedLocations([]);
-                                                                                setAddressFocused(false);
-                                                                            }}
-                                                                            style={{
-                                                                                margin: 0,
-                                                                                padding: '8px 12px',
-                                                                                cursor: 'pointer',
-                                                                                backgroundColor:
-                                                                                    suggestionIndex ===
-                                                                                    activeSuggestionIndex
-                                                                                        ? '#f0f0f0'
-                                                                                        : '#fff',
-                                                                            }}
-                                                                            className="hover-bg-change text-black">
-                                                                            {data.formatted}
-                                                                        </p>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                    </Col>
-                                                    <Col sm={4} className="mb-2">
-                                                        <Form.Label className="mb-1">State</Form.Label>
-                                                        <Form.Select
-                                                            {...register(`address[${index}].state`)}
-                                                            data-has-value={!!getValues(`address[${index}].state`)}
-                                                            onChange={handleStateSelection}>
-                                                            <option value="">Select State</option>
-                                                            {statesData?.states?.map((data) => (
-                                                                <option
-                                                                    key={data?.name}
-                                                                    data-key={data?.id}
-                                                                    value={data?.state_code}>
-                                                                    {data?.name}
-                                                                </option>
-                                                            ))}
-                                                        </Form.Select>
-                                                    </Col>
-                                                    <Col sm={4} className="mb-2">
-                                                        <Form.Label className="mb-1">City</Form.Label>
-                                                        <Form.Select
-                                                            data-has-value={!!getValues(`address[${index}].city`)}
-                                                            {...register(`address[${index}].city`)}
-                                                            disabled={
-                                                                !selectedState || store?.getCitiesReducer?.loading
-                                                            }>
-                                                            <option value="">
-                                                                {store?.getCitiesReducer?.loading
-                                                                    ? 'Loading...'
-                                                                    : 'Select City'}
-                                                            </option>
-                                                            {cities?.map((data) => (
-                                                                <option key={data?.name} value={data?._id}>
-                                                                    {data?.name}
-                                                                </option>
-                                                            ))}
-                                                        </Form.Select>
-                                                    </Col>
-                                                    <Col sm={4}>
-                                                        <Form.Group className="mb-2">
-                                                            <Form.Label className="mb-1">Postal Code</Form.Label>
-                                                            <Form.Control
-                                                                type="text"
-                                                                placeholder="Postal Code"
-                                                                {...register(`postalCode`, {
-                                                                    minLength: {
-                                                                        value: 5,
-                                                                        message:
-                                                                            'Postal code must be at least 5 characters long',
-                                                                    },
-                                                                    pattern: {
-                                                                        value: /^[0-9]+$/,
-                                                                        message:
-                                                                            'Postal code must contain numbers only',
-                                                                    },
-                                                                })}
-                                                                maxLength={5}
-                                                                onKeyPress={handleFirstSpace}
-                                                            />
-                                                            {errors.postalCode && (
-                                                                <span className="text-danger">
-                                                                    {errors.postalCode.message}
-                                                                </span>
-                                                            )}
-                                                        </Form.Group>
-                                                    </Col>
-
-                                                    <Col sm={4} className="position-relative">
-                                                        <Form.Label className="mb-1">Country</Form.Label>
-
-                                                        <Form.Control
-                                                            type="text"
-                                                            placeholder="Country"
-                                                            value={item.country}
-                                                            onChange={(e) =>
-                                                                handleAddressChange(index, 'country', e.target.value)
-                                                            }
-                                                        />
-                                                        {addresses.length > 1 && index !== 0 && (
-                                                            <span
-                                                                className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                                style={{ right: '-2%', top: '50%' }}
-                                                                onClick={() => removeAddress(index)}>
-                                                                <CiCircleMinus />
-                                                            </span>
-                                                        )}
-                                                    </Col>
-                                                </Row>
-                                            ))}
-
+                                            <AddressForm
+                                                addresses={updatePracticeAddresses}
+                                                setAddresses={setUpdatePracticeAddresses}
+                                            />
                                             <hr className="mb-1" />
                                             {pocs.map((poc, pocIndex) => (
                                                 <div key={pocIndex} className="p-2">

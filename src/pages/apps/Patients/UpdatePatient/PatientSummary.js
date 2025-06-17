@@ -491,7 +491,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                             <span className="fw-bold fs-6">Social History</span>
                         </div>
                         <div>
-                            <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
+                            {/* <MdAddCircleOutline className="text-primary me-2 cursor-pointer" /> */}
                             <MdOutlinePrint className="text-secondary cursor-pointer" />
                         </div>
                     </Card.Header>
@@ -540,7 +540,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                             <span className="fw-bold fs-6">Recent Encounters</span>
                         </div>
                         <div>
-                            <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
+                            {/* <MdAddCircleOutline className="text-primary me-2 cursor-pointer" /> */}
                             <MdOutlinePrint className="text-secondary cursor-pointer" />
                         </div>
                     </Card.Header>

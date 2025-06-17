@@ -116,7 +116,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         }
     }, [patientDetails]);
     return (
-        <>
+        <div >
             <Row>
                 <Col sm={12}>
                     <h5>
@@ -235,7 +235,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                         </Form.Select>
                     </Col>
 
-                    <Col>
+                    <Col className={`position-relative ${identifiers?.length > 1 ? 'pe-4' : ''}`}>
                         <Form.Control
                             type="date"
                             value={item?.expiry ? new Date(item.expiry).toISOString().split('T')[0] : ''}
@@ -245,7 +245,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                         {index >= defaultIdentifiers?.length && (
                             <span
                                 className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                                style={{ marginTop: '-29px', right: '9px' }}
+                                style={{ marginTop: '-29px', right: '12px' }}
                                 onClick={() => removeIdentifier(index)}>
                                 <CiCircleMinus />
                             </span>
@@ -253,7 +253,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     </Col>
                 </Row>
             ))}
-        </>
+        </div>
     );
 };
 

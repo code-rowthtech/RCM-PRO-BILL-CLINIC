@@ -117,7 +117,10 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                             <p className="text-muted">
                                                 Create your first encounter to get started
                                             </p>
-                                            <Button className='custom-buttons' onClick={() => setCreateEncounter(true)}>
+                                            <Button className='custom-buttons' onClick={() => {
+                                                setCreateEncounter(true);
+                                                setExpanded(true);
+                                            }}>
                                                 Create New Encounter
                                             </Button>
                                         </div>

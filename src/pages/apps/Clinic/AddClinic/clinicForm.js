@@ -36,6 +36,7 @@ import { getDoctorsAction, getSubClinicAction } from '../../../../redux/actions'
 import { FormInput } from '../../../../components';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
 import { components } from 'react-select';
+import AddressForm from '../../Common Pages/AddressForm';
 
 const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const {
@@ -94,7 +95,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
-
+ const [practiceAddresses, setPracticeAddresses] = useState([
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+    ]);
     const handleStateSelection = (e, addressType, index) => {
         const selectedOption = e.target.selectedOptions[0];
         const stateId = selectedOption.getAttribute('data-key');
@@ -139,9 +142,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                              url: data?.documents?.[0]?.url, // Store URL
-                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                          }
+                            url: data?.documents?.[0]?.url, // Store URL
+                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -189,7 +192,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 postalCode: addr.postalCode || '',
                 country: addr.country || 'US',
             })) || [{ type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }];
-            setAddresses(newAddresses);
+            setPracticeAddresses(newAddresses);
             if (statesData?.states) {
                 newAddresses.forEach((address) => {
                     const state = statesData.states.find((s) => s.name === address.state);
@@ -267,7 +270,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 ]
             );
         }
-    }, [clinicsDataGet, setValue]);
+    }, [clinicsDataGet, setValue,statesData,clinectypes]);
 
     const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
@@ -305,7 +308,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 issuingAuthority: item.issuingAuthority,
             })),
             telecom: constantContact,
-            address: addresses,
+            address: practiceAddresses,
             poc: pocs,
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
@@ -741,11 +744,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     />
                                     <span
                                         style={{ right: '2%', top: '43%' }}
-                                        className={`${
-                                            clinicsDataGet?.userId?.verified_email
+                                        className={`${clinicsDataGet?.userId?.verified_email
                                                 ? 'text-success position-absolute fs-4'
                                                 : 'd-none'
-                                        }`}>
+                                            }`}>
                                         <MdVerified />
                                     </span>
 
@@ -757,14 +759,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                 <div
                                     onClick={handleLogoClick}
-                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                        logoName || logoUploading ? 'form-control' : 'custom-form-fields'
-                                    }`}>
+                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading ? 'form-control' : 'custom-form-fields'
+                                        }`}>
                                     {logoName
                                         ? logoName.split('/').pop().slice(0, 30) + '...'
                                         : logoUploading
-                                          ? 'Uploading...'
-                                          : 'Upload Logo'}
+                                            ? 'Uploading...'
+                                            : 'Upload Logo'}
                                     <div className="d-flex align-items-center gap-2">
                                         <FiEye
                                             onClick={(e) => {
@@ -874,24 +875,24 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         item.type === 'NPI' || item.type === 'CLIA'
                                                             ? 10
                                                             : item.type === 'NAIC'
-                                                              ? 10
-                                                              : item.type === 'Medicare'
-                                                                ? 11
-                                                                : item.type === 'Medicaid'
-                                                                  ? 12
-                                                                  : item.type === 'State License'
-                                                                    ? 15
-                                                                    : item.type === 'Accreditation'
-                                                                      ? 10
-                                                                      : item.type === 'CCN'
-                                                                        ? 6
-                                                                        : item.type === 'Taxonomy Code'
-                                                                          ? 10
-                                                                          : item.type === 'DUNS'
-                                                                            ? 9
-                                                                            : item.type === 'Facility ID'
-                                                                              ? 12
-                                                                              : 20
+                                                                ? 10
+                                                                : item.type === 'Medicare'
+                                                                    ? 11
+                                                                    : item.type === 'Medicaid'
+                                                                        ? 12
+                                                                        : item.type === 'State License'
+                                                                            ? 15
+                                                                            : item.type === 'Accreditation'
+                                                                                ? 10
+                                                                                : item.type === 'CCN'
+                                                                                    ? 6
+                                                                                    : item.type === 'Taxonomy Code'
+                                                                                        ? 10
+                                                                                        : item.type === 'DUNS'
+                                                                                            ? 9
+                                                                                            : item.type === 'Facility ID'
+                                                                                                ? 12
+                                                                                                : 20
                                                     }
                                                     {...register(`identifiers[${index}].number`, {
                                                         // required: defaultIdentifiers.includes(item.type)
@@ -987,9 +988,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     onClick={() =>
                                                         document.getElementById(`fileInput-identifier-${index}`).click()
                                                     }
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                        item.file ? 'form-control' : 'custom-form-fields'
-                                                    }`}>
+                                                    className={`custom-file-upload justify-content-between cursor-pointer ${item.file ? 'form-control' : 'custom-form-fields'
+                                                        }`}>
                                                     {item.file?.name
                                                         ? item.file.name.length > 30
                                                             ? item.file.name.slice(0, 25) + '...'
@@ -1184,7 +1184,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </Col>
                             </Row>
                             <hr className="mb-1" />
-                            <Row>
+                            {/* <Row>
                                 <Col sm={12}>
                                     <h5>
                                         Address Details
@@ -1392,8 +1392,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     item?.type === 'physical'
                                                         ? cities1
                                                         : item?.type === 'postal'
-                                                          ? cities2
-                                                          : cities3;
+                                                            ? cities2
+                                                            : cities3;
 
                                                 return cities?.map((data) => (
                                                     <option key={data?._id} value={data?.name}>
@@ -1442,7 +1442,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         </Form.Group>
                                     </Col>
                                 </Row>
-                            ))}
+                            ))} */}
+                            <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses}/>
                             <hr className="mb-1" />
                             <Row>
                                 <Col sm={12}>
