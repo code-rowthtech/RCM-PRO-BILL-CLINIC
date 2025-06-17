@@ -451,13 +451,10 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         </Form.Group>
                     </Col>
                     {addresses.length > 1 && index !== 0 && (
-
-
                         <CiCircleMinus
-                            style={{ top: '75%', right: '-0.5%' }}
+                            style={{ top: '80%', right: '49%' }}
                             onClick={() => removeAddress(index)}
                             className="text-danger px-0 cursor-pointer position-absolute w-auto fs-5 " />
-
                     )}
                 </Row>
             ))}
