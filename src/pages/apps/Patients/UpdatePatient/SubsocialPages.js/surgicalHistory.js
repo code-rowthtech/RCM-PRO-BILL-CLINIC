@@ -349,6 +349,7 @@ const SurgicalHistory = () => {
                             <Button
                                 type="submit"
                                 variant="primary"
+                                style={{width:'100px'}}
                                 disabled={
                                     store?.createSurgicalHistoryReducer?.loading ||
                                     store?.updateSurgicalHistoryReducer?.loading
@@ -356,7 +357,7 @@ const SurgicalHistory = () => {
                                 className="px-2 py-1 custom-buttons">
                                 {store?.createSurgicalHistoryReducer?.loading ||
                                     store?.updateSurgicalHistoryReducer?.loading ? (
-                                    <Spinner animation="border" size="sm" className="text-white" />
+                                    <Spinner/>
                                 ) : toEdit ? (
                                     'Update'
                                 ) : (
@@ -364,6 +365,7 @@ const SurgicalHistory = () => {
                                 )}
                             </Button>
                         </div>
+                   
                     </Form>
                 </Card.Body>
             </Col>
