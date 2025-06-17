@@ -32,7 +32,6 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
     ]);
     const [submissionType, setSubmissionType] = useState(null);
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log({patientDetails})
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
 
     const primaryState = watch('primaryStateName');
@@ -199,11 +198,6 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                                     placeholder="(XXX)XXX-XXXX"
                                 />
                             </InputGroup>
-                            {/* <div
-                            className="position-absolute"
-                            style={{ top: '54%', left: '1%', transform: 'translateY(-16%)' }}>
-                            <img src={us} alt="country code flag" width={20} />
-                        </div> */}
                             {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
                         </Form.Group>
                     </Col>
@@ -212,21 +206,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                 <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
             </div>
             <div className="d-flex gap-2 align-items-end justify-content-end my-1">
-                {/* <Button className="cancel-button" onClick={() => reset()}>
-                    Clear
-                </Button>
                 <Button
-                    onClick={() => {
-                        setSubmissionType('saveAndReset');
-                    }}
-                    className="custom-buttons"
-                    type="submit">
-                    Save & Add Another
-                </Button> */}
-                <Button
-                    // onClick={() => {
-                    //     setSubmissionType('saveAndNext');
-                    // }}
                     disabled={store?.addReferringDoctorReducer?.loading}
                     className="custom-buttons"
                     style={{ width: '200px' }}
