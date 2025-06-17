@@ -47,10 +47,7 @@ const PatientDocs = ({ isAccordionOpen }) => {
 
     useEffect(() => {
         if (updateDocumentsResponse?.data?.status === 200 || deleteDocumentsResponse?.data?.status === 200) {
-            if (subjectId !== lastFetchedSubjectId.current) {
-                dispatch(getDocumentsAction({ subject: subjectId }));
-                lastFetchedSubjectId.current = subjectId;
-            }
+            dispatch(getDocumentsAction({ subject: subjectId }));
             closeDeleteModal();
         }
     }, [updateDocumentsResponse, deleteDocumentsResponse, subjectId]);
