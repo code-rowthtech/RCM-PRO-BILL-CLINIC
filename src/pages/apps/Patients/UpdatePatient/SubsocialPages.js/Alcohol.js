@@ -14,7 +14,7 @@ import Spinner from '../../../../../constants/Spinner';
 import ToastHandle from '../../../../../helpers/ToastMessage';
 import useQuillWordLimit from '../../../../../helpers/quillWordLimit';
 
-const MAX_WORDS = 10;
+const MAX_WORDS = 1000;
 const WAX_WORD_LENGTH = 45;
 const Alcohol = () => {
     const dispatch = useDispatch();
@@ -166,9 +166,9 @@ const Alcohol = () => {
     return (
         <Row className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: "100%" }}>
             {/* Left Side - Form */}
-            <Col md={6} className="d-flex border-end flex-column pt-0 mt-0 pe-1 ">
+            <Col md={6} className="d-flex border-end px-0 flex-column pt-0 mt-0 pe-1 ">
                 <div className="h-100 mt-1  ">
-                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
+                    <Card.Body className="d-flex flex-column pt-0 px-0 pb-2 mt-0">
                         {/* <Card.Title className="border-bottom pb-2 pt-0 mb-1">
                             <h5 className="fw-semibold mb-0">Add Alcohol History</h5>
                         </Card.Title> */}

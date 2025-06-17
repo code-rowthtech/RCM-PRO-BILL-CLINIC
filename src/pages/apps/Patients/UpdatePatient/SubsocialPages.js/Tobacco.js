@@ -36,7 +36,7 @@ const Tobacco = () => {
     const deleteSuccess = store?.deleteTobaccooReducer?.data?.status;
     const updateSuccess = store?.updateTobaccooReducer;
     const quillRef = useRef(null);
-    const MAX_WORDS = 10;
+    const MAX_WORDS = 1000;
     const MAX_WORD_LENGTH = 45;
 
     // useEffect(() => {

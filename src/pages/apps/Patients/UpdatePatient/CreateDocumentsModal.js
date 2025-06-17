@@ -40,7 +40,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
     const [error, setError] = useState(null);
     const [loadingUpload, setLoadingUpload] = useState(false);
     const quillRef = useRef(null);
-    const MAX_LENGTH = 10000;
+    const MAX_LENGTH = 1000;
     useEffect(() => {
         if (quillRef) {
             const editor = quillRef?.current?.getEditor();

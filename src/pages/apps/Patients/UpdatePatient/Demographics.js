@@ -10,6 +10,7 @@ import {
     getCities2Action,
     getCities3Action,
     updatePatientsAction,
+    getCities4Action,
 } from '../../../../redux/actions';
 import us from '../../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -54,21 +55,15 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
     const [mailingFocused, setMailingFocused] = useState(false);
     const [employerFocused, setEmployerFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState(null);
-    const [primaryCitySearch, setPrimaryCitySearch] = useState(null);
-    const [mailingCitySearch, setMailingCitySearch] = useState(null);
-    const [employerCitySearch, setEmployerCitySearch] = useState(null);
-    const [searchedMailingLocations, setSearchedMailingLocations] = useState(null);
+    const [employerCitySearch, setEmployerCitySearch] = useState('');
     const [searchedEmployerLocations, setSearchedEmployerLocations] = useState(null);
     const [sameAsPrimary, setSameAsPrimary] = useState(false);
     const [identifiers, setIdentifiers] = useState([]);
 
     const statesData = store?.getStatesReducer?.data;
-    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-    const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    const primaryState = watch('primaryStateName');
-    const mailingState = watch('mailingStateName');
+    const cities4 = store?.getCitiesReducer?.cities4?.data?.cities;
     const employerState = watch('employerStateName');
+
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const [demographicAddresses, setDemographicAddresses] = useState([
         { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
@@ -89,16 +84,22 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (employerState) {
+        if (employerState && statesData?.states) {
             const stateCity = statesData?.states?.find((data) => data?.state_code === employerState)?.id;
-            dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
+            dispatch(getCities4Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
         }
-    }, [employerState]);
+    }, [employerState, statesData]);
+
+    useEffect(() => {
+        setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city);
+    }, [cities4])
+
     useEffect(() => {
         if (employerCitySearch) {
             setValue('employerCity', employerCitySearch);
         }
-    }, [employerCitySearch, cities3]);
+    }, [employerCitySearch, cities4]);
+
     useEffect(() => {
         if (patientDetails && id) {
             setValue('race', patientDetails?.race?.[0]?.display || '');
@@ -132,6 +133,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
             // ✅ Employer Address Fix
             setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city || '');
+            setEmployerCitySearch(patientDetails?.employerDetails?.workLocation?.address?.city)
             setValue('employerStateName', patientDetails?.employerDetails?.workLocation?.address?.state || '');
             setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
             setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
@@ -343,7 +345,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 occupation: data?.occupation,
                 workLocation: {
                     address: {
-                        line: [data?.employerAddress],
+                        line: data?.employerAddress,
                         city: data?.employerCity,
                         state: data?.employerStateName,
                         postalCode: data?.employerZip,
@@ -952,7 +954,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                 <option hidden value="">
                                                     {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
                                                 </option>
-                                                {cities3?.map((data) => (
+                                                {cities4?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}
                                                     </option>
@@ -990,19 +992,6 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                             )}
                                         </Form.Group>
                                     </Col>
-                                    {/* <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">Time Zone</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('employerTimeZone')}
-                                                placeholder="Time Zone"
-                                            />
-                                            {errors.employerTimeZone && (
-                                                <span className="text-danger">{errors.employerTimeZone.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col> */}
                                 </Row>
                             </Col>
                         </Row>

@@ -139,9 +139,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                              url: data?.documents?.[0]?.url, // Store URL
-                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                          }
+                            url: data?.documents?.[0]?.url, // Store URL
+                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -741,11 +741,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     />
                                     <span
                                         style={{ right: '2%', top: '43%' }}
-                                        className={`${
-                                            clinicsDataGet?.userId?.verified_email
+                                        className={`${clinicsDataGet?.userId?.verified_email
                                                 ? 'text-success position-absolute fs-4'
                                                 : 'd-none'
-                                        }`}>
+                                            }`}>
                                         <MdVerified />
                                     </span>
 
@@ -757,14 +756,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                 <div
                                     onClick={handleLogoClick}
-                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                        logoName || logoUploading ? 'form-control' : 'custom-form-fields'
-                                    }`}>
+                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading ? 'form-control' : 'custom-form-fields'
+                                        }`}>
                                     {logoName
                                         ? logoName.split('/').pop().slice(0, 30) + '...'
                                         : logoUploading
-                                          ? 'Uploading...'
-                                          : 'Upload Logo'}
+                                            ? 'Uploading...'
+                                            : 'Upload Logo'}
                                     <div className="d-flex align-items-center gap-2">
                                         <FiEye
                                             onClick={(e) => {
@@ -874,24 +872,24 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         item.type === 'NPI' || item.type === 'CLIA'
                                                             ? 10
                                                             : item.type === 'NAIC'
-                                                              ? 10
-                                                              : item.type === 'Medicare'
-                                                                ? 11
-                                                                : item.type === 'Medicaid'
-                                                                  ? 12
-                                                                  : item.type === 'State License'
-                                                                    ? 15
-                                                                    : item.type === 'Accreditation'
-                                                                      ? 10
-                                                                      : item.type === 'CCN'
-                                                                        ? 6
-                                                                        : item.type === 'Taxonomy Code'
-                                                                          ? 10
-                                                                          : item.type === 'DUNS'
-                                                                            ? 9
-                                                                            : item.type === 'Facility ID'
-                                                                              ? 12
-                                                                              : 20
+                                                                ? 10
+                                                                : item.type === 'Medicare'
+                                                                    ? 11
+                                                                    : item.type === 'Medicaid'
+                                                                        ? 12
+                                                                        : item.type === 'State License'
+                                                                            ? 15
+                                                                            : item.type === 'Accreditation'
+                                                                                ? 10
+                                                                                : item.type === 'CCN'
+                                                                                    ? 6
+                                                                                    : item.type === 'Taxonomy Code'
+                                                                                        ? 10
+                                                                                        : item.type === 'DUNS'
+                                                                                            ? 9
+                                                                                            : item.type === 'Facility ID'
+                                                                                                ? 12
+                                                                                                : 20
                                                     }
                                                     {...register(`identifiers[${index}].number`, {
                                                         // required: defaultIdentifiers.includes(item.type)
@@ -987,9 +985,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     onClick={() =>
                                                         document.getElementById(`fileInput-identifier-${index}`).click()
                                                     }
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                        item.file ? 'form-control' : 'custom-form-fields'
-                                                    }`}>
+                                                    className={`custom-file-upload justify-content-between cursor-pointer ${item.file ? 'form-control' : 'custom-form-fields'
+                                                        }`}>
                                                     {item.file?.name
                                                         ? item.file.name.length > 30
                                                             ? item.file.name.slice(0, 25) + '...'
@@ -1392,8 +1389,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     item?.type === 'physical'
                                                         ? cities1
                                                         : item?.type === 'postal'
-                                                          ? cities2
-                                                          : cities3;
+                                                            ? cities2
+                                                            : cities3;
 
                                                 return cities?.map((data) => (
                                                     <option key={data?._id} value={data?.name}>
