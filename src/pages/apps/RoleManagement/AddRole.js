@@ -14,6 +14,7 @@ import { useSearchParams } from 'react-router-dom';
 import { updateRolesReducer } from '../../../redux/roles/reducers';
 
 const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => {
+    console.log({dataToEdit})
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -569,7 +570,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                 Cancel
                             </Button>
 
-                            {dataToEdit ? (
+                            {dataToEdit?._id ? (
                                 <Button
                                     type="submit"
                                     variant="primary"
