@@ -1,24 +1,21 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
-    Button, Card, Table, Modal, Row, Col,
-    Form
+    Button, Card, Table, Modal, Row, Col, Form
 } from 'react-bootstrap';
 import {
-    FiPlus as PlusIcon,
-    FiFileText
+    FiPlus as PlusIcon, FiFileText
 } from 'react-icons/fi';
-
 import {
-    BsFileEarmarkPdf,
-    BsFileWord,
-    BsFileImage,
-    BsFileEarmark
+    BsFileEarmarkPdf, BsFileWord, BsFileImage, BsFileEarmark
 } from 'react-icons/bs';
 import AsyncSelect from 'react-select/async';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
-import { deletePatientDocumentsAction, getDocumentByIdAction, getDocumentsAction, getEncounterAction, updatePatientDocumentsAction, uploadPatientDocumentsAction } from '../../../../redux/actions';
+import {
+    deletePatientDocumentsAction, getDocumentByIdAction, getDocumentsAction,
+    getEncounterAction, updatePatientDocumentsAction, uploadPatientDocumentsAction
+} from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import PreviewModal from './PreviewModal';
@@ -39,12 +36,21 @@ const PatientDocs = ({ isAccordionOpen }) => {
     const deleteDocumentsResponse = store?.deleteDocumentsReducer;
     const patientDocuments = store?.getDocumentsReducer?.data?.patientDocuments || [];
     const updateDocumentsResponse = store?.updateDocumentsReducer;
+    const lastFetchedSubjectId = useRef(null);
+
+    useEffect(() => {
+        if (subjectId && subjectId !== lastFetchedSubjectId.current) {
+            dispatch(getDocumentsAction({ subject: subjectId }));
+            lastFetchedSubjectId.current = subjectId;
+        }
+    }, [dispatch, subjectId]);
+
     useEffect(() => {
         if (updateDocumentsResponse?.data?.status === 200 || deleteDocumentsResponse?.data?.status === 200) {
             dispatch(getDocumentsAction({ subject: subjectId }));
             closeDeleteModal();
         }
-    }, [updateDocumentsResponse, deleteDocumentsResponse]);
+    }, [updateDocumentsResponse, deleteDocumentsResponse, subjectId]);
 
     const [previewLink, setPreviewLink] = useState(null);
     const [previewModal, setPreviewModal] = useState(false);
@@ -54,12 +60,14 @@ const PatientDocs = ({ isAccordionOpen }) => {
     const [expandedDoc, setExpandedDoc] = useState(null);
     const [isExpandedView, setIsExpandedView] = useState(false);
     const documentById = store?.getDocumentsByIdReducer?.data;
-    const [notes, setNotes] = useState()
+    const [notes, setNotes] = useState();
+
     useEffect(() => {
         if (documentById) {
-            setNotes(documentById?.notes)
+            setNotes(prev => prev !== documentById?.notes ? documentById?.notes : prev);
         }
-    }, [documentById])
+    }, [documentById]);
+
     // DOCUMENT TYPE HANDLING
     const [documentTypesMap, setDocumentTypesMap] = useState({});
     const formattedDocumentTypes = useMemo(() =>
@@ -73,13 +81,12 @@ const PatientDocs = ({ isAccordionOpen }) => {
             callback(formattedDocumentTypes.slice(0, 10));
             return;
         }
-
         const filteredOptions = formattedDocumentTypes.filter((option) =>
             option?.label?.toLowerCase()?.includes(inputValue?.toLowerCase())
         );
-
         callback(filteredOptions.slice(0, 20));
     }, [formattedDocumentTypes]);
+
     const handleDocumentTypeChange = useCallback((docId, selectedOption) => {
         const documentTypePayload = {
             coding: [{
@@ -91,12 +98,16 @@ const PatientDocs = ({ isAccordionOpen }) => {
         };
         dispatch(updatePatientDocumentsAction({ key: encryptMessage({ type: documentTypePayload }), patientDocId: docId }));
     }, []);
+
     useEffect(() => {
-        const initialTypes = {};
+        const newTypes = {};
         patientDocuments?.forEach(doc => {
-            initialTypes[doc._id] = doc?.type?.text || null;
+            newTypes[doc._id] = doc?.type?.text || null;
         });
-        setDocumentTypesMap(initialTypes);
+        setDocumentTypesMap(prev => {
+            const isDifferent = Object.keys(newTypes).some(id => newTypes[id] !== prev[id]);
+            return isDifferent ? newTypes : prev;
+        });
     }, [patientDocuments]);
 
     useEffect(() => {
@@ -114,18 +125,17 @@ const PatientDocs = ({ isAccordionOpen }) => {
     const closePreviewModal = () => {
         setPreviewModal(false);
         setPreviewLink(null);
-    }
+    };
 
     useEffect(() => {
         if (uploadDocumentsResponse?.data?.status === 201) {
             setShowUploadModal(false);
+            // if (subjectId !== lastFetchedSubjectId.current) {
             dispatch(getDocumentsAction({ subject: subjectId }));
+            // lastFetchedSubjectId.current = subjectId;
+            // }
         }
-    }, [uploadDocumentsResponse])
-
-    useEffect(() => {
-        dispatch(getDocumentsAction({ subject: subjectId }))
-    }, [dispatch])
+    }, [uploadDocumentsResponse, subjectId]);
 
     const formatFileSize = (bytes) => {
         const sizes = ['B', 'KB', 'MB', 'GB'];
@@ -134,11 +144,9 @@ const PatientDocs = ({ isAccordionOpen }) => {
         return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
     };
 
-    {/* Helper functions */ }
     function getFileIcon(contentType, fileName) {
         const extension = fileName?.split('.').pop().toLowerCase();
         const size = 24;
-
         if (contentType === 'application/pdf' || extension === 'pdf') {
             return <BsFileEarmarkPdf size={size} color="red" />;
         }
@@ -154,10 +162,11 @@ const PatientDocs = ({ isAccordionOpen }) => {
     const closeDocumentModal = () => {
         setDocumentData(null);
         setShowUploadModal(false);
-    }
+    };
+
     const handleDeleteAttachment = (document, attachmentId) => () => {
         const content = document?.content
-            ?.filter(doc => doc._id !== attachmentId) // Remove the matching attachment
+            ?.filter(doc => doc._id !== attachmentId)
             ?.map(doc => ({
                 attachment: {
                     contentType: doc?.attachment?.contentType,
@@ -179,13 +188,14 @@ const PatientDocs = ({ isAccordionOpen }) => {
         setDocToDelete(null);
         setCollectionId(null);
         setDeleteModal(false);
-    }
+    };
     const [docToDeleteId, setDocToDeleteId] = useState(null);
     const [docToDelete, setDocToDelete] = useState(null);
     const [collectionId, setCollectionId] = useState(null);
     const handleDeleteCollection = () => {
         dispatch(deletePatientDocumentsAction({ patientDocId: collectionId }));
-    }
+    };
+
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center">
@@ -208,9 +218,8 @@ const PatientDocs = ({ isAccordionOpen }) => {
                             </div>
                         </div>
                         :
-
                         patientDocuments?.map((doc) => (
-                            <div className="col-12  mb-2 p-0 position-relative" key={doc?._id}>
+                            <div className="col-12 mb-2 p-0 position-relative" key={doc?._id}>
                                 <div className='d-flex gap-1 align-items-center' style={{ position: 'absolute', left: '96%', top: '1%', zIndex: 111 }}>
                                     <i
                                         title='Expand'
@@ -218,7 +227,7 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                             setExpandedDoc(doc);
                                             setIsExpandedView(true);
                                         }}
-                                        className='mdi mdi-square-edit-outline fs-5 cursor-pointer '
+                                        className='mdi mdi-square-edit-outline fs-5 cursor-pointer'
                                     />
                                     <i
                                         title='Delete'
@@ -228,9 +237,7 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                         }}
                                         className='bi bi-trash text-danger fs-5 cursor-pointer'
                                     />
-
                                 </div>
-
                                 <Card className='p-1 mb-0 border' style={{ height: '32vh' }}>
                                     <Card.Body className='p-0'>
                                         <div className="row">
@@ -245,8 +252,7 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                             :
                                                             <div
                                                                 dangerouslySetInnerHTML={{
-                                                                    __html:
-                                                                        doc?.notes,
+                                                                    __html: doc?.notes,
                                                                 }}
                                                             />
                                                         }
@@ -254,13 +260,13 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                 </div>
                                             </div>
                                             <div className="col-5">
-                                                <div className="row g-1 mt-0 overflow-auto thin-scrollbar" style={{ height: '26.2vh' }} >
+                                                <div className="row g-1 mt-0 overflow-auto thin-scrollbar" style={{ height: '26.2vh' }}>
                                                     {doc?.content?.map((content, index) => (
-                                                        <div className="col-6" >
+                                                        <div className="col-6">
                                                             <div
                                                                 title={content?.attachment?.fileName}
                                                                 key={`${doc?._id}-${index}`}
-                                                                className="p-2 shadow-sm  rounded-1 cursor-pointer d-flex align-items-center justify-content-between"
+                                                                className="p-2 shadow-sm rounded-1 cursor-pointer d-flex align-items-center justify-content-between"
                                                                 style={{
                                                                     borderLeft: '4px solid rgba(97, 104, 208, 0.73)',
                                                                     borderTop: '1px solid rgba(0, 0, 0, 0.1)',
@@ -274,7 +280,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                                     <div className="flex-shrink-0">
                                                                         {getFileIcon(content?.attachment?.contentType, content?.attachment?.fileName)}
                                                                     </div>
-
                                                                     <div className="flex-grow-1" style={{ minWidth: 0 }}>
                                                                         <div className="text-truncate fw-medium">
                                                                             {content?.attachment?.fileName?.length > 35 ? content?.attachment?.fileName?.slice(0, 34) + '...' : content?.attachment?.fileName}
@@ -283,7 +288,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                                             {formatFileSize(content?.attachment?.size)}
                                                                         </div>
                                                                     </div>
-
                                                                     <div className="d-flex gap-1 flex-shrink-0">
                                                                         <i title='Preview' onClick={() => {
                                                                             setPreviewModal(true);
@@ -293,7 +297,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                                             setDocToDelete(doc);
                                                                             setDocToDeleteId(content?._id);
                                                                             setDeleteModal(true);
-                                                                            // handleDeleteAttachment(doc, content?._id)
                                                                         }} className='bi bi-trash text-danger fs-5 cursor-pointer' />
                                                                     </div>
                                                                 </div>
@@ -302,15 +305,11 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                     ))}
                                                 </div>
                                             </div>
-                                            {/* <div className="col-12 p-0 m-0 mt-1">
-                                            </div> */}
                                         </div>
                                     </Card.Body>
                                 </Card>
                             </div>
                         ))}
-
-                {/* Expanded view modal */}
                 {isExpandedView && expandedDoc && (
                     <div
                         style={{
@@ -336,7 +335,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
                             padding: '10px',
                             position: 'relative'
                         }}>
-                            {/* Close button */}
                             <button
                                 onClick={() => setIsExpandedView(false)}
                                 style={{
@@ -351,8 +349,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
                             >
                                 ×
                             </button>
-
-                            {/* Expanded content - you can reuse your card structure but make it larger */}
                             <div className='mt-1' style={{ padding: '10px' }}>
                                 {store?.getDocumentsByIdReducer?.loading ?
                                     <div className='row'>
@@ -373,7 +369,7 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                         readOnly
                                                     />
                                                 </div>
-                                                <div className="col-4 ">
+                                                <div className="col-4">
                                                     <Form.Label className='mb-0'>Category</Form.Label>
                                                     <Form.Select
                                                         onChange={(e) => {
@@ -395,7 +391,7 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                         ))}
                                                     </Form.Select>
                                                 </div>
-                                                <div className="col-4 ">
+                                                <div className="col-4">
                                                     <Form.Label className='mb-0'>Type</Form.Label>
                                                     <AsyncSelect
                                                         loadOptions={loadDocumentTypeOptions}
@@ -428,7 +424,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div className="col-12">
                                             <Form.Label className='mb-0'>Notes & Comments</Form.Label>
                                             <ReactQuill
@@ -448,14 +443,13 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                         </div>
                                         {notes !== documentById?.notes &&
                                             <div className="row mt-2 pe-0">
-                                                <div className="col-12 mt-4 pe-0 d-flex justify-content-end   ">
+                                                <div className="col-12 mt-4 pe-0 d-flex justify-content-end">
                                                     <Button disabled={store?.updateDocumentsReducer?.loading} onClick={() => {
                                                         dispatch(updatePatientDocumentsAction({ key: encryptMessage({ notes: notes }), patientDocId: documentById?._id }));
                                                     }} className='custom-buttons'>
                                                         {store?.updateDocumentsReducer?.loading ?
                                                             <Spinner className='spinner-border-sm' color='white' />
-                                                            :
-                                                            `Save`
+                                                            : `Save`
                                                         }
                                                     </Button>
                                                 </div>
@@ -463,11 +457,8 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                         }
                                     </div>
                                 }
-
                             </div>
-
                         </div>
-
                         <div className='position-absolute thin-scrollbar' style={{
                             backgroundColor: 'white',
                             borderRadius: '8px',
@@ -490,11 +481,11 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                         </div>
                                     </div>
                                     : documentById?.content?.map((content, index) => (
-                                        <div className="col-12 mb-1" >
+                                        <div className="col-12 mb-1">
                                             <div
                                                 title={content?.attachment?.fileName}
                                                 key={`${expandedDoc?._id}-${index}`}
-                                                className="p-2 shadow-sm  rounded-1 cursor-pointer d-flex align-items-center justify-content-between"
+                                                className="p-2 shadow-sm rounded-1 cursor-pointer d-flex align-items-center justify-content-between"
                                                 style={{
                                                     borderLeft: '4px solid rgba(97, 104, 208, 0.73)',
                                                     borderTop: '1px solid rgba(0, 0, 0, 0.1)',
@@ -508,7 +499,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                     <div className="flex-shrink-0">
                                                         {getFileIcon(content?.attachment?.contentType, content?.attachment?.fileName)}
                                                     </div>
-
                                                     <div className="flex-grow-1" style={{ minWidth: 0 }}>
                                                         <div className="text-truncate fw-medium">
                                                             {content?.attachment?.fileName?.length > 35 ? content?.attachment?.fileName?.slice(0, 34) + '...' : content?.attachment?.fileName}
@@ -517,7 +507,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                             {formatFileSize(content?.attachment?.size)}
                                                         </div>
                                                     </div>
-
                                                     <div className="d-flex gap-1 flex-shrink-0">
                                                         <i title='Preview' onClick={() => {
                                                             setPreviewModal(true);
@@ -532,10 +521,8 @@ const PatientDocs = ({ isAccordionOpen }) => {
                             </div>
                         </div>
                     </div>
-                )
-                }
+                )}
             </div>
-
             <CreateDocumentsModal documentData={documentData} showUploadModal={showUploadModal} closeModal={closeDocumentModal} />
             <PreviewModal show={previewModal} closePreviewModal={closePreviewModal} previewLink={previewLink} />
             <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={collectionId ? handleDeleteCollection : handleDeleteAttachment(docToDelete, docToDeleteId)} item={collectionId ? 'selected document collection' : 'selected attachment'} isLoading={store?.updateDocumentsReducer?.loading || store?.deleteDocumentsReducer?.loading} />
@@ -543,4 +530,4 @@ const PatientDocs = ({ isAccordionOpen }) => {
     );
 };
 
-export default PatientDocs;
+export default React.memo(PatientDocs);

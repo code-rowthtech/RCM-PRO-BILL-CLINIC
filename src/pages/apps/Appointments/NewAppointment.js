@@ -28,7 +28,9 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
         if (rescheduleResponse === 200) {
             dispatch(getAppointmentByIdAction({ id: id }));
             dispatch(resetUpdateActionAppiontment());
-            onCancel();
+            if (!id) {
+                onCancel();
+            }
         }
     }, [rescheduleResponse]);
 

@@ -22,7 +22,7 @@ import Spinner from '../../../../constants/Spinner';
 import ToastHandle from '../../../../helpers/ToastMessage';
 import useQuillWordLimit from '../../../../helpers/quillWordLimit';
 
-const MAX_WORDS = 10;
+const MAX_WORDS = 1000;
 const MAX_WORD_LENGTH = 45;
 export default function AddMedication({ show, onCancel, selectedMedication }) {
     const { register, handleSubmit, setValue, watch, control, getValues, reset, formState: { errors } } = useForm();

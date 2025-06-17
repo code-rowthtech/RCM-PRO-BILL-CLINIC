@@ -21,7 +21,7 @@ import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import ToastHandle from '../../../../helpers/ToastMessage';
 import useQuillWordLimit from '../../../../helpers/quillWordLimit';
 
-const MAX_WORDS = 10;
+const MAX_WORDS = 1000;
 const WAX_WORD_LENGTH = 45;
 const AddProblem = ({ onCancel }) => {
     const dispatch = useDispatch();

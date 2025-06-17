@@ -200,13 +200,6 @@ const ScheduleTab = () => {
             return updatedDays;
         });
     };
-    // const ToastHandle = (message, type) => {
-    //     if (type === 'danger') {
-    //         toast.error(message);
-    //     } else if (type === 'success') {
-    //         toast.success(message);
-    //     }
-    // };
 
     const handleRemoveSlot = (dayIndex, slotIndex) => {
         setDays((prevDays) => {
@@ -219,8 +212,7 @@ const ScheduleTab = () => {
     };
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <p className="mt-0 form_heading">Edit Schedule</p>
-
+            {/* <p className="mt-0 form_heading">Edit Schedule</p> */}
             <div className="row">
                 <div className="col-md-3 col-sm-6 col-12 mb-1 responnsible-party-select">
                     <label htmlFor="doctorName" className="form-label" style={{ fontWeight: 'bold' }}>
@@ -264,119 +256,121 @@ const ScheduleTab = () => {
                     />
                 </div>
             </div>
-
-            <Table striped className="mt-2">
-                <thead>
-                    <tr>
-                        <th className="text-white">Available On</th>
-                        <th>
-                            <table className="schedule-table" style={{ width: '100%' }}>
-                                <thead>
-                                    <tr className="text-white">
-                                        <th style={{ width: '40%' }} className="pe-1">
-                                            Available From
-                                        </th>
-                                        <th style={{ width: '40%' }} className="ps-1">
-                                            Available To
-                                        </th>
-                                        <th style={{ width: '20%' }}>Action</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {/* Loading State */}
-                    {store?.getPractitionerTimingsReducer?.loading ? (
+            <div className=' scroll-container' style={{ height: '60vh' }}>
+                <Table striped className="mt-2">
+                    <thead>
                         <tr>
-                            <td className="text-center" colSpan={2}>
-                                <Spinner />
-                            </td>
+                            <th className="text-white">Available On</th>
+                            <th>
+                                <table className="schedule-table" style={{ width: '100%' }}>
+                                    <thead>
+                                        <tr className="text-white">
+                                            <th style={{ width: '40%' }} className="pe-1">
+                                                Available From
+                                            </th>
+                                            <th style={{ width: '40%' }} className="ps-1">
+                                                Available To
+                                            </th>
+                                            <th style={{ width: '20%' }}>Action</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </th>
                         </tr>
-                    ) : (
-                        days?.map((day, dayIndex) => (
-                            <tr key={dayIndex}>
-                                <td>
-                                    {/* Day Name */}
-                                    <input className="form-control" type="text" value={day?.day} readOnly />
+                    </thead>
+                    <tbody>
+                        {/* Loading State */}
+                        {store?.getPractitionerTimingsReducer?.loading ? (
+                            <tr>
+                                <td className="text-center" colSpan={2}>
+                                    <Spinner />
                                 </td>
-                                <td>
-                                    {/* Slot Table for Each Day */}
-                                    <table className="schedule-table" style={{ width: '100%' }}>
-                                        <tbody>
-                                            {day?.slots?.map((slot, slotIndex) => (
-                                                <tr key={slotIndex}>
-                                                    <td style={{ width: '40%' }} className="text-black pe-1">
-                                                        {/* <input
+                            </tr>
+                        ) : (
+                            days?.map((day, dayIndex) => (
+                                <tr key={dayIndex}>
+                                    <td>
+                                        {/* Day Name */}
+                                        <input className="form-control" type="text" value={day?.day} readOnly />
+                                    </td>
+                                    <td>
+                                        {/* Slot Table for Each Day */}
+                                        <table className="schedule-table" style={{ width: '100%' }}>
+                                            <tbody>
+                                                {day?.slots?.map((slot, slotIndex) => (
+                                                    <tr key={slotIndex}>
+                                                        <td style={{ width: '40%' }} className="text-black pe-1">
+                                                            {/* <input
                               className="form-control"
                               type="time"
                               defaultValue={slot?.startTime}
                             /> */}
-                                                        <input
-                                                            className="form-control"
-                                                            type="time"
-                                                            value={slot.startTime || ''}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value;
-                                                                setDays((prevDays) => {
-                                                                    const updatedDays = [...prevDays];
-                                                                    updatedDays[dayIndex].slots[slotIndex].startTime =
-                                                                        value;
-                                                                    return updatedDays;
-                                                                });
-                                                            }}
-                                                        />
-                                                    </td>
-                                                    <td style={{ width: '40%' }} className="ps-1">
-                                                        {/* <input
+                                                            <input
+                                                                className="form-control"
+                                                                type="time"
+                                                                value={slot.startTime || ''}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value;
+                                                                    setDays((prevDays) => {
+                                                                        const updatedDays = [...prevDays];
+                                                                        updatedDays[dayIndex].slots[slotIndex].startTime =
+                                                                            value;
+                                                                        return updatedDays;
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                        <td style={{ width: '40%' }} className="ps-1">
+                                                            {/* <input
                               className="form-control"
                               type="time"
                               defaultValue={slot?.endTime}
                             // value={slot?.endTime}
                             /> */}
-                                                        <input
-                                                            className="form-control"
-                                                            type="time"
-                                                            value={slot.endTime || ''}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value;
-                                                                setDays((prevDays) => {
-                                                                    const updatedDays = [...prevDays];
-                                                                    updatedDays[dayIndex].slots[slotIndex].endTime =
-                                                                        value;
-                                                                    return updatedDays;
-                                                                });
-                                                            }}
-                                                        />
-                                                    </td>
-                                                    <td style={{ width: '20%' }}>
-                                                        <span
-                                                            className={`uil-plus-circle plusicon fw-bold cursor-pointer ${day.slots.length >= 10 ? 'disabled' : ''
-                                                                }`}
-                                                            onClick={() =>
-                                                                day.slots.length < 10 && handleAddSlots(dayIndex)
-                                                            }></span>
-                                                        {day.slots.length > 1 && (
+                                                            <input
+                                                                className="form-control"
+                                                                type="time"
+                                                                value={slot.endTime || ''}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value;
+                                                                    setDays((prevDays) => {
+                                                                        const updatedDays = [...prevDays];
+                                                                        updatedDays[dayIndex].slots[slotIndex].endTime =
+                                                                            value;
+                                                                        return updatedDays;
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                        <td style={{ width: '20%' }}>
                                                             <span
-                                                                className="uil-minus-circle minusicon fw-bold cursor-pointer ms-2"
+                                                                className={`uil-plus-circle plusicon fw-bold cursor-pointer ${day.slots.length >= 10 ? 'disabled' : ''
+                                                                    }`}
                                                                 onClick={() =>
-                                                                    handleRemoveSlot(dayIndex, slotIndex)
+                                                                    day.slots.length < 10 && handleAddSlots(dayIndex)
                                                                 }></span>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-            </Table>
+                                                            {day.slots.length > 1 && (
+                                                                <span
+                                                                    className="uil-minus-circle minusicon fw-bold cursor-pointer ms-2"
+                                                                    onClick={() =>
+                                                                        handleRemoveSlot(dayIndex, slotIndex)
+                                                                    }></span>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </Table>
+            </div>
 
-            <div className="d-flex justify-content-end">
+
+            <div className="d-flex justify-content-end pt-1">
                 <Button className="custom-buttons" disabled={store?.createScheduleReducer?.loading} type="submit">
                     {store?.updateTimingsReducer?.loading || store?.createTimingsReducer?.loading ? (
                         <Spinner className="spinner-border-sm" color="white" />

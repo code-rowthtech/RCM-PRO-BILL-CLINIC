@@ -87,7 +87,7 @@ export const getPractitionerTimings = `${BaseRoute}/practitioner/schedule`;
 // appointments
 export const createAppointment = `${BaseRoute}/appointment/create`;
 export const rescheduleAppointment = `${BaseRoute}/appointment/update/`;
-export const getPractitionerSchedule = `${BaseRoute}/getPractitionerSchedule`;
+export const getPractitionerSchedule = `${BaseRoute}/practitioner/holidays`;
 export const getAppointments = `${BaseRoute}/appointments/`;
 export const getAppointmentById = `${BaseRoute}/appointment/`;
 export const getPractitionerSlots = `${BaseRoute}/practitioner/slots`;
@@ -110,10 +110,10 @@ export const getPatientAppointment = `${BaseRoute}/app/get-by-patientId`;
 export const getProblemDetails = `${BaseRoute}/getProblemDetails`;
 
 // Patient Access History
-export const getPatientAccessLogs =`${BaseRoute}/patient-access-logs`;
+export const getPatientAccessLogs = `${BaseRoute}/patient-access-logs`;
 
 // Audit Report
-export const getAuditReport =`${BaseRoute}/audit-report`;
+export const getAuditReport = `${BaseRoute}/audit-report`;
 
 // Allergy List
 // export const getAllergylist = `${BaseRoute}/getAllergiesList`;

@@ -81,7 +81,7 @@ const Schedule = () => {
             clinicId: clinicId,
             fromDate: startDate || null,
             toDate: endDate || null,
-            page : skip,
+            page: skip,
             ...(selectedDoctor?.value ? { doctorId: selectedDoctor?.value } : {}),
         };
 
@@ -109,7 +109,7 @@ const Schedule = () => {
         <div className="schedule-container">
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card className=" scroll-container page-height">
+                    <Card style={{ height: '90vh' }}>
                         <Card.Body>
                             <Row className="mb-2">
                                 {/* Navigation Tabs */}
@@ -218,19 +218,21 @@ const Schedule = () => {
                                     </Row>
                                 </Col>
                             </Row>
-                          
+
 
                             {/* Tab Content */}
                             <div className="mt-1">{renderTabContent()}</div>
-                              <Row>
-                                <Col className="mt-2 d-flex justify-content-end">
-                                    <Paginations
-                                        currentPage={skip}
-                                        totalPages={store?.getScheduleReducer?.data?.totalPages}
-                                        onPageChange={handlePageChange}
-                                    />
-                                </Col>
-                            </Row>
+                            {activeTab === 'DoctorHolidays' &&
+                                <Row>
+                                    <Col className="mt-2 d-flex justify-content-end">
+                                        <Paginations
+                                            currentPage={skip}
+                                            totalPages={store?.getScheduleReducer?.data?.totalPages}
+                                            onPageChange={handlePageChange}
+                                        />
+                                    </Col>
+                                </Row>
+                            }
                         </Card.Body>
                     </Card>
                 </Col>

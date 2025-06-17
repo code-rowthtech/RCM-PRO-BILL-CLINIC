@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Form, Modal, Row, Toast, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 // Redux actions
 import { getPatientsAction } from '../../../../redux/patients/actions';
-import { createAppointmentAction, getAppointmentByIdAction, getDoctorsAction, rescheduleAppointmentAction } from '../../../../redux/actions';
+import { createAppointmentAction, getAppointmentByIdAction, getDoctorsAction, getPractitionerScheduleAction, rescheduleAppointmentAction } from '../../../../redux/actions';
 import { getMastersDataAction, getMastersDataAction2 } from '../../../../redux/settings/action';
 
 // Components
@@ -26,6 +26,8 @@ import { appointmentTypeOptions } from '../../../../utils/DataSets/apppointmentt
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
 import { appointmentRecurrence, appointmentStatus } from '../../../../utils/DataSets/commonData';
 import DateUtils from '../../../../utils/dateUtils'; // Import DateUtils
+import { loggedInUser } from '../../../../helpers/api/loggedInUser';
+import HolidayModal from '../HolidayModal';
 
 // Memoized components
 const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, scheduledDate, id }) => {
@@ -263,7 +265,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const appointmentDetails = useMemo(() => store?.getAppointmentByIdReducer?.data, [store]);
     const consultationRoomData = useMemo(() => store?.getMastersDataReducer?.data1?.data?.result, [store]);
     const patientsData = useMemo(() => store?.getPatientsReducer?.data?.data, [store]);
-
+    const practitionerSchedule = useMemo(() => store?.getPractitionerScheduleReducer?.data?.holidays, [store]);
     const isLoading = store?.getAppointmentByIdReducer?.loading
     const clinicId = useMemo(() => JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId, []);
     const [status, setStatus] = useState(true);
@@ -277,7 +279,9 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const [repeatType, setRepeatType] = useState('day');
     const [appointmentDates, setAppointmentDates] = useState();
     const [appointmentReason, setAppointmentReason] = useState(null);
-    const [scheduledDate, setScheduledDate] = useState()
+    const [scheduledDate, setScheduledDate] = useState();
+    const [showHolidayModal, setShowHolidayModal] = useState(false);
+
     function formatDateToYYYYMMDD(date) {
         const d = new Date(date);
         const year = d.getFullYear();
@@ -350,7 +354,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 setValue('startTime', formatTime(selectedSlot?.start));
             }
         } else {
-            setScheduledDate(new Date().toISOString().split('T')[0]);
+            // setScheduledDate(new Date().toISOString().split('T')[0]);
             setValue('startTime', getDefaultTime());
             setValue('duration', '30');
         }
@@ -411,6 +415,27 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             }
         }
     }, [appointmentDetails, id, patientsData, doctorDetails, setValue, formatTime]);
+
+    useEffect(() => {
+        if (watchedDoctorName) {
+            dispatch(getPractitionerScheduleAction({ clinicId: loggedInUser?.clinicId, doctorId: watchedDoctorName }))
+        }
+    }, [watchedDoctorName])
+
+    useEffect(() => {
+        if (scheduledDate && practitionerSchedule?.length) {
+            const scheduledDateOnly = new Date(scheduledDate).toISOString().split('T')[0];
+
+            const match = practitionerSchedule.some((item) => {
+                const itemDateOnly = new Date(item.date).toISOString().split('T')[0];
+                return itemDateOnly === scheduledDateOnly;
+            });
+
+            if (match) {
+                setShowHolidayModal(true);
+            }
+        }
+    }, [practitionerSchedule, scheduledDate]);
 
     // Handle form submission
     // const onSubmit = useCallback((data) => {
@@ -542,6 +567,11 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
 
         callback(filteredOptions.slice(0, 20));
     }, [formattedReasonOptions]);
+
+    const closeHolidayModal = () => {
+        setShowHolidayModal(false);
+    }
+
     return (
         <div>
             {isLoading ?
@@ -590,15 +620,19 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                         </Col>
                         <Col sm={6}>
                             <Form.Group className="mb-1" controlId="doctorName">
-                                <Form.Label className="mb-0">Select Doctor</Form.Label>
+                                <Form.Label className="mb-0">Select Provider</Form.Label>
                                 <div>
                                     <Form.Control
                                         as="select"
                                         className="form-select"
+                                        {...register('doctorName', { required: 'Doctor is required' })}
                                         data-has-value={!!watchedDoctorName}
-                                        {...register('doctorName', { required: 'Doctor is required' })}>
+                                    // onChange={(e) => {
+                                    //     dispatch(getPractitionerScheduleAction({ clinicId: loggedInUser?.clinicId, doctorId: e.target.value }));
+                                    // }}
+                                    >
                                         <option value="" hidden>
-                                            {store?.getDoctorsReducer?.loading ? "Loading..." : 'Select Doctor'}
+                                            {store?.getDoctorsReducer?.loading ? "Loading..." : 'Select Provider'}
                                         </option>
                                         {doctorDetails?.map((doctor) => (
                                             <option key={doctor?._id} value={doctor?._id}>
@@ -896,6 +930,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     </div>
                 </Modal.Body>
             </Modal>
+            <HolidayModal showModal={showHolidayModal} handleCloseModal={closeHolidayModal} setScheduledDate={setScheduledDate} scheduledDate={scheduledDate} />
         </div>
     );
 };
