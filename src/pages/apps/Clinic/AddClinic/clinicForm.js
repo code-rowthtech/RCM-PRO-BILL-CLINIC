@@ -124,6 +124,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log(clinicsDataGet,'clinicData')
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         if (clinicsDataGet) {
@@ -187,7 +188,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 type: addr.type || '', // Make sure type is included
                 use: addr.use || '',
                 line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
-                city: addr?.[0]?.city || '',
+                city: addr?.city || '',
                 state: addr.state || '',
                 postalCode: addr.postalCode || '',
                 country: addr.country || 'US',
