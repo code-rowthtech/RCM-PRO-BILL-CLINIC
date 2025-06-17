@@ -42,7 +42,6 @@ const metricUnits = {
 };
 
 const EncounterSummary = () => {
-
     // VARIABLE INITIALIZATIONS
     const now = new Date();
     const dispatch = useDispatch()
@@ -110,7 +109,6 @@ const EncounterSummary = () => {
         return acc;
     }, {});
 
-    // console.log(allergyData, problemData, medicationList, patientVitals, 'shubham')
     const statusColorMap = {
         active: 'text-success',
         'on-hold': 'text-warning',
@@ -149,6 +147,9 @@ const EncounterSummary = () => {
         if (!medicationList) {
             dispatch(getMedicationAction({ patientId: patientId, limit: 3 }))
         }
+        if (patientVitals?.length === 0) {
+            dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 3 }));
+        }
     }, [allergyData, problemData, medicationList])
 
     // FUNCTIONS
@@ -166,7 +167,7 @@ const EncounterSummary = () => {
 
     const closeVitalsModal = () => {
         setVitalsModal(false);
-        // dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
+        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 3 }));
     };
 
     const getSeverityBadge = (severity) => {

@@ -26,7 +26,6 @@ const Alcohol = () => {
     const deleteResponse = store?.deleteAlcoholHistoryReducer?.data?.status
     const updateResponse = store?.updateAlcoholHistoryReducer?.data?.status
     const alcoholData = store?.getAlcoholHistoryReducer?.data?.data;
-    console.log(alcoholData, 'alcoholData')
     const { register, handleSubmit, reset, control, watch, getValues, setValue } = useForm();
     const [entries, setEntries] = useState([]);
     const watchUseStatus = watch("useStatus");
@@ -160,7 +159,9 @@ const Alcohol = () => {
         quillRef,
         maxWords: MAX_WORDS,
         maxWordLength: WAX_WORD_LENGTH,
-        onLimitExceed: handleLimitExceed
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
     });
     return (
         <Row className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: "100%" }}>

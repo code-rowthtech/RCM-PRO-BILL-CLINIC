@@ -2,7 +2,6 @@ import { loggedInUser } from "../../../../../helpers/api/loggedInUser";
 
 export const handlePrintEncounters = (encounterData, patientDetails) => {
     const originalContent = document?.body?.innerHTML;
-    console.log(loggedInUser, 'loggedInUserloggedInUser')
     const printContent = `
          <!DOCTYPE html>
         <html>

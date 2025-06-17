@@ -19,7 +19,6 @@ const PatientAccess = () => {
     const [endDate, setEndDate] = useState(null);
 
     const PatientAccessLogs = store?.getPatientsAccessLogsReducer?.data?.data;
-    console.log(PatientAccessLogs, 'PatientAccessLogs')
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);

@@ -1,11 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { FormInput } from 'lucide-react';
-import { Button, Card, Col, Form, Modal, Row, Spinner, Table } from 'react-bootstrap';
+import { useEffect, useRef } from 'react';
+import { Button, Col, Form, Modal, Row, Spinner, Table } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
-import { FiFileText, FiFilter, FiUploadCloud } from 'react-icons/fi';
-import { IoMdClose, IoMdRefresh } from 'react-icons/io';
-import { IoSearchSharp } from 'react-icons/io5';
-import { MdFileDownload } from 'react-icons/md';
 import ReactQuill from 'react-quill';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
@@ -15,10 +10,14 @@ import { getDoctorsAction, getEncounterAction, getPatientsAction, getRolesAction
 import { loggedInUser } from '../../../helpers/api/loggedInUser';
 import { encryptMessage } from '../../../cryptoUtils';
 import { createUserTasksAction, getTaskByIdAction, updateUserTasksAction } from '../../../redux/Tasks/action';
+import useQuillWordLimit from '../../../helpers/quillWordLimit';
+import ToastHandle from '../../../helpers/ToastMessage';
 
 const ModalTask = ({ show, handleClose, taskId }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
+    const MAX_WORDS = 1000;
+    const WAX_WORD_LENGTH = 45;
     const {
         register,
         handleSubmit,
@@ -26,20 +25,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
         reset,
         watch, setValue,
         formState: { errors },
-    } = useForm(
-            //     {
-            //     defaultValues: {
-            //         title: '',
-            //         assignTo: '',
-            //         category: '',
-            //         status: 'open',
-            //         dueDate: '',
-            //         priority: 'medium',
-            //         patient: '',
-            //         note: '<ul><li></li></ul>',
-            //     },
-            // }
-        );
+    } = useForm();
     const CategoryData = store?.getMastersDataReducer?.data1?.data?.result;
     const roleData = store?.getRolesDataReducer?.data;
     const clinicId = loggedInUser?.clinicId;
@@ -48,6 +34,8 @@ const ModalTask = ({ show, handleClose, taskId }) => {
     const createTaskResponse = store?.createUserTasksReducer?.data?.status;
     const encounters = store?.getEncounterReducer?.data?.encounters;
     const taskData = store?.getTaskByIdReducer?.data?.task;
+    const quillRef = useRef(null);
+
     useEffect(() => {
         if (taskData && taskId) {
             setValue('description', taskData?.description);
@@ -111,6 +99,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
             )
         );
 
+
         // Overwrite note with formatted object if note exists
         if (cleanedData.note) {
             cleanedData.note = [
@@ -125,7 +114,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
         cleanedData.clinicId = loggedInUser?.clinicId;
         cleanedData.assignedById = loggedInUser?._id;
         if (taskId) {
-            dispatch(updateUserTasksAction({ key: `${encryptMessage(cleanedData)}`, taskId: taskId }));
+            dispatch(updateUserTasksAction({ data: `${encryptMessage(cleanedData)}`, taskId: taskId }));
         } else {
             dispatch(createUserTasksAction({ key: `${encryptMessage(cleanedData)}` }));
         }
@@ -139,6 +128,20 @@ const ModalTask = ({ show, handleClose, taskId }) => {
 
     const selectedPatientId = watch('associatedPatientId'); // from react-hook-form
 
+    // react quill word limit
+
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
+    });
     return (
         <>
             <Modal show={show} onHide={handleClose} centered size="lg">
@@ -432,7 +435,27 @@ const ModalTask = ({ show, handleClose, taskId }) => {
 
                             <Col xs={12} className="mt-0 mb-5">
                                 <Form.Group controlId="notes">
-                                    <Form.Label className="fw-medium mb-1">Notes</Form.Label>
+                                    <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            Notes{' '}
+                                        </div>
+                                        <small className="text-muted">
+                                            {(() => {
+                                                const content = watch('note') || '';
+                                                const plainText = content.replace(/<[^>]*>/g, '').trim();
+                                                const words = plainText.split(/\s+/).filter(Boolean);
+                                                const wordCount = words.length > MAX_WORDS ? MAX_WORDS : words.length;
+                                                const longestWord = words.reduce((max, word) =>
+                                                    word.length > max.length ? word : max,
+                                                    '');
+                                                return (
+                                                    <div>
+                                                        <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </small>
+                                    </Form.Label>
                                     <Controller
                                         name="note"
                                         control={control}
@@ -440,6 +463,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                         render={({ field: { onChange, value } }) => (
                                             <div style={{ width: '100%', maxHeight: '25vh' }}>
                                                 <ReactQuill
+                                                    ref={quillRef}
                                                     value={value}
                                                     onChange={(content, delta, source) => {
                                                         if (source === 'user') {

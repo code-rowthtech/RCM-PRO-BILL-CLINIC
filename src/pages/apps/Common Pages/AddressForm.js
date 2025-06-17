@@ -26,7 +26,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
             dispatch(getStatesByCountryAction());
         }
     }, [statesData, dispatch])
-    // console.log(store?.getCitiesReducer?.cities1, 'asdasdasdasdasdasd')
     const [selectedLocation, setSelectedLocation] = useState(null);
     const {
         control,

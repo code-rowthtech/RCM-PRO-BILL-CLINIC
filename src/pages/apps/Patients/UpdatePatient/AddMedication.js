@@ -23,7 +23,7 @@ import ToastHandle from '../../../../helpers/ToastMessage';
 import useQuillWordLimit from '../../../../helpers/quillWordLimit';
 
 const MAX_WORDS = 10;
-const WAX_WORD_LENGTH = 45;
+const MAX_WORD_LENGTH = 45;
 export default function AddMedication({ show, onCancel, selectedMedication }) {
     const { register, handleSubmit, setValue, watch, control, getValues, reset, formState: { errors } } = useForm();
     const [searchParams] = useSearchParams();
@@ -117,7 +117,6 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
     const debouncedSearch = useMemo(
         () =>
             debounce((searchValue) => {
-                console.log(`searcching ${searchValue}`)
                 dispatch(getDrugsAction({ skip: 1, search: searchValue }));
             }, 100),
         [dispatch]
@@ -210,8 +209,10 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
     useQuillWordLimit({
         quillRef,
         maxWords: MAX_WORDS,
-        maxWordLength: WAX_WORD_LENGTH,
-        onLimitExceed: handleLimitExceed
+        maxWordLength: MAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
     });
     return (
         <Modal

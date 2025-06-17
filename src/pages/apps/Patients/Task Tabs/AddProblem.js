@@ -188,7 +188,9 @@ const AddProblem = ({ onCancel }) => {
         quillRef,
         maxWords: MAX_WORDS,
         maxWordLength: WAX_WORD_LENGTH,
-        onLimitExceed: handleLimitExceed
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
     });
 
     return (

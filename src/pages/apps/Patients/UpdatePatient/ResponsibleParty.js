@@ -35,7 +35,6 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
 
     useEffect(() => {
         if ((patientDetails && patientId) && patientDetails?._id === patientId) {
-            console.log(patientDetails, 'patientDetails84hg938boivn')
             setValue('title', patientDetails?.relatedPerson?.name?.[0]?.prefix);
             setValue('fullName', patientDetails?.relatedPerson?.name?.find((data) => data?.use === 'official')?.text);
             setValue('gender', patientDetails?.gender);
