@@ -95,7 +95,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
- const [practiceAddresses, setPracticeAddresses] = useState([
+    const [practiceAddresses, setPracticeAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
     const handleStateSelection = (e, addressType, index) => {
@@ -187,7 +187,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 type: addr.type || '', // Make sure type is included
                 use: addr.use || '',
                 line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
-                city: addr?.[0]?.city || '',
+                city: addr?.city || '',
                 state: addr.state || '',
                 postalCode: addr.postalCode || '',
                 country: addr.country || 'US',
@@ -270,7 +270,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 ]
             );
         }
-    }, [clinicsDataGet, setValue,statesData,clinectypes]);
+    }, [clinicsDataGet, setValue, statesData, clinectypes]);
 
     const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
@@ -745,8 +745,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <span
                                         style={{ right: '2%', top: '43%' }}
                                         className={`${clinicsDataGet?.userId?.verified_email
-                                                ? 'text-success position-absolute fs-4'
-                                                : 'd-none'
+                                            ? 'text-success position-absolute fs-4'
+                                            : 'd-none'
                                             }`}>
                                         <MdVerified />
                                     </span>
@@ -1443,7 +1443,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                 </Row>
                             ))} */}
-                            <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses}/>
+                            <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses} />
                             <hr className="mb-1" />
                             <Row>
                                 <Col sm={12}>

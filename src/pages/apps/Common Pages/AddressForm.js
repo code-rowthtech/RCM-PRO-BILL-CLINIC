@@ -92,7 +92,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
         });
     };
 
-    const handleAddressChange = (index, field, value) => {
+    const handleAddressChange = (index, field, value, lineIndex = 0) => {
         if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
             ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
             return; // Prevent selection
@@ -101,7 +101,11 @@ const AddressForm = ({ addresses, setAddresses }) => {
         // if(addresses?.some((address) => address?.use === field)) {}
         const updatedAddresses = [...addresses];
         if (field === 'line') {
-            updatedAddresses[index].line[0] = value; // update street address
+            // updatedAddresses[index].line[0] = value; // update street address
+            // Create a new array with the updated line
+            const updatedLines = [...updatedAddresses[index].line];
+            updatedLines[lineIndex] = value;
+            updatedAddresses[index].line = updatedLines;
         } else {
             updatedAddresses[index][field] = value;
         }
