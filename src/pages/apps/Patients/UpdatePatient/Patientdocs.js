@@ -11,10 +11,9 @@ import {
 import AsyncSelect from 'react-select/async';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import {
     deletePatientDocumentsAction, getDocumentByIdAction, getDocumentsAction,
-    getEncounterAction, updatePatientDocumentsAction, uploadPatientDocumentsAction
+    getEncounterAction, updatePatientDocumentsAction
 } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';

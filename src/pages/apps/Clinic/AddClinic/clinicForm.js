@@ -95,7 +95,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
- const [practiceAddresses, setPracticeAddresses] = useState([
+    const [practiceAddresses, setPracticeAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
     const handleStateSelection = (e, addressType, index) => {
@@ -124,7 +124,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet,'clinicData')
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         if (clinicsDataGet) {
@@ -271,7 +270,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 ]
             );
         }
-    }, [clinicsDataGet, setValue,statesData,clinectypes]);
+    }, [clinicsDataGet, setValue, statesData, clinectypes]);
 
     const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
@@ -746,8 +745,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <span
                                         style={{ right: '2%', top: '43%' }}
                                         className={`${clinicsDataGet?.userId?.verified_email
-                                                ? 'text-success position-absolute fs-4'
-                                                : 'd-none'
+                                            ? 'text-success position-absolute fs-4'
+                                            : 'd-none'
                                             }`}>
                                         <MdVerified />
                                     </span>
@@ -1444,7 +1443,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                 </Row>
                             ))} */}
-                            <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses}/>
+                            <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses} />
                             <hr className="mb-1" />
                             <Row>
                                 <Col sm={12}>

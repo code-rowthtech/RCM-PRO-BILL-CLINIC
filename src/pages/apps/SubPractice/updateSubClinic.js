@@ -651,7 +651,6 @@ const SubUpdateClinic = () => {
     const [addresses, setAddresses] = useState([
         { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }, // Default address
     ]);
-    const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     // Load Default Identifiers & Contacts
     useEffect(() => {
