@@ -36,6 +36,7 @@ import { getDoctorsAction, getSubClinicAction } from '../../../../redux/actions'
 import { FormInput } from '../../../../components';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
 import { components } from 'react-select';
+import AddressForm from '../../Common Pages/AddressForm';
 
 const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const {
@@ -94,7 +95,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
-
+ const [practiceAddresses, setPracticeAddresses] = useState([
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+    ]);
     const handleStateSelection = (e, addressType, index) => {
         const selectedOption = e.target.selectedOptions[0];
         const stateId = selectedOption.getAttribute('data-key');
@@ -189,7 +192,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 postalCode: addr.postalCode || '',
                 country: addr.country || 'US',
             })) || [{ type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }];
-            setAddresses(newAddresses);
+            setPracticeAddresses(newAddresses);
             if (statesData?.states) {
                 newAddresses.forEach((address) => {
                     const state = statesData.states.find((s) => s.name === address.state);
@@ -267,7 +270,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 ]
             );
         }
-    }, [clinicsDataGet, setValue]);
+    }, [clinicsDataGet, setValue,statesData,clinectypes]);
 
     const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
@@ -305,7 +308,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 issuingAuthority: item.issuingAuthority,
             })),
             telecom: constantContact,
-            address: addresses,
+            address: practiceAddresses,
             poc: pocs,
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
@@ -1181,7 +1184,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </Col>
                             </Row>
                             <hr className="mb-1" />
-                            <Row>
+                            {/* <Row>
                                 <Col sm={12}>
                                     <h5>
                                         Address Details
@@ -1439,7 +1442,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         </Form.Group>
                                     </Col>
                                 </Row>
-                            ))}
+                            ))} */}
+                            <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses}/>
                             <hr className="mb-1" />
                             <Row>
                                 <Col sm={12}>
