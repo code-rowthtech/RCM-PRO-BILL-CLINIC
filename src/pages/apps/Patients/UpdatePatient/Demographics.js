@@ -92,7 +92,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
     useEffect(() => {
         setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city);
-    }, [cities4])
+    }, [cities4]);
 
     useEffect(() => {
         if (employerCitySearch) {
@@ -133,7 +133,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
             // ✅ Employer Address Fix
             setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city || '');
-            setEmployerCitySearch(patientDetails?.employerDetails?.workLocation?.address?.city)
+            setEmployerCitySearch(patientDetails?.employerDetails?.workLocation?.address?.city);
             setValue('employerStateName', patientDetails?.employerDetails?.workLocation?.address?.state || '');
             setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
             setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
@@ -343,18 +343,20 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 employerPhone: data?.employerPhone?.replace(/\D/g, ''),
                 employmentStatus: data?.employmentStatus,
                 occupation: data?.occupation,
-                workLocation: {
-                    address: {
-                        line: data?.employerAddress,
-                        city: data?.employerCity,
-                        state: data?.employerStateName,
-                        postalCode: data?.employerZip,
-                        country: 'US',
-                    },
-                },
+                workLocation: data?.employerAddress
+                    ? {
+                          address: {
+                              line: [data?.employerAddress],
+                              city: data?.employerCity,
+                              state: data?.employerStateName,
+                              postalCode: data?.employerZip,
+                              country: 'United States',
+                          },
+                      }
+                    : {},
             },
             identifier: finalIdentifiers,
-            address: demographicAddresses,
+            ...(demographicAddresses && { address: demographicAddresses }),
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
@@ -425,8 +427,9 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
     return (
         <Form className="" onSubmit={handleSubmit(onSubmit)}>
-            <div className=' scroll-container ' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
-
+            <div
+                className=" scroll-container "
+                style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <IdentifierForm
                     defaultIdentifiers={[
                         {
@@ -881,10 +884,11 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}

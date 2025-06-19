@@ -143,7 +143,7 @@ type AppMenuProps = {
 const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$FragmentType> => {
     let location = useLocation();
     const menuRef = useRef(null);
-
+    const navigate  = useNavigate()
     const [activeMenuItems, setActiveMenuItems] = useState([]);
 
     /*
@@ -188,11 +188,13 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
     return (
         <>
             <ul className="side-nav" ref={menuRef} id="main-side-menu" >
-                <li className="text-center navbar-nav py-3 px-4 mb-2 mainLogo " style={{ top: 0 }}>
+                <li className="text-center navbar-nav mb-2 py-3" style={{ top: 0 }}>
                     {isCondensed === true ? (
-                        <img src={logo_sm} alt="" height="25" className="logo-condensed px-2" />
+                        <img src={logo_sm} alt="" height="25" className="logo-condensed px-2" onClick={() => navigate('/')} />
+                        // <h1>logo</h1>
                     ) : (
-                        <img src={logo} alt="" height="25" className="logo-full px-2" />
+                        <img src={logo} alt="" height="25" className="logo-full px-4" onClick={() => navigate('/')} />
+                        // <h1>LogoBig</h1>
                     )}
                 </li>
                 <div className='scroll-container' style={{ height: '73vh' }}>
