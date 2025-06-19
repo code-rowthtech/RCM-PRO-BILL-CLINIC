@@ -207,7 +207,6 @@ select.form-control:not([size]):not([multiple]) {
 .form-label {
     color: rgba(51, 51, 51, 0.6) !important; /* #333 with 60% opacity */
     font-weight: 500 !important;
-    /* opacity: 0.6; */
     font-size: 12px;
 }
 
