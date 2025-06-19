@@ -153,7 +153,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
             delete data.email;
             delete data.password;
             delete data.confirmPassword;
-            console.log(data, 'updateData');
             dispatch(updateRolesAction({ key: `${encryptMessage(data)}` }));
         } else {
             dispatch(createRolesAction({ key: `${encryptMessage(data)}` }));
@@ -573,7 +572,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                             required: dataToEdit ? false : 'Role is required',
                                         })}
                                         className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}>
-                                        <option value="" hidden>
+                                        <option value=""  className="select" hidden>
                                             Select Role
                                         </option>
                                         {decryptedRolesData?.map((data) => (

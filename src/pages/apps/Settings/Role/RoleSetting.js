@@ -317,9 +317,9 @@ const RoleSetting = () => {
                                                                     }}>
                                                                     <i className="mdi mdi-square-edit-outline"></i>
                                                                 </Link>
-                                                                <i
+                                                                {/* <i
                                                                     onClick={() => toggleRow(index)}
-                                                                    className="mdi mdi-eye fs-4"></i>
+                                                                    className="mdi mdi-eye fs-4"></i> */}
                                                             </td>
                                                         </tr>
                                                         {expandedRowIndex === index && (

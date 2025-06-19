@@ -137,7 +137,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
             setValue('employerStateName', patientDetails?.employerDetails?.workLocation?.address?.state || '');
             setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
             setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
-            setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line || '');
+            setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line[0] || '');
             const defaultIdentifiers = patientDetails?.identifier?.map((data, index) => ({
                 expiry: data?.expiry,
                 file: data?.file?.[0],
@@ -360,6 +360,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log('Payload for Update Patient:', payload);
     };
 
     const getEmployerGeolocation = (e) => {

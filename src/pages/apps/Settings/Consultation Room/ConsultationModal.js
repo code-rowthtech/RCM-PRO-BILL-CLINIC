@@ -150,7 +150,7 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
                             <Button onClick={onClose} className="custom-buttons">
                             Close
                         </Button>
-                        <Button type="submit" className="custom-buttons">
+                        <Button type="submit" className="custom-buttons"  style={{width:'65px'}}>
                             {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
                                 <div class="spinner-border spinner-border-sm" role="status">
                                     <span class="visually-hidden">Loading...</span>

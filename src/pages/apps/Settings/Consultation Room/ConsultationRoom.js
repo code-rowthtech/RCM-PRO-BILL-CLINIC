@@ -99,9 +99,6 @@ const ConsultationRoom = () => {
         setEdit(null);
         reset();
     };
-    
- 
-
 
     return (
         <div>
@@ -252,15 +249,19 @@ const ConsultationRoom = () => {
                                     )}
                                 </tbody>
                             </Table>
-                            <Row>
-                                <Col className="mt-2 d-flex justify-content-end">
-                                    <Paginations
-                                        currentPage={skip}
-                                        // totalPages={roleData?.pagination?.totalPages || 1}
-                                        onPageChange={handlePageChange}
-                                    />
-                                </Col>
-                            </Row>
+                            {tableGetData?.length > 0 && (
+                                <Row>
+                                    <Col className="mt-2 d-flex justify-content-end">
+                                        <Paginations
+                                            currentPage={skip}
+                                            totalPages={
+                                                store?.getMastersDataReducer?.data1?.data?.pagination?.totalPages
+                                            }
+                                            onPageChange={handlePageChange}
+                                        />
+                                    </Col>
+                                </Row>
+                            )}
                         </Card.Body>
                     </Card>
                 </Col>
