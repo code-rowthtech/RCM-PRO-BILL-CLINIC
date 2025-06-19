@@ -6,6 +6,7 @@ import {
     // getStatesByCountryAction,
     // getCitiesAction,
     addReferringDoctorAction,
+    getPatientByIdAction,
 } from '../../../../redux/actions';
 import us from '../../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -108,7 +109,11 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
         };
         dispatch(addReferringDoctorAction({ key: encryptMessage(payload) }));
     };
-
+  useEffect(() => {
+        if(createResponseReferring === 201) {
+            dispatch(getPatientByIdAction({ patientId }));
+        }
+    }, [createResponseReferring]);
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <div className='scroll-container mt-1' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>

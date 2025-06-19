@@ -1,12 +1,22 @@
 import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
 import {
-    createInsuranceApi, createPatientsApi, createResponsiblePartyApi,
-    getDocumentsApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi,
-    getPatientsByAppointmentApi, getResponsiblePartyApi, updateInsuranceApi,
-    updatePatientsApi, updateResponsiblePartyApi, uploadDocumentsApi, updateDocumentsApi,
+    createInsuranceApi,
+    createPatientsApi,
+    createResponsiblePartyApi,
+    getDocumentsApi,
+    getInsuranceByIdApi,
+    getPatientByIdApi,
+    getPatientsApi,
+    getPatientsByAppointmentApi,
+    getResponsiblePartyApi,
+    updateInsuranceApi,
+    updatePatientsApi,
+    updateResponsiblePartyApi,
+    uploadDocumentsApi,
+    updateDocumentsApi,
     deleteDocumentsApi,
-    getDocumentsByIdApi
+    getDocumentsByIdApi,
 } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
@@ -14,7 +24,6 @@ import ToastHandle from '../../helpers/ToastMessage';
  * Login the user
  * @param {*} payload - username and password
  */
-
 
 function* getPatientsFunction(data) {
     try {
@@ -140,6 +149,10 @@ function* createResponsiblePartyFunction(data) {
                 type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_SUCCESS,
                 payload: { ...decryptedData },
             });
+              yield put({
+                type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_RESET,
+                payload: { ...decryptedData },
+            });
         } else {
             yield put({
                 type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_ERROR,
@@ -164,12 +177,15 @@ function* updateResponsiblePartyFunction(data) {
         const response = yield call(updateResponsiblePartyApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
-
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_SUCCESS,
                 payload: { ...decryptedData },
             });
+             yield put({
+                type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_RESET,
+                payload: { ...decryptedData },
+            }); 
         } else {
             yield put({
                 type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_ERROR,
@@ -223,6 +239,10 @@ function* updatePatientsFunction(data) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: PatientsActionTypes.UPDATE_PATIENTS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: PatientsActionTypes.UPDATE_PATIENTS_RESET,
                 payload: { ...decryptedData },
             });
         } else {
@@ -485,9 +505,7 @@ export function* callResetUpdate() {
         type: PatientsActionTypes.RESET_UPDATE_STATUS,
         payload: {},
     });
-
 }
-
 
 export function* watchGetPatients() {
     yield takeEvery(PatientsActionTypes.GET_PATIENTS, getPatientsFunction);
@@ -564,9 +582,15 @@ function* patientsSaga() {
         fork(watchCreateResponsibleParty),
         fork(watchUpdateResponsibleParty),
         fork(watchGetResponsibleParty),
-        fork(watchUpdatePatients), fork(watchCreateInsurance), fork(watchUpdateInsurance),
-        fork(watchGetInsuranceByPatientId), fork(watchUploadDocuments), fork(watchUpdateDocuments),
-        fork(watchGetDocuments), fork(watchDeleteDocuments), fork(watchGetDocumentById),
+        fork(watchUpdatePatients),
+        fork(watchCreateInsurance),
+        fork(watchUpdateInsurance),
+        fork(watchGetInsuranceByPatientId),
+        fork(watchUploadDocuments),
+        fork(watchUpdateDocuments),
+        fork(watchGetDocuments),
+        fork(watchDeleteDocuments),
+        fork(watchGetDocumentById),
         fork(watchresetState),
     ]);
 }

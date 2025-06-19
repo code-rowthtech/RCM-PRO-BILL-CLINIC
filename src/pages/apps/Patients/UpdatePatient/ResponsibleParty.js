@@ -6,7 +6,7 @@ import AddressForm from '../../Common Pages/AddressForm';
 import TelecomFrom from '../../Common Pages/TelecomFrom';
 import { useDispatch, useSelector } from 'react-redux';
 import { encryptMessage } from '../../../../cryptoUtils';
-import { createResponsiblePartyAction } from '../../../../redux/actions';
+import { createResponsiblePartyAction, getPatientByIdAction } from '../../../../redux/actions';
 import { dataList } from '../../../../utils/DataSets/relations.data';
 import Select from 'react-select';
 import Spinner from '../../../../constants/Spinner';
@@ -18,6 +18,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
+    console.log('patientId', patientId);
     const [responsibleAddresses, setResponsibleAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
@@ -97,17 +98,11 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
     };
 
-    // useEffect(() => {
-    //     if (createResponse === 201) {
-    //         // if (submissionType === 'saveAndNext') {
-    //         //     // reset(); // Reset the form
-    //         //     // setActiveTab('referringDoctor');
-    //         // } else if (submissionType === 'saveAndReset') {
-    //         //     reset();
-    //         //     // setActiveTab('personalDetails');
-    //         // }
-    //     }
-    // }, [createResponse]);
+  useEffect(() => {
+        if(createResponse === 201) {
+            dispatch(getPatientByIdAction({ patientId }));
+        }
+    }, [createResponse]);
     const relationshipOption = dataList?.map((relation) => ({
         value: relation, // Code as the value
         label: relation.display, // Display text as the label
