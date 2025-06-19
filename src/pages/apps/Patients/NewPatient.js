@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Card, Col, Form, Modal, Row, InputGroup } from 'react-bootstrap';
-import { FiUploadCloud } from 'react-icons/fi';
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Spinner } from 'react-bootstrap';
+import { FiDownloadCloud, FiEye, FiUploadCloud } from 'react-icons/fi';
 import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPatientsAction, getPatientByIdAction, getResponsiblePartyAction } from '../../../redux/patients/actions';
@@ -24,6 +24,9 @@ import ReferringDoctor from './referringDoctor';
 const calculateAge = (dob) => {
     const birthDate = new Date(dob);
     const today = new Date();
+    if (isNaN(birthDate.getTime())) {
+        return '0.0';
+    }
 
     let years = today.getFullYear() - birthDate.getFullYear();
     let months = today.getMonth() - birthDate.getMonth();
@@ -44,7 +47,7 @@ const calculateAge = (dob) => {
         months += 12;
     }
 
-    return `${years}.${months}`;
+    return `${String(years).padStart(2, '0')}.${String(months).padStart(2, '0')}`;
 };
 
 const NewPatient = () => {
@@ -75,6 +78,7 @@ const NewPatient = () => {
     const logoFileInputRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
+    console.log(logo, 'logo');
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
     const [showResponsibleTab, setShowResponsibleTab] = useState(true);
@@ -85,7 +89,24 @@ const NewPatient = () => {
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [responsibleParty, setResponsibleParty] = useState('true');
     const [referringPhysician, setReferringPhysician] = useState('true');
+    const [showModalPic, setShowModalPic] = useState(false);
+    const [modalFileUrl, setModalFileUrl] = useState('');
+    console.log(modalFileUrl, 'modalFileUrl');
+    const [imageLoading, setImageLoading] = useState(true);
 
+    const handleShowModal = (url) => {
+        setModalFileUrl(url);
+        setShowModalPic(true);
+    };
+    const handleCloseModal = () => {
+        setShowModalPic(false); // Close the modal
+        setModalFileUrl(''); // Reset file URL
+    };
+    useEffect(() => {
+        if (showModalPic && modalFileUrl) {
+            setImageLoading(true);
+        }
+    }, [showModalPic, modalFileUrl]);
     const options = responsibleParties?.map((party) => ({
         value: party._id,
         label: party.fullName,
@@ -248,7 +269,7 @@ const NewPatient = () => {
             setLogo(url);
             setLogoName(selectedFile?.name);
             clearErrors('profileImage');
-        } catch (error) { }
+        } catch (error) {}
     };
     useEffect(() => {
         dispatch(getStatesByCountryAction());
@@ -278,8 +299,8 @@ const NewPatient = () => {
     };
 
     const renderPhoneField = (label, name, iconToggle) => (
-        <div className="col-md-3 col-12 mb-2 ">
-            <Form.Group className="mb-1 position-relative p">
+        <div className="col-md-3 col-12 mb-2">
+            <Form.Group className="position-relative ">
                 <Form.Label className="mb-0 d-flex justify-content-start gap-1 align-items-center">
                     {label}
                     {iconToggle}
@@ -291,14 +312,18 @@ const NewPatient = () => {
                     <Controller
                         name={name}
                         control={control}
-                        rules={!id ? {
-                            pattern: {
-                                value: /^\(\d{3}\)\d{3}-\d{4}$/,
-                                message: 'Format must be (XXX)XXX-XXXX',
-                            },
-                            maxLength: { value: 13, message: 'Max 13 characters' },
-                            minLength: { value: 13, message: 'Min 13 characters' },
-                        } : {}}
+                        rules={
+                            !id
+                                ? {
+                                      pattern: {
+                                          value: /^\(\d{3}\)\d{3}-\d{4}$/,
+                                          message: 'Format must be (XXX)XXX-XXXX',
+                                      },
+                                      maxLength: { value: 13, message: 'Max 13 characters' },
+                                      minLength: { value: 13, message: 'Min 13 characters' },
+                                  }
+                                : {}
+                        }
                         render={({ field: { onChange, value, ref } }) => (
                             <Form.Control
                                 type="tel"
@@ -329,7 +354,6 @@ const NewPatient = () => {
     const maxInputsReached = showCellPhone && showOfficePhone;
 
     const onSubmit = (data) => {
-
         const payload = {
             clinicId: clinicId || '',
             birthDate: data?.dateOfBirth || '',
@@ -346,15 +370,15 @@ const NewPatient = () => {
 
             photo: logo?.url
                 ? [
-                    {
-                        contentType: logo?.fileType || 'image/jpeg', // Assuming fileType exists, default to 'image/jpeg'
-                        url: logo?.url?.split('?')[0], // Remove query params from URL
-                        data: logo?.base64 || undefined, // If base64 data is available
-                        hash: logo?.hash || '', // If you have a hash for verification
-                        title: logoName || '', // Use provided file name as title
-                        creation: new Date().toISOString(), // Current timestamp
-                    },
-                ]
+                      {
+                          contentType: logo?.fileType || 'image/jpeg', // Assuming fileType exists, default to 'image/jpeg'
+                          url: logo?.url?.split('?')[0], // Remove query params from URL
+                          data: logo?.base64 || undefined, // If base64 data is available
+                          hash: logo?.hash || '', // If you have a hash for verification
+                          title: logoName || '', // Use provided file name as title
+                          creation: new Date().toISOString(), // Current timestamp
+                      },
+                  ]
                 : [],
             patientStatus: data?.patientStatus || '',
             paymentProfile: data?.paymentProfile || '',
@@ -431,8 +455,6 @@ const NewPatient = () => {
             value: data?.alternateEmail || '',
         });
 
-
-
         if (data?.patientStatus === 'Inactive-Deceased') {
             payload.deceasedBoolean = true;
             if (data?.deceasedDateTime) {
@@ -465,16 +487,18 @@ const NewPatient = () => {
                             <ul className="nav nav-underline">
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${activeTab === 'personalDetails' ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`text-black nav-link fw-medium ${
+                                            activeTab === 'personalDetails' ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleTabChange('personalDetails')}>
                                         Personal Details
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${activeTab === 'demographicDetails' ? 'active fw-bold' : ''
-                                            }`}
+                                        className={`text-black nav-link fw-medium ${
+                                            activeTab === 'demographicDetails' ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleTabChange('demographicDetails')}>
                                         Demographic
                                     </button>
@@ -482,8 +506,9 @@ const NewPatient = () => {
                                 {showResponsibleTab && (
                                     <li className="nav-item">
                                         <button
-                                            className={`text-black nav-link fw-medium ${activeTab === 'responsible' ? 'active fw-bold' : ''
-                                                }`}
+                                            className={`text-black nav-link fw-medium ${
+                                                activeTab === 'responsible' ? 'active fw-bold' : ''
+                                            }`}
                                             onClick={() => handleTabChange('responsible')}>
                                             Responsible Party
                                         </button>
@@ -492,8 +517,9 @@ const NewPatient = () => {
                                 {showReferringTab && (
                                     <li className="nav-item">
                                         <button
-                                            className={`text-black nav-link fw-medium ${activeTab === 'referringDoctor' ? 'active fw-bold' : ''
-                                                }`}
+                                            className={`text-black nav-link fw-medium ${
+                                                activeTab === 'referringDoctor' ? 'active fw-bold' : ''
+                                            }`}
                                             onClick={() => handleTabChange('referringDoctor')}>
                                             Referring Doctor
                                         </button>
@@ -534,7 +560,7 @@ const NewPatient = () => {
                         {activeTab === 'personalDetails' && (
                             <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                                 <div className="row mt-md-3">
-                                    <div className="col-md-3 col-12 ">
+                                    <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label htmlFor="firstName" className="mb-0">
                                                 First Name <span className="text-danger">*</span>
@@ -576,7 +602,7 @@ const NewPatient = () => {
                                             )}
                                         </Form.Group>
                                     </div>
-                                    <div className="col-md-3 col-12">
+                                    <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label htmlFor="lastName" className="mb-0">
                                                 Last Name <span className="text-danger">*</span>
@@ -670,10 +696,13 @@ const NewPatient = () => {
                                         'Home Phone',
                                         'homePhone',
                                         !maxInputsReached && (
-                                            <span className=' uil-plus-circle plusicon cursor-pointer' onClick={() => {
-                                                if (!showCellPhone) setShowCellPhone(true);
-                                                else if (!showOfficePhone) setShowOfficePhone(true);
-                                            }} />
+                                            <span
+                                                className=" uil-plus-circle plusicon cursor-pointer"
+                                                onClick={() => {
+                                                    if (!showCellPhone) setShowCellPhone(true);
+                                                    else if (!showOfficePhone) setShowOfficePhone(true);
+                                                }}
+                                            />
                                         )
                                     )}
 
@@ -681,7 +710,8 @@ const NewPatient = () => {
                                         renderPhoneField(
                                             'Cell Phone',
                                             'cellPhone',
-                                            <span className=' uil-minus-circle minusicon text-danger cursor-pointer'
+                                            <span
+                                                className=" uil-minus-circle minusicon text-danger cursor-pointer"
                                                 onClick={() => setShowCellPhone(false)}
                                             />
                                         )}
@@ -690,17 +720,21 @@ const NewPatient = () => {
                                         renderPhoneField(
                                             'Office Phone',
                                             'officePhone',
-                                            <span className=' uil-minus-circle minusicon text-danger cursor-pointer'
-                                                onClick={() => setShowOfficePhone(false)} />
+                                            <span
+                                                className=" uil-minus-circle minusicon text-danger cursor-pointer"
+                                                onClick={() => setShowOfficePhone(false)}
+                                            />
                                         )}
 
-                                    <div className="col-md-3 col-12 mb-2">
+                                    <div className="col-md-3 col-12 mb-2 mt-1">
                                         <Form.Group>
                                             <Form.Label className="mb-0 d-flex justify-content-start gap-1 align-items-center">
                                                 Email ID
                                                 {!showAltEmail && (
-                                                    <span className=' uil-plus-circle plusicon cursor-pointer'
-                                                        onClick={() => setShowAltEmail(true)} />
+                                                    <span
+                                                        className=" uil-plus-circle plusicon cursor-pointer"
+                                                        onClick={() => setShowAltEmail(true)}
+                                                    />
                                                 )}
                                             </Form.Label>
                                             <Form.Control
@@ -728,7 +762,7 @@ const NewPatient = () => {
                                                     Alternate Email
                                                     <span
                                                         onClick={() => setShowAltEmail(false)}
-                                                        className=' uil-minus-circle minusicon text-danger cursor-pointer'></span>
+                                                        className=" uil-minus-circle minusicon text-danger cursor-pointer"></span>
                                                 </Form.Label>
                                                 <Form.Control
                                                     type="email"
@@ -769,7 +803,17 @@ const NewPatient = () => {
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Approx. age"
+                                                inputMode="decimal" // For numeric + dot keyboard on mobile
+                                                pattern="^\d*\.?\d*$" // Regex for numbers with optional one dot
                                                 {...register('approxAge')}
+                                                onInput={(e) => {
+                                                    const value = e.target.value;
+                                                    // Allow only digits and one optional dot
+                                                    const valid = value
+                                                        .replace(/[^0-9.]/g, '')
+                                                        .replace(/(\..*?)\..*/g, '$1');
+                                                    e.target.value = valid;
+                                                }}
                                             />
                                         </Form.Group>
                                     </Col>
@@ -801,7 +845,7 @@ const NewPatient = () => {
                                 </div>
                                 <hr className="mt-0" />
                                 <div className="row">
-                                    <div className="col-md-3 col-12">
+                                    <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label htmlFor="patientstatus" className="mb-0">
                                                 Patient Status
@@ -834,22 +878,35 @@ const NewPatient = () => {
                                             </Form.Group>
                                         </div>
                                     )}
-                                    <div className="col-md-3 col-12">
-                                        <div className="mb-2 d-flex flex-column position-relative">
+                                    <div className="col-md-3 col-12 mb-2">
+                                        <div className="d-flex flex-column position-relative">
                                             <Form.Label className="mb-0">Patient Photo</Form.Label>
                                             <div
                                                 onClick={() => logoFileInputRef.current.click()}
-                                                style={{ height: '30px' }}
-                                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
-                                                    }`}>
+                                                style={{ height: '30px', marginTop: '3px' }}
+                                                className={`custom-file-upload justify-content-between cursor-pointer ${
+                                                    logoName || profileUploading ? '' : 'custom-form-fields'
+                                                }`}>
                                                 {logoName
                                                     ? logoName.split('/').pop().slice(0, 30) + '...'
                                                     : profileUploading
-                                                        ? 'Uploading...'
-                                                        : 'Upload Photo'}
-                                                <p className="mb-0">
-                                                    <FiUploadCloud />
-                                                </p>
+                                                      ? 'Uploading...'
+                                                      : 'Upload Photo'}
+                                                <div className="d-flex align-items-center gap-2">
+                                                    {logo?.url && (
+                                                        <FiEye
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleShowModal(logo?.url);
+                                                            }}
+                                                            className="text-dark cursor-pointer"
+                                                        />
+                                                    )}
+
+                                                    <p className="mb-0">
+                                                        <FiDownloadCloud />
+                                                    </p>
+                                                </div>
                                             </div>
                                             <Form.Control
                                                 type="file"
@@ -895,7 +952,7 @@ const NewPatient = () => {
                                             )}
                                         </Form.Group>
                                     </div>
-                                    <div className="col-md-3 col-12">
+                                    <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Previous Birth Name </Form.Label>
                                             <Form.Control
@@ -1084,7 +1141,8 @@ const NewPatient = () => {
                                             <Form.Label className="mb-0">Reminder Language</Form.Label>
                                             <Form.Select
                                                 {...register('reminderLanguage')}
-                                                data-has-value={!!watch('reminderLanguage')} defaultValue="English">
+                                                data-has-value={!!watch('reminderLanguage')}
+                                                defaultValue="English">
                                                 <option value="English">English</option>
                                                 <option value="Spanish">Spanish</option>
                                                 <option value="French">French</option>
@@ -1097,8 +1155,7 @@ const NewPatient = () => {
                                             <Form.Select
                                                 onChange={handleResponsibleChange}
                                                 data-has-value={!!responsibleParty}
-                                                value={responsibleParty}
-                                            >
+                                                value={responsibleParty}>
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>
@@ -1111,8 +1168,7 @@ const NewPatient = () => {
                                             <Form.Select
                                                 onChange={handleReferringChange}
                                                 data-has-value={!!referringPhysician}
-                                                value={referringPhysician}
-                                            >
+                                                value={referringPhysician}>
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>
@@ -1152,7 +1208,9 @@ const NewPatient = () => {
                                                     }),
                                                     placeholder: (provided) => ({
                                                         ...provided,
-                                                        fontWeight: 'bold',
+                                                        fontWeight: '600',
+                                                        marginTop: '4px',
+                                                        marginLeft: '-5px',
                                                         fontSize: '12px',
                                                         paddingBottom: '5px',
                                                     }),
@@ -1166,7 +1224,8 @@ const NewPatient = () => {
                                             <Form.Label className="mb-0">Medical History Concent</Form.Label>
                                             <Form.Select
                                                 {...register('medicationHistoryConsent')}
-                                                data-has-value={!!watch('medicationHistoryConsent')} defaultValue={'true'}>
+                                                data-has-value={!!watch('medicationHistoryConsent')}
+                                                defaultValue={'true'}>
                                                 <option value={'true'}>Yes</option>
                                                 <option value={'false'}>No</option>
                                             </Form.Select>
@@ -1179,7 +1238,8 @@ const NewPatient = () => {
                                             <Form.Select
                                                 {...register('paymentProfile')}
                                                 aria-label="Payment Profile"
-                                                data-has-value={!!watch('paymentProfile')} defaultValue={'Cash'}>
+                                                data-has-value={!!watch('paymentProfile')}
+                                                defaultValue={'Cash'}>
                                                 <option value="Cash">Cash</option>
                                                 <option value="Insurance">Insurance</option>
                                                 <option value="Insurance Out of Network">
@@ -1331,6 +1391,41 @@ const NewPatient = () => {
                             </Col>
                         </Row>
                     </Form>
+                </Modal.Body>
+            </Modal>
+            <Modal show={showModalPic} onHide={handleCloseModal} centered>
+                <Modal.Body>
+                    <div className="d-flex justify-content-center">
+                        <p className="fw-bold" style={{ color: '#6169D0' }}>
+                            File Preview
+                        </p>
+                    </div>
+                    <div
+                        style={{
+                            overflow: 'hidden',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            minHeight: '300px', // minimum height to keep space for loader
+                        }}>
+                        {imageLoading && (
+                            <div className="d-flex justify-content-center align-items-center">
+                                <Spinner />
+                            </div>
+                        )}
+                        <img
+                            src={modalFileUrl}
+                            alt="File Preview"
+                            onLoad={() => setImageLoading(false)}
+                            onError={() => setImageLoading(false)} // hide spinner on error too
+                            style={{
+                                maxWidth: '100%',
+                                maxHeight: '100vh',
+                                objectFit: 'contain',
+                                display: imageLoading ? 'none' : 'block', // hide while loading
+                            }}
+                        />
+                    </div>
                 </Modal.Body>
             </Modal>
         </div>

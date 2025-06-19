@@ -28,17 +28,17 @@ export const createRoleDataReducer = (state = CREATE_ROLE_DATA_INITIAL_STATE, ac
                 data: action.payload,
                 loading: false
             }
+            case RoleActionTypes.CREATE_ROLE_DATA_RESET:
+            return {
+                data: [],
+                loading: false
+            }
         case RoleActionTypes.CREATE_ROLE_DATA_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case RoleActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
-        default: return state
+        default: return {...state}
     }
 }
 
@@ -59,11 +59,6 @@ export const getRoleDataReducer = (state = GET_ROLE_DATA_INITIAL_STATE, action) 
                 data: action.payload,
                 loading: false
             }
-        case RoleActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
         default: return state
     }
 }
@@ -81,17 +76,18 @@ export const updateRoleDataReducer = (state = UPDATE_ROLE_DATA_INITIAL_STATE, ac
                 data: action.payload,
                 loading: false
             }
+            case RoleActionTypes.UPDATE_ROLE_DATA_RESET:
+            return {
+                data: [],
+                loading: false
+            }
         case RoleActionTypes.UPDATE_ROLE_DATA_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case RoleActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
-        default: return state
+     
+        default: return {...state}
     }
 }
 

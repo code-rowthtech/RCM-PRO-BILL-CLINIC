@@ -225,7 +225,7 @@ const MedicalHistory = () => {
                                                 styles={{
                                                     control: (provided) => ({
                                                         ...provided,
-                                                        minHeight: '30px',
+                                                        // minHeight: '30px',
                                                     }),
                                                 }}
                                             />
@@ -401,7 +401,7 @@ const MedicalHistory = () => {
                                                     />
                                                 ) : (
                                                     <i
-                                                        className="bi bi-pencil text-info cursor-pointer"
+                                                        className="mdi mdi-square-edit-outline cursor-pointer fs-5"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setToEdit(item);

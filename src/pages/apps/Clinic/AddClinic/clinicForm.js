@@ -312,6 +312,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             poc: pocs,
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
+        console.log(newPayload,'newpayload')
     };
     const logoFileInputRef = useRef(null);
     const handleLogoClick = () => {
@@ -996,14 +997,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             : item.file.name
                                                         : 'Upload Document'}
                                                     <div className="d-flex align-items-center gap-2">
-                                                        {(item?.file?.url || clinicsDataGet?.orgLogo?.url) && (
+                                                        {(item?.file?.url) && (
                                                             <FiEye
                                                                 className="cursor-pointer"
                                                                 onClick={(e) => {
                                                                     e.preventDefault();
                                                                     e.stopPropagation();
                                                                     handleShowModal(
-                                                                        item?.file?.url || clinicsDataGet?.orgLogo?.url
+                                                                        item?.file?.url 
                                                                     );
                                                                 }}
                                                             />

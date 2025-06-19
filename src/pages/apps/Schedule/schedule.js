@@ -174,7 +174,7 @@ const Schedule = () => {
                                                             }),
                                                             input: (provided) => ({
                                                                 ...provided,
-                                                                margin: '0px',
+                                                                marginLeft: '5px',
                                                             }),
                                                             indicatorsContainer: (provided) => ({
                                                                 ...provided,

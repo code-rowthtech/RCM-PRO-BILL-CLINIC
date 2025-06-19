@@ -86,13 +86,25 @@ const TaskCategory = () => {
     useEffect(() => {
         if (createResponse === 200)
             dispatch(
-                getMastersDataAction({ status: status, category: 'task-category', search: search, limit: 10, skip: skip })
+                getMastersDataAction({
+                    status: status,
+                    category: 'task-category',
+                    search: search,
+                    limit: 10,
+                    skip: skip,
+                })
             );
     }, [createResponse]);
     useEffect(() => {
         if (updateResponse === 200) {
             dispatch(
-                getMastersDataAction({ status: status, category: 'task-category', search: search, limit: 10, skip: skip })
+                getMastersDataAction({
+                    status: status,
+                    category: 'task-category',
+                    search: search,
+                    limit: 10,
+                    skip: skip,
+                })
             );
         }
     }, [updateResponse]);
@@ -121,16 +133,18 @@ const TaskCategory = () => {
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'
-                                            } me-2`}>
+                                        className={`active_inactive_buttons ${
+                                            status === true ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2`}>
                                         Active
                                     </Button>
 
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={` active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'
-                                            } me-2`}>
+                                        className={` active_inactive_buttons ${
+                                            status === false ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2`}>
                                         Inactive
                                     </Button>
                                 </Col>
@@ -150,7 +164,7 @@ const TaskCategory = () => {
                                                 <FormInput
                                                     type="text"
                                                     value={search}
-                                                    placeholder='Search...'
+                                                    placeholder="Search..."
                                                     onChange={(e) => {
                                                         setSearch(e.target.value);
                                                         setSkip(1);
@@ -215,7 +229,7 @@ const TaskCategory = () => {
                             <Table
                                 responsive
                                 className="table-centered table-nowrap mb-0  rounded"
-                                style={{ height: tableGetData?.length === 0 ? '76vh' : 'auto' }}>
+                                style={{ height: tableGetData?.length === 0 ? '' : 'auto' }}>
                                 <thead className="text-white">
                                     <tr>
                                         <th className="text-white py-2" style={{ fontSize: '13px' }}>
@@ -254,8 +268,14 @@ const TaskCategory = () => {
                                                 <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                     {data?.name?.charAt(0).toUpperCase() + data?.name?.slice(1)}
                                                 </td>
-                                                <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                    {data.description}...
+                                                <td
+                                                    className="py-1"
+                                                    style={{ fontSize: '13px', fontWeight: '400' }}
+                                                    title={data.description} // Tooltip with full text
+                                                >
+                                                    {data.description?.length > 50
+                                                        ? data.description.slice(0, 50) + '...'
+                                                        : data.description}
                                                 </td>
                                                 <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                     {formatDate(data.createdAt)}
@@ -379,7 +399,7 @@ const TaskCategory = () => {
                                 </Button>
                                 <Button type="submit" className="custom-buttons">
                                     {store?.createMastersDataReducer?.loading ||
-                                        store?.updateMastersDataReducer?.loading ? (
+                                    store?.updateMastersDataReducer?.loading ? (
                                         <div class="spinner-border spinner-border-sm" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>

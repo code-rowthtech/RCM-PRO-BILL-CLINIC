@@ -224,7 +224,9 @@ const Demographicdetails = ({
                 employerPhone: data?.employerPhone?.replace(/\D/g, ''),
                 employmentStatus: data?.employmentStatus,
                 occupation: data?.occupation,
-                workLocation: {
+                workLocation: 
+                // employerAddress ?
+                 {
                     address: {
                         line: [data?.employerAddress],
                         city: data?.employerCity,
@@ -232,9 +234,11 @@ const Demographicdetails = ({
                         postalCode: data?.employerZip,
                         country: 'United States',
                     },
-                },
+                }
+                //  : {},
             },
             identifier: finalIdentifiers,
+            // ...(demographicAddresses && {address: demographicAddresses}),
             address: demographicAddresses,
             ...(data?.notes && { notes: data.notes }),
         };

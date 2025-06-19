@@ -25,6 +25,10 @@ function* createRoleDataFunction(data) {
                 type: RoleActionTypes.CREATE_ROLE_DATA_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: RoleActionTypes.CREATE_ROLE_DATA_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: RoleActionTypes.CREATE_ROLE_DATA_ERROR,
@@ -83,6 +87,10 @@ function* updateRoleDataFunction(data) {
             yield put({
                 type: RoleActionTypes.UPDATE_ROLE_DATA_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: RoleActionTypes.UPDATE_ROLE_DATA_RESET,
+                payload: {},
             });
         } else {
             yield put({

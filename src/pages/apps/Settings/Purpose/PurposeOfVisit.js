@@ -155,7 +155,7 @@ const POV = () => {
                                                     setSearch(e.target.value);
                                                     setSkip(1);
                                                 }}
-                                                placeholder='Search...'
+                                                placeholder="Search..."
                                                 className="pe-4"
                                                 style={{
                                                     border: 'none',
@@ -215,7 +215,7 @@ const POV = () => {
                         <Table
                             responsive
                             className="table-centered table-nowrap mb-0  rounded"
-                            style={{ height: tableGetData?.length === 0 ? '100vh' : 'auto' }}>
+                            style={{ height: tableGetData?.length === 0 ? '' : 'auto' }}>
                             <thead className="text-white">
                                 <tr>
                                     <th className="text-white">S.No.</th>
@@ -259,24 +259,25 @@ const POV = () => {
                                         </tr>
                                     ))
                                 ) : (
-                                    <tr>
+                                    <tr key={''}>
                                         <td colSpan={6} className="text-center">
-                                            No Data Found
+                                            <h3 className="my-5">No Data Found</h3>
                                         </td>
                                     </tr>
                                 )}
                             </tbody>
                         </Table>
-
-                        <Row>
-                            <Col className="mt-2 d-flex justify-content-end">
-                                <Paginations
-                                    currentPage={skip}
-                                    totalPages={store?.getMastersDataReducer?.data1?.data?.totalPages}
-                                    onPageChange={handlePageChange}
-                                />
-                            </Col>
-                        </Row>
+                        {tableGetData?.length > 0 && (
+                            <Row>
+                                <Col className="mt-2 d-flex justify-content-end">
+                                    <Paginations
+                                        currentPage={skip}
+                                        totalPages={store?.getMastersDataReducer?.data1?.data?.pagination?.totalPages}
+                                        onPageChange={handlePageChange}
+                                    />
+                                </Col>
+                            </Row>
+                        )}
                     </Card.Body>
                 </Card>
             </Col>
@@ -374,7 +375,7 @@ const POV = () => {
                             <Button onClick={closeAddModal} className="custom-buttons">
                                 Close
                             </Button>
-                            <Button type="submit" className="custom-buttons">
+                            <Button type="submit" className="custom-buttons" style={{width:'65px'}}>
                                 {store?.createMastersDataReducer?.loading ||
                                 store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">

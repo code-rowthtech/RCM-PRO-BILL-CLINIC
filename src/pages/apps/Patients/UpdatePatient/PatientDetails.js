@@ -770,6 +770,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                 <Button
                     type="submit"
                     className="custom-buttons btn-height"
+                    style={{width: '70px'}}
                     disabled={store?.updatePatientsReducer?.loading}>
                     {store?.updatePatientsReducer?.loading ? (
                         <Spinner className="spinner-border-sm" color="white" />

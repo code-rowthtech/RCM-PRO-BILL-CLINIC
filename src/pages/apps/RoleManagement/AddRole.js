@@ -14,6 +14,7 @@ import { useSearchParams } from 'react-router-dom';
 import { updateRolesReducer } from '../../../redux/roles/reducers';
 
 const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => {
+    console.log({ dataToEdit });
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -152,7 +153,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
             delete data.email;
             delete data.password;
             delete data.confirmPassword;
-            console.log(data, 'updateData')
             dispatch(updateRolesAction({ key: `${encryptMessage(data)}` }));
         } else {
             dispatch(createRolesAction({ key: `${encryptMessage(data)}` }));
@@ -191,8 +191,19 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
     const role = watch('roleId');
 
     const handleContactChange = (value, field) => {
+        // Remove all non-numeric characters
+        let rawValue = value.replace(/\D/g, '');
+        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
+
+        // Format as (XXX)XXX-XXXX
+        const formattedValue = rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
+            if (p3) return `(${p1})${p2}-${p3}`;
+            if (p2) return `(${p1})${p2}`;
+            return `(${p1}`;
+        });
+
         setTelecom((prevTelecom) =>
-            prevTelecom.map((contact, index) => (index === field ? { ...contact, value } : contact))
+            prevTelecom.map((contact, index) => (index === field ? { ...contact, value: formattedValue } : contact))
         );
     };
 
@@ -295,28 +306,27 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 minLength: dataToEdit
                                                     ? false
                                                     : {
-                                                        value: 8,
-                                                        message: 'Password must be at least 8 characters',
-                                                    },
+                                                          value: 8,
+                                                          message: 'Password must be at least 8 characters',
+                                                      },
                                                 maxLength: dataToEdit
                                                     ? false
                                                     : {
-                                                        value: 16,
-                                                        message: 'Password must not exceed 16 characters',
-                                                    },
+                                                          value: 16,
+                                                          message: 'Password must not exceed 16 characters',
+                                                      },
                                                 validate: dataToEdit
                                                     ? false
                                                     : {
-                                                        noEmpty: (value) =>
-                                                            value.trim() !== '' ||
-                                                            'Password cannot be empty or only spaces',
-                                                        noSpacesBeforeText: (value) =>
-                                                            !/^\s/.test(value) ||
-                                                            'First character cannot be a space',
-                                                        isStrong: (value) =>
-                                                            strongRegex.test(value) ||
-                                                            'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
-                                                    },
+                                                          noEmpty: (value) =>
+                                                              value.trim() !== '' ||
+                                                              'Password cannot be empty or only spaces',
+                                                          noSpacesBeforeText: (value) =>
+                                                              !/^\s/.test(value) || 'First character cannot be a space',
+                                                          isStrong: (value) =>
+                                                              strongRegex.test(value) ||
+                                                              'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
+                                                      },
                                             })}
                                             onChange={(e) => {
                                                 handlePasswordChange(e);
@@ -350,10 +360,9 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 validate: dataToEdit
                                                     ? false
                                                     : {
-                                                        matchPassword: (value) =>
-                                                            value === watch('password') ||
-                                                            'Passwords do not match',
-                                                    },
+                                                          matchPassword: (value) =>
+                                                              value === watch('password') || 'Passwords do not match',
+                                                      },
                                             })}
                                             onChange={() => trigger('confirmPassword')}
                                             maxLength={16}
@@ -367,9 +376,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                             {passwordVisibility.confirmPassword ? <FaEyeSlash /> : <FaEye />}
                                         </span>
                                         {errors.confirmPassword?.type === 'matchPassword' && (
-                                            <span className="text-danger fs-6">
-                                                {errors.confirmPassword.message}
-                                            </span>
+                                            <span className="text-danger fs-6">{errors.confirmPassword.message}</span>
                                         )}
                                     </Form.Group>
                                 </Col>
@@ -419,38 +426,45 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 'phone',
                                                 !id
                                                     ? {
-                                                        required: dataToEdit ? false : 'Contact number is required',
-                                                        pattern: {
-                                                            value: /^[0-9]*$/,
-                                                            message: 'Contact must be numeric only',
-                                                        },
-                                                        maxLength: {
-                                                            value: 10,
-                                                            message: 'Contact must not exceed 10 digits',
-                                                        },
-                                                        minLength: {
-                                                            value: 10,
-                                                            message: 'Contact must not be less than 10 digits',
-                                                        },
-                                                        validate: {
-                                                            noEmpty: (value) =>
-                                                                value.trim() !== '' ||
-                                                                'Contact cannot be empty or only spaces',
-                                                            noSpacesBeforeText: (value) =>
-                                                                !/^\s/.test(value) ||
-                                                                'First character cannot be a space',
-                                                        },
-                                                    }
+                                                          required: dataToEdit ? false : 'Contact number is required',
+                                                          pattern: {
+                                                              value: /^[0-9()\-\s]*$/,
+                                                              message: 'Contact must be numeric only',
+                                                          },
+                                                          maxLength: {
+                                                              value: 13, // (XXX)XXX-XXXX is 13 chars
+                                                              message: 'Contact must not exceed 10 digits',
+                                                          },
+                                                          minLength: {
+                                                              value: 13,
+                                                              message: 'Contact must not be less than 10 digits',
+                                                          },
+                                                          validate: {
+                                                              noEmpty: (value) =>
+                                                                  value.trim() !== '' ||
+                                                                  'Contact cannot be empty or only spaces',
+                                                              noSpacesBeforeText: (value) =>
+                                                                  !/^\s/.test(value) ||
+                                                                  'First character cannot be a space',
+                                                          },
+                                                      }
                                                     : {}
                                             )}
-                                            placeholder="1234567890"
-                                            maxLength={10}
+                                            placeholder="(845)567-9292"
+                                            maxLength={13}
                                             onChange={(e) => {
-                                                handleContactChange(e.target.value, 0);
-                                            }}
-                                            onInput={(e) => {
-                                                const value = e.target.value;
-                                                e.target.value = value.replace(/\s/g, ''); // Remove spaces
+                                                let rawValue = e.target.value.replace(/\D/g, '');
+                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
+                                                const formattedValue = rawValue.replace(
+                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                    (match, p1, p2, p3) => {
+                                                        if (p3) return `(${p1})${p2}-${p3}`;
+                                                        if (p2) return `(${p1})${p2}`;
+                                                        return `(${p1}`;
+                                                    }
+                                                );
+                                                setValue('phone', formattedValue);
+                                                handleContactChange(formattedValue, 0);
                                             }}
                                         />
                                     </InputGroup>
@@ -472,19 +486,26 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 {...register('phNumberSecondary', {
                                                     validate: {
                                                         isValid: (value) =>
-                                                            !value || // If empty, allow submission
-                                                            /^[0-9]{10}$/.test(value) ||
+                                                            !value ||
+                                                            (/^[0-9()\-\s]*$/.test(value) && value.length === 13) ||
                                                             'Contact Number Secondary must be a 10-digit number',
                                                     },
                                                 })}
-                                                placeholder="1234-234-234"
-                                                maxLength={10}
+                                                placeholder="(845)567-9292"
+                                                maxLength={13}
                                                 onChange={(e) => {
-                                                    handleContactChange(e.target.value, 1);
-                                                }}
-                                                onInput={(e) => {
-                                                    const value = e.target.value;
-                                                    e.target.value = value.replace(/\s/g, ''); // Remove all spaces
+                                                    let rawValue = e.target.value.replace(/\D/g, '');
+                                                    if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
+                                                    const formattedValue = rawValue.replace(
+                                                        /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                        (match, p1, p2, p3) => {
+                                                            if (p3) return `(${p1})${p2}-${p3}`;
+                                                            if (p2) return `(${p1})${p2}`;
+                                                            return `(${p1}`;
+                                                        }
+                                                    );
+                                                    setValue('phNumberSecondary', formattedValue);
+                                                    handleContactChange(formattedValue, 1);
                                                 }}
                                             />
                                         </InputGroup>
@@ -501,7 +522,8 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                         Designation <span className="text-danger">*</span>
                                         <i
                                             className="bi bi-plus-circle text-primary ms-1"
-                                            style={{ fontSize: '0.9rem' }} onClick={() => setAddDesiginationModal(true)}></i>
+                                            style={{ fontSize: '0.9rem' }}
+                                            onClick={() => setAddDesiginationModal(true)}></i>
                                     </Form.Label>
                                     <Form.Select
                                         {...register('designation', {
@@ -542,14 +564,15 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                         <span className="text-danger">*</span>
                                         <i
                                             className="bi bi-plus-circle text-primary ms-1"
-                                            style={{ fontSize: '0.9rem' }} onClick={() => setShowModal(true)}></i>
+                                            style={{ fontSize: '0.9rem' }}
+                                            onClick={() => setShowModal(true)}></i>
                                     </Form.Label>
                                     <Form.Select
                                         {...register('roleId', {
                                             required: dataToEdit ? false : 'Role is required',
                                         })}
                                         className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}>
-                                        <option value="" hidden>
+                                        <option value=""  className="select" hidden>
                                             Select Role
                                         </option>
                                         {decryptedRolesData?.map((data) => (
@@ -571,6 +594,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                 <Button
                                     type="submit"
                                     variant="primary"
+                                    style={{ width: '80px' }}
                                     className="ms-2 custom-buttons btn-height"
                                     disabled={store?.updateRolesReducer?.loading}>
                                     {store?.updateRolesReducer?.loading ? (
@@ -622,7 +646,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                 setAddDepartmentModal={setAddDepartmentalModal}
                 closeAddModal={closeAddModal}
             />
-
         </>
     );
 };
