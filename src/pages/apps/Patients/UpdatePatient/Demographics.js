@@ -66,7 +66,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const [demographicAddresses, setDemographicAddresses] = useState([
-        { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
 
     const updateResponse = store?.updatePatientsReducer?.data?.status;
@@ -1013,7 +1013,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                     </Col>
                 </Row>
             </div>
-            <div className="d-flex gap-2 align-items-end justify-content-end my-1">
+            <div className="d-flex gap-2 align-items-end justify-content-end my-2">
                 <Button
                     className="custom-buttons btn-height"
                     disabled={store?.updatePatientsReducer?.loading}

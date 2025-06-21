@@ -544,14 +544,11 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                     'gender'
                                     //  { required: 'Gender is required' }
                                 )}
-                                data-has-value={!!watch('gender')}>
-                                <option value="" hidden>
-                                    Select
-                                </option>
+                               >
+                                <option value="unknown">Unknown</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
-                                <option value="unknown">Unknown</option>
                             </Form.Select>
                             {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                         </Form.Group>

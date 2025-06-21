@@ -147,10 +147,9 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                                 <Form.Select
                                     {...register('gender', { required: 'Gender is required' })}
                                     aria-label="Select Gender">
-                                    <option value="">Select Gender</option>
+                                    <option value="unknown">Unknown</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
-                                    <option value="other">Other</option>
                                 </Form.Select>
                             </div>
                             {errors.gender && <span className="text-danger">{errors.gender.message}</span>}

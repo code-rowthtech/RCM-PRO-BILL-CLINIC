@@ -244,7 +244,7 @@ const FamilyHistory = () => {
                     <Form
                         onSubmit={handleSubmit(onSubmit)}
                         style={{
-                            minHeight: 'calc(100vh - 330px)',
+                            minHeight: 'calc(100vh - 340px)',
                             height: 'auto',
                             display: 'flex',
                             flexDirection: 'column',
@@ -447,8 +447,8 @@ const FamilyHistory = () => {
                                 type="submit"
                                 variant="primary"
                                 disabled={isLoading}
-                                className="px-4 py-1 custom-buttons">
-                                {toEdit ? 'Update' : 'Add'}
+                                className="px-2 py-1 custom-buttons">
+                                {toEdit ? 'Update' : 'Add Record'}
                             </Button>
                         </div>
                     </Form>

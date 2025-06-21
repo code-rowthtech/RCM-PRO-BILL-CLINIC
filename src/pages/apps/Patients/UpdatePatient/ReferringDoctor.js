@@ -29,7 +29,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
         watch,
     } = useForm();
     const [referringDoctorAddress, setReferringDoctorAddress] = useState([
-        { line: [''], city: '', state: '', postalCode: '', country: 'USA' },
+        {type:'', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
     const [submissionType, setSubmissionType] = useState(null);
     const patientDetails = store?.getPatientByIdReducer?.data?.data;

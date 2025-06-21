@@ -462,6 +462,7 @@ const NewPatient = () => {
             }
         }
         dispatch(createPatientsAction({ key: encryptMessage(payload) }));
+        console.log('Payload:', payload);
         if (submissionType === 'saveAndReset') {
             reset(); // Reset before dispatch
         }
@@ -686,7 +687,7 @@ const NewPatient = () => {
                                                 </InputGroup>
                                             </Form.Group>
 
-                                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                            <div className="position-absolute" style={{ top: '48%', left: '1%' }}>
                                                 <img src={us} alt="country code flag" width={20} />
                                             </div>
                                         </Form.Group>
@@ -828,14 +829,11 @@ const NewPatient = () => {
                                                     'gender'
                                                     //  { required: 'Gender is required' }
                                                 )}
-                                                data-has-value={!!watch('gender')}>
-                                                <option value="" hidden>
-                                                    Select
-                                                </option>
+                                             >
+                                                <option value="unknown">Unknown</option>
                                                 <option value="male">Male</option>
                                                 <option value="female">Female</option>
                                                 <option value="other">Other</option>
-                                                <option value="unknown">Unknown</option>
                                             </Form.Select>
                                             {errors.gender && (
                                                 <span className="text-danger">{errors.gender.message}</span>
@@ -893,11 +891,11 @@ const NewPatient = () => {
                                                       ? 'Uploading...'
                                                       : 'Upload Photo'}
                                                 <div className="d-flex align-items-center gap-2">
-                                                    {logo?.url && (
+                                                    {(logo?.url || logo) && (
                                                         <FiEye
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                handleShowModal(logo?.url);
+                                                                handleShowModal(logo?.url || logo);
                                                             }}
                                                             className="text-dark cursor-pointer"
                                                         />
@@ -913,7 +911,7 @@ const NewPatient = () => {
                                                 className="d-none "
                                                 style={{ height: '30px!important' }}
                                                 {...register('profileImage', {})}
-                                                accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
+                                                accept=".png, .jpg, .jpeg, .svg"
                                                 ref={logoFileInputRef}
                                                 onChange={handleFileChange}
                                             />

@@ -243,6 +243,7 @@ const Demographicdetails = ({
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload,'demographic payload');
     };
 
     useEffect(() => {
@@ -343,9 +344,7 @@ const Demographicdetails = ({
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select {...register('sex')}>
-                                <option value="" hidden>
-                                    Select Sex
-                                </option>
+                               
                                 {sexAssignedAtBirthOptions.map((option) => (
                                     <option key={option.value} value={option?.value}>
                                         {option.label}
@@ -359,9 +358,6 @@ const Demographicdetails = ({
                         <Form.Group>
                             <Form.Label className="mb-0">Gender Identity</Form.Label>
                             <Form.Select {...register('genderIdentity')}>
-                                <option value="" hidden>
-                                    Select
-                                </option>
                                 {genderIdentityOptions?.map((option) => (
                                     <option key={option?.value} value={option?.show}>
                                         {option?.show}
@@ -375,9 +371,6 @@ const Demographicdetails = ({
                         <Form.Group>
                             <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
                             <Form.Select {...register('sexParameter')}>
-                                <option value="" hidden>
-                                    Select
-                                </option>
                                 {sexParameterOptions.map((option) => (
                                     <option key={option.value} value={option?.show}>
                                         {option.show}

@@ -279,9 +279,9 @@ const SubUpdateClinic = () => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]
                         ? {
-                            url: data?.documents?.[0], // Store URL
-                            name: data?.documents?.[0]?.url?.split('/').pop(), // Extract filename from URL
-                        }
+                              url: data?.documents?.[0], // Store URL
+                              name: data?.documents?.[0]?.url?.split('/').pop(), // Extract filename from URL
+                          }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -811,10 +811,13 @@ const SubUpdateClinic = () => {
             setPocs(updatedPocs);
         }
     };
+    const [selectedIndex, setSelectedIndex] = useState(null);
+
     const handleIdentifierFileChange = async (e, index) => {
+                    setSelectedIndex(index); // Set the index of the selected identifier
+
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
-
         try {
             const url = await handleUpload(selectedFile, setIdentifierDocumnent); // Upload file
             setConstantIdentifiers((prevDetails) => {
@@ -830,7 +833,9 @@ const SubUpdateClinic = () => {
             });
         } catch (error) {
             console.error('Error during file upload:', error);
-        }
+        } finally {
+        setSelectedIndex(null); // Always reset after upload (success or error)
+    }
     };
     const formatDateForInput = (dateString) => {
         if (!dateString) return ''; // Return empty if no date
@@ -947,10 +952,11 @@ const SubUpdateClinic = () => {
                                                     />
                                                     <span
                                                         style={{ right: '2%', top: '43%' }}
-                                                        className={`${subClinicsDetailsGet?.userId?.email
-                                                            ? 'text-success position-absolute fs-4'
-                                                            : 'd-none'
-                                                            }`}>
+                                                        className={`${
+                                                            subClinicsDetailsGet?.userId?.email
+                                                                ? 'text-success position-absolute fs-4'
+                                                                : 'd-none'
+                                                        }`}>
                                                         <MdVerified />
                                                     </span>
                                                     {errors.email && (
@@ -963,15 +969,16 @@ const SubUpdateClinic = () => {
                                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                                 <div
                                                     onClick={handleLogoClick}
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading
-                                                        ? 'form-control'
-                                                        : 'custom-form-fields'
-                                                        }`}>
+                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
+                                                        logoName || logoUploading
+                                                            ? 'form-control'
+                                                            : 'custom-form-fields'
+                                                    }`}>
                                                     {logoName
                                                         ? logoName.split('/').pop().slice(0, 30) + '...'
                                                         : logoUploading
-                                                            ? 'Uploading...'
-                                                            : 'Upload Logo'}
+                                                          ? 'Uploading...'
+                                                          : 'Upload Logo'}
                                                     <div className="d-flex align-items-center gap-2">
                                                         <FiEye
                                                             onClick={(e) => {
@@ -1080,8 +1087,8 @@ const SubUpdateClinic = () => {
                                                                         item.type === 'NPI' || item.type === 'CLIA'
                                                                             ? 10
                                                                             : item.type === 'NAIC'
-                                                                                ? 5
-                                                                                : undefined
+                                                                              ? 5
+                                                                              : undefined
                                                                     }
                                                                     {...register(`identifiers[${index}].number`, {
                                                                         // required: defaultIdentifiers.includes(item.type)
@@ -1144,36 +1151,34 @@ const SubUpdateClinic = () => {
                                                                             )
                                                                             .click()
                                                                     }
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${item.file
-                                                                        ? 'form-control'
-                                                                        : 'custom-form-fields'
-                                                                        }`}>
-                                                                    {item.file?.name
-                                                                        ? (() => {
-                                                                            const decodedName = decodeURIComponent(
-                                                                                item.file.name
-                                                                            );
-                                                                            return decodedName.length > 30
-                                                                                ? decodedName.slice(0, 25) + '...'
-                                                                                : decodedName;
-                                                                        })()
-                                                                        : 'Upload Document'}
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
+                                                                        item.file
+                                                                            ? 'form-control'
+                                                                            : 'custom-form-fields'
+                                                                    }`}>
+                                                               {index === selectedIndex
+                                                                            ? 'Uploading...'
+                                                                            : item.file?.name
+                                                                              ? item.file.name.length > 30
+                                                                                  ? item.file.name.slice(0, 25) + '...'
+                                                                                  : item.file.name
+                                                                              : 'Upload Document'}
                                                                     <div className="d-flex align-items-center gap-2">
                                                                         {(item?.file?.url ||
                                                                             subClinicsDetailsGet?.orgLogo?.url) && (
-                                                                                <FiEye
-                                                                                    className="cursor-pointer"
-                                                                                    onClick={(e) => {
-                                                                                        e.preventDefault();
-                                                                                        e.stopPropagation();
-                                                                                        handleShowModal(
-                                                                                            item?.file?.url ||
+                                                                            <FiEye
+                                                                                className="cursor-pointer"
+                                                                                onClick={(e) => {
+                                                                                    e.preventDefault();
+                                                                                    e.stopPropagation();
+                                                                                    handleShowModal(
+                                                                                        item?.file?.url ||
                                                                                             subClinicsDetailsGet
                                                                                                 ?.orgLogo?.url
-                                                                                        );
-                                                                                    }}
-                                                                                />
-                                                                            )}
+                                                                                    );
+                                                                                }}
+                                                                            />
+                                                                        )}
                                                                         <p className="mb-0">
                                                                             <FiDownloadCloud />
                                                                         </p>

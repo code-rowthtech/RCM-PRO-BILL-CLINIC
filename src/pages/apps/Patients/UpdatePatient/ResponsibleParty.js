@@ -20,7 +20,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
     const patientId = searchParams.get('id');
     console.log('patientId', patientId);
     const [responsibleAddresses, setResponsibleAddresses] = useState([
-        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
 
     const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
@@ -35,7 +35,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
     } = useForm();
 
     useEffect(() => {
-        if ((patientDetails && patientId) && patientDetails?._id === patientId) {
+        if (patientDetails && patientId && patientDetails?._id === patientId) {
             setValue('title', patientDetails?.relatedPerson?.name?.[0]?.prefix);
             setValue('fullName', patientDetails?.relatedPerson?.name?.find((data) => data?.use === 'official')?.text);
             setValue('gender', patientDetails?.gender);
@@ -59,10 +59,10 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
             const rawTelecom = patientDetails?.relatedPerson?.telecom;
             const updateTelecom = Array.isArray(rawTelecom)
                 ? rawTelecom.map((data) => ({
-                    system: data?.system || '',
-                    value: data?.value || '',
-                    use: data?.use || '',
-                }))
+                      system: data?.system || '',
+                      value: data?.value || '',
+                      use: data?.use || '',
+                  }))
                 : [];
 
             setResponsibleTelecom(updateTelecom);
@@ -98,8 +98,8 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
     };
 
-  useEffect(() => {
-        if(createResponse === 201) {
+    useEffect(() => {
+        if (createResponse === 201) {
             dispatch(getPatientByIdAction({ patientId }));
         }
     }, [createResponse]);
@@ -113,7 +113,9 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
     };
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
-            <div className='scroll-container ' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
+            <div
+                className="scroll-container "
+                style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <div className="row  pb-2 pt-1 pe-0">
                     <div className="col-md-3 col-12 pe-1">
                         <Form.Label className="mb-0">
@@ -149,10 +151,9 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                             <Form.Select
                                 {...register('gender', { required: 'Gender is required' })}
                                 aria-label="Select Gender">
-                                <option value="">Select Gender</option>
+                                <option value="unknown">Unknown</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
-                                <option value="other">Other</option>
                             </Form.Select>
                         </div>
                         {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
@@ -226,7 +227,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                     style={{ width: '200px' }}
                     type="submit">
                     {store?.createResponsiblePartyReducer?.loading ? (
-                        <Spinner className='spinner-border-sm' color='white' />
+                        <Spinner className="spinner-border-sm" color="white" />
                     ) : (
                         'Save & Continue Editing'
                     )}
