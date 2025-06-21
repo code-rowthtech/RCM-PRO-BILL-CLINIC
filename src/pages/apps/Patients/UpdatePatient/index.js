@@ -45,9 +45,13 @@ const UpdatePatientIndex = () => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const id = searchParams.get('id');
-
+    console.log('Patient ID:', id);
+    
     // STORE AND STATE VARIABLES DECLARATIONS
+    const updateResponse=store?.updatePatientsReducer?.data?.status;
+    console.log('Update Response:',updateResponse);
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
+    console.log('Patient Details:', patientDetails);
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [printOptions, setPrintOptions] = useState([]);
@@ -99,6 +103,12 @@ const UpdatePatientIndex = () => {
     useEffect(() => {
         dispatch(getPatientByIdAction({ id }));
     }, [dispatch, id]);
+    
+    useEffect(() => {
+        if(updateResponse === 200) {
+            dispatch(getPatientByIdAction({ id }));
+        }
+    }, [updateResponse]);
 
     // useEffect(() => {
     //     const fetchData = async () => {
@@ -194,7 +204,7 @@ const UpdatePatientIndex = () => {
         <div className="mt-1 g-0  px-0 mx-0">
             <div className="page-height g-0 px-0 mx-0">
                 <div className="row mb-2">
-                    {store?.getPatientByIdReducer?.loading ? (
+                    {store?.getPatientByIdReducer?.loading && id !== patientDetails?._id ? (
                         <div
                             style={{ height: '80vh' }}
                             className="col-12 d-flex align-items-center justify-content-center">

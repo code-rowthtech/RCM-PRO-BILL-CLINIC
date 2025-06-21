@@ -14,6 +14,7 @@ import {
 import { IoMdClose } from 'react-icons/io';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
+import Paginations from '../../../../helpers/Paginations';
 
 const Department = () => {
     const store = useSelector((state) => state);
@@ -157,7 +158,7 @@ const Department = () => {
                                                     setSearch(e.target.value);
                                                     setSkip(1);
                                                 }}
-                                                placeholder='Search...'
+                                                placeholder="Search..."
                                                 className="pe-4"
                                                 style={{
                                                     border: 'none',
@@ -218,7 +219,7 @@ const Department = () => {
                         <Table
                             responsive
                             className="table-centered table-nowrap mb-0  rounded"
-                            style={{ height: tableGetData?.length === 0 ? '76vh' : 'auto' }}>
+                            style={{ height: tableGetData?.length === 0 ? '' : 'auto' }}>
                             <thead className="text-white">
                                 <tr>
                                     <th className="text-white py-2" style={{ fontSize: '13px' }}>
@@ -279,13 +280,24 @@ const Department = () => {
                                     ))
                                 ) : (
                                     <tr key={''}>
-                                        <td colSpan={7} className="text-center">
+                                        <td colSpan={6} className="text-center">
                                             <h3 className="my-5">No Data Found</h3>
                                         </td>
                                     </tr>
                                 )}
                             </tbody>
                         </Table>
+                        {tableGetData?.length > 0 && (
+                            <Row>
+                                <Col className="mt-2 d-flex justify-content-end">
+                                    <Paginations
+                                        currentPage={skip}
+                                        totalPages={store?.getMastersDataReducer?.data1?.data?.pagination?.totalPages}
+                                        onPageChange={handlePageChange}
+                                    />
+                                </Col>
+                            </Row>
+                        )}
                     </Card.Body>
                 </Card>
             </Col>
@@ -380,7 +392,7 @@ const Department = () => {
                             <Button onClick={closeAddModal} className="custom-buttons">
                                 Close
                             </Button>
-                            <Button type="submit" className="custom-buttons">
+                            <Button type="submit" className="custom-buttons" style={{ width: '65px' }}>
                                 {store?.createMastersDataReducer?.loading ||
                                 store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">

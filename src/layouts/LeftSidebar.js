@@ -211,7 +211,7 @@ const LeftSidebar = ({
                                     onClick={() => (isLogout ? handleCheckLogout(ele.label) : navigate(ele.redirectTo))}
                                     className="px-3 py-2 w-100 d-flex justify-content-center align-items-center bg-transparent border-0">
                                     <span
-                                        className={`${ele.icon?.startsWith('mdi') ? 'mdi' : ''} ${ele.icon} mdi-18px textLeftSidebar`}></span>
+                                        className={`${ele.icon?.startsWith('mdi') ? 'mdi' : ''} ${ele.icon} mdi-18px textLeftSidebar mt-5`}></span>
                                 </button>
                             ) : (
                                 <div className="info-color px-2 py-1 align-items-center">

@@ -173,6 +173,10 @@ function* addReferringDoctorFunction(data) {
                 type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_SUCCESS,
                 payload: { ...decryptedData },
             });
+              yield put({
+                type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_RESET,
+                payload: { ...decryptedData },
+            });
         } else {
             yield put({
                 type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_ERROR,

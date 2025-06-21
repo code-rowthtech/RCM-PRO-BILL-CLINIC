@@ -14,6 +14,7 @@ import {
 import { IoMdClose } from 'react-icons/io';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
+import Paginations from '../../../../helpers/Paginations';
 
 const Designation = () => {
     const store = useSelector((state) => state);
@@ -35,6 +36,7 @@ const Designation = () => {
     const createResponse = store?.createMastersDataReducer?.data?.status;
     const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
     const updateResponse = store?.updateMastersDataReducer?.data?.status;
+    console.log(store?.getMastersDataReducer, 'store?.getMastersDataReducer');
     const closeAddModal = () => {
         setAddDesiginationModal(false);
         setEdit(null);
@@ -102,6 +104,7 @@ const Designation = () => {
         const payload = { id: data?._id, isActive: !data?.isActive, category: 'Desigination' };
         dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
     };
+
     return (
         <Row className="mt-2">
             <Col xs={12} className="px-0">
@@ -112,15 +115,17 @@ const Designation = () => {
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={` active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2 py-1`}>
+                                    className={` active_inactive_buttons ${
+                                        status ? 'text-white' : 'bg-white border-primary text-dark'
+                                    } me-2 py-1`}>
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2 py-1`}>
+                                    className={`active_inactive_buttons ${
+                                        !status ? 'text-white' : 'bg-white border-primary text-dark'
+                                    } me-2 py-1`}>
                                     Inactive
                                 </Button>
                             </Col>
@@ -144,7 +149,7 @@ const Designation = () => {
                                                     setSearch(e.target.value);
                                                     setSkip(1);
                                                 }}
-                                                placeholder='Search...'
+                                                placeholder="Search..."
                                                 className="pe-4"
                                                 style={{
                                                     border: 'none',
@@ -204,7 +209,7 @@ const Designation = () => {
                         <Table
                             responsive
                             className="table-centered table-nowrap mb-0  rounded"
-                            style={{ height: tableGetData?.length === 0 ? '76vh' : 'auto' }}>
+                            style={{ height: tableGetData?.length === 0 ? '' : 'auto' }}>
                             <thead className="text-white">
                                 <tr className="">
                                     <th className="text-white py-2" style={{ fontSize: '13px' }}>
@@ -259,13 +264,24 @@ const Designation = () => {
                                     ))
                                 ) : (
                                     <tr key={''}>
-                                        <td colSpan={7} className="text-center">
+                                        <td colSpan={6} className="text-center">
                                             <h3 className="my-5">No Data Found</h3>
                                         </td>
                                     </tr>
                                 )}
                             </tbody>
                         </Table>
+                        {tableGetData?.length > 0 && (
+                            <Row>
+                                <Col className="mt-2 d-flex justify-content-end">
+                                    <Paginations
+                                        currentPage={skip}
+                                        totalPages={store?.getMastersDataReducer?.data1?.data?.pagination?.totalPages}
+                                        onPageChange={handlePageChange}
+                                    />
+                                </Col>
+                            </Row>
+                        )}
                     </Card.Body>
                 </Card>
             </Col>
@@ -339,9 +355,9 @@ const Designation = () => {
                             <Button onClick={closeAddModal} className="custom-buttons">
                                 Close
                             </Button>
-                            <Button type="submit" className="custom-buttons">
+                            <Button type="submit" className="custom-buttons" style={{ width: '65px' }}>
                                 {store?.createMastersDataReducer?.loading ||
-                                    store?.updateMastersDataReducer?.loading ? (
+                                store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>

@@ -212,7 +212,7 @@ select.form-control:not([size]):not([multiple]) {
 
 .form-control {
     color: black !important;
-    font-weight: 500 !important;
+    font-weight: 400 !important;
     padding: 6px !important;
     font-size: 12px;
     background-color: #e8f0fe !important;
@@ -458,7 +458,15 @@ table {
     padding: 0 0.5rem !important;
     border-radius: 3px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
+}
+.css-1t5521d-placeholder {
+    grid-area: 1 / 1 / 2 / 3;
+    color: #0908084f;
+    margin-left: 7px !important;
+    margin-right: 2px;
+    box-sizing: border-box;
+    font-weight: 600;
 }
 
 .schedule-table {
@@ -1273,6 +1281,4 @@ option {
     padding-bottom: 0px !important;
 }
 
-.css-1dimb5e-singleValue {
-    margin-left: 0px !important;
-}
+

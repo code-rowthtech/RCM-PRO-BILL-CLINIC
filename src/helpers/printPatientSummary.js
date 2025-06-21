@@ -208,12 +208,14 @@ export const handlePrintPatientSummary = ({
           <div class="record-header">
             <span class="record-number">${index + 1}.</span>
             <span class="record-title">${substance} <small>(${typeLabel})</small></span>
+            <span>
+            ${date ? `<div class="record-date">${formatDate(date)}</div>` : ''}
+            </span>
             <span class="record-status ${statusClass(allergy.clinicalStatus?.text?.toLowerCase())}">
               ${clinicalStatus}
             </span>
           </div>
           <div class="record-details">
-            ${date ? `<div class="record-date">${formatDate(date)}</div>` : ''}
             ${notes ? `<div class="record-notes">${notes}</div>` : ''}
           </div>
         </div>
@@ -236,12 +238,14 @@ export const handlePrintPatientSummary = ({
           <div class="record-header">
             <span class="record-number">${index + 1}.</span>
             <span class="record-title">${problemText} ${code ? `<small>(${code})</small>` : ''}</span>
+            <span>
+            ${date ? `<div class="record-date">${formatDate(date)}</div>` : ''}
+            </span>
             <span class="record-status ${statusClass(problem.clinicalStatus?.text?.toLowerCase())}">
               ${clinicalStatus}
             </span>
           </div>
           <div class="record-details">
-            ${date ? `<div class="record-date">${formatDate(date)}</div>` : ''}
             ${notes ? `<div class="record-notes">${notes}</div>` : ''}
           </div>
         </div>
@@ -262,16 +266,18 @@ export const handlePrintPatientSummary = ({
           <div class="record-header">
             <span class="record-number">${index + 1}.</span>
             <span class="record-title">${proprietaryName} ${nonProprietaryName ? `<small>(${nonProprietaryName})</small>` : ''}</span>
+            <span>
+               ${startDate || endDate
+          ? `<div class="record-date">
+                  ${startDate ? formatDate(startDate) : '?'} - ${endDate ? formatDate(endDate) : 'Present'}
+                </div>`
+          : ''}
+            </span>
             <span class="record-status ${statusClass(med?.status)}">
               ${status}
             </span>
           </div>
           <div class="record-details">
-            ${startDate || endDate
-          ? `<div class="record-date">
-                  ${startDate ? formatDate(startDate) : '?'} - ${endDate ? formatDate(endDate) : 'Present'}
-                </div>`
-          : ''}
             ${dosage ? `<div class="record-dosage">${dosage}</div>` : ''}
             ${notes ? `<div class="record-notes">${notes}</div>` : ''}
           </div>
@@ -424,7 +430,6 @@ export const handlePrintPatientSummary = ({
     
     .record-date {
       color: #7f8c8d;
-      margin-bottom: 5px;
     }
     
     .record-dosage {

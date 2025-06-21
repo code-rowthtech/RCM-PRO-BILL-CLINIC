@@ -11,6 +11,7 @@ import {
     getCities3Action,
     updatePatientsAction,
     getDoctorsAction,
+    getPatientByIdAction,
 } from '../../../../redux/actions';
 import us from '../../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -106,7 +107,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
             setValue('preferredCommunication', patientDetails?.preferredCommunication || '');
             setValue('reminderLanguage', patientDetails?.reminderLanguage || '');
             setValue('previousBirthName', patientDetails?.name[1]?.text || '');
-            setValue('title', patientDetails?.name[0]?.prefix[0] || '')
+            setValue('title', patientDetails?.name[0]?.prefix[0] || '');
             // Extracting telecom details
             const homePhone =
                 patientDetails?.telecom?.find((t) => t.use === 'home' && t.system === 'phone')?.value || '';
@@ -177,7 +178,6 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
             },
         ];
         if (data?.previousBirthName) {
-
             payload.name.push({
                 use: 'old',
                 text: data.previousBirthName,
@@ -246,7 +246,9 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
 
     return (
         <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-            <div className=' scroll-container mt-1' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
+            <div
+                className=" scroll-container mt-1"
+                style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <div className="row ">
                     <div className="col-md-3 col-12">
                         <Form.Group>
@@ -307,19 +309,19 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                             'homePhone',
                                             !id
                                                 ? {
-                                                    pattern: {
-                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                    },
-                                                    maxLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not exceed 13 digits',
-                                                    },
-                                                    minLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not be less than 13 digits',
-                                                    },
-                                                }
+                                                      pattern: {
+                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                          message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                      },
+                                                      maxLength: {
+                                                          value: 13,
+                                                          message: 'Contact must not exceed 13 digits',
+                                                      },
+                                                      minLength: {
+                                                          value: 13,
+                                                          message: 'Contact must not be less than 13 digits',
+                                                      },
+                                                  }
                                                 : {}
                                         )}
                                         onChange={(e) => {
@@ -370,19 +372,19 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                             'cellPhone',
                                             !id
                                                 ? {
-                                                    pattern: {
-                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                    },
-                                                    maxLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not exceed 13 digits',
-                                                    },
-                                                    minLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not be less than 13 digits',
-                                                    },
-                                                }
+                                                      pattern: {
+                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                          message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                      },
+                                                      maxLength: {
+                                                          value: 13,
+                                                          message: 'Contact must not exceed 13 digits',
+                                                      },
+                                                      minLength: {
+                                                          value: 13,
+                                                          message: 'Contact must not be less than 13 digits',
+                                                      },
+                                                  }
                                                 : {}
                                         )}
                                         onChange={(e) => {
@@ -433,19 +435,19 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                             'officePhone',
                                             !id
                                                 ? {
-                                                    pattern: {
-                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                    },
-                                                    maxLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not exceed 13 digits',
-                                                    },
-                                                    minLength: {
-                                                        value: 13,
-                                                        message: 'Contact must not be less than 13 digits',
-                                                    },
-                                                }
+                                                      pattern: {
+                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                          message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                      },
+                                                      maxLength: {
+                                                          value: 13,
+                                                          message: 'Contact must not exceed 13 digits',
+                                                      },
+                                                      minLength: {
+                                                          value: 13,
+                                                          message: 'Contact must not be less than 13 digits',
+                                                      },
+                                                  }
                                                 : {}
                                         )}
                                         onChange={(e) => {
@@ -542,37 +544,34 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                     'gender'
                                     //  { required: 'Gender is required' }
                                 )}
-                                data-has-value={!!watch('gender')}
-                            >
-                                <option value="" hidden>
-                                    Select
-                                </option>
+                               >
+                                <option value="unknown">Unknown</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
-                                <option value="unknown">Unknown</option>
                             </Form.Select>
                             {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                         </Form.Group>
                     </div>
                 </div>
-                <hr className='border border-muted' />
+                <hr className="border border-muted" />
                 <div className="row">
                     <div className="col-md-3 col-12">
                         <div className="mb-1 d-flex flex-column position-relative">
                             <Form.Label className="mb-0">Patient Photo</Form.Label>
                             <div
                                 onClick={() => logoFileInputRef.current.click()}
-                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
-                                    }`}
+                                className={`custom-file-upload justify-content-between cursor-pointer ${
+                                    logoName || profileUploading ? '' : 'custom-form-fields'
+                                }`}
                                 style={{ backgroundColor: '#d9ddd6' }}>
                                 {logoName
                                     ? logoName.length > 25
                                         ? `${logoName.substring(0, 22)}...`
                                         : logoName.split('/').pop().slice(0, 30) + '...'
                                     : profileUploading
-                                        ? 'Uploading...'
-                                        : 'Upload Patient Chart Photo'}
+                                      ? 'Uploading...'
+                                      : 'Upload Patient Chart Photo'}
                                 <p className="mb-0">
                                     <FiUploadCloud />
                                 </p>
@@ -625,19 +624,17 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                             </Form.Select>
                         </Form.Group>
                     </div>
-
-
-
-
-
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Previous Birth Name </Form.Label>
-                            <Form.Control type="text" placeholder="Previous Birth Name" {...register('previousBirthName')} />
+                            <Form.Control
+                                type="text"
+                                placeholder="Previous Birth Name"
+                                {...register('previousBirthName')}
+                            />
                             {errors.birthName && <span className="text-danger">{errors.birthName.message}</span>}
                         </Form.Group>
                     </div>
-
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Preferred Communication</Form.Label>
@@ -670,7 +667,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                         </Form.Group>
                     </div>
                 </div>
-                <hr className='border border-muted' />
+                <hr className="border border-muted" />
                 <Row>
                     <div className="col-md-3 col-12">
                         <Form.Group controlId="doctorName">
@@ -770,6 +767,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                 <Button
                     type="submit"
                     className="custom-buttons btn-height"
+                    style={{ width: '70px' }}
                     disabled={store?.updatePatientsReducer?.loading}>
                     {store?.updatePatientsReducer?.loading ? (
                         <Spinner className="spinner-border-sm" color="white" />

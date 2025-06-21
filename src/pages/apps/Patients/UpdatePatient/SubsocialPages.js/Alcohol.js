@@ -351,11 +351,11 @@ const Alcohol = () => {
                                 )}
                             </div>
                             <div className="d-flex justify-content-end mt-3 align-items-center">
-                                <Button variant="primary" type="submit" className="custom-buttons px-4 py-1">
+                                <Button variant="primary" type="submit" className="custom-buttons px-2 py-1">
                                     {toEdit ?
                                         `Update`
                                         :
-                                        `Add`
+                                        `Add Record`
                                     }
                                 </Button>
                             </div>

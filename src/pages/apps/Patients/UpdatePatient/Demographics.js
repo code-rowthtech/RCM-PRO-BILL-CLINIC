@@ -66,7 +66,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const [demographicAddresses, setDemographicAddresses] = useState([
-        { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
 
     const updateResponse = store?.updatePatientsReducer?.data?.status;
@@ -92,7 +92,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
     useEffect(() => {
         setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city);
-    }, [cities4])
+    }, [cities4]);
 
     useEffect(() => {
         if (employerCitySearch) {
@@ -133,11 +133,11 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
             // ✅ Employer Address Fix
             setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city || '');
-            setEmployerCitySearch(patientDetails?.employerDetails?.workLocation?.address?.city)
+            setEmployerCitySearch(patientDetails?.employerDetails?.workLocation?.address?.city);
             setValue('employerStateName', patientDetails?.employerDetails?.workLocation?.address?.state || '');
             setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
             setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
-            setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line || '');
+            setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line[0] || '');
             const defaultIdentifiers = patientDetails?.identifier?.map((data, index) => ({
                 expiry: data?.expiry,
                 file: data?.file?.[0],
@@ -343,21 +343,24 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 employerPhone: data?.employerPhone?.replace(/\D/g, ''),
                 employmentStatus: data?.employmentStatus,
                 occupation: data?.occupation,
-                workLocation: {
-                    address: {
-                        line: data?.employerAddress,
-                        city: data?.employerCity,
-                        state: data?.employerStateName,
-                        postalCode: data?.employerZip,
-                        country: 'US',
-                    },
-                },
+                workLocation: data?.employerAddress
+                    ? {
+                          address: {
+                              line: [data?.employerAddress],
+                              city: data?.employerCity,
+                              state: data?.employerStateName,
+                              postalCode: data?.employerZip,
+                              country: 'United States',
+                          },
+                      }
+                    : {},
             },
             identifier: finalIdentifiers,
-            address: demographicAddresses,
+            ...(demographicAddresses && { address: demographicAddresses }),
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log('Payload for Update Patient:', payload);
     };
 
     const getEmployerGeolocation = (e) => {
@@ -425,8 +428,9 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
     return (
         <Form className="" onSubmit={handleSubmit(onSubmit)}>
-            <div className=' scroll-container ' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
-
+            <div
+                className=" scroll-container "
+                style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <IdentifierForm
                     defaultIdentifiers={[
                         {
@@ -881,10 +885,11 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -1008,7 +1013,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                     </Col>
                 </Row>
             </div>
-            <div className="d-flex gap-2 align-items-end justify-content-end my-1">
+            <div className="d-flex gap-2 align-items-end justify-content-end my-2">
                 <Button
                     className="custom-buttons btn-height"
                     disabled={store?.updatePatientsReducer?.loading}

@@ -168,14 +168,14 @@ export const addReferringDoctorReducer = (state = ADD_REFERRING_DOCTOR_DETAILS_I
                 data: action.payload,
                 loading: false
             }
+            case DoctorsActionTypes.ADD_REFERRING_DOCTOR_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case DoctorsActionTypes.ADD_REFERRING_DOCTOR_ERROR:
             return {
                 data: action.payload,
-                loading: false
-            }
-        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false
             }
         default: return state
