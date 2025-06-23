@@ -117,6 +117,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
             );
         }
     }, [patientVitals]);
+
     // useEffect(() => {
     //     const data = {
     //         patientId: patientId,
@@ -141,9 +142,6 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
     };
     const handleAddProblemClose = () => setShowAddProblemModal(false);
     const handleAppointmentClose = () => setShowAppointmentModal(false);
-    const handlePageChange = (pageNumber) => {
-        setSkip(pageNumber);
-    };
 
     const statusColorMap = {
         active: 'text-success',

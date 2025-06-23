@@ -794,15 +794,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                 control={control}
                             />
                             <div className="row position-relative ">
-                                {/* <div
-                                    style={{ top: '8%' }}
-                                    className="position-absolute d-flex align-items-center gap-2 py-2">
-                                    <Stopwatch
-                                        isRunning={isSessionRunning}
-                                        time={stopwatchTime}
-                                        onToggle={toggleSession}
-                                    />
-                                </div> */}
                                 <div className=" d-flex justify-content-end gap-2 py-2">
                                     <Button
                                         type='Submit'
