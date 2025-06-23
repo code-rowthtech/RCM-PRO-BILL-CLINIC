@@ -95,6 +95,7 @@ const NewPatient = () => {
     const [imageLoading, setImageLoading] = useState(true);
 
     const handleShowModal = (url) => {
+        console.log(url, '123456789');
         setModalFileUrl(url);
         setShowModalPic(true);
     };
@@ -895,7 +896,7 @@ const NewPatient = () => {
                                                         <FiEye
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                handleShowModal(logo?.url || logo);
+                                                                handleShowModal(logo?.url?.split('?')[0]);
                                                             }}
                                                             className="text-dark cursor-pointer"
                                                         />

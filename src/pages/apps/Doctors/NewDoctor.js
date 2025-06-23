@@ -834,13 +834,13 @@ const NewDoctor = () => {
                                                                         </span>
 
                                                                         <div className="d-flex align-items-center gap-2">
-                                                                            {(logo ||
+                                                                            {(logo?.url?.split('?')[0] ||
                                                                                 doctorDetails?.photo?.[0]?.url) && (
                                                                                     <FaEye
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
                                                                                             handleShowModal(
-                                                                                               logo || doctorDetails?.photo?.[0]?.url
+                                                                                               logo?.url?.split('?')[0] || doctorDetails?.photo?.[0]?.url
                                                                                             );
                                                                                         }}
                                                                                         className="text-dark cursor-pointer"

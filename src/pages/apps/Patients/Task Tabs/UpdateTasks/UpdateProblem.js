@@ -302,7 +302,7 @@ const UpdateProblem = ({ onCancel, problem }) => {
                 </Col>
 
                 <Col sm={12} className="d-flex justify-content-end gap-2 mt-3">
-                    <Button type="submit" className="custom-buttons" disabled={store?.updateProblemListReducer?.loading}>
+                    <Button type="submit" className="custom-buttons" disabled={store?.updateProblemListReducer?.loading} style={{width: '65px'}}>
                         {store?.updateProblemListReducer?.loading ?
                             <Spinner className='spinner-border-sm' color='white' />
                             :

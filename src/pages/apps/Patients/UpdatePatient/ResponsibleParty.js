@@ -46,7 +46,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                     ? new Date(patientDetails?.relatedPerson?.dateOfBirth).toISOString().split('T')[0]
                     : ''
             );
-            const updateAddress = patientDetails?.address?.map((data, index) => ({
+            const updateAddress = patientDetails?.relatedPerson?.address?.map((data, index) => ({
                 city: data?.city,
                 country: data?.country,
                 line: data?.line,
@@ -90,12 +90,13 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                     text: data?.fullName, // Human-readable relationship (e.g., "Father", "Aunt")
                 },
             ],
-            address: responsibleAddresses,
+            ...(responsibleAddresses && { address: responsibleAddresses }),
             gender: data?.gender,
             dateOfBirth: data?.dateOfBirth,
             telecom: responsibleTelecom,
         };
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
+        console.log('payload', payload);
     };
 
     useEffect(() => {
@@ -165,6 +166,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                         <Form.Control
                             type="date"
                             placeholder="Date of Birth"
+                            max={new Date().toISOString().split('T')[0]} // today's date in YYYY-MM-DD format
                             {...register('dateOfBirth', { required: 'This field is required' })}
                         />
                         {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}

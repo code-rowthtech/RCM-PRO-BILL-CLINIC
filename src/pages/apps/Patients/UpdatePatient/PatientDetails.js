@@ -560,18 +560,20 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                         <div className="mb-1 d-flex flex-column position-relative">
                             <Form.Label className="mb-0">Patient Photo</Form.Label>
                             <div
-                                onClick={() => logoFileInputRef.current.click()}
+                                onClick={() => !profileUploading && logoFileInputRef.current.click()}
                                 className={`custom-file-upload justify-content-between cursor-pointer ${
                                     logoName || profileUploading ? '' : 'custom-form-fields'
                                 }`}
-                                style={{ backgroundColor: '#d9ddd6' }}>
-                                {logoName
-                                    ? logoName.length > 25
-                                        ? `${logoName.substring(0, 22)}...`
-                                        : logoName.split('/').pop().slice(0, 30) + '...'
-                                    : profileUploading
-                                      ? 'Uploading...'
-                                      : 'Upload Patient Chart Photo'}
+                                style={{ backgroundColor: '#d9ddd6', opacity: profileUploading ? 0.7 : 1, pointerEvents: profileUploading ? 'none' : 'auto' }}>
+                                {profileUploading
+                                    ? (
+                                     'Uploading...'
+                                    )
+                                    : logoName
+                                        ? logoName.length > 25
+                                            ? `${logoName.substring(0, 22)}...`
+                                            : logoName.split('/').pop().slice(0, 30) + '...'
+                                        : 'Upload Patient Chart Photo'}
                                 <p className="mb-0">
                                     <FiUploadCloud />
                                 </p>

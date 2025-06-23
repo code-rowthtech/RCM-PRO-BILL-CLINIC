@@ -175,11 +175,12 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     }, [docPreviewUrl]);
 
     const handlePreview = (file) => {
+        console.log(file,"file")
         if (file?.localPreviewUrl && /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file.fileName)) {
             setDocPreviewUrl(file.localPreviewUrl);
             setShowDocPreview(true);
         } else if (file?.url && /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file.fileName)) {
-            setDocPreviewUrl(file.url);
+            setDocPreviewUrl(file.url?.split('?')[0]);
             setShowDocPreview(true);
         }
     };

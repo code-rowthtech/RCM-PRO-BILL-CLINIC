@@ -957,7 +957,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('employerCity')}>
                                                 <option hidden value="">
-                                                    {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
+                                                    {store?.getCitiesReducer?.cities4?.loading ? 'Loading...' : 'City'}
                                                 </option>
                                                 {cities4?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
@@ -976,9 +976,11 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                 <Row>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">Zip</Form.Label>
+                                            <Form.Label className="mb-0">Postal Code </Form.Label>
                                             <Form.Control
                                                 type="text"
+                                                placeholder="Postal code"
+                                                maxLength={5}
                                                 {...register('employerZip', {
                                                     minLength: {
                                                         value: 5,
@@ -989,8 +991,20 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                         message: 'ZIP code must contain numbers only',
                                                     },
                                                 })}
-                                                placeholder="Zip"
-                                                maxLength={5}
+                                                onKeyDown={(e) => {
+                                                    if (
+                                                        !/[0-9]/.test(e.key) &&
+                                                        ![
+                                                            'Backspace',
+                                                            'Tab',
+                                                            'ArrowLeft',
+                                                            'ArrowRight',
+                                                            'Delete',
+                                                        ].includes(e.key)
+                                                    ) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
                                             {errors.employerZip && (
                                                 <span className="text-danger">{errors.employerZip.message}</span>

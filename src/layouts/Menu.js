@@ -196,10 +196,10 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
                             alt=""
                             height="25"
                             className="logo-condensed px-2"
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/apps/patients/list')}
                         />
                     ) : (
-                        <img src={logo} alt="" height="25" className="logo-full px-4" onClick={() => navigate('/')} />
+                        <img src={logo} alt="" height="25" className="logo-full px-4" onClick={() => navigate('/apps/patients/list')} />
                     )}
                 </li>
                 <div className={!isCondensed ? 'scroll-container' : ''} style={{ height: '73vh' }}>

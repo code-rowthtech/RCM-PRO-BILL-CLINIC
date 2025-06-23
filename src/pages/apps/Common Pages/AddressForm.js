@@ -25,7 +25,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
         if (statesData?.length === 0) {
             dispatch(getStatesByCountryAction());
         }
-    }, [statesData, dispatch])
+    }, [statesData, dispatch]);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const {
         control,
@@ -52,7 +52,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
             { type: availableType, use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
         ]);
     };
-
 
     const removeAddress = (index) => {
         if (addresses.length > 1) {
@@ -158,7 +157,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                     state_code: stateCode,
                     name: address?.city || '',
                     limit: 25,
-                    skip: ''
+                    skip: '',
                 };
 
                 switch (address?.type) {
@@ -180,7 +179,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
             ToastHandle('Maximum 3 address lines are allowed.', 'danger');
             return;
         }
-        setAddresses(prev => {
+        setAddresses((prev) => {
             const updated = [...prev];
             const currentAddress = { ...updated[index] };
 
@@ -251,9 +250,12 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         </Form.Select>
                     </Col>
                     <Col sm={3} className="mb-1 position-relative" style={{ height: 'fit-content' }}>
-                        <Form.Label className="mb-0">Line 1   <span
-                            className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                            onClick={() => addAddressLine(index)}></span></Form.Label>
+                        <Form.Label className="mb-0">
+                            Line 1{' '}
+                            <span
+                                className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                onClick={() => addAddressLine(index)}></span>
+                        </Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Street Address"
@@ -297,29 +299,55 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                     <p
                                         key={suggestionIndex}
                                         onClick={() => {
-                                            const state = statesData?.states?.find(s => s.name === data.components?.state);
+                                            const state = statesData?.states?.find(
+                                                (s) => s.name === data.components?.state
+                                            );
                                             const stateCode = state?.id;
-                                            const cityName = data.components?.city || data.components?.town || data.components?.village || '';
+                                            const cityName =
+                                                data.components?.city ||
+                                                data.components?.town ||
+                                                data.components?.village ||
+                                                '';
 
                                             // Dispatch city load based on address type
                                             if (item?.type === 'physical') {
-                                                dispatch(getCitiesAction({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                                dispatch(
+                                                    getCitiesAction({
+                                                        state_code: stateCode,
+                                                        name: cityName,
+                                                        limit: 25,
+                                                        skip: '',
+                                                    })
+                                                );
                                             } else if (item?.type === 'postal') {
-                                                dispatch(getCities2Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                                dispatch(
+                                                    getCities2Action({
+                                                        state_code: stateCode,
+                                                        name: cityName,
+                                                        limit: 25,
+                                                        skip: '',
+                                                    })
+                                                );
                                             } else {
-                                                dispatch(getCities3Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                                dispatch(
+                                                    getCities3Action({
+                                                        state_code: stateCode,
+                                                        name: cityName,
+                                                        limit: 25,
+                                                        skip: '',
+                                                    })
+                                                );
                                             }
 
                                             // Update address
                                             const newAddress = {
                                                 ...item,
-                                                line: [data.formatted || '', ...(item.line?.slice(1) || [])],  // keep existing lines after the first
+                                                line: [data.formatted || '', ...(item.line?.slice(1) || [])], // keep existing lines after the first
                                                 state: data.components?.state || '',
                                                 city: cityName,
                                                 postalCode: data.components?.postcode || '',
                                                 country: data.components?.country || '',
                                             };
-
 
                                             const updatedAddresses = [...addresses];
                                             updatedAddresses[index] = newAddress;
@@ -382,48 +410,43 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             onChange={(e) => {
                                 handleAddressChange(index, 'city', e.target.value);
                             }}
-                            disabled={item?.type === 'physical'
-                                ? store?.getCitiesReducer?.cities1?.loading
-                                : item?.type === 'postal'
-                                    ? store?.getCitiesReducer?.cities2?.loading
-                                    : store?.getCitiesReducer?.cities3?.loading}
-                        >
+                            disabled={
+                                item?.type === 'physical'
+                                    ? store?.getCitiesReducer?.cities1?.loading
+                                    : item?.type === 'postal'
+                                      ? store?.getCitiesReducer?.cities2?.loading
+                                      : store?.getCitiesReducer?.cities3?.loading
+                            }>
                             <option value="">
-                                {
-                                    item?.type === 'physical'
-                                        ? store?.getCitiesReducer?.cities1?.loading
-                                            ? 'Loading...'
-                                            : 'Select City'
-                                        : item?.type === 'postal'
-                                            ? store?.getCitiesReducer?.cities2?.loading
-                                                ? 'Loading...'
-                                                : 'Select City'
-                                            : store?.getCitiesReducer?.cities3?.loading
-                                                ? 'Loading...'
-                                                : 'Select City'
-                                }
+                                {item?.type === 'physical'
+                                    ? store?.getCitiesReducer?.cities1?.loading
+                                        ? 'Loading...'
+                                        : 'Select City'
+                                    : item?.type === 'postal'
+                                      ? store?.getCitiesReducer?.cities2?.loading
+                                          ? 'Loading...'
+                                          : 'Select City'
+                                      : store?.getCitiesReducer?.cities3?.loading
+                                        ? 'Loading...'
+                                        : 'Select City'}
                             </option>
                             {(() => {
                                 const cities =
-                                    item?.type === 'physical' ? cities1 :
-                                        item?.type === 'postal' ? cities2 :
-                                            cities3;
+                                    item?.type === 'physical' ? cities1 : item?.type === 'postal' ? cities2 : cities3;
 
                                 return cities?.map((data) => (
                                     <option key={data?._id} value={data?.name}>
-                                        {
-                                            item?.type === 'physical'
-                                                ? store?.getCitiesReducer?.cities1?.loading
-                                                    ? 'Loading...'
-                                                    : data?.name
-                                                : item?.type === 'postal'
-                                                    ? store?.getCitiesReducer?.cities2?.loading
-                                                        ? 'Loading...'
-                                                        : data?.name
-                                                    : store?.getCitiesReducer?.cities3?.loading
-                                                        ? 'Loading...'
-                                                        : data?.name
-                                        }
+                                        {item?.type === 'physical'
+                                            ? store?.getCitiesReducer?.cities1?.loading
+                                                ? 'Loading...'
+                                                : data?.name
+                                            : item?.type === 'postal'
+                                              ? store?.getCitiesReducer?.cities2?.loading
+                                                  ? 'Loading...'
+                                                  : data?.name
+                                              : store?.getCitiesReducer?.cities3?.loading
+                                                ? 'Loading...'
+                                                : data?.name}
                                     </option>
                                 ));
                             })()}
@@ -434,8 +457,9 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             <Form.Label className="mb-0">Postal Code</Form.Label>
                             <Form.Control
                                 type="text"
-                                value={item.postalCode || ''} // Ensure empty string if undefined
+                                value={item.postalCode || ''}
                                 placeholder="Postal Code"
+                                maxLength={5}
                                 {...register(`address[${index}].postalCode`, {
                                     minLength: {
                                         value: 5,
@@ -446,19 +470,27 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                         message: 'Postal code must contain numbers only',
                                     },
                                 })}
-                                maxLength={5}
-                                onChange={(e) => {
-                                    handleAddressChange(index, 'postalCode', e.target.value);
+                                onKeyDown={(e) => {
+                                    if (
+                                        !/[0-9]/.test(e.key) &&
+                                        !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'].includes(e.key)
+                                    ) {
+                                        e.preventDefault();
+                                    }
                                 }}
+                                onChange={(e) => handleAddressChange(index, 'postalCode', e.target.value)}
                             />
-                            {errors.postalCode && <span className="text-danger">{errors.postalCode.message}</span>}
+                            {errors?.address?.[index]?.postalCode && (
+                                <span className="text-danger">{errors.address[index].postalCode.message}</span>
+                            )}
                         </Form.Group>
                     </Col>
                     {addresses.length > 1 && index !== 0 && (
                         <CiCircleMinus
                             style={{ top: '80%', right: '49%' }}
                             onClick={() => removeAddress(index)}
-                            className="text-danger px-0 cursor-pointer position-absolute w-auto fs-5 " />
+                            className="text-danger px-0 cursor-pointer position-absolute w-auto fs-5 "
+                        />
                     )}
                 </Row>
             ))}
