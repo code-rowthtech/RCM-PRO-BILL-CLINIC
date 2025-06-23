@@ -18,6 +18,11 @@ export function getEncounterApi(params: any): any {
     return api.get(`${URL.encounter}/patient/${data?.patientId}?limit=10&page=${data?.skip || 1}`);
 }
 
+export function getPastEncounterApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.encounter}/patient/past/${data?.patientId}?limit=10&page=${data?.skip || 1}`);
+}
+
 export function getEncounterNotesTypeApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.encounterNotesType}?clinicId=${data?.clinicId || loggedInUser?.clinicId}&userId=${data?.userId || loggedInUser?._id}&page=${data?.skip}&search=${data?.search || ''}`);

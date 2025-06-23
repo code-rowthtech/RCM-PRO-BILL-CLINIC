@@ -1,4 +1,4 @@
-import { loggedInUser } from "./api/loggedInUser";
+import { loggedInUser } from './api/loggedInUser';
 
 export const handlePrintPatientSummary = ({
   toBePrinted,
@@ -6,11 +6,11 @@ export const handlePrintPatientSummary = ({
   medicationList = [],
   patientDetails,
   allergyData = [],
-  problemData = []
+  problemData = [],
+  encounterData,
 }) => {
   // Backup original content
   const originalContent = document.body.innerHTML;
-
   try {
     // Define all possible vital types with their display names and units
     const vitalTypes = [
@@ -29,7 +29,7 @@ export const handlePrintPatientSummary = ({
       { key: 'Weight-for-Length Percentile', display: 'Weight-for-Length %', unit: '%' },
       { key: 'Head Occipital-frontal Circumference Percentile', display: 'Head Circumference %', unit: '%' },
       { key: 'Oxygen Concentration', display: 'O₂ Concentration', unit: '%' },
-      { key: 'Inhaled Oxygen Flow Rate', display: 'O₂ Flow Rate', unit: 'l/min' }
+      { key: 'Inhaled Oxygen Flow Rate', display: 'O₂ Flow Rate', unit: 'l/min' },
     ];
 
     const statusClass = (status) => {
@@ -41,7 +41,7 @@ export const handlePrintPatientSummary = ({
         'entered-in-error': 'status-danger',
         stopped: 'status-secondary',
         draft: 'status-muted',
-        unknown: 'status-dark'
+        unknown: 'status-dark',
       };
       return map[status] || '';
     };
@@ -54,7 +54,7 @@ export const handlePrintPatientSummary = ({
         return date.toLocaleDateString('en-GB', {
           day: '2-digit',
           month: '2-digit',
-          year: 'numeric'
+          year: 'numeric',
         });
       } catch (e) {
         return '';
@@ -70,7 +70,7 @@ export const handlePrintPatientSummary = ({
           month: '2-digit',
           year: 'numeric',
           hour: '2-digit',
-          minute: '2-digit'
+          minute: '2-digit',
         });
       } catch (e) {
         return '';
@@ -101,8 +101,10 @@ export const handlePrintPatientSummary = ({
     // Sort dates chronologically
     const sortedDates = Object.keys(groupedByDate).sort((a, b) => {
       try {
-        return new Date(a.split(',')[0].split('/').reverse().join('-')) -
-          new Date(b.split(',')[0].split('/').reverse().join('-'));
+        return (
+          new Date(a.split(',')[0].split('/').reverse().join('-')) -
+          new Date(b.split(',')[0].split('/').reverse().join('-'))
+        );
       } catch (e) {
         return 0;
       }
@@ -113,23 +115,23 @@ export const handlePrintPatientSummary = ({
       if (!entries || !type) return '';
 
       try {
-        const vital = entries.find(v =>
-          v.code?.text === type.key ||
-          v.code?.coding?.[0]?.display === type.key
+        const vital = entries.find(
+          (v) => v.code?.text === type.key || v.code?.coding?.[0]?.display === type.key
         );
 
         if (!vital) return '';
 
         // Handle blood pressure specially
         if (vital.component?.length > 0) {
-          const systolic = vital.component.find(c =>
-            c.code?.coding?.[0]?.code === '8480-6' ||
-            c.code?.coding?.[0]?.display?.includes('Systolic')
+          const systolic = vital.component.find(
+            (c) =>
+              c.code?.coding?.[0]?.code === '8480-6' || c.code?.coding?.[0]?.display?.includes('Systolic')
           )?.valueQuantity?.value;
 
-          const diastolic = vital.component.find(c =>
-            c.code?.coding?.[0]?.code === '8462-4' ||
-            c.code?.coding?.[0]?.display?.includes('Diastolic')
+          const diastolic = vital.component.find(
+            (c) =>
+              c.code?.coding?.[0]?.code === '8462-4' ||
+              c.code?.coding?.[0]?.display?.includes('Diastolic')
           )?.valueQuantity?.value;
 
           return systolic && diastolic ? `${systolic}/${diastolic}` : '';
@@ -152,12 +154,12 @@ export const handlePrintPatientSummary = ({
     };
 
     // Generate table rows for vitals
-    const vitalsRows = vitalTypes.map(type => {
-      const rowData = sortedDates.map(date => {
+    const vitalsRows = vitalTypes.map((type) => {
+      const rowData = sortedDates.map((date) => {
         return getVitalValue(groupedByDate[date], type);
       });
 
-      const tds = rowData.map(val => `<td class="${!val ? 'empty-value' : ''}">${val || '-'}</td>`).join('');
+      const tds = rowData.map((val) => `<td class="${!val ? 'empty-value' : ''}">${val || '-'}</td>`).join('');
       return `<tr><td class="vital-name">${type.display} ${type.unit ? `(${type.unit})` : ''}</td>${tds}</tr>`;
     });
 
@@ -168,7 +170,23 @@ export const handlePrintPatientSummary = ({
 
     // Process problems data
     const filteredProblem = problemData || [];
-
+    const filteredEncounters = encounterData || [];
+    const renderEncounter = () => {
+      return `
+${encounterData?.data
+          ?.map(
+            (section, index) => `
+                <div class="encounter-section">
+                    <h3 class="section-header">${section?.type || 'Section'}</h3>
+                    <div class="section-content">
+                        ${section?.content?.value || 'No content available'}
+                    </div>
+                </div>
+            `
+          )
+          .join('')}
+`;
+    };
     // Generate HTML sections
     const generateSection = (title, data, itemRenderer) => {
       if (!toBePrinted?.includes(title)) return '';
@@ -196,9 +214,7 @@ export const handlePrintPatientSummary = ({
       const typeLabel = typeMap[category] || '-';
       const substance = allergy.code?.text || allergy.code?.coding?.[0]?.display || '-';
       const clinicalStatus = capitalizeFirst(
-        allergy.clinicalStatus?.text ||
-        allergy.clinicalStatus?.[0]?.coding?.[0]?.display ||
-        '-'
+        allergy.clinicalStatus?.text || allergy.clinicalStatus?.[0]?.coding?.[0]?.display || '-'
       );
       const date = allergy.onset?.onsetDateTime;
       const notes = allergy.note?.[0]?.text || allergy.note?.[0]?.coding?.[0]?.display || '-';
@@ -208,12 +224,14 @@ export const handlePrintPatientSummary = ({
           <div class="record-header">
             <span class="record-number">${index + 1}.</span>
             <span class="record-title">${substance} <small>(${typeLabel})</small></span>
+            <span>
+            ${date ? `<div class="record-date">${formatDate(date)}</div>` : ''}
+            </span>
             <span class="record-status ${statusClass(allergy.clinicalStatus?.text?.toLowerCase())}">
               ${clinicalStatus}
             </span>
           </div>
           <div class="record-details">
-            ${date ? `<div class="record-date">${formatDate(date)}</div>` : ''}
             ${notes ? `<div class="record-notes">${notes}</div>` : ''}
           </div>
         </div>
@@ -224,9 +242,7 @@ export const handlePrintPatientSummary = ({
       const problemText = problem.code?.text || problem.code?.coding?.[0]?.display || '-';
       const code = problem.code?.coding?.[0]?.code || '';
       const clinicalStatus = capitalizeFirst(
-        problem.clinicalStatus?.text ||
-        problem.clinicalStatus?.[0]?.coding?.[0]?.display ||
-        '-'
+        problem.clinicalStatus?.text || problem.clinicalStatus?.[0]?.coding?.[0]?.display || '-'
       );
       const date = problem?.onsetDateTime;
       const notes = problem.note?.[0]?.text || problem.note?.[0]?.coding?.[0]?.display || '-';
@@ -236,12 +252,14 @@ export const handlePrintPatientSummary = ({
           <div class="record-header">
             <span class="record-number">${index + 1}.</span>
             <span class="record-title">${problemText} ${code ? `<small>(${code})</small>` : ''}</span>
+            <span>
+            ${date ? `<div class="record-date">${formatDate(date)}</div>` : ''}
+            </span>
             <span class="record-status ${statusClass(problem.clinicalStatus?.text?.toLowerCase())}">
               ${clinicalStatus}
             </span>
           </div>
           <div class="record-details">
-            ${date ? `<div class="record-date">${formatDate(date)}</div>` : ''}
             ${notes ? `<div class="record-notes">${notes}</div>` : ''}
           </div>
         </div>
@@ -262,16 +280,19 @@ export const handlePrintPatientSummary = ({
           <div class="record-header">
             <span class="record-number">${index + 1}.</span>
             <span class="record-title">${proprietaryName} ${nonProprietaryName ? `<small>(${nonProprietaryName})</small>` : ''}</span>
+            <span>
+               ${startDate || endDate
+          ? `<div class="record-date">
+                  ${startDate ? formatDate(startDate) : '?'} - ${endDate ? formatDate(endDate) : 'Present'}
+                </div>`
+          : ''
+        }
+            </span>
             <span class="record-status ${statusClass(med?.status)}">
               ${status}
             </span>
           </div>
           <div class="record-details">
-            ${startDate || endDate
-          ? `<div class="record-date">
-                  ${startDate ? formatDate(startDate) : '?'} - ${endDate ? formatDate(endDate) : 'Present'}
-                </div>`
-          : ''}
             ${dosage ? `<div class="record-dosage">${dosage}</div>` : ''}
             ${notes ? `<div class="record-notes">${notes}</div>` : ''}
           </div>
@@ -424,7 +445,6 @@ export const handlePrintPatientSummary = ({
     
     .record-date {
       color: #7f8c8d;
-      margin-bottom: 5px;
     }
     
     .record-dosage {
@@ -536,7 +556,8 @@ export const handlePrintPatientSummary = ({
     </div>
   </div>
 
-  ${toBePrinted?.includes('Vitals') && sortedDates.length > 0 ? `
+  ${toBePrinted?.includes('Vitals') && sortedDates.length > 0
+        ? `
     <div class="section-container">
       <h3 class="section-title">Vitals</h3>
       <div class="section-content">
@@ -544,7 +565,7 @@ export const handlePrintPatientSummary = ({
           <thead>
             <tr>
               <th>Vital Sign</th>
-              ${sortedDates.map(date => `<th>${date}</th>`).join('')}
+              ${sortedDates.map((date) => `<th>${date}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
@@ -553,12 +574,16 @@ export const handlePrintPatientSummary = ({
         </table>
       </div>
     </div>
-  ` : ''}
+  `
+        : ''
+      }
 
   ${generateSection('Allergies', filteredAllergies, renderAllergy)}
   ${generateSection('Problems', filteredProblem, renderProblem)}
   ${generateSection('Medications', medicationList, renderMedication)}
+  ${encounterData ? renderEncounter() : ''}
 
+  
   <footer style="margin-top: 30px; text-align: center; font-size: 12px; color: #7f8c8d;">
     <p>This report was generated electronically and does not require a signature.</p>
   </footer>
@@ -569,14 +594,12 @@ export const handlePrintPatientSummary = ({
     // Open print dialog
     document.body.innerHTML = printContent;
     window.print();
-
   } catch (error) {
     console.error('Error generating print summary:', error);
     alert('An error occurred while generating the report. Please try again.');
   } finally {
     // Restore original content
     document.body.innerHTML = originalContent;
-
   }
   window.location.reload();
 };

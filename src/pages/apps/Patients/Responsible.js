@@ -147,10 +147,9 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                                 <Form.Select
                                     {...register('gender', { required: 'Gender is required' })}
                                     aria-label="Select Gender">
-                                    <option value="">Select Gender</option>
+                                    <option value="unknown">Unknown</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
-                                    <option value="other">Other</option>
                                 </Form.Select>
                             </div>
                             {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
@@ -162,6 +161,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                             <Form.Control
                                 type="date"
                                 placeholder="Date of Birth"
+                                max={new Date().toISOString().split('T')[0]} // today's date in YYYY-MM-DD format
                                 {...register('dateOfBirth', { required: 'This field is required' })}
                             />
                             {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
@@ -224,7 +224,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                         style={{ width: '200px' }}
                         type="submit">
                         {store?.createResponsiblePartyReducer?.loading ? (
-                            <Spinner className='spinner-border-sm' color='white' />
+                            <Spinner className="spinner-border-sm" color="white" />
                         ) : (
                             ' Save & Continue Editing'
                         )}

@@ -24,7 +24,14 @@ const AddAllergy = ({ onCancel }) => {
     const quillRef = useRef(null);
     const [searchParams] = useSearchParams();
     const {
-        register, handleSubmit, formState: { errors }, setValue, control, reset, watch, getValues
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        control,
+        reset,
+        watch,
+        getValues,
     } = useForm({
         defaultValues: {
             category: 'medication',
@@ -43,8 +50,6 @@ const AddAllergy = ({ onCancel }) => {
     const [submissionType, setSubmissionType] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-
-
     // Fetch dynamic appointments
     useEffect(() => {
         const currentPatientId = store?.getPatientAppointmentReducer?.data?.patientId;
@@ -54,7 +59,6 @@ const AddAllergy = ({ onCancel }) => {
             dispatch(getPatientAppointmentAction({ patientId }));
         }
     }, [dispatch, patientId, store?.getPatientAppointmentReducer?.data]);
-
 
     useEffect(() => {
         if (createStatus === 200) {
@@ -180,7 +184,6 @@ const AddAllergy = ({ onCancel }) => {
 
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-
     const handleEditorFocus = () => {
         dispatch(createSuggestionAction({ module: 'allergy' }));
         setShowSuggestions(true);
@@ -217,8 +220,7 @@ const AddAllergy = ({ onCancel }) => {
                             <Form.Select
                                 {...register('category', { required: 'Allergy Category is required' })}
                                 value={watch('category') || 'medication'}
-                                onChange={(e) => setValue('category', e.target.value)}
-                            >
+                                onChange={(e) => setValue('category', e.target.value)}>
                                 {category?.map((item) => (
                                     <option key={item?.code} value={item?.code}>
                                         {item?.display}
@@ -232,7 +234,9 @@ const AddAllergy = ({ onCancel }) => {
                     </Col>
                     <Col sm={6}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Select Allergy <span className="text-danger">*</span></Form.Label>
+                            <Form.Label className="mb-0">
+                                Select Allergy <span className="text-danger">*</span>
+                            </Form.Label>
                             <Controller
                                 name="allergyCode"
                                 control={control}
@@ -248,9 +252,11 @@ const AddAllergy = ({ onCancel }) => {
                                             classNamePrefix="select"
                                             placeholder="Select"
                                             value={
-                                                formattedCodeOption.find(option => option.value.code === field.value?.code) || null
+                                                formattedCodeOption.find(
+                                                    (option) => option.value.code === field.value?.code
+                                                ) || null
                                             }
-                                            onChange={option => {
+                                            onChange={(option) => {
                                                 field.onChange(option ? option.value : null);
                                                 setCode(option ? option.value : null);
                                             }}
@@ -315,9 +321,7 @@ const AddAllergy = ({ onCancel }) => {
                                     </option>
                                 ))}
                             </Form.Select>
-                            {errors.status && (
-                                <Form.Text className="text-danger">{errors.status.message}</Form.Text>
-                            )}
+                            {errors.status && <Form.Text className="text-danger">{errors.status.message}</Form.Text>}
                         </Form.Group>
                     </Col>
 
@@ -346,14 +350,20 @@ const AddAllergy = ({ onCancel }) => {
                             {selectMode === 'appointment' ? (
                                 <>
                                     <Form.Label className="mb-0">Appointment</Form.Label>
-                                    <Form.Select {...register('appointment')}>
-                                        <option>Select Appointment Date </option>
+                                    <Form.Select
+                                        {...register('appointment', {
+                                            required: selectMode === 'appointment' ? 'Appointment is required' : false,
+                                        })}>
+                                        <option value="">Select Appointment Date</option>
                                         {appointments?.map((item) => (
                                             <option key={item?._id} value={JSON.stringify(item)}>
                                                 {item?.date ? new Date(item.date).toISOString().split('T')[0] : 'N/A'}
                                             </option>
                                         ))}
                                     </Form.Select>
+                                    {errors.appointment && (
+                                        <small className="text-danger">{errors.appointment.message}</small>
+                                    )}
                                 </>
                             ) : (
                                 <>

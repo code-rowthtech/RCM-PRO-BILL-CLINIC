@@ -871,8 +871,9 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     Consultation Room
                                     <span>
                                         <i
-                                            className="bi bi-plus-circle text-primary ms-1"
-                                            style={{ fontSize: '0.9rem' }}
+                                            className="bi bi-plus-circle text-primary ms-1 cursor-pointer"
+                                            style={{ fontSize: '0.7rem' }}
+                                            title='Add Consultation Room'
                                             onClick={() => setConsultationModal(true)}></i>
                                     </span>
                                 </Form.Label>

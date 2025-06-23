@@ -35,7 +35,7 @@ import { createSuggestionsReducer } from './suggestions/reducer';
 import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateMedicationReducer } from './medication/reducer';
 import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobaccooReducer, deleteSurgicalHistoryReducer, getFamilyGeneticReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateSurgicalHistoryReducer, updateTobaccooReducer, createMedicalHistoryReducer, getMedicalHistoryReducer, deleteTobaccooReducer, createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer } from './socialHistory/reducer';
 import { getIcdProcedureReducer } from './icdCodes/reducer';
-import { createEncounterReducer, createEncounterSettingsReducer, getEncounterByIdReducer, getEncounterNotesFieldsReducer, getEncounterNotesTypeReducer, getEncounterReducer, getEncounterSettingsReducer, updateEncounterReducer, updateEncounterSettingsReducer } from './encounter/reducer';
+import { createEncounterReducer, createEncounterSettingsReducer, getEncounterByIdReducer, getEncounterNotesFieldsReducer, getEncounterNotesTypeReducer, getEncounterReducer, getEncounterSettingsReducer, getPastEncounterReducer, updateEncounterReducer, updateEncounterSettingsReducer } from './encounter/reducer';
 import { createNoteCategoriesReducer, createSettingsTabsReducer, getNoteCategoriesReducer, getSettingsTabsReducer, updateNoteCategoriesReducer, updateSettingsTabsReducer } from './noteCategories/reducer';
 import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
 import { createUserTasksReducer, getTaskByIdReducer, getUserTasksReducer, updateUserTasksReducer } from './Tasks/reducer';
@@ -72,7 +72,8 @@ export default (combineReducers({
     createTobaccooReducer, deleteTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,
     getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer,
     createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer,
-    createEncounterReducer, getEncounterReducer, updateEncounterReducer, createEncounterSettingsReducer, getEncounterSettingsReducer, updateEncounterSettingsReducer, getEncounterByIdReducer, getEncounterNotesTypeReducer, getEncounterNotesFieldsReducer,
+    createEncounterReducer, getEncounterReducer, updateEncounterReducer, createEncounterSettingsReducer, getEncounterSettingsReducer, updateEncounterSettingsReducer,
+    getEncounterByIdReducer, getEncounterNotesTypeReducer, getEncounterNotesFieldsReducer, getPastEncounterReducer,
     // note categories
     createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer,
     // templates
@@ -85,5 +86,5 @@ export default (combineReducers({
     getPatientsAccessLogsReducer,
     // Audit Report
     getAuditReportReducer,
-    
+
 }): any);

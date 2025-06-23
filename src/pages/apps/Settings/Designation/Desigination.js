@@ -36,7 +36,6 @@ const Designation = () => {
     const createResponse = store?.createMastersDataReducer?.data?.status;
     const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
     const updateResponse = store?.updateMastersDataReducer?.data?.status;
-    console.log(store?.getMastersDataReducer, 'store?.getMastersDataReducer');
     const closeAddModal = () => {
         setAddDesiginationModal(false);
         setEdit(null);
@@ -115,17 +114,15 @@ const Designation = () => {
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={` active_inactive_buttons ${
-                                        status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={` active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`active_inactive_buttons ${
-                                        !status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Inactive
                                 </Button>
                             </Col>
@@ -357,7 +354,7 @@ const Designation = () => {
                             </Button>
                             <Button type="submit" className="custom-buttons" style={{ width: '65px' }}>
                                 {store?.createMastersDataReducer?.loading ||
-                                store?.updateMastersDataReducer?.loading ? (
+                                    store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>

@@ -43,7 +43,6 @@ const ConsultationRoom = () => {
 
     const createResponse = store?.createMastersDataReducer?.data?.status;
     const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
-    console.log('tableGetData', store?.getMastersDataReducer);
     const updateResponse = store?.updateMastersDataReducer?.data?.status;
 
     // useEffect(() => {
@@ -111,18 +110,16 @@ const ConsultationRoom = () => {
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`active_inactive_buttons ${
-                                            status === true ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2`}>
+                                        className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'
+                                            } me-2`}>
                                         Active
                                     </Button>
 
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={` active_inactive_buttons ${
-                                            status === false ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2`}>
+                                        className={` active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'
+                                            } me-2`}>
                                         Inactive
                                     </Button>
                                 </Col>

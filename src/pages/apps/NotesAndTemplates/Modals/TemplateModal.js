@@ -18,19 +18,17 @@ import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import TemplateSection from './TemplateSection';
 const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
     const { control, register, handleSubmit, reset } = useForm();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const createResponse = store?.createTemplateReducer?.data?.success;
     const updateResponse = store?.updateTemplateReducer?.data?.success;
-
-    const [tags, setTags] = useState([]);
     const practiceOptions = practiceTypeOptions?.map((data) => ({
         label: data?.type, value: data?.type, description: data?.description
-    }))
+    }));
 
+    const [tags, setTags] = useState([]);
     const [activeTab, setActiveTab] = useState('details');
     const [sectionsId, setSectionsId] = useState(null);
-
 
     useEffect(() => {
         if (createResponse) {
@@ -38,6 +36,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
             setActiveTab('sections')
         }
     }, [createResponse])
+
     useEffect(() => {
         if (createResponse === true || updateResponse === true) {
             dispatch(getTemplateAction({ search: '', page: 1, limit: 10, status: 'active' }))
@@ -61,7 +60,6 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
             setSectionsId(template._id);
         }
     }, [template, reset]);
-
 
     const handleAddTag = (e) => {
         const inputValue = e.target.value.trim();
@@ -215,7 +213,6 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                 </Form.Group>
                             </div>
                             <div className="row my-2">
-
                                 <div className="col-md-4 pe-0">
                                     <Form.Group>
                                         <Form.Label className='mb-0'>Practice Type <span className='text-danger'>*</span></Form.Label>
@@ -230,7 +227,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                                     isSearchable
                                                     className="basic-single"
                                                     classNamePrefix="select"
-                                                    placeholder=" Select"
+                                                    placeholder="Select"
                                                     styles={{
                                                         control: (provided) => ({
                                                             ...provided,
@@ -272,7 +269,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                         <Form.Control
                                             rows={4}
                                             type="text"
-                                            placeholder=" "
+                                            placeholder="Type a tag, hit Enter or Space"
                                             onKeyDown={handleAddTag}
                                             maxLength={15}
                                         />
@@ -288,7 +285,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                             className="d-flex px-2 align-items-center mb-0">
                                             {/* {tag?.length > 35 ? tag?.slice(0, 34) + '...' : tag} */}
                                             {tag}
-                                            <TiDelete className='text-white fs-4 ms-1' onClick={() => handleRemoveTag(index)} />
+                                            <TiDelete className='text-white fs-4 ms-1 cursor-pointer' onClick={() => handleRemoveTag(index)} />
                                         </Badge>
                                     ))}
                                 </div>

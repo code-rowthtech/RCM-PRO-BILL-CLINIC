@@ -1,4 +1,10 @@
 export const genderIdentityOptions = [
+      { 
+        show: "Unknown", 
+        value: "UNK", 
+        label: "Unknown", 
+        system: "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+    },
     { 
         show: "Female", 
         value: "446141000124107", 
@@ -23,10 +29,5 @@ export const genderIdentityOptions = [
         label: "Asked But Declined", 
         system: "http://terminology.hl7.org/CodeSystem/data-absent-reason"
     },
-    { 
-        show: "Unknown", 
-        value: "UNK", 
-        label: "Unknown", 
-        system: "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
-    }
+  
 ];

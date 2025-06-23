@@ -90,6 +90,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
     //         })
     //     );
     // }, [dispatch, skip]);
+
     useEffect(() => {
         const fetchData = async () => {
             await dispatch(getProblemListAction({ patientId: patientId }));
@@ -117,6 +118,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
             );
         }
     }, [patientVitals]);
+
     // useEffect(() => {
     //     const data = {
     //         patientId: patientId,
@@ -141,9 +143,6 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
     };
     const handleAddProblemClose = () => setShowAddProblemModal(false);
     const handleAppointmentClose = () => setShowAppointmentModal(false);
-    const handlePageChange = (pageNumber) => {
-        setSkip(pageNumber);
-    };
 
     const statusColorMap = {
         active: 'text-success',
@@ -689,7 +688,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                     <Modal.Title className="">Add Vitals</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <VitalStatus />
+                    <VitalStatus unitSystem={'imperial'} />
                 </Modal.Body>
             </Modal>
             <Modal show={showAddProblemModal} onHide={handleAddProblemClose} size="lg" centered>

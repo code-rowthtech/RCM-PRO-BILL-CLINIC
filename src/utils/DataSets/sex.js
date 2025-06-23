@@ -1,5 +1,10 @@
 export const sexAssignedAtBirthOptions = [
     {
+      value: "UNK",
+      label: "Unknown",
+      system: "http://hl7.org/fhir/StructureDefinition/us-core-birthsex",
+    },
+    {
       value: "M",
       label: "Male",
       system: "http://hl7.org/fhir/StructureDefinition/us-core-birthsex",
@@ -9,10 +14,6 @@ export const sexAssignedAtBirthOptions = [
       label: "Female",
       system: "http://hl7.org/fhir/StructureDefinition/us-core-birthsex",
     },
-    {
-      value: "UNK",
-      label: "Unknown",
-      system: "http://hl7.org/fhir/StructureDefinition/us-core-birthsex",
-    },
+  
   ];
   

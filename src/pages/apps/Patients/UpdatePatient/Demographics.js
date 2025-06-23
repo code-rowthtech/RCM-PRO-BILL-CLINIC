@@ -66,7 +66,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const [demographicAddresses, setDemographicAddresses] = useState([
-        { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
 
     const updateResponse = store?.updatePatientsReducer?.data?.status;
@@ -345,14 +345,14 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 occupation: data?.occupation,
                 workLocation: data?.employerAddress
                     ? {
-                          address: {
-                              line: [data?.employerAddress],
-                              city: data?.employerCity,
-                              state: data?.employerStateName,
-                              postalCode: data?.employerZip,
-                              country: 'United States',
-                          },
-                      }
+                        address: {
+                            line: [data?.employerAddress],
+                            city: data?.employerCity,
+                            state: data?.employerStateName,
+                            postalCode: data?.employerZip,
+                            country: 'United States',
+                        },
+                    }
                     : {},
             },
             identifier: finalIdentifiers,
@@ -360,7 +360,6 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log('Payload for Update Patient:', payload);
     };
 
     const getEmployerGeolocation = (e) => {
@@ -885,11 +884,10 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
                                                             ? 'd-none'
                                                             : ''
-                                                    }`}>
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -957,7 +955,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('employerCity')}>
                                                 <option hidden value="">
-                                                    {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
+                                                    {store?.getCitiesReducer?.cities4?.loading ? 'Loading...' : 'City'}
                                                 </option>
                                                 {cities4?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
@@ -976,9 +974,11 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                 <Row>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">Zip</Form.Label>
+                                            <Form.Label className="mb-0">Postal Code </Form.Label>
                                             <Form.Control
                                                 type="text"
+                                                placeholder="Postal code"
+                                                maxLength={5}
                                                 {...register('employerZip', {
                                                     minLength: {
                                                         value: 5,
@@ -989,8 +989,20 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                         message: 'ZIP code must contain numbers only',
                                                     },
                                                 })}
-                                                placeholder="Zip"
-                                                maxLength={5}
+                                                onKeyDown={(e) => {
+                                                    if (
+                                                        !/[0-9]/.test(e.key) &&
+                                                        ![
+                                                            'Backspace',
+                                                            'Tab',
+                                                            'ArrowLeft',
+                                                            'ArrowRight',
+                                                            'Delete',
+                                                        ].includes(e.key)
+                                                    ) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
                                             {errors.employerZip && (
                                                 <span className="text-danger">{errors.employerZip.message}</span>
@@ -1013,7 +1025,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                     </Col>
                 </Row>
             </div>
-            <div className="d-flex gap-2 align-items-end justify-content-end my-1">
+            <div className="d-flex gap-2 align-items-end justify-content-end my-2">
                 <Button
                     className="custom-buttons btn-height"
                     disabled={store?.updatePatientsReducer?.loading}

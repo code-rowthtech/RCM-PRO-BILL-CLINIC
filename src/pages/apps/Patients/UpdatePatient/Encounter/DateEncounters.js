@@ -14,96 +14,84 @@ import { useSearchParams } from 'react-router-dom';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import Spinner from '../../../../../constants/Spinner';
 import PastEncounters from './PastEncounters';
+import { string } from 'prop-types';
 import { Controller } from 'react-hook-form';
 import ToastHandle from '../../../../../helpers/ToastMessage';
 
-const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId }) => {
-    // Constant Declarations
+const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType,
+    isAccordionOpen, encounterAction, encounterId,
+    encounterTabs, setEncounterTabs, setActiveTab, setExpanded }) => {
+
+    const [leftTab, setLeftTab] = useState('Summary');
+    const [selectedFromList, setSelectedFromList] = useState({})
     const store = useSelector((state) => state);
     const { handleSubmit, register, setValue, formState: { errors }, getValues, reset, control } = useForm();
     const dispatch = useDispatch()
     const [searchParams] = useSearchParams();
-    const intervalRef = useRef(null);
     const id = searchParams.get('id');
+    const [initialLoading, setInitialLoading] = useState(true);
+
+    // Get data from store
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const providerOptions = doctorDetails?.map((data) => ({
         label: data?.name?.[0]?.text, value: data?._id
-    }));
-
+    }))
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
     const createEncounterData = store?.createEncounterReducer;
-
+    // const encounterData=
     const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
     const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
         label: data?.title, value: data?._id, isDefault: data?.default
     }));
     const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
-    const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
-    const updateEncounterData = store?.updateEncounterReducer;
-    const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
-    const visibleTabs =
-        settingsDataMainItems?.length > 0
-            ? settingsDataMainItems?.filter((item) => item?.show === true)
-            : defaultTabs.map((name, index) => ({
-                _id: index.toString(),
-                name,
-            }));
-
-    // STATE VARIABLES INITIALIZATION
-    const [leftTab, setLeftTab] = useState('Summary');
-    const [selectedFromList, setSelectedFromList] = useState({})
-    const [initialLoading, setInitialLoading] = useState(true);
-    const [isSessionRunning, setIsSessionRunning] = useState(false);
-    const [stopwatchTime, setStopwatchTime] = useState(0);
     const [noteType, setNoteType] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
+    const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
+    // Get update encounter data from store
+    const updateEncounterData = store?.updateEncounterReducer;
 
-
-    // USEEFFECTS
+    const [updateClicked, setUpdateClicked] = useState(false);
+    // Handle successful encounter creation or update
     useEffect(() => {
         if (createEncounterData?.data?.status === 201) {
-            dispatch(getEncounterAction({ patientId: id }));
-            clearInterval(intervalRef.current); // Stop the stopwatch interval
-            setStopwatchTime(0);
-            setIsSessionRunning(false);
-            // reset();
+            dispatch(getEncounterAction({ patientId: id, status: '' }));
+            reset();
         }
-        else if (updateEncounterData?.data?.status === 200) {
+        else if (updateEncounterData?.data?.status === 200 && updateClicked) {
+            setUpdateClicked(false);
             setInitialLoading(false);
             dispatch(getEncounterByIdAction({ encounterId: encounterId }))
-            dispatch(getEncounterAction({ patientId: id }));
+            dispatch(getEncounterAction({ patientId: id, status: '' }));
             // removeEncounterTab(encounterId)
             reset();
         }
     }, [
         createEncounterData?.data?.status,
         updateEncounterData?.data?.status,
+        updateClicked
     ]);
 
     useEffect(() => {
-        if (store?.getEncounterNotesTypeReducer?.data?.data) {
-            setNoteType(defaultNoteTypeOption?.value);
+        if (encounterAction === 'updateEncounter') {
+            dispatch(getEncounterByIdAction({ encounterId: encounterId }))
         }
-    }, [store?.getEncounterNotesTypeReducer?.data?.data, defaultNoteTypeOption]);
-
+    }, [encounterAction])
+    // Set default note type and populate form for update
     useEffect(() => {
-        if (noteType) {
-            dispatch(getEncounterNotesFieldsAction({ noteId: noteType }));
+        if (!noteType && defaultNoteTypeOption) {
+            setNoteType(defaultNoteTypeOption.value);
+            dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption.value }));
         }
-    }, [noteType])
-
-
-    useEffect(() => {
-        // if (!noteType && defaultNoteTypeOption) {
-        //     setNoteType(defaultNoteTypeOption.value);
-        //     dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption?.value }));
-        // }
 
         // Populate form for update operation
         if (encounterAction === 'updateEncounter' && encounterData && notesFields) {
             // Set provider
             if (encounterData?.providerId) {
-                setSelectedProvider(encounterData?.providerId);
+                setSelectedProvider(encounterData?.providerId?._id);
+            }
+            if (encounterData?.noteType) {
+                setNoteType(encounterData?.noteType);
             }
 
             // Set form values
@@ -114,40 +102,38 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             if (encounterData?.class?.coding?.[0]) {
                 setValue('class', encounterData?.class?.coding?.[0]?.code);
             }
+
             if (encounterData?.status) {
                 setValue('status', encounterData?.status);
             }
+
             if (encounterData?.period?.start) {
                 setValue('startDate', encounterData?.period?.start?.split('T')[0]);
-            }            // Set note fields
+            }
+
+            // Set note fields
             if (encounterData?.data && Array.isArray(encounterData?.data)) {
-                const soapSections = ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'];
                 encounterData?.data?.forEach(field => {
                     if (field?.type && field?.content?.value) {
-                        // Ensure we have content to set
-                        const contentValue = field?.content?.value;
-                        if (contentValue && typeof contentValue === 'string') {
-                            // For SOAP sections, make sure we preserve HTML formatting
-                            if (soapSections.includes(field.type)) {
-                                // If content doesn't have HTML tags, wrap it in <p> tags
-                                const formattedValue = contentValue.trim().startsWith('<')
-                                    ? contentValue
-                                    : `<p>${contentValue}</p>`;
-                                setValue(field.type, formattedValue);
-                            } else {
-                                setValue(field.type, contentValue);
-                            }
-                        }
+                        setValue(field?.type, field?.content?.value);
                     }
                 });
             }
         }
-    }, [noteType, defaultNoteTypeOption, notesTypeOptions, encounterAction, encounterData, setValue, notesFields]);
+    }, [encounterAction, encounterData, setValue, notesFields]);
 
 
+    const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
+    const visibleTabs =
+        settingsDataMainItems?.length > 0
+            ? settingsDataMainItems?.filter((item) => item?.show === true)
+            : defaultTabs.map((name, index) => ({
+                _id: index.toString(),
+                name,
+            }));
 
     const handleNotesTypeChange = (selectedOption) => {
-        // dispatch(getEncounterNotesFieldsAction({ noteId: selectedOption?.value }))
+        dispatch(getEncounterNotesFieldsAction({ noteId: selectedOption?.value }))
         setNoteType(selectedOption ? selectedOption.value : '');
     };
 
@@ -156,15 +142,15 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         if (!selectedFromList) return;
 
         setTimeout(() => {
-            ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', "Notes"].forEach((section) => {
+            ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach((section) => {
                 if (selectedFromList?.[section]) {
-                    setValue(section === 'Care Plan' ? 'CarePlan' : section, selectedFromList[section]);
+                    setValue(section, selectedFromList[section]);
                 }
             });
         }, 0);
     }, [selectedFromList, setValue]);
 
-    const patientDetails = store?.getPatientByIdReducer?.data?.data;
+
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
         // For SOAP sections, keep refs for each ReactQuill
         const quillRefs = useRef({
@@ -406,10 +392,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         );
     };
     const [providerError, setProviderError] = useState(false);
-
     const onSubmit = (data) => {
-        const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type);
-        const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class);
+        const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type)
+        const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class)
         const type = {
             coding: [{
                 system: encounterTypeSelected.system,
@@ -440,7 +425,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
             // Handle SOAP notes specially
             if (name === 'Notes (SOAP)') {
-                ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].forEach(section => {
+                ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach(section => {
                     const value = getValues(section) || '';
                     fieldsData.push({
                         type: section,
@@ -472,8 +457,8 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 subject: id,
                 status: data?.status,
                 providerId: selectedProvider,
+                noteType,
                 data: fieldsData,
-                sessionTime: formatTime(stopwatchTime),
                 period: {
                     start: data?.startDate,
                 }
@@ -483,6 +468,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                     id: encounterId,
                     data: fieldsData
                 }
+                setUpdateClicked(true);
                 dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
             } else {
                 dispatch(createEncounterAction({ key: encryptMessage(payload) }));
@@ -491,30 +477,40 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
     }
 
-
-    const formatTime = (timeInSeconds) => {
-        const hours = Math.floor(timeInSeconds / 3600);
-        const minutes = Math.floor((timeInSeconds % 3600) / 60);
-        const seconds = timeInSeconds % 60;
-
-        return [
-            hours.toString().padStart(2, '0'),
-            minutes.toString().padStart(2, '0'),
-            seconds.toString().padStart(2, '0')
-        ].join(':');
-    };
+    const [isSessionRunning, setIsSessionRunning] = useState(false);
+    const [stopwatchTime, setStopwatchTime] = useState(0);
+    const intervalRef = useRef(null);
 
     const Stopwatch = React.memo(({ isRunning, time, onToggle }) => {
+        const formatTime = (timeInSeconds) => {
+            const hours = Math.floor(timeInSeconds / 3600);
+            const minutes = Math.floor((timeInSeconds % 3600) / 60);
+            const seconds = timeInSeconds % 60;
+
+            return [
+                hours.toString().padStart(2, '0'),
+                minutes.toString().padStart(2, '0'),
+                seconds.toString().padStart(2, '0')
+            ].join(':');
+        };
 
         return (
-            <div className="d-flex align-items-center gap-1">
-                <span onClick={onToggle} className={`cursor-pointer fs-5 ${isRunning ? "text-danger" : "text-success"}`}>
-                    {isRunning ? <i className="bi bi-pause-fill" title='Stop Session'></i> : <i title='Start Session' className="bi bi-play-fill"></i>}
-                </span>
+            <div className="d-flex align-items-center gap-3">
+                <div className="text-nowrap">
+                    {!isRunning ? "Session Stopped" : "Session Running"}
+                </div>
                 <div className="fw-bold">
                     {formatTime(time)}
                 </div>
-            </div>
+                <Button
+                    variant={isRunning ? "outline-danger" : "outline-success"}
+                    size="sm"
+                    className={`${isRunning ? "btn-danger" : "btn-success"} timer-button text-white d-flex align-items-center justify-content-center`}
+                    onClick={onToggle}
+                >
+                    {isRunning ? "Stop Session" : "Start Session"}
+                </Button>
+            </div >
         );
     });
 
@@ -530,7 +526,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         }
         setIsSessionRunning(!isSessionRunning);
     }, [isSessionRunning, stopwatchTime]);
-
     return (
         <div className='px-0 mt-1  row border h-100  mx-1'>
             <Col className={` px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
@@ -551,7 +546,8 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                     <Col sm={12} className='px-md-1 scroll-container ' style={{ height: !expanded ? (isAccordionOpen ? '55vh' : '70vh') : '78vh', overflowX: 'hidden' }}>
                         {leftTab === 'Summary' && <EncounterSummary />}
                         {leftTab === 'Templates' && <EncounterTemplates selectedFromList={selectedFromList} setSelectedFromList={setSelectedFromList} />}
-                        {leftTab === 'Past Encounters' && <PastEncounters />}
+                        {leftTab === 'Past Encounters' && <PastEncounters encounterTabs={encounterTabs} setEncounterTabs={setEncounterTabs} setActiveTab={setActiveTab} setExpanded={setExpanded} />}
+                        {/* {leftTab === 'PMH' && <>PMH</>} */}
                     </Col>
                 </Row>
             </Col>
@@ -559,9 +555,13 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             {/* Main Content Column */}
             <Col className='px-0 border-start pb-2' sm={isCollapsed ? 12 : 8}>
                 {/* Encounter Details */}
-                <div className={`px-1 h-100 ${store?.getEncounterByIdReducer?.loading && initialLoading ? 'd-flex align-items-center justify-content-center p-5' : ''}`}>
-                    {store?.getEncounterByIdReducer?.loading && initialLoading ?
-                        <Spinner />
+                <div className={`px-1 h-100 ${store?.getEncounterByIdReducer?.loading ? 'd-flex align-items-center justify-content-center p-5' : ''}`}>
+                    {store?.getEncounterByIdReducer?.loading ?
+                        <Row style={{ height: '15vh' }}>
+                            <Col sm={12} className='d-flex align-items-center justify-content-center py-4'>
+                                <Spinner />
+                            </Col>
+                        </Row>
                         :
                         <Form onSubmit={handleSubmit(onSubmit)}>
                             <Row
@@ -591,7 +591,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                         dispatch(updateEncounterAction({ key: encryptMessage(payload) }));
                                                     }
                                                 }}
-                                                className='border-primary' >
+                                                className='border-primary'>
                                                 <option key='' value='' hidden>Select...</option>
                                                 {encounterTypes?.map((data, index) => (
                                                     <option key={index} value={data?.code}>{data?.code + '-' + data?.display}</option>
@@ -727,7 +727,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                 className='text-capitalize'>
                                                 <option key='' value=''>Select Status</option>
                                                 {['planned', 'arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'cancelled']?.map((data, index) => (
-                                                    <option selected={!encounterData && data === 'arrived'} value={data} className='text-capitalize' key={index}>{data}</option>
+                                                    <option value={data} className='text-capitalize' key={index}>{data}</option>
                                                 ))}
                                             </Form.Select>
                                         </div>
@@ -793,26 +793,19 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                 data={notesFields}
                                 control={control}
                             />
-                            <div className="row position-relative ">
-                                {/* <div
-                                    style={{ top: '8%' }}
-                                    className="position-absolute d-flex align-items-center gap-2 py-2">
-                                    <Stopwatch
+                            <div className="row">
+                                <div className="col-12 d-flex justify-content-end gap-2 py-2">
+                                    {/* <Stopwatch
                                         isRunning={isSessionRunning}
                                         time={stopwatchTime}
                                         onToggle={toggleSession}
-                                    />
-                                </div> */}
-                                <div className=" d-flex justify-content-end gap-2 py-2">
+                                    /> */}
                                     <Button
                                         type='Submit'
                                         className='custom-buttons'
                                         disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                                     >
-                                        {store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading ?
-                                            <Spinner className='spinner-border-sm' color='white' />
-                                            :
-                                            encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
+                                        {encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
                                     </Button>
                                 </div>
                             </div>

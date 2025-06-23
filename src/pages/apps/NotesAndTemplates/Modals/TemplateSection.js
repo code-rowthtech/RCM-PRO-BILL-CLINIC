@@ -117,7 +117,7 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
         const data = {
             items: items
         }
-        dispatch(updateTemplateAction({ key: encryptMessage(data), templateId: sectionsId }))
+        dispatch(updateTemplateAction({ key: encryptMessage(data), templateId: sectionsId }));
     }
 
     return (
@@ -126,7 +126,7 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
                 <div className="row mb-2">
                     {/* <h5 className="mb-1 fs-5">Add Section</h5> */}
                     <div className="col-8 d-flex flex-wrap ">
-                        {sectionLabels.map(label => (
+                        {sectionLabels?.map(label => (
                             <button
                                 key={label}
                                 variant="outlined"
@@ -254,7 +254,7 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
                                                             ...newItem,
                                                             shortcut: e.target.value
                                                         })}
-                                                        placeholder=" "
+                                                        placeholder=""
                                                     />
                                                 </Form.Group>
                                             </div>

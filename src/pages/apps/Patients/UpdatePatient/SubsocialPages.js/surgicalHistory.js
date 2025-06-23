@@ -204,7 +204,7 @@ const SurgicalHistory = () => {
                     <Form
                         onSubmit={handleSubmit(onSubmit)}
                         style={{
-                            minHeight: 'calc(100vh - 330px)',
+                            minHeight: 'calc(100vh - 340px)',
                             height: 'auto',
                             display: 'flex',
                             flexDirection: 'column',

@@ -197,6 +197,10 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 setSearchNoteType={setSearchNoteType}
                                 isCollapsed={isCollapsed}
                                 setCreateEncounter={setCreateEncounter}
+                                encounterTabs={encounterTabs}
+                                setEncounterTabs={setEncounterTabs}
+                                setActiveTab={setActiveTab}
+                                setExpanded={setExpanded}
                             />
                         )}
                     </div>

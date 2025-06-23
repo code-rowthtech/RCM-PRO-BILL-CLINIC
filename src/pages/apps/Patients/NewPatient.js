@@ -78,7 +78,6 @@ const NewPatient = () => {
     const logoFileInputRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
-    console.log(logo, 'logo');
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
     const [showResponsibleTab, setShowResponsibleTab] = useState(true);
@@ -91,10 +90,10 @@ const NewPatient = () => {
     const [referringPhysician, setReferringPhysician] = useState('true');
     const [showModalPic, setShowModalPic] = useState(false);
     const [modalFileUrl, setModalFileUrl] = useState('');
-    console.log(modalFileUrl, 'modalFileUrl');
     const [imageLoading, setImageLoading] = useState(true);
 
     const handleShowModal = (url) => {
+        console.log(url, '123456789');
         setModalFileUrl(url);
         setShowModalPic(true);
     };
@@ -269,7 +268,7 @@ const NewPatient = () => {
             setLogo(url);
             setLogoName(selectedFile?.name);
             clearErrors('profileImage');
-        } catch (error) {}
+        } catch (error) { }
     };
     useEffect(() => {
         dispatch(getStatesByCountryAction());
@@ -315,13 +314,13 @@ const NewPatient = () => {
                         rules={
                             !id
                                 ? {
-                                      pattern: {
-                                          value: /^\(\d{3}\)\d{3}-\d{4}$/,
-                                          message: 'Format must be (XXX)XXX-XXXX',
-                                      },
-                                      maxLength: { value: 13, message: 'Max 13 characters' },
-                                      minLength: { value: 13, message: 'Min 13 characters' },
-                                  }
+                                    pattern: {
+                                        value: /^\(\d{3}\)\d{3}-\d{4}$/,
+                                        message: 'Format must be (XXX)XXX-XXXX',
+                                    },
+                                    maxLength: { value: 13, message: 'Max 13 characters' },
+                                    minLength: { value: 13, message: 'Min 13 characters' },
+                                }
                                 : {}
                         }
                         render={({ field: { onChange, value, ref } }) => (
@@ -370,15 +369,15 @@ const NewPatient = () => {
 
             photo: logo?.url
                 ? [
-                      {
-                          contentType: logo?.fileType || 'image/jpeg', // Assuming fileType exists, default to 'image/jpeg'
-                          url: logo?.url?.split('?')[0], // Remove query params from URL
-                          data: logo?.base64 || undefined, // If base64 data is available
-                          hash: logo?.hash || '', // If you have a hash for verification
-                          title: logoName || '', // Use provided file name as title
-                          creation: new Date().toISOString(), // Current timestamp
-                      },
-                  ]
+                    {
+                        contentType: logo?.fileType || 'image/jpeg', // Assuming fileType exists, default to 'image/jpeg'
+                        url: logo?.url?.split('?')[0], // Remove query params from URL
+                        data: logo?.base64 || undefined, // If base64 data is available
+                        hash: logo?.hash || '', // If you have a hash for verification
+                        title: logoName || '', // Use provided file name as title
+                        creation: new Date().toISOString(), // Current timestamp
+                    },
+                ]
                 : [],
             patientStatus: data?.patientStatus || '',
             paymentProfile: data?.paymentProfile || '',
@@ -487,18 +486,16 @@ const NewPatient = () => {
                             <ul className="nav nav-underline">
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'personalDetails' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'personalDetails' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('personalDetails')}>
                                         Personal Details
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'demographicDetails' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'demographicDetails' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('demographicDetails')}>
                                         Demographic
                                     </button>
@@ -506,9 +503,8 @@ const NewPatient = () => {
                                 {showResponsibleTab && (
                                     <li className="nav-item">
                                         <button
-                                            className={`text-black nav-link fw-medium ${
-                                                activeTab === 'responsible' ? 'active fw-bold' : ''
-                                            }`}
+                                            className={`text-black nav-link fw-medium ${activeTab === 'responsible' ? 'active fw-bold' : ''
+                                                }`}
                                             onClick={() => handleTabChange('responsible')}>
                                             Responsible Party
                                         </button>
@@ -517,9 +513,8 @@ const NewPatient = () => {
                                 {showReferringTab && (
                                     <li className="nav-item">
                                         <button
-                                            className={`text-black nav-link fw-medium ${
-                                                activeTab === 'referringDoctor' ? 'active fw-bold' : ''
-                                            }`}
+                                            className={`text-black nav-link fw-medium ${activeTab === 'referringDoctor' ? 'active fw-bold' : ''
+                                                }`}
                                             onClick={() => handleTabChange('referringDoctor')}>
                                             Referring Doctor
                                         </button>
@@ -686,7 +681,7 @@ const NewPatient = () => {
                                                 </InputGroup>
                                             </Form.Group>
 
-                                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                            <div className="position-absolute" style={{ top: '48%', left: '1%' }}>
                                                 <img src={us} alt="country code flag" width={20} />
                                             </div>
                                         </Form.Group>
@@ -828,14 +823,11 @@ const NewPatient = () => {
                                                     'gender'
                                                     //  { required: 'Gender is required' }
                                                 )}
-                                                data-has-value={!!watch('gender')}>
-                                                <option value="" hidden>
-                                                    Select
-                                                </option>
+                                            >
+                                                <option value="unknown">Unknown</option>
                                                 <option value="male">Male</option>
                                                 <option value="female">Female</option>
                                                 <option value="other">Other</option>
-                                                <option value="unknown">Unknown</option>
                                             </Form.Select>
                                             {errors.gender && (
                                                 <span className="text-danger">{errors.gender.message}</span>
@@ -884,20 +876,19 @@ const NewPatient = () => {
                                             <div
                                                 onClick={() => logoFileInputRef.current.click()}
                                                 style={{ height: '30px', marginTop: '3px' }}
-                                                className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                    logoName || profileUploading ? '' : 'custom-form-fields'
-                                                }`}>
+                                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
+                                                    }`}>
                                                 {logoName
                                                     ? logoName.split('/').pop().slice(0, 30) + '...'
                                                     : profileUploading
-                                                      ? 'Uploading...'
-                                                      : 'Upload Photo'}
+                                                        ? 'Uploading...'
+                                                        : 'Upload Photo'}
                                                 <div className="d-flex align-items-center gap-2">
-                                                    {logo?.url && (
+                                                    {(logo?.url || logo) && (
                                                         <FiEye
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                handleShowModal(logo?.url);
+                                                                handleShowModal(logo?.url?.split('?')[0]);
                                                             }}
                                                             className="text-dark cursor-pointer"
                                                         />
@@ -913,7 +904,7 @@ const NewPatient = () => {
                                                 className="d-none "
                                                 style={{ height: '30px!important' }}
                                                 {...register('profileImage', {})}
-                                                accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
+                                                accept=".png, .jpg, .jpeg, .svg"
                                                 ref={logoFileInputRef}
                                                 onChange={handleFileChange}
                                             />
