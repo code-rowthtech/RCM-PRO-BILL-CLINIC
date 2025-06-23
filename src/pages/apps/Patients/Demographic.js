@@ -224,9 +224,9 @@ const Demographicdetails = ({
                 employerPhone: data?.employerPhone?.replace(/\D/g, ''),
                 employmentStatus: data?.employmentStatus,
                 occupation: data?.occupation,
-                workLocation: 
+                workLocation:
                 // employerAddress ?
-                 {
+                {
                     address: {
                         line: [data?.employerAddress],
                         city: data?.employerCity,
@@ -243,7 +243,6 @@ const Demographicdetails = ({
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload,'demographic payload');
     };
 
     useEffect(() => {
@@ -344,7 +343,7 @@ const Demographicdetails = ({
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select {...register('sex')}>
-                               
+
                                 {sexAssignedAtBirthOptions.map((option) => (
                                     <option key={option.value} value={option?.value}>
                                         {option.label}

@@ -15,6 +15,11 @@ const GET_ENCOUNTER_INITIAL_STATE = {
     loading: false,
 };
 
+const GET_PAST_ENCOUNTER_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
 const GET_ENCOUNTER_NOTES_TYPE_INITIAL_STATE = {
     data: [],
     loading: false,
@@ -115,6 +120,29 @@ export const getEncounterReducer = (state = GET_ENCOUNTER_INITIAL_STATE, action)
             };
 
         case EncounterActionTypes.GET_ENCOUNTER_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};
+
+export const getPastEncounterReducer = (state = GET_PAST_ENCOUNTER_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case EncounterActionTypes.GET_PAST_ENCOUNTER_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case EncounterActionTypes.GET_PAST_ENCOUNTER_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case EncounterActionTypes.GET_PAST_ENCOUNTER_ERROR:
             return {
                 data: action.payload,
                 loading: false,

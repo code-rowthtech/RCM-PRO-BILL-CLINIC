@@ -20,8 +20,9 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
     useEffect(() => {
-        dispatch(getEncounterAction({ patientId: id, skip: skip }))
-    }, [skip, dispatch, id])
+        dispatch(getEncounterAction({ patientId: id, skip }));
+    }, [dispatch, id, skip]);
+
 
     const statusColorMap = {
         planned: 'text-secondary',
@@ -35,6 +36,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
+        // dispatch(getEncounterAction({ patientId: id, skip: pageNumber }))
     };
 
     // const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
@@ -65,18 +67,8 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                     <tr
                                         key={item?._id}>
                                         <td>{index + 1}</td>
-                                        <td className="d-flex align-items-center gap-2">
-                                            <Image
-                                                src={item?.providerId?.photo?.[0]?.url || dummyProfile}
-                                                roundedCircle
-                                                width={35}
-                                                height={35}
-                                                alt={item?.providerId?.name?.[0]?.text}
-                                            />
-                                            <div>
-                                                <div>{item?.providerId?.name?.[0]?.text}</div>
-                                                <small className="text-muted">{item?.providerId?.telecom?.find((data) => data?.system === 'email')?.value}</small>
-                                            </div>
+                                        <td>
+                                            {item?.providerId?.name?.[0]?.text}
                                         </td>
                                         <td>{item?.type?.[0]?.coding?.[0]?.display}</td>
                                         <td className={`text-capitalize fw-bold ${statusColorMap[item?.status] || ''}`}>

@@ -141,7 +141,6 @@ type AppMenuProps = {
 };
 
 const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$FragmentType> => {
-    console.log(`AppMenu`, menuItems);
     let location = useLocation();
     const menuRef = useRef(null);
     const navigate = useNavigate();

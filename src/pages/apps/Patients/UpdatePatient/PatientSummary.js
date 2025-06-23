@@ -90,6 +90,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
     //         })
     //     );
     // }, [dispatch, skip]);
+
     useEffect(() => {
         const fetchData = async () => {
             await dispatch(getProblemListAction({ patientId: patientId }));
@@ -687,7 +688,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                     <Modal.Title className="">Add Vitals</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <VitalStatus />
+                    <VitalStatus unitSystem={'imperial'} />
                 </Modal.Body>
             </Modal>
             <Modal show={showAddProblemModal} onHide={handleAddProblemClose} size="lg" centered>

@@ -345,14 +345,14 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 occupation: data?.occupation,
                 workLocation: data?.employerAddress
                     ? {
-                          address: {
-                              line: [data?.employerAddress],
-                              city: data?.employerCity,
-                              state: data?.employerStateName,
-                              postalCode: data?.employerZip,
-                              country: 'United States',
-                          },
-                      }
+                        address: {
+                            line: [data?.employerAddress],
+                            city: data?.employerCity,
+                            state: data?.employerStateName,
+                            postalCode: data?.employerZip,
+                            country: 'United States',
+                        },
+                    }
                     : {},
             },
             identifier: finalIdentifiers,
@@ -360,7 +360,6 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log('Payload for Update Patient:', payload);
     };
 
     const getEmployerGeolocation = (e) => {
@@ -885,11 +884,10 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
                                                             ? 'd-none'
                                                             : ''
-                                                    }`}>
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}

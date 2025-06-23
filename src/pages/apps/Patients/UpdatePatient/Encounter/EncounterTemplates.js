@@ -55,14 +55,14 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                                                     <li
                                                         style={{ backgroundColor: alreadySelected ? 'rgb(232 240 254 / 61%)' : '' }}
                                                         onClick={() => {
-                                                            if (!alreadySelected) {
-                                                                setSelectedFromList(prev => ({
-                                                                    ...prev,
-                                                                    [item?.label]: prev[item?.label]
-                                                                        ? `${prev[item?.label]}\n${itemList?.text}`
-                                                                        : itemList?.text
-                                                                }));
-                                                            }
+                                                            // if (!alreadySelected) {
+                                                            setSelectedFromList(prev => ({
+                                                                ...prev,
+                                                                [item?.label]: prev[item?.label]
+                                                                    ? `${prev[item?.label]}\n${itemList?.text}`
+                                                                    : itemList?.text
+                                                            }));
+                                                            // }
                                                         }}
                                                         className={`border-bottom py-1 cursor-pointer list-hover ${alreadySelected ? 'text-muted' : ''}`}
                                                         key={index}

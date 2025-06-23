@@ -18,7 +18,6 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
-    console.log('patientId', patientId);
     const [responsibleAddresses, setResponsibleAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
@@ -59,10 +58,10 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
             const rawTelecom = patientDetails?.relatedPerson?.telecom;
             const updateTelecom = Array.isArray(rawTelecom)
                 ? rawTelecom.map((data) => ({
-                      system: data?.system || '',
-                      value: data?.value || '',
-                      use: data?.use || '',
-                  }))
+                    system: data?.system || '',
+                    value: data?.value || '',
+                    use: data?.use || '',
+                }))
                 : [];
 
             setResponsibleTelecom(updateTelecom);
