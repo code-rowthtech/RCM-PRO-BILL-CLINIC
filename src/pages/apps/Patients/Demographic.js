@@ -340,17 +340,13 @@ const Demographicdetails = ({
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select {...register('sex')}>
-<<<<<<< HEAD
-
-=======
->>>>>>> 43de84c5829f832afb03b1d5148cfd2908b82b84
-    {
-        sexAssignedAtBirthOptions.map((option) => (
-            <option key={option.value} value={option?.value}>
-                {option.label}
-            </option>
-        ))
-    }
+                                {
+                                    sexAssignedAtBirthOptions.map((option) => (
+                                        <option key={option.value} value={option?.value}>
+                                            {option.label}
+                                        </option>
+                                    ))
+                                }
                             </Form.Select >
                         </Form.Group >
                     </Col >
@@ -769,11 +765,10 @@ const Demographicdetails = ({
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
                                                             ? 'd-none'
                                                             : ''
-                                                    }`}>
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
