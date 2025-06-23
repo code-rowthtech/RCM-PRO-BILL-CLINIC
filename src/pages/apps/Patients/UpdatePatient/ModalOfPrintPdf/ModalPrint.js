@@ -92,7 +92,7 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                 <Modal.Title>Print Patient Summary</Modal.Title>
             </Modal.Header>
 
-            <Modal.Body className="px-2 py-1" style={{ maxHeight: 'calc(50vh - 120px)', overflow: 'hidden' }}>
+            <Modal.Body className="px-2 py-1 scroll-container" style={{ maxHeight: 'calc(50vh - 120px)' }}>
                 <div className="d-flex gap-4 mb-2">
                     {[['Patient Information', patientInfoOptions],
                     ['Clinical Review', clinicalReviewOptions],

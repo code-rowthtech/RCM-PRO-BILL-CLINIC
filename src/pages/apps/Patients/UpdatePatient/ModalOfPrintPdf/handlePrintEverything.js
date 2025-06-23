@@ -102,10 +102,13 @@ export const handlePrintEverything = (printData) => {
     }, {});
 
     // Sort dates chronologically
-    const sortedDates = Object.keys(groupedByDate).sort((a, b) => {
-        return new Date(a.split(' ')[0].split('/').reverse().join('-')) -
-            new Date(b.split(' ')[0].split('/').reverse().join('-'));
-    });
+    const sortedDates = groupedByDate && typeof groupedByDate === 'object'
+        ? Object.keys(groupedByDate).sort((a, b) => {
+            return new Date(a.split(' ')[0].split('/').reverse().join('-')) -
+                new Date(b.split(' ')[0].split('/').reverse().join('-'));
+        })
+        : [];
+
 
     // Function to get vital value with proper formatting
     const getVitalValue = (entries, type) => {
