@@ -4,11 +4,7 @@ import { useForm } from 'react-hook-form';
 import { FiDownloadCloud, FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-    getStatesByCountryAction,
-    updatePatientsAction,
-    getCities4Action,
-} from '../../../redux/actions';
+import { getStatesByCountryAction, updatePatientsAction, getCities4Action } from '../../../redux/actions';
 import Select from 'react-select';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
@@ -234,7 +230,7 @@ const Demographicdetails = ({
                         postalCode: data?.employerZip,
                         country: 'United States',
                     },
-                }
+                },
                 //  : {},
             },
             identifier: finalIdentifiers,
@@ -243,6 +239,7 @@ const Demographicdetails = ({
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'demographic payload');
     };
 
     useEffect(() => {
@@ -343,15 +340,20 @@ const Demographicdetails = ({
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select {...register('sex')}>
+<<<<<<< HEAD
 
-                                {sexAssignedAtBirthOptions.map((option) => (
-                                    <option key={option.value} value={option?.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
+=======
+>>>>>>> 43de84c5829f832afb03b1d5148cfd2908b82b84
+    {
+        sexAssignedAtBirthOptions.map((option) => (
+            <option key={option.value} value={option?.value}>
+                {option.label}
+            </option>
+        ))
+    }
+                            </Form.Select >
+                        </Form.Group >
+                    </Col >
 
                     <Col sm={3}>
                         <Form.Group>
@@ -510,7 +512,7 @@ const Demographicdetails = ({
                             )}
                         </Form.Group>
                     </Col>
-                </Row>
+                </Row >
                 <hr />
                 <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
                 <hr />
@@ -767,10 +769,11 @@ const Demographicdetails = ({
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -813,7 +816,9 @@ const Demographicdetails = ({
                                     <Col sm={6}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">State</Form.Label>
-                                            <Form.Select {...register('employerStateName')} onChange={(e) => handleStateSelection(e)}>
+                                            <Form.Select
+                                                {...register('employerStateName')}
+                                                onChange={(e) => handleStateSelection(e)}>
                                                 <option value="" hidden>
                                                     State
                                                 </option>
@@ -857,9 +862,11 @@ const Demographicdetails = ({
                                 <Row>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">Zip</Form.Label>
+                                            <Form.Label className="mb-0">Postal code</Form.Label>
                                             <Form.Control
                                                 type="text"
+                                                placeholder="Postal code"
+                                                maxLength={5}
                                                 {...register('employerZip', {
                                                     minLength: {
                                                         value: 5,
@@ -870,8 +877,20 @@ const Demographicdetails = ({
                                                         message: 'ZIP code must contain numbers only',
                                                     },
                                                 })}
-                                                placeholder="Zip"
-                                                maxLength={5}
+                                                onKeyDown={(e) => {
+                                                    if (
+                                                        !/[0-9]/.test(e.key) &&
+                                                        ![
+                                                            'Backspace',
+                                                            'Tab',
+                                                            'ArrowLeft',
+                                                            'ArrowRight',
+                                                            'Delete',
+                                                        ].includes(e.key)
+                                                    ) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
                                             {errors.employerZip && (
                                                 <span className="text-danger">{errors.employerZip.message}</span>
@@ -932,7 +951,7 @@ const Demographicdetails = ({
                         )}
                     </Button>
                 </div>
-            </Form>
+            </Form >
         </>
     );
 };

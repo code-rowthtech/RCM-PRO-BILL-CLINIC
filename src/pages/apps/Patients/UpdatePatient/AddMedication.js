@@ -456,25 +456,18 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                     </Row>
 
                     <div className="d-flex justify-content-end mt-3">
-                        <Button
-                            onClick={() => {
-                                onCancel();
-                                reset();
-                                setAdditionalInstruction();
-                            }}
-                            className="me-2 custom-buttons">
-                            Cancel
-                        </Button>
+                     
                         <Button
                             disabled={
                                 store?.createMedicationReducer?.loading || store?.updateMedicationReducer?.loading
                             }
+                            style={{width: '100px'}}
                             type="submit"
                             className="custom-buttons">
                             {store?.createMedicationReducer?.loading || store?.updateMedicationReducer?.loading ?
                                 <Spinner className='spinner-border-sm' color='white' />
                                 :
-                                selectedMedication ? 'Update' : 'Save'
+                                selectedMedication ? 'Update' : 'Save & Exit'
                             }
                         </Button>
                     </div>

@@ -161,6 +161,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                             <Form.Control
                                 type="date"
                                 placeholder="Date of Birth"
+                                max={new Date().toISOString().split('T')[0]} // today's date in YYYY-MM-DD format
                                 {...register('dateOfBirth', { required: 'This field is required' })}
                             />
                             {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
@@ -223,7 +224,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                         style={{ width: '200px' }}
                         type="submit">
                         {store?.createResponsiblePartyReducer?.loading ? (
-                            <Spinner className='spinner-border-sm' color='white' />
+                            <Spinner className="spinner-border-sm" color="white" />
                         ) : (
                             ' Save & Continue Editing'
                         )}
