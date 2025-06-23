@@ -1128,7 +1128,9 @@ option {
 .upload-documents .modal-dialog .modal-content {
     height: 85vh !important;
 }
-
+.print_documents_modal .modal-dialog .modal-content {
+    height: 50vh !important;
+}
 .scroll-will-change {
     will-change: transform;
 }
