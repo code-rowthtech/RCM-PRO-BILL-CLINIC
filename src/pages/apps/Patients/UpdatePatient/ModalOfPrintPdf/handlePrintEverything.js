@@ -874,8 +874,26 @@ ${printData?.toBePrinted?.some((data) => data === 'Patient Details') ?
         </html >
     `;
 
-    document.body.innerHTML = printContent;
-    window.print();
-    document.body.innerHTML = originalContent;
-    window.location.reload();
+
+    // document.body.innerHTML = printContent;
+    // window.print();
+    // document.body.innerHTML = originalContent;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert('Popup blocked. Please allow popups for this site.');
+        return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for window to finish loading styles and layout
+    printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+        // printWindow.close(); // optional
+    };
+    // window.location.reload();
 };
