@@ -95,7 +95,6 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
             telecom: responsibleTelecom,
         };
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
-        console.log('payload', payload);
     };
 
     useEffect(() => {
@@ -104,8 +103,8 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
         }
     }, [createResponse]);
     const relationshipOption = dataList?.map((relation) => ({
-        value: relation, // Code as the value
-        label: relation.display, // Display text as the label
+        value: relation,
+        label: relation.display,
     }));
     const [rela, setRela] = useState(null);
     const handleRelationChange = (selectedOption) => {

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Card, Col, Row, Table, Badge } from 'react-bootstrap';
-import { FiFileText, FiEdit2, FiArchive, FiTrash2 } from 'react-icons/fi';
+import { FiFileText } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
 import { FormInput } from '../../../components';
 import TemplateModal from './Modals/TemplateModal';
@@ -16,11 +16,7 @@ const TemplatesPage = () => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const templatesData = store?.getTemplateReducer?.data?.data;
-    const createResponse = store?.createTemplateReducer?.data?.success;
-    const updateResponse = store?.updateTemplateReducer?.data?.success;
     const [showModal, setShowModal] = useState(false);
-    const [templates, setTemplates] = useState([]);
-    const [filteredTemplates, setFilteredTemplates] = useState([]);
     const [skip, setSkip] = useState(1);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -85,29 +81,26 @@ const TemplatesPage = () => {
                                 <div className="d-flex gap-2 flex-wrap">
                                     <Button
                                         onClick={() => setActiveStatus('active')}
-                                        className={` active_inactive_buttons text-nowrap ${
-                                            activeStatus === 'active'
-                                                ? ' text-white py-'
-                                                : 'bg-white border-primary text-dark py-'
-                                        }`}>
+                                        className={` active_inactive_buttons text-nowrap ${activeStatus === 'active'
+                                            ? ' text-white py-'
+                                            : 'bg-white border-primary text-dark py-'
+                                            }`}>
                                         Active
                                     </Button>
                                     <Button
                                         onClick={() => setActiveStatus('inactive')}
-                                        className={` active_inactive_buttons text-nowrap ${
-                                            activeStatus === 'inactive'
-                                                ? ' text-white py-'
-                                                : 'bg-white border-primary text-dark py-'
-                                        }`}>
+                                        className={` active_inactive_buttons text-nowrap ${activeStatus === 'inactive'
+                                            ? ' text-white py-'
+                                            : 'bg-white border-primary text-dark py-'
+                                            }`}>
                                         Inactive
                                     </Button>
                                     <Button
                                         onClick={() => setActiveStatus('archive')}
-                                        className={` active_inactive_buttons text-nowrap ${
-                                            activeStatus === 'archive'
-                                                ? ' text-white py-'
-                                                : 'bg-white border-primary text-dark py-'
-                                        }`}>
+                                        className={` active_inactive_buttons text-nowrap ${activeStatus === 'archive'
+                                            ? ' text-white py-'
+                                            : 'bg-white border-primary text-dark py-'
+                                            }`}>
                                         Archived
                                     </Button>
                                 </div>
@@ -209,8 +202,8 @@ const TemplatesPage = () => {
                                                         {searchTerm
                                                             ? 'Try adjusting your search query'
                                                             : activeStatus !== 'all'
-                                                              ? `There are no ${activeStatus} templates`
-                                                              : 'Create your first template to get started'}
+                                                                ? `There are no ${activeStatus} templates`
+                                                                : 'Create your first template to get started'}
                                                     </p>
                                                     {!searchTerm && (
                                                         <Button className="custom-buttons" onClick={openCreateModal}>
@@ -251,7 +244,7 @@ const TemplatesPage = () => {
                                                         className="mdi mdi-square-edit-outline me-1 cursor-pointer fs-4"></i>
                                                     <i
                                                         style={{ cursor: 'not-allowed' }}
-                                                        className="bi bi-trash me-1 fs-5"></i>
+                                                        className="bi bi-trash text-danger me-1 fs-5"></i>
                                                 </td>
                                             </tr>
                                         ))

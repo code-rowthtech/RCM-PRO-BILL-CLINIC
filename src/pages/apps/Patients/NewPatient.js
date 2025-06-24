@@ -93,7 +93,6 @@ const NewPatient = () => {
     const [imageLoading, setImageLoading] = useState(true);
 
     const handleShowModal = (url) => {
-        console.log(url, '123456789');
         setModalFileUrl(url);
         setShowModalPic(true);
     };

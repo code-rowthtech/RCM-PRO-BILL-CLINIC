@@ -2,9 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { getAlcoholHistoryAction, getEncounterAction, getFamilyGeneticAction, getMedicalHistoryAction, getMedicationAction, getSurgicalHistoryAction, getTobaccooAction, getVitalsByPatientIdAction } from '../../../../../redux/actions';
-import { handlePrintPatientSummary } from '../../../../../helpers/printPatientSummary';
 import { handlePrintEverything } from './handlePrintEverything';
-import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 import { getProblemListAction } from '../../../../../redux/ProblemList/action';
 import { useSearchParams } from 'react-router-dom';
 import { getAllergiesOfPatientAction } from '../../../../../redux/allergyList/action';
@@ -15,7 +13,7 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
     const patientId = searchParams.get('id');
     const [printOptions, setPrintOptions] = useState([]);
     const [selectedEncounter, setSelectedEncounter] = useState('');
-    const [skip, setSkip] = useState(1);
+    // const [skip, setSkip] = useState(1);
 
     const encounters = store?.getEncounterReducer?.data?.encounters || [];
 
@@ -32,8 +30,8 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
     ], []);
 
     useEffect(() => {
-        dispatch(getEncounterAction({ patientId: id, skip }));
-    }, [dispatch, id, skip]);
+        dispatch(getEncounterAction({ patientId: id, skip: 1 }));
+    }, [dispatch, id]);
 
     const handleCheckboxChange = (option) => {
         const skip = 1;
@@ -92,7 +90,7 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                 <Modal.Title>Print Patient Summary</Modal.Title>
             </Modal.Header>
 
-            <Modal.Body className="px-2 py-1 scroll-container" style={{ maxHeight: 'calc(50vh - 120px)' }}>
+            <Modal.Body className="px-2 py-1 scroll-container   " style={{ maxHeight: 'calc(50vh - 120px)' }}>
                 <div className="d-flex gap-4 mb-2">
                     {[['Patient Information', patientInfoOptions],
                     ['Clinical Review', clinicalReviewOptions],
