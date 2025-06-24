@@ -12,6 +12,7 @@ import { FormInput } from 'lucide-react';
 import { Controller, Form, useForm } from 'react-hook-form';
 import Paginations from '../../../helpers/Paginations';
 import { IoMdClose } from 'react-icons/io';
+import Spinner from '../../../constants/Spinner';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
@@ -83,26 +84,7 @@ const NotesTypes = () => {
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
-    useEffect(() => {
-        const storedTabId = localStorage.getItem('note_activeTabId');
-        const storedOpenTabs = localStorage.getItem('note_openTabs');
 
-        if (storedTabId) setActiveTabId(storedTabId);
-
-        if (storedOpenTabs) {
-            try {
-                setOpenTabs(JSON.parse(storedOpenTabs));
-            } catch (e) {
-                console.error('Error parsing openTabs from localStorage');
-            }
-        }
-    }, []);
-
-    // Save to localStorage
-    useEffect(() => {
-        localStorage.setItem('note_activeTabId', activeTabId);
-        localStorage.setItem('note_openTabs', JSON.stringify(openTabs));
-    }, [activeTabId, openTabs]);
     return (
         <Row className="mt-2">
             <Col xs={12} className="px-0">
@@ -111,7 +93,7 @@ const NotesTypes = () => {
                         <Row className="">
                             <Col className="border-bottom" sm={12}>
                                 <div
-                                    className="d-flex gap-3 mb-1"
+                                    className="d-flex gap-2"
                                     style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10 }}>
                                     <span
                                         onClick={() => setActiveTabId('note-categories')}
@@ -120,13 +102,12 @@ const NotesTypes = () => {
                                         }}
                                         role="button"
                                         tabIndex={0}
-                                        className={`fw-semibold cursor-pointer font_active_tabs ${
-                                            activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
-                                        }`}>
+                                        className={`fw-semibold cursor-pointer font_active_tabs fs-6 ${activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
+                                            }`}>
                                         Note Categories
                                     </span>
 
-                                    {openTabs?.map((tab, index) => (
+                                    {openTabs?.map((tab) => (
                                         <span
                                             key={tab?._id}
                                             onClick={() => setActiveTabId(tab?._id)}
@@ -135,10 +116,9 @@ const NotesTypes = () => {
                                             }}
                                             role="button"
                                             tabIndex={0}
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
-                                            }`}>
-                                            {tab?.title} Display Setting
+                                            className={`fw-semibold cursor-pointer fs-6 font_active_tabs ${activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
+                                                }`} title={tab?.title}>
+                                            {tab?.title?.length > 30 ? tab?.title?.slice(0, 29) + '...' : tab?.title}
                                             <span
                                                 style={{
                                                     marginLeft: 8,
@@ -175,11 +155,10 @@ const NotesTypes = () => {
                                                         })
                                                     );
                                                 }}
-                                                className={`me-md-2 active_inactive_buttons ${
-                                                    status === 'active'
-                                                        ? ' text-white py-'
-                                                        : 'bg-white border-primary text-dark py-'
-                                                }`}>
+                                                className={`me-md-2 active_inactive_buttons ${status === 'active'
+                                                    ? ' text-white py-'
+                                                    : 'bg-white border-primary text-dark py-'
+                                                    }`}>
                                                 Active
                                             </Button>
                                             <Button
@@ -197,22 +176,12 @@ const NotesTypes = () => {
                                                         })
                                                     );
                                                 }}
-                                                className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
-                                                    status === 'inactive'
-                                                        ? ' text-white py-'
-                                                        : 'bg-white border-primary text-dark py-'
-                                                }`}>
+                                                className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${status === 'inactive'
+                                                    ? ' text-white py-'
+                                                    : 'bg-white border-primary text-dark py-'
+                                                    }`}>
                                                 Inactive
                                             </Button>
-                                            {/* <Button
-                                                onClick={() =>{setStatus('private');dispatch(getNoteCategoriesAction({private:true,active:true, search: search, page: skip, limit: 8, clinicId: ClinicId,noteType:noteType }));}}
-                                                className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
-                                                    status==='private'
-                                                        ? ' text-white py-'
-                                                        : 'bg-white border-primary text-dark py-'
-                                                }`}>
-                                                Private
-                                            </Button> */}
                                         </Col>
 
                                         <Col sm={6} className="d-flex justify-content-end align-items-center">
@@ -229,13 +198,6 @@ const NotesTypes = () => {
                                                     ))}
                                                 </select>
                                             </div>
-                                            {/* <div className="ms-2">
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    onChange={(e) => setSearch(e.target.value)}
-                                                    placeholder="Search"
-                                                /> */}
                                             <div
                                                 className="input_search_box position-relative ms-2"
                                                 style={{
@@ -306,7 +268,15 @@ const NotesTypes = () => {
                             )}
                         </Row>
                         {activeTabId === 'note-categories' ? (
-                            <NoteTypeCards handleOpenTab={handleOpenTab} handleOpenEditModal={handleOpenEditModal} />
+                            store?.getNoteCategoriesReducer?.loading ?
+                                <div className="row">
+                                    <div style={{ height: '40vh' }} className="col-12 d-flex align-items-center justify-content-center">
+                                        <Spinner />
+                                    </div>
+                                </div>
+                                :
+                                <NoteTypeCards handleOpenTab={handleOpenTab} handleOpenEditModal={handleOpenEditModal} />
+
                         ) : activeNote ? (
                             <SettingTabs noteType={activeNote} />
                         ) : (

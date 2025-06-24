@@ -544,33 +544,6 @@ width: 100%;
             ''
         }
            
-        ${printData?.toBePrinted?.some((data) => data === "Referring Doctor") ?
-            ` <div class="patient-info">
-                   <h2>Referring Doctor</h2>
-                   <div class="patient-details">
-                       <div class="detail-item">
-                           <span class="detail-label">Name</span>
-                           <span class="detail-value">${printData?.patientDetails?.referringDocId?.name?.[0]?.prefix + ' ' || ''}
-                          ${printData?.patientDetails?.referringDocId?.name?.[0]
-                ? `${printData?.patientDetails?.referringDocId?.name?.[0]?.given?.join(' ') || ''} ${printData?.patientDetails?.referringDocId?.name?.[0]?.family || ''}`?.trim()
-                : 'Not available'
-            }
-
-                        </span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Phone No.</span>
-                        <span class="detail-value">${'+1-' + printData?.patientDetails?.referringDocId?.telecom?.find((data) => data?.system === 'phone')?.value || 'Not available'}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Address</span>
-                        <span class="detail-value">${referringAddressString}</span>
-                    </div>
-                </div>
-            </div>`
-            :
-            ''
-        }
        
         ${printData?.toBePrinted?.some((data) => data === "Allergies") ?
             ` <div class="patient-info">
@@ -834,9 +807,10 @@ width: 100%;
         }
        
         ${printData?.toBePrinted?.some((data) => data === "Encounter") ?
-            printData?.encounterData?.map((dataEncounter, index) => (
+            `
+            ${printData?.encounterData?.map((dataEncounter, index) => (
                 ` <div class="patient-info">
-                   <h2>${index + 1}.</h2>
+                   <h2>Encounter ${index + 1}.</h2>
 
                 <div class="summary-headers">
                     <b class="detail-label">
@@ -864,7 +838,8 @@ width: 100%;
                 `
                 ))}
             </div > `
-            ))
+            ))}
+            `
             :
             ''
         }

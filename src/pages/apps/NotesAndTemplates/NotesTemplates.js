@@ -97,14 +97,14 @@ const TemplatesPage = () => {
                                             }`}>
                                         Inactive
                                     </Button>
-                                    <Button
+                                    {/* <Button
                                         onClick={() => setActiveStatus('archive')}
                                         className={` active_inactive_buttons text-nowrap ${activeStatus === 'archive'
                                             ? ' text-white py-'
                                             : 'bg-white border-primary text-dark py-'
                                             }`}>
                                         Archived
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </Col>
                             <Col sm={6} className="text-end mt-md-0 mt-2 mt-sm-0">
