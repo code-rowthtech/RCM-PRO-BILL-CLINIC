@@ -69,12 +69,13 @@ const DateUtils = {
         let iterationCount = 0;
 
         while (currentDate <= endOfDay && iterationCount < maxIterations) {
+            const weekStartDate = new Date(currentDate);
             selectedDays.forEach(dayIndex => {
                 if (dayIndex < 0 || dayIndex > 6) return;
 
-                const appointmentDate = new Date(currentDate);
-                const daysToAdd = (dayIndex - currentDate.getDay() + 7) % 7;
-                appointmentDate.setDate(currentDate.getDate() + daysToAdd);
+                const appointmentDate = new Date(weekStartDate);
+                const daysToAdd = (dayIndex - weekStartDate.getDay() + 7) % 7;
+                appointmentDate.setDate(weekStartDate.getDate() + daysToAdd);
 
                 if (appointmentDate <= endOfDay) {
                     dates.push(this.formatDate(appointmentDate));
