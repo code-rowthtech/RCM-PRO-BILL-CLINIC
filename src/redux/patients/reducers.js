@@ -34,10 +34,6 @@ const GET_RESPONSIBLE_PARTY_INITIAL_STATE = {
     loading: false,
 }
 
-const GET_RESPONSIBLE_PARTY_BY_ID_INITIAL_STATE = {
-    data: [],
-    loading: false,
-}
 const UPDATE_PATIENTS_INITIAL_STATE = {
     data: [],
     loading: false
@@ -57,7 +53,30 @@ const GET_INSURANCE_BY_PATIENT_ID_INITIAL_STATE = {
     loading: false
 }
 
+const UPLOAD_DOCUMENTS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 
+const UPDATE_DOCUMENTS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
+const DELETE_DOCUMENTS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
+const GET_DOCUMENTS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
+const GET_DOCUMENTS_BY_ID_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 export const getPatientsReducer = (state = GET_PATIENTS_INITIAL_STATE, action) => {
     switch (action.type) {
         case PatientsActionTypes.GET_PATIENTS_LOADING:
@@ -126,11 +145,7 @@ export const getPatientByIdReducer = (state = GET_PATIENTS_BY_ID_INITIAL_STATE, 
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
+
         default: return state
     }
 }
@@ -172,16 +187,17 @@ export const createResponsiblePartyReducer = (state = CREATE_RESPONSIBLE_PARTY_I
                 data: action.payload,
                 loading: false
             }
+            case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_RESET:    
+            return {
+                data: [],
+                loading: false
+                }
         case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
+     
         default: return state
     }
 }
@@ -279,19 +295,16 @@ export const updatePatientsReducer = (state = UPDATE_PATIENTS_INITIAL_STATE, act
                 data: action.payload,
                 loading: false
             }
+            case PatientsActionTypes.UPDATE_PATIENTS_RESET:
+            return {
+                data: [],
+                loading: false
+                }
         case PatientsActionTypes.UPDATE_PATIENTS_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.RESET_UPDATE_STATUS:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    status: null, // or whatever the initial state should be
-                },
-            };
         default: return state
     }
 }
@@ -379,3 +392,129 @@ export const updateInsuranceReducer = (state = UPDATE_INSURANCE_INITIAL_STATE, a
 
 
 
+export const uploadDocumentsReducer = (state = UPLOAD_DOCUMENTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.UPLOAD_DOCUMENTS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.UPLOAD_DOCUMENTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case PatientsActionTypes.UPLOAD_DOCUMENTS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case PatientsActionTypes.UPLOAD_DOCUMENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const updateDocumentsReducer = (state = UPDATE_DOCUMENTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.UPDATE_DOCUMENTS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.UPDATE_DOCUMENTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case PatientsActionTypes.UPDATE_DOCUMENTS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case PatientsActionTypes.UPDATE_DOCUMENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const deleteDocumentsReducer = (state = DELETE_DOCUMENTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.DELETE_DOCUMENTS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.DELETE_DOCUMENTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case PatientsActionTypes.DELETE_DOCUMENTS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case PatientsActionTypes.DELETE_DOCUMENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const getDocumentsReducer = (state = GET_DOCUMENTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.GET_DOCUMENTS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.GET_DOCUMENTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case PatientsActionTypes.GET_DOCUMENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};
+
+export const getDocumentsByIdReducer = (state = GET_DOCUMENTS_BY_ID_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.GET_DOCUMENTS_BY_ID_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.GET_DOCUMENTS_BY_ID_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case PatientsActionTypes.GET_DOCUMENTS_BY_ID_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};

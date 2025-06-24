@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { createMastersDataAction, getDepartmentDataAction } from '../../../redux/settings/action';
+import { createMastersDataAction, getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
 import { encryptMessage } from '../../../cryptoUtils';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
@@ -24,9 +24,6 @@ const Adddepartment = ({ addDepartmentModal,setAddDesiginationModal, setAddDepar
         };
 
         dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-        console.log("create", payload);
-
-
     };
     useEffect(() => {
         if (createResponse === 200) {
@@ -48,15 +45,12 @@ const Adddepartment = ({ addDepartmentModal,setAddDesiginationModal, setAddDepar
         };
        
           dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-          console.log("create", payload);
-    
-    
       };
       useEffect(() => {
         if (createResponse === 200) {
           setAddDesiginationModal(false);
           reset();
-          dispatch(getDepartmentDataAction({ status: true, category: 'Designation', limit: 10, skip: 1, search: '' }));
+            dispatch(getMastersDataAction({ status : true, category: 'Desigination', limit: 10, skip :1, search:'' }));
 
         }
       }, [createResponse]);
@@ -164,7 +158,7 @@ const Adddepartment = ({ addDepartmentModal,setAddDesiginationModal, setAddDepar
 
 
              <Modal centered show={addDesiginationModal} onHide={closeAddModal}>
-                    <Modal.Body>
+                    <Modal.Body className='' style={{ border:'1px solid lightgray'}}>
                       <Row className="border-bottom mb-2 pb-2">
                         <Col sm={11} className='text-center'><h4>New Desigination</h4></Col>
                         <Col sm={1}><IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} /></Col>

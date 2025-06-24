@@ -5,7 +5,8 @@ const api = new APICore();
 
 export function getPatientsApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getPatients, data);
+    return api.get(URL.getPatients, data);
+
 }
 
 export function getPatientsByAppointmentApi(params: any): any {
@@ -15,7 +16,7 @@ export function getPatientsByAppointmentApi(params: any): any {
 
 export function getPatientByIdApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getPatientById, data);
+    return api.get(`${URL.getPatientById}?id=${data?.id ? data.id : data?.patientId}`);
 }
 
 export function createPatientsApi(params: any): any {
@@ -44,7 +45,7 @@ export function updateResponsiblePartyApi(params: any): any {
 
 export function updatePatientsApi(params: any): any {
     const { data } = params;
-    return api.create(URL.updatePatients, data);
+    return api.update(URL.updatePatients, data);
 }
 
 export function createInsuranceApi(params: any): any {
@@ -62,3 +63,26 @@ export function updateInsuranceApi(params: any): any {
     return api.create(URL.updateInsurance, data);
 }
 
+export function uploadDocumentsApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.documents, data);
+}
+
+export function updateDocumentsApi(params: any): any {
+    const { data } = params;
+    return api.update(`${URL.documents}/${data?.patientDocId}`, data);
+}
+
+export function deleteDocumentsApi(params: any): any {
+    const { data } = params;
+    return api.delete(`${URL.documents}/${data?.patientDocId}`, data);
+}
+
+export function getDocumentsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.documents}?subject=${data?.subject}`);
+}
+export function getDocumentsByIdApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.documents}/${data?.docId}`);
+}

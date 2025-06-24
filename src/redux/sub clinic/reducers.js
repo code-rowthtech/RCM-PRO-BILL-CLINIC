@@ -1,5 +1,11 @@
 import { SubClinicsActionTypes } from "./constants"
 
+const initial_state = {
+    data: [],
+    message: "",
+    loading: false,
+};
+
 const CREATE_SUBCLINICS_INITIAL_STATE = {
     data: [],
     loading: false
@@ -87,19 +93,21 @@ export const createSubClinicsReducer = (state = CREATE_SUBCLINICS_INITIAL_STATE,
                 data: action.payload,
                 loading: false
             }
+        case SubClinicsActionTypes.CREATE_SUBCLINIC_RESET:
+            return {
+                data: initial_state.data,
+                loading: false,
+            };
         case SubClinicsActionTypes.CREATE_SUBCLINIC_ERROR:
             return {
-                data: action.payload,
-                loading: false
-            }
-        case SubClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
-        default: return state
+                data: action?.payload,
+                loading: false,
+                // message: action?.payload,
+            };
+        default:
+            return { ...state };
     }
-}
+};
 
 export const createUpgradeReducer = (state = CREATE_UPGRADE_INITIAL_STATE, action) => {
     switch (action.type) {
@@ -165,19 +173,20 @@ export const updateSubClinicReducer = (state = UPDATE_SUB_CLINICS_INITIAL_STATE,
                 data: action.payload,
                 loading: false
             }
-        case SubClinicsActionTypes.UPDATE_SUBCLINIC_ERROR:
-            return {
-                data: action.payload,
-                loading: false
-            }
-        case SubClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case SubClinicsActionTypes.UPDATE_SUBCLINIC_RESET:
             return {
                 data: [],
-                loading: false
-            }
-        default: return state
+                loading: false,
+            };
+        case SubClinicsActionTypes.UPDATE_SUBCLINIC_ERROR:
+            return {
+                data: action?.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
     }
-}
+};
 
 export const getSubClinicTypeReducer = (state = GET_SUBCLINIC_TYPE_INITIAL_STATE, action) => {
     switch (action.type) {

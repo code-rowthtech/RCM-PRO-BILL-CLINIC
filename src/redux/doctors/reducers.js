@@ -17,6 +17,10 @@ const GET_DOCTORS_DETAILS_INITIAL_STATE = {
     data: [],
     loading: false
 }
+const CREATE_DOCTOR_DETAILS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 
 const ADD_REFERRING_DOCTOR_DETAILS_INITIAL_STATE = {
     data: [],
@@ -87,20 +91,19 @@ export const createtDoctorsReducer = (state = CREATE_DOCTORS_INITIAL_STATE, acti
                 data: action.payload,
                 loading: false
             }
+        case DoctorsActionTypes.CREATE_DOCTORS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case DoctorsActionTypes.CREATE_DOCTORS_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
         default: return state
     }
 }
-
 export const getDoctorDetailsReducer = (state = GET_DOCTORS_DETAILS_INITIAL_STATE, action) => {
     switch (action.type) {
         case DoctorsActionTypes.GET_DOCTORS_DETAILS_LOADING:
@@ -127,7 +130,7 @@ export const getDoctorDetailsReducer = (state = GET_DOCTORS_DETAILS_INITIAL_STAT
     }
 }
 
-export const createtDoctorsDetailReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => {
+export const createtDoctorsDetailReducer = (state = CREATE_DOCTOR_DETAILS_INITIAL_STATE, action) => {
     switch (action.type) {
         case DoctorsActionTypes.CREATE_DOCTORS_DETAIL_LOADING:
             return {
@@ -139,14 +142,14 @@ export const createtDoctorsDetailReducer = (state = GET_DOCTORS_INITIAL_STATE, a
                 data: action.payload,
                 loading: false
             }
+        case DoctorsActionTypes.CREATE_DOCTORS_DETAIL_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case DoctorsActionTypes.CREATE_DOCTORS_DETAIL_ERROR:
             return {
                 data: action.payload,
-                loading: false
-            }
-        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false
             }
         default: return state
@@ -165,14 +168,14 @@ export const addReferringDoctorReducer = (state = ADD_REFERRING_DOCTOR_DETAILS_I
                 data: action.payload,
                 loading: false
             }
+            case DoctorsActionTypes.ADD_REFERRING_DOCTOR_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case DoctorsActionTypes.ADD_REFERRING_DOCTOR_ERROR:
             return {
                 data: action.payload,
-                loading: false
-            }
-        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false
             }
         default: return state

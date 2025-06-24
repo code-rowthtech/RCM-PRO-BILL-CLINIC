@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getRolesAction, updateRolesAction } from '../../../redux/actions'
 import UpdateRole from './Modal/updateRole'
 import { encryptMessage } from '../../../cryptoUtils'
-import { stateEmptydAction } from '../../../redux/roles/actions'
 import Spinner from '../../../constants/Spinner'
 import Paginations from '../../../helpers/Paginations'
 
@@ -28,7 +27,6 @@ const Roles = () => {
     useEffect(() => {
         dispatch(getRolesAction({ limit: 10, skip: skip, search: search }));
         if (updateSuccess === 200) {
-            dispatch(stateEmptydAction());
             dispatch(getRolesAction({ limit: 10, skip: skip, search: search }));
         }
     }, [dispatch, updateSuccess, skip, search])
@@ -60,7 +58,7 @@ const Roles = () => {
             /> */}
             <Row className='mt-2'>
                 <Col xs={12}>
-                    <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card className="scroll-container page-height">
                         <Card.Body>
                             <Row className="mb-2 d-flex justify-content-between">
                                 <Col xs="auto">

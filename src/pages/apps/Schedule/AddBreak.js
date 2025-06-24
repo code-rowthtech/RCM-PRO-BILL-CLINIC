@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
 import { encryptMessage } from "../../../cryptoUtils";
-import { stateEmptydAction } from "../../../redux/actions";
 import Spinner from "../../../constants/Spinner";
 
 const AddBreak = () => {
@@ -35,7 +34,6 @@ const AddBreak = () => {
     useEffect(() => {
         if (addResponse === 200) {
             reset();
-            dispatch(stateEmptydAction());
             dispatch(getDoctorsListAction());
         }
     }, [addResponse])
@@ -99,12 +97,12 @@ const AddBreak = () => {
                                         <div className="col-6">
                                             <Form.Group className="mb-1">
                                                 <Form.Label className="mb-0">
-                                                    Doctor Name<span className="text-danger">*</span>
+                                                    Provider Name<span className="text-danger">*</span>
                                                 </Form.Label>
                                                 <Form.Select
                                                     {...register("doctorInfo", { required: "Doctor selection is required" })}
                                                 >
-                                                    <option value="">Select doctor</option>
+                                                    <option value="">Select Provider</option>
                                                     {doctorLists?.map((doctor, index) => (
                                                         <option
                                                             key={index}

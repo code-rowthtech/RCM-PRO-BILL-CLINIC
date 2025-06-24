@@ -1,29 +1,19 @@
 // File: Index.jsx
 import React, { useEffect, useState } from 'react';
-import PageTitle from '../../../../components/PageTitle';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 // import { getRolesAction } from '../../../../redux/actions';
-import { getClinicTypeAction, stateEmptydAction } from '../../../../redux/clinics/actions';
-import ToastHandle from '../../../../helpers/ToastMessage';
+import { getClinicTypeAction } from '../../../../redux/clinics/actions';
 import ClinicForm from './clinicForm';
 import BillingForm from './billing';
 import Contract from './contract';
 import { useNavigate } from 'react-router-dom';
-import SendEmailModal from './SendEmailModal';
 
 const Index = () => {
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('clinic');
     const [clinicId, setClinicId] = useState(null);
     const [billingId, setBillingId] = useState(null);
-    
-    // const [showModal, setShowModal] = useState(false); // Modal visibility state
-    // const [mailId, setMailId] = useState({ email: 'clinic@example.com' }); // Mock email for demo
-    const store = useSelector((state) => state);
-
-    const navigate = useNavigate();
-
     useEffect(() => {
         dispatch(getClinicTypeAction())
     }, [dispatch]);
@@ -32,20 +22,12 @@ const Index = () => {
         setActiveTab(data);
     };
 
-    // const handleOpenModal = () => {
-    //     setShowModal(true);
-    // };
-
-    // const handleCloseModal = () => {
-    //     setShowModal(false);
-    // };
-
     return (
         <>
             <Row className="mt-2">
-                <Col xs={12} className=''>
-                <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
-                    <Row className="mb-0">
+                <Col xs={12} className='px-0'>
+                    <Card className="px-md-3 py-md-2 scroll-container page-height">
+                        <Row className="mb-0">
                             <Col className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex gap-4">
                                     {['clinic', 'billing', 'contract'].map((tab) => (
@@ -54,23 +36,16 @@ const Index = () => {
                                             onClick={() => handleActiveTab(tab)}
                                             role="button"
                                             tabIndex="0"
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTab === tab ? 'active_tabs_link fw-bold' : ''
-                                            }`}>
+                                            className={`fw-semibold cursor-pointer font_active_tabs ${activeTab === tab ? 'active_tabs_link fw-bold' : ''
+                                                }`}>
                                             {tab === 'clinic'
                                                 ? 'Practice Information'
                                                 : tab === 'billing'
-                                                ? 'Billing and Subscription Information'
-                                                : 'Contract'}
+                                                    ? 'Billing and Subscription Information'
+                                                    : 'Contract'}
                                         </span>
                                     ))}
                                 </div>
-                                {/* <div className="d-flex gap-2">
-                                    <Button className="custom-buttons" onClick={handleOpenModal}>
-                                        Email to Clinic
-                                    </Button>
-                                    <Button className="custom-buttons">View</Button>
-                                </div> */}
                             </Col>
                         </Row>
 
@@ -95,9 +70,6 @@ const Index = () => {
                     </Card>
                 </Col>
             </Row>
-
-            {/* Include Modal */}
-            {/* <SendEmailModal show={showModal} closeModal={handleCloseModal} mailId={mailId} /> */}
         </>
     );
 };

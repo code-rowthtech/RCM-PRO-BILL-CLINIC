@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { DoctorsActionTypes } from './constants';
 import { addReferringDoctorApi, createDoctorApi, createDoctorDetailApi, getDoctorsApi, getDoctorsDetailApi, getDoctorsRolesApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
@@ -79,6 +79,10 @@ function* createDoctorsFunction(data) {
                 type: DoctorsActionTypes.CREATE_DOCTORS_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: DoctorsActionTypes.CREATE_DOCTORS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: DoctorsActionTypes.CREATE_DOCTORS_ERROR,
@@ -108,12 +112,17 @@ function* createDoctorsDetailFunction(data) {
                 type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_ERROR,
                 payload: { ...decryptedData },
             });
         }
+
     } catch (error) {
         ToastHandle(error, 'danger')
         yield put({
@@ -162,6 +171,10 @@ function* addReferringDoctorFunction(data) {
             ToastHandle(decryptedData.message, 'success')
             yield put({
                 type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_SUCCESS,
+                payload: { ...decryptedData },
+            });
+              yield put({
+                type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_RESET,
                 payload: { ...decryptedData },
             });
         } else {

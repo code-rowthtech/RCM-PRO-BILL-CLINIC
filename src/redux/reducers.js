@@ -7,7 +7,7 @@ import { getPermissionsDataReducer, createPermissionsDataReducer, deletePermissi
 import { createRolesReducer, getRolesDataReducer, updateRolesReducer, getUserDataReducer, deleteRolesDataReducer, viewPasswordReducer } from './roles/reducers';
 import { createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer, getDepartmentDataReducer } from './settings/reducers';
 import {
-    createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer, getStatesReducer,
+    createClinicsReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer,
     getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer, standardContractReducer, changeEmailReducer
 } from './clinics/reducers';
 import { getDoctorsReducer, getDoctorsRolesReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer } from './doctors/reducers';
@@ -15,7 +15,12 @@ import { getAnalyticsReducer } from './dashboard/reducers';
 import {
     createPatientsReducer, getPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, getResponsiblePartyReducer,
     updateResponsiblePartyReducer, updateInsuranceReducer, createInsuranceReducer, getInsuranceByIdReducer,
-    getPatientsByAppointmentReducer
+    getPatientsByAppointmentReducer,
+    uploadDocumentsReducer,
+    getDocumentsReducer,
+    updateDocumentsReducer,
+    deleteDocumentsReducer,
+    getDocumentsByIdReducer
 } from './patients/reducers';
 import { getSubscriptionReducer, getSubSubscriptionReducer } from './subscriptions/reducers';
 import { createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer, updateSubClinicReducer } from './sub clinic/reducers';
@@ -23,6 +28,19 @@ import { createScheduleReducer, getDoctorsListReducer, getScheduleReducer, delet
 import { createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer } from './settings/rolesetting/reducers';
 import { createAppointmentReducer, getAppointmentByIdReducer, getAppointmentsReducer, getPractitionerScheduleReducer, getPractitionerSlotsReducer, rescheduleAppointmentReducer } from './appointments/reducers';
 import { createVitalsReducer, getVitalsByAppointmentIdReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
+import { createTaskReducer, getClinicEmployeesReducer, getTaskDetailsReducer, getTaskReducer, updateTaskReducer } from './assigntasks/reducer';
+import { createProblemListReducer, deleteProblemListReducer, getALLCodesReducer, getPatientAppointmentReducer, getProblemDetailsReducer, getProblemListReducer, updateProblemListReducer } from './ProblemList/reducer';
+import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer, deleteAllergyReducer } from './allergyList/reducer';
+import { createSuggestionsReducer } from './suggestions/reducer';
+import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateMedicationReducer } from './medication/reducer';
+import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobaccooReducer, deleteSurgicalHistoryReducer, getFamilyGeneticReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateSurgicalHistoryReducer, updateTobaccooReducer, createMedicalHistoryReducer, getMedicalHistoryReducer, deleteTobaccooReducer, createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer } from './socialHistory/reducer';
+import { getIcdProcedureReducer } from './icdCodes/reducer';
+import { createEncounterReducer, createEncounterSettingsReducer, getEncounterByIdReducer, getEncounterNotesFieldsReducer, getEncounterNotesTypeReducer, getEncounterReducer, getEncounterSettingsReducer, getPastEncounterReducer, updateEncounterReducer, updateEncounterSettingsReducer } from './encounter/reducer';
+import { createNoteCategoriesReducer, createSettingsTabsReducer, getNoteCategoriesReducer, getSettingsTabsReducer, updateNoteCategoriesReducer, updateSettingsTabsReducer } from './noteCategories/reducer';
+import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
+import { createUserTasksReducer, getTaskByIdReducer, getUserTasksReducer, updateUserTasksReducer } from './Tasks/reducer';
+import { getPatientsAccessLogsReducer } from './patientAccessHistory/reducers';
+import { getAuditReportReducer } from './auditReport/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -31,11 +49,10 @@ export default (combineReducers({
     getAnalyticsReducer, createMastersDataReducer, getMastersDataReducer, getDepartmentDataReducer, updateMastersDataReducer, createSubscriptionPlanReducer, createContractReducer, standardContractReducer,
     getDoctorsReducer, getClinicTypeReducer, updateSubClinicReducer,
     createClinicsReducer, changeEmailReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer,
-    createSubscriptionPlanReducer,
-    getDoctorsReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer,
+    createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer,
     createPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, updateResponsiblePartyReducer, updateInsuranceReducer, createInsuranceReducer, getResponsiblePartyReducer, getDoctorsListReducer, createScheduleReducer, getScheduleReducer, deleteScheduleReducer,
     getDoctorsRolesReducer,
-    getPatientsReducer,
+    getPatientsReducer, uploadDocumentsReducer, getDocumentsReducer, updateDocumentsReducer, deleteDocumentsReducer, getDocumentsByIdReducer,
     getSubscriptionReducer, getSubSubscriptionReducer,
     createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer,
     createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer,
@@ -43,5 +60,31 @@ export default (combineReducers({
     rescheduleAppointmentReducer, viewPasswordReducer, getCitiesReducer, getInsuranceByIdReducer,
     // vitals
     createVitalsReducer, updateVitalsReducer, getVitalsReducer, getVitalsByPatientIdReducer, getVitalsByAppointmentIdReducer,
-    getPatientsByAppointmentReducer
+    getPatientsByAppointmentReducer,
+    // assign task
+    getClinicEmployeesReducer, createTaskReducer, getTaskReducer, updateTaskReducer, getTaskDetailsReducer,
+    // problem list
+    createProblemListReducer, getProblemListReducer, updateProblemListReducer, getALLCodesReducer, getProblemDetailsReducer, getPatientAppointmentReducer, deleteProblemListReducer,
+    // allergy list
+    createAllergyReducer, getAllergyDetailsReducer, getAllergiesOfAPatientReducer, updateAllergyReducer, deleteAllergyReducer,
+    // suggestions
+    createSuggestionsReducer, createMedicationReducer, getMedicationReducer, getDrugsReducer, updateMedicationReducer,
+    createTobaccooReducer, deleteTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,
+    getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer,
+    createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer,
+    createEncounterReducer, getEncounterReducer, updateEncounterReducer, createEncounterSettingsReducer, getEncounterSettingsReducer, updateEncounterSettingsReducer,
+    getEncounterByIdReducer, getEncounterNotesTypeReducer, getEncounterNotesFieldsReducer, getPastEncounterReducer,
+    // note categories
+    createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer,
+    // templates
+    createTemplateReducer, updateTemplateReducer, getTemplateReducer, deleteTemplateReducer,
+    // settings tabs
+    getSettingsTabsReducer, createSettingsTabsReducer, updateSettingsTabsReducer,
+    // TASKS
+    createUserTasksReducer, getUserTasksReducer, updateUserTasksReducer, getTaskByIdReducer,
+    // Patient History Logs
+    getPatientsAccessLogsReducer,
+    // Audit Report
+    getAuditReportReducer,
+
 }): any);

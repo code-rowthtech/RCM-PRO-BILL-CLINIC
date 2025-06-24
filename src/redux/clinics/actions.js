@@ -29,7 +29,7 @@ export const getStatesByCountryAction = (data): AuthAction => ({
 });
 
 export const getCitiesAction = (data) => ({
-    type: ClinicsActionTypes.GET_CITIES,
+    type: ClinicsActionTypes.GET_CITIES1,
     data
 });
 
@@ -39,6 +39,18 @@ export const getCities2Action = (data) => ({
 });
 export const getCities3Action = (data) => ({
     type: ClinicsActionTypes.GET_CITIES3,
+    data
+});
+export const getCities4Action = (data) => ({
+    type: ClinicsActionTypes.GET_CITIES4,
+    data
+});
+export const getCities5Action = (data) => ({
+    type: ClinicsActionTypes.GET_CITIES5,
+    data
+});
+export const getCities6Action = (data) => ({
+    type: ClinicsActionTypes.GET_CITIES6,
     data
 });
 
@@ -78,6 +90,6 @@ export const deleteClinicAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydAction = (): LayoutAction => ({
+export const stateEmptydActionAuth = (): LayoutAction => ({
     type: ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE,
 });

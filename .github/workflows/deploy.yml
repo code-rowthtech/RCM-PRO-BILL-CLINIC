@@ -2,7 +2,7 @@ name: ARC-PRO-BILL-CLINIC cicd
 
 on:
   push:
-    branches: [ main ]
+    branches: [ Prod-Master ]
 
 jobs:
   build:

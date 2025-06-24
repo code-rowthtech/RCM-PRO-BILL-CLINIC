@@ -13,22 +13,41 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
         register,
         handleSubmit,
         formState: { errors },
-        reset,
+        reset, setValue
     } = useForm();
     const dispatch = useDispatch();
     const onSubmit = () => {
+        // alert(JSON.stringify(formData))
         dispatch(createDoctorAction({ key: encryptMessage(formData) }));
 
     }
     const store = useSelector((state) => state);
     const createResponse = store?.createtDoctorsReducer?.data?.status
+    const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
+
+    useEffect(() => {
+        setValue('name', formData?.email)
+    }, [formData])
     useEffect(() => {
         if (createResponse === 200) {
             closeModal();
-            setFormData();
+            setFormData({
+                role: doctorRoleId,
+                email: '',
+                name: {
+                    use: 'official',
+                    text: '',
+                    family: '',
+                    given: '',
+                },
+                phone: '',
+                password: '',
+                confirmPassword: '',
+            });
             reset();
         }
     }, [createResponse])
+
     return (
         <div>
             <Modal centered show={show} onHide={closeModal}>
@@ -36,7 +55,7 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
                     <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
                         <Col sm={1}></Col>
                         <Col sm={10}>
-                            <h4 className="mb-0 text-center">Email to Doctor</h4>
+                            <h4 className="mb-0 text-center">Email to Provider</h4>
                         </Col>
                         <Col sm={1}>
                             <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
@@ -52,19 +71,20 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
                                         type="text"
                                         placeholder="Enter email address"
                                         {...register('name', { required: 'Name is required' })}
-                                        defaultValue={formData?.email}
+                                        readOnly
+                                    // defaultValue={formData?.email}
                                     />
-                                    {errors.name && <span className="text-danger">{errors.name.message}</span>}
+                                    {/* {errors.name && <span className="text-danger">{errors.name.message}</span>} */}
                                 </Form.Group>
 
                                 <div className='text-center'>
-                                    <p className='mb-0'>The Doctor will receive an onboarding email on</p>
-                                    <p className='fw-bold'> "{formData?.email}"</p>
+                                    <p className='mb-0'>The Provider will receive an onboarding email on</p>
+                                    <strong> "{formData?.email}"</strong>
                                 </div>
                             </Col>
                         </Row>
                         <Modal.Footer className='d-flex justify-content-center'>
-                            <Button type="submit" className="custom-buttons" disabled={store?.createDoctorsReducer?.loading}>
+                            <Button type="submit" className="custom-buttons" style={{ width: '55px' }} disabled={store?.createDoctorsReducer?.loading}>
                                 {store?.createtDoctorsReducer?.loading ?
                                     <Spinner color='white' className='spinner-border-sm' />
                                     :

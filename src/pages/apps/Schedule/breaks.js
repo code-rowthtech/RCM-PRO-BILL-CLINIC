@@ -37,7 +37,7 @@ const Breaks = () => {
                 <thead className="text-white">
                     <tr>
                         <th className="text-white">Sr.No.</th>
-                        <th className="text-white">Doctor Name</th>
+                        <th className="text-white">Provider Name</th>
                         <th className="text-white">Break From</th>
                         <th className="text-white">Break To</th>
                         <th className="text-white">Day</th>

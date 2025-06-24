@@ -10,7 +10,7 @@ import { encryptMessage } from '../../../../../cryptoUtils';
 import Spinner from '../../../../../constants/Spinner';
 
 
-const Insurance = ({ patientId }) => {
+const Insurance = ({ patientId, isAccordionOpen }) => {
     const [activeTab, setActiveTab] = useState("primaryInsurance");
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
@@ -31,66 +31,64 @@ const Insurance = ({ patientId }) => {
     };
 
     return (
-        <div>
-            <div className='row'>
-                <div className="col-12">
-                    <ul className="nav nav-underline">
-                        <li className="nav-item">
-                            <button
-                                className={`text-black nav-link fw-medium ${activeTab === "primaryInsurance" ? "active fw-bold" : ""}`}
-                                onClick={() => handleTabChange("primaryInsurance")}
-                            >
-                                Primary Insurance
-                            </button>
-                        </li>
-                        <li className="nav-item">
-                            <button
-                                className={`text-black nav-link fw-medium ${activeTab === "secondaryInsurance" ? "active fw-bold" : ""}`}
-                                onClick={() => handleTabChange("secondaryInsurance")}
-                            >
-                                Secondary Insurance
-                            </button>
-                        </li>
-                        <li className="nav-item">
-                            <button
-                                className={`text-black nav-link fw-medium ${activeTab === "autoAccident" ? "active fw-bold" : ""}`}
-                                onClick={() => handleTabChange("autoAccident")}
-                            >
-                                Auto Accident
-                            </button>
-                        </li>
-                        <li className="nav-item">
-                            <button
-                                className={`text-black nav-link fw-medium ${activeTab === "workersCamp" ? "active fw-bold" : ""}`}
-                                onClick={() => handleTabChange("workersCamp")}
-                            >
-                                Worker's Comp
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-                <div className="col-12 mt-2">
-                    {
-                        store?.getInsuranceByIdReducer?.loading ?
-                            <div className='d-flex justify-content-center'>
-                                <Spinner />
-                            </div>
+        <div className='row '>
+            <div className="col-12">
+                <ul className="nav nav-underline">
+                    <li className="nav-item">
+                        <button
+                            className={`text-black nav-link fw-medium ${activeTab === "primaryInsurance" ? "active fw-bold" : ""}`}
+                            onClick={() => handleTabChange("primaryInsurance")}
+                        >
+                            Primary Insurance
+                        </button>
+                    </li>
+                    <li className="nav-item">
+                        <button
+                            className={`text-black nav-link fw-medium ${activeTab === "secondaryInsurance" ? "active fw-bold" : ""}`}
+                            onClick={() => handleTabChange("secondaryInsurance")}
+                        >
+                            Secondary Insurance
+                        </button>
+                    </li>
+                    <li className="nav-item">
+                        <button
+                            className={`text-black nav-link fw-medium ${activeTab === "autoAccident" ? "active fw-bold" : ""}`}
+                            onClick={() => handleTabChange("autoAccident")}
+                        >
+                            Auto Accident
+                        </button>
+                    </li>
+                    <li className="nav-item">
+                        <button
+                            className={`text-black nav-link fw-medium ${activeTab === "workersCamp" ? "active fw-bold" : ""}`}
+                            onClick={() => handleTabChange("workersCamp")}
+                        >
+                            Worker's Comp
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div className="col-12 mt-2">
+                {
+                    store?.getInsuranceByIdReducer?.loading ?
+                        <div className='d-flex justify-content-center'>
+                            <Spinner />
+                        </div>
+                        :
+                        activeTab === 'primaryInsurance' ?
+                            <PrimaryInsurance isAccordionOpen={isAccordionOpen} patientId={patientId} />
                             :
-                            activeTab === 'primaryInsurance' ?
-                                <PrimaryInsurance patientId={patientId} />
+                            activeTab === 'secondaryInsurance' ?
+                                <SecondaryInsurance isAccordionOpen={isAccordionOpen} patientId={patientId} />
                                 :
-                                activeTab === 'secondaryInsurance' ?
-                                    <SecondaryInsurance patientId={patientId} />
-                                    :
-                                    activeTab === 'autoAccident' ?
-                                        <AutoAccident patientId={patientId} />
-                                        : activeTab === 'workersCamp' ?
-                                            <WorkersCamp patientId={patientId} /> : ''
+                                activeTab === 'autoAccident' ?
+                                    <AutoAccident isAccordionOpen={isAccordionOpen} patientId={patientId} />
+                                    : activeTab === 'workersCamp' ?
+                                        <WorkersCamp isAccordionOpen={isAccordionOpen} patientId={patientId} /> : ''
 
-                    }
+                }
 
 
-                </div>
             </div>
         </div>
     );

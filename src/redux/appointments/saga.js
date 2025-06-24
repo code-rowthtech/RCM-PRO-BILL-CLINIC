@@ -23,6 +23,10 @@ function* createAppointmentFunction(data) {
                 type: AppointmentActionTypes.CREATE_APPOINTMENT_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: AppointmentActionTypes.CREATE_APPOINTMENT_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: AppointmentActionTypes.CREATE_APPOINTMENT_ERROR,
@@ -30,6 +34,7 @@ function* createAppointmentFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error, 'danger')
         yield put({
             type: AppointmentActionTypes.CREATE_APPOINTMENT_ERROR,
             payload: error,
@@ -50,6 +55,10 @@ function* rescheduleAppointmentFunction(data) {
             yield put({
                 type: AppointmentActionTypes.RESCHEDULE_APPOINTMENT_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: AppointmentActionTypes.RESCHEDULE_APPOINTMENT_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -145,7 +154,6 @@ function* getAppointmentsFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger')
         yield put({
             type: AppointmentActionTypes.GET_APPOINTMENT_ERROR,
             payload: error,

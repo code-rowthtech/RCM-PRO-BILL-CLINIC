@@ -1,63 +1,40 @@
 // @flow
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 // components
-import PageTitle from '../../../components/PageTitle';
 
 import Statistics from './Statistics';
 // import Status from './Status';
 import Tasks from './Tasks';
 // import TasksChart from './TasksChart';
 import Activity from './Activity';
-import Calendar from './Calendar';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAnalyticsAction } from '../../../redux/dashboard/actions';
+import { useSelector } from 'react-redux';
 
 const ProjectDashboardPage = (): React$Element<React$FragmentType> => {
-    const dispatch = useDispatch();
     const store = useSelector((state) => state);
     // useEffect(() => {
     //     dispatch(getAnalyticsAction())
     // }, [dispatch])
     const analyticsResponse = store?.getAnalyticsReducer;
     return (
-        <div className='scroll-container' style={{height: '82vh', overflow: 'scroll' }}>
-            {/* <PageTitle
-                breadCrumbItems={[
-                    { label: 'Dashboard', path: '/', active: true },
-                ]}
-                title={'Dashboard'}
-            /> */}
+        <div className='' >
+            <h4 className=''>IN-PROGRESS</h4>
 
-            <Statistics data={analyticsResponse} />
 
-            <Row>
-                {/* <Col lg={4}>
-                    <Status />
-                </Col> */}
-                <Col lg={12}>
+
+            {/* <Row>
+                <Col lg={12} className='mt-1'>
                     <Tasks />
                 </Col>
-            </Row>
 
-            <Row>
-                <Col xs={12}>
-                    {/* <TasksChart /> */}
+                <Col lg={6} className=''>
+                    <Statistics data={analyticsResponse} />
                 </Col>
-                {/* <Col xl={4}>
-                    <Activity />
-                </Col> */}
-            </Row>
-
-            <Row>
-                <Col>
+                <Col lg={6}>
                     <Activity />
                 </Col>
-                {/* <Col xl={7}>
-                    <Calendar />
-                </Col> */}
-            </Row>
+            </Row> */}
         </div>
     );
 };

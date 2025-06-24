@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { RolesActionTypes } from './constants';
 import { createRolesApi, deleteRoles, getRolesApi, getUser, updateRolesApi, viewPasswordApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
@@ -23,6 +23,10 @@ function* createRolesFunction(data) {
             yield put({
                 type: RolesActionTypes.CREATE_ROLES_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: RolesActionTypes.CREATE_ROLES_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -84,6 +88,10 @@ function* updateRolesFunction(data) {
             yield put({
                 type: RolesActionTypes.UPDATE_ROLES_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: RolesActionTypes.UPDATE_ROLES_RESET,
+                payload: {},
             });
         } else {
             yield put({

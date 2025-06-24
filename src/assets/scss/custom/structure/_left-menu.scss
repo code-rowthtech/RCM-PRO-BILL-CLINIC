@@ -1049,3 +1049,14 @@ body[data-layout-color="dark"] {
         }
     }
 }
+
+.leftSideBarLine {
+    @media only screen and (min-width: 320px) and (max-width: 769px) {
+      display: none;
+    }
+  
+    border-top: 1px solid #bbbbbb;
+    margin-bottom: 20px;
+    margin-left: 28px;
+    margin-right: 28px;
+  }

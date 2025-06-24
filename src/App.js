@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, { useEffect } from 'react';
 import Routes from './routes/Routes';
 
 // setup fake backend
@@ -24,8 +24,79 @@ type AppProps = {};
 /**
  * Main app component
  */
+
+// color Changing of select options
+function useSelectColorWatcher() {
+  useEffect(() => {
+    const updateSelectColors = () => {
+      const selects = document.querySelectorAll('.form-select');
+      selects.forEach(select => {
+        const value = select.value.trim();
+        select.style.color = value === '' ? '#0908084f' : 'black';
+      });
+    };
+
+    // Initial update
+    updateSelectColors();
+
+    // Listen for changes to the DOM
+    const observer = new MutationObserver((mutations) => {
+      let needsUpdate = false;
+      mutations.forEach(mutation => {
+        if (
+          mutation.type === 'childList' ||
+          (mutation.type === 'attributes' && mutation.attributeName === 'value')
+        ) {
+          needsUpdate = true;
+        }
+      });
+      if (needsUpdate) updateSelectColors();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['value']
+    });
+
+    // Listen for user changes
+    const handleChange = () => updateSelectColors();
+    const attachListeners = () => {
+      const selects = document.querySelectorAll('.form-select');
+      selects.forEach(select => {
+        select.addEventListener('change', handleChange);
+      });
+    };
+
+    const detachListeners = () => {
+      const selects = document.querySelectorAll('.form-select');
+      selects.forEach(select => {
+        select.removeEventListener('change', handleChange);
+      });
+    };
+
+    attachListeners();
+
+    // Update styles if new elements are added later
+    const intervalId = setInterval(() => {
+      updateSelectColors();
+      attachListeners();
+    }, 1000); // Re-check every second just in case
+
+    return () => {
+      observer.disconnect();
+      detachListeners();
+      clearInterval(intervalId);
+    };
+  }, []);
+}
+
 const App = (props: AppProps): React$Element<any> => {
-    return <Routes></Routes>;
+
+  useSelectColorWatcher();
+
+  return <Routes></Routes>;
 };
 
 export default App;

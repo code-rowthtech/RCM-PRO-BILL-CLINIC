@@ -32,15 +32,22 @@ const GET_CITIES_INITIAL_STATE = {
     cities3: {
         data: [],
         loading: false,
+    },
+    cities4: {
+        data: [],
+        loading: false,
+    },
+    cities5: {
+        data: [],
+        loading: false,
+    },
+    cities6: {
+        data: [],
+        loading: false,
     }
 };
 
 const GET_CLINIC_TYPE_INITIAL_STATE = {
-    data: [],
-    loading: false
-}
-
-const UPDATE_CLINICS_INITIAL_STATE = {
     data: [],
     loading: false
 }
@@ -229,7 +236,7 @@ export const getStatesReducer = (state = GET_STATES_INITIAL_STATE, action) => {
 }
 export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
     switch (action.type) {
-        case ClinicsActionTypes.GET_CITIES_LOADING:
+        case ClinicsActionTypes.GET_CITIES1_LOADING:
             return {
                 ...state,
                 cities1: {
@@ -237,7 +244,7 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
                     loading: true
                 }
             };
-        case ClinicsActionTypes.GET_CITIES_SUCCESS:
+        case ClinicsActionTypes.GET_CITIES1_SUCCESS:
             return {
                 ...state,
                 cities1: {
@@ -245,7 +252,7 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
                     loading: false
                 }
             };
-        case ClinicsActionTypes.GET_CITIES_ERROR:
+        case ClinicsActionTypes.GET_CITIES1_ERROR:
             return {
                 ...state,
                 cities1: {
@@ -297,6 +304,78 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
             return {
                 ...state,
                 cities3: {
+                    data: [],
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES4_LOADING:
+            return {
+                ...state,
+                cities4: {
+                    ...state.cities4,
+                    loading: true
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES4_SUCCESS:
+            return {
+                ...state,
+                cities4: {
+                    data: action.payload,
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES4_ERROR:
+            return {
+                ...state,
+                cities4: {
+                    data: [],
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES5_LOADING:
+            return {
+                ...state,
+                cities5: {
+                    ...state.cities5,
+                    loading: true
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES5_SUCCESS:
+            return {
+                ...state,
+                cities5: {
+                    data: action.payload,
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES5_ERROR:
+            return {
+                ...state,
+                cities5: {
+                    data: [],
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES6_LOADING:
+            return {
+                ...state,
+                cities6: {
+                    ...state.cities6,
+                    loading: true
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES6_SUCCESS:
+            return {
+                ...state,
+                cities6: {
+                    data: action.payload,
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES6_ERROR:
+            return {
+                ...state,
+                cities6: {
                     data: [],
                     loading: false
                 }
@@ -370,16 +449,17 @@ export const createSubscriptionPlanReducer = (state = CREATE_SUBSCRIPTION_PLAN_I
                 data: action.payload,
                 loading: false
             }
+        case ClinicsActionTypes.CREATE_SUBSCRIPTION_RESET:
+            return {
+                data: [],
+                loading: false
+            }
         case ClinicsActionTypes.CREATE_SUBSCRIPTION_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
+
         default: return state
     }
 }

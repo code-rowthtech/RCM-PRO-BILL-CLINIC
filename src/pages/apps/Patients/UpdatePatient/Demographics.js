@@ -1,19 +1,50 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table } from "react-bootstrap";
-import { useForm } from "react-hook-form";
-import { FiUploadCloud } from "react-icons/fi";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { getStatesByCountryAction, getCitiesAction, getCities2Action, getCities3Action, updatePatientsAction } from "../../../../redux/actions";
-import us from '../../../../assets/images/flags/us.jpg'
-import { encryptMessage } from "../../../../cryptoUtils";
-const Demographicdetails = ({ patientId }) => {
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { FiUploadCloud } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import {
+    getStatesByCountryAction,
+    getCitiesAction,
+    getCities2Action,
+    getCities3Action,
+    updatePatientsAction,
+    getCities4Action,
+} from '../../../../redux/actions';
+import us from '../../../../assets/images/flags/us.jpg';
+import { encryptMessage } from '../../../../cryptoUtils';
+import { genderIdentityOptions } from '../../../../utils/DataSets/genderIdentities';
+import { sexParameterOptions } from '../../../../utils/DataSets/SexParameterforClinicalUse';
+import { personalPronounsOptions } from '../../../../utils/DataSets/personalPronouns';
+import { raceOptions } from '../../../../utils/DataSets/race.data';
+import { dataList } from '../../../../utils/DataSets/relations.data';
+import { ethnicityOptions } from '../../../../utils/DataSets/enthnicity.data';
+import { tribalEntitiesOptions } from '../../../../utils/DataSets/tribalEntities';
+import IdentifierForm from '../../Common Pages/IdentifierForm';
+import { sexAssignedAtBirthOptions } from '../../../../utils/DataSets/sex';
+import { maritalStatusOptions } from '../../../../utils/DataSets/maritalStatus';
+import AddressForm from '../../Common Pages/AddressForm';
+import Select from 'react-select';
+import { error } from 'jquery';
+import { use } from 'react';
+
+const Demographicdetails = ({ patientId, isAccordionOpen }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const { register, handleSubmit, formState: { errors }, setValue, clearErrors, watch, getValues } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        clearErrors,
+        watch,
+        reset,
+        getValues,
+    } = useForm();
     const [longitude, setLongitude] = useState(null);
     const [latitude, setLatitude] = useState(null);
     const [mailingLongitude, setMailingLongitude] = useState(null);
@@ -24,243 +55,320 @@ const Demographicdetails = ({ patientId }) => {
     const [mailingFocused, setMailingFocused] = useState(false);
     const [employerFocused, setEmployerFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState(null);
-    const [primaryCitySearch, setPrimaryCitySearch] = useState(null);
-    const [mailingCitySearch, setMailingCitySearch] = useState(null);
-    const [employerCitySearch, setEmployerCitySearch] = useState(null);
-    const [searchedMailingLocations, setSearchedMailingLocations] = useState(null);
+    const [employerCitySearch, setEmployerCitySearch] = useState('');
     const [searchedEmployerLocations, setSearchedEmployerLocations] = useState(null);
     const [sameAsPrimary, setSameAsPrimary] = useState(false);
-    const statesData = store?.getStatesReducer?.data;
-    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-    const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    const primaryState = watch('primaryStateName');
-    const mailingState = watch('mailingStateName');
-    const employerState = watch('employerStateName');
-    const patientDetails = store?.getPatientByIdReducer?.data?.patient;
+    const [identifiers, setIdentifiers] = useState([]);
 
+    const statesData = store?.getStatesReducer?.data;
+    const cities4 = store?.getCitiesReducer?.cities4?.data?.cities;
+    const employerState = watch('employerStateName');
+
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
+    const [demographicAddresses, setDemographicAddresses] = useState([
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
+    ]);
+
+    const updateResponse = store?.updatePatientsReducer?.data?.status;
+    const formatPhoneNumber = (phone) => {
+        if (!phone) return '';
+        const cleaned = phone.replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+            return `(${match[1]})${match[2]}-${match[3]}`;
+        }
+        return phone; // fallback if not 10 digits
+    };
     useEffect(() => {
         dispatch(getStatesByCountryAction());
-    }, [dispatch])
+    }, [dispatch]);
+
     useEffect(() => {
-        if (primaryCitySearch) {
-            setValue('primaryCity', cities1 && cities1.find((data) => data?.name === primaryCitySearch)?.name)
+        if (employerState && statesData?.states) {
+            const stateCity = statesData?.states?.find((data) => data?.state_code === employerState)?.id;
+            dispatch(getCities4Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
         }
-        if (mailingCitySearch) {
-            setValue('mailingCity', cities2 && cities2.find((data) => data?.name === mailingCitySearch)?.name)
-        }
+    }, [employerState, statesData]);
+
+    useEffect(() => {
+        setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city);
+    }, [cities4]);
+
+    useEffect(() => {
         if (employerCitySearch) {
-            setValue('employerCity', cities3 && cities3.find((data) => data?.name === employerCitySearch)?.name)
+            setValue('employerCity', employerCitySearch);
         }
-    }, [primaryCitySearch, cities1, mailingCitySearch, cities2, employerCitySearch, cities3])
+    }, [employerCitySearch, cities4]);
 
     useEffect(() => {
-        if (patientDetails && statesData) {
-            setValue('race', patientDetails?.race)
-            setValue('raceSubcategories', patientDetails?.raceSubcategories)
-            setValue('sex', patientDetails?.sex)
-            setValue('genderIdentity', patientDetails?.genderIdentity)
-            setValue('sexualOrientation', patientDetails?.sexualOrientation)
-            setValue('patientStudentStatus', patientDetails?.patientStudentStatus)
-            setValue('nationalIdNumber', patientDetails?.nationalIdNumber)
-            setValue('preferredLanguage', patientDetails?.preferredLanguage)
+        if (patientDetails && id) {
+            setValue('race', patientDetails?.race?.[0]?.display || '');
+            setValue('raceSubcategories', patientDetails?.raceSubcategories);
+            setValue('sex', patientDetails?.birthSex?.[0]?.value || '');
+            setValue('genderIdentity', patientDetails?.genderIdentity?.[0]?.code || '');
+            setValue('sexParameter', patientDetails?.sexParameterForClinicalUse?.[0]?.code || '');
+            setValue('personalPronouns', patientDetails?.personalPronouns?.[0]?.code || '');
+            setValue('patientStudentStatus', patientDetails?.patientStudentStatus);
+            setValue('nationalIdNumber', patientDetails?.nationalIdNumber);
+            setValue('preferredLanguage', patientDetails?.communication?.[0]?.language?.coding?.[0]?.code || '');
+            // setValue('trible', patientDetails?.trible?.[0]?.code || '');
+            // setValue('ethnicity', patientDetails?.ethnicity?.[0]?.value || '');
+            setEth(patientDetails?.ethnicity);
+            setTri(patientDetails?.tribalAffiliation);
+            setValue('notes', patientDetails?.notes);
+            setValue('maritalStatus', patientDetails?.maritalStatus?.[0]?.display || '');
+            setValue('epsdtServices', patientDetails?.epsdtServices);
+            setValue('epsdtReferralCondition', patientDetails?.epsdtReferralCondition);
 
-            setValue('ethnicity', patientDetails?.ethnicity)
-            setValue('notes', patientDetails?.notes)
-            setValue('maritalStatus', patientDetails?.maritalStatus)
-            setValue('epsdtServices', patientDetails?.epsdtServices)
-            setValue('epsdtReferralCondition', patientDetails?.epsdtReferralCondition)
-            // Employer details
-            setValue('emergencyContactName', patientDetails?.emergencyContactName)
-            setValue('emergencyContactPhone', patientDetails?.emergencyContactPhone ? patientDetails?.emergencyContactPhone.replace(/\D/g, '')
-                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                )
-                : '');
-            setValue('emergencyContactRelation', patientDetails?.emergencyContactRelation)
-            setValue('employerName', patientDetails?.employerName)
-            setValue('employerPhone', patientDetails?.employerPhone ? patientDetails?.employerPhone.replace(/\D/g, '')
-                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                )
-                : '');
-            setValue('employerTimeZone', patientDetails?.employerAddress?.timeZone)
-            setValue('employerAddress', patientDetails?.employerAddress?.address);
-            setValue('employerStreet', patientDetails?.employerAddress?.street)
-            setValue('employerZip', patientDetails?.employerAddress?.zip)
-            setEmployerLatitude(patientDetails?.employerAddress?.latitude);
-            setEmployerLongitude(patientDetails?.employerAddress?.longitude);
-            // primary address
-            setValue('primaryAddress', patientDetails?.address?.address);
-            setValue('primaryTimeZone', patientDetails?.address?.timeZone);
-            setValue('primaryStreet', patientDetails?.address?.street);
-            setValue('primaryZip', patientDetails?.address?.zip);
-            setLatitude(patientDetails?.address?.latitude);
-            setLongitude(patientDetails?.address?.longitude);
-            // secondary address
-            setValue('mailingAddress', patientDetails?.mailingAddress?.address);
-            setValue('mailingTimeZone', patientDetails?.mailingAddress?.timeZone)
-            setValue('mailingStreet', patientDetails?.mailingAddress?.street)
-            setValue('mailingZip', patientDetails?.mailingAddress?.zip)
-            setMailingLatitude(patientDetails?.mailingAddress?.latitude);
-            setMailingLongitude(patientDetails?.mailingAddress?.longitude);
-        }
-    }, [patientDetails]);
-    useEffect(() => {
-        if (statesData?.states?.length > 0 && patientDetails) {
-            if (patientDetails?.address?.state) {
-                setValue('primaryStateName', patientDetails?.address?.state)
-                const stateCity1 = statesData?.states?.find((data) => data?.state_code === patientDetails?.address?.state)?.id
-                dispatch(getCitiesAction({ state_code: stateCity1, name: patientDetails?.address?.city || '', limit: 25, skip: '' }))
-            }
-            if (patientDetails?.mailingAddress?.state) {
-                setValue('mailingStateName', patientDetails?.mailingAddress?.state)
-                const stateCity2 = statesData?.states?.find((data) => data?.state_code === patientDetails?.mailingAddress?.state)?.id
-                dispatch(getCities2Action({ state_code: stateCity2, name: patientDetails?.mailingAddress?.city || '', limit: 25, skip: '' }))
-            }
-            if (patientDetails?.employerAddress?.state) {
-                setValue('employerStateName', patientDetails?.employerAddress?.state)
-                const stateCity3 = statesData?.states?.find((data) => data?.state_code === patientDetails?.employerAddress?.state)?.id
-                dispatch(getCities3Action({ state_code: stateCity3, name: patientDetails?.employerAddress?.city || '', limit: 25, skip: '' }))
-            }
-        }
-    }, [statesData, patientDetails])
-    const handleStateSelection = (code, data) => {
-        if (data === 'primary') {
-            const stateCity1 = statesData?.states?.find((data) => data?.state_code === code)?.id
-            dispatch(getCitiesAction({ state_code: stateCity1, name: primaryCitySearch ? primaryCitySearch : '', limit: 25, skip: '' }))
-        }
-        if (data === 'mailing') {
-            const stateCity2 = statesData?.states?.find((data) => data?.state_code === code)?.id
-            dispatch(getCities2Action({ state_code: stateCity2, name: mailingCitySearch ? mailingCitySearch : '', limit: 25, skip: '' }))
-        }
-        if (data === 'employer') {
-            const stateCity3 = statesData?.states?.find((data) => data?.state_code === code)?.id
-            dispatch(getCities3Action({ state_code: stateCity3, name: employerCitySearch ? employerCitySearch : '', limit: 25, skip: '' }))
-        }
-    }
-    useEffect(() => {
-        if (cities1?.length > 0 && patientDetails?.address?.city) {
-            setPrimaryCitySearch(patientDetails?.address?.city)
-        }
-        if (cities2?.length > 0 && patientDetails?.mailingAddress?.city) {
-            setMailingCitySearch(patientDetails?.mailingAddress?.city)
-        }
-        if (cities3?.length > 0 && patientDetails?.employerAddress?.city) {
-            setEmployerCitySearch(patientDetails?.employerAddress?.city)
-        }
-    }, [cities1, cities2, cities3, patientDetails])
-    const onSubmit = (data) => {
-        const enrichedData = {
-            ...data,
-            id: id,
-            emergencyContactPhone: data?.emergencyContactPhone?.replace(/\D/g, ''), // Sanitize emergency contact phone
-            employerPhone: data?.employerPhone?.replace(/\D/g, ''), // Sanitize employer phone
-            address: {
-                address: data?.primaryAddress,
-                street: data?.primaryStreet,
-                city: data?.primaryCity,
-                state: data?.primaryStateName,
-                zip: data?.primaryZip,
-                latitude: latitude,
-                longitude: longitude,
-                timeZone: data?.primaryTimeZone
-            },
-            employerAddress: sameAsPrimary ?
-                {
-                    address: data?.primaryAddress,
-                    street: data?.primaryStreet,
-                    city: data?.primaryCity,
-                    state: data?.primaryStateName,
-                    zip: data?.primaryZip,
-                    latitude: latitude,
-                    longitude: longitude,
-                    timeZone: data?.primaryTimeZone
-                }
-                : {
-                    address: data?.employerAddress,
-                    street: data?.employerStreet,
-                    city: data?.employerCity,
-                    state: data?.employerStateName,
-                    zip: data?.employerZip,
-                    latitude: employerLatitude,
-                    longitude: employerLongitude,
-                    timeZone: data?.employerTimeZone
+            // ✅ Emergency Contact Fix
+            setValue('emergencyContactName', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value));
+            // setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding);
+
+            // ✅ Employer Details Fix
+            setValue('employerName', patientDetails?.employerDetails?.employerName || '');
+            setValue('employmentStatus', patientDetails?.employerDetails?.employmentStatus || '');
+            setValue('occupation', patientDetails?.employerDetails?.occupation || '');
+
+            // ✅ Employer Address Fix
+            setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city || '');
+            setEmployerCitySearch(patientDetails?.employerDetails?.workLocation?.address?.city);
+            setValue('employerStateName', patientDetails?.employerDetails?.workLocation?.address?.state || '');
+            setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
+            setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
+            setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line[0] || '');
+            const defaultIdentifiers = patientDetails?.identifier?.map((data, index) => ({
+                expiry: data?.expiry,
+                file: data?.file?.[0],
+                issuingAuthority: data?.issuingAuthority,
+                number: data?.value,
+                system: '',
+                type: {
+                    label: data?.type?.coding?.[0]?.display,
+                    value: data?.type?.coding?.[0]?.system,
+                    code: data?.type?.coding?.[0]?.code,
                 },
-            mailingAddress: {
-                address: data?.mailingAddress,
-                street: data?.mailingStreet,
-                city: data?.mailingCity,
-                state: data?.mailingStateName,
-                zip: data?.mailingZip,
-                latitude: mailingLatitude,
-                longitude: mailingLongitude,
-                timeZone: data?.mailingTimeZone
+            }));
+            setIdentifiers(defaultIdentifiers || []);
+            // setDemographicAddresses(patientDetails?.address || []);
+            const newAddresses = patientDetails?.address?.map((addr) => ({
+                type: addr.type || '', // Make sure type is included
+                use: addr.use || '',
+                line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
+                city: addr.city || '',
+                state: addr.state || '',
+                postalCode: addr.postalCode || '',
+                country: addr.country || 'US',
+            })) || [{ type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }];
+            setDemographicAddresses(newAddresses);
+            if (statesData?.states) {
+                newAddresses.forEach((address) => {
+                    const state = statesData.states.find((s) => s.name === address.state);
+                    if (!state) return;
+                    if (address.type === 'physical') {
+                        dispatch(
+                            getCitiesAction({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
+                    } else if (address.type === 'postal') {
+                        dispatch(
+                            getCities2Action({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
+                    } else {
+                        dispatch(
+                            getCities3Action({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
+                    }
+                });
             }
+        }
+    }, [patientDetails, statesData]);
+
+    const onSubmit = (data) => {
+        const selectedGenderIdentity = genderIdentityOptions.find((option) => option.value === data.genderIdentity);
+        const selectedSexualOrientation = sexParameterOptions.find((option) => option.value === data.sexParameter);
+        const selectedPersonalPronouns = personalPronounsOptions.find(
+            (option) => option.value === data.personalPronouns
+        );
+        const selectedMaritalStatus = maritalStatusOptions.find((option) => option.show === data.maritalStatus);
+        const selectedRaceOption = raceOptions.find((option) => option.display === data.race);
+        const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
+
+        let finalIdentifiers = [];
+        identifiers.forEach((element) => {
+            const identifierData = {
+                expiry: element?.expiry,
+                file: element?.file,
+                value: element?.number || element?.value,
+                use: 'official',
+                system: element?.type?.value || element?.system,
+                type: {
+                    coding: [
+                        {
+                            system: element?.type?.value || element?.system,
+                            code: element?.type?.code || element?.type?.coding?.[0]?.code,
+                            display: element?.type?.label || element?.type?.coding?.[0]?.display,
+                        },
+                    ],
+                    text: element?.type?.label || element?.type?.coding?.[0]?.display,
+                },
+                issuingAuthority: element?.issuingAuthority,
+            };
+            finalIdentifiers.push(identifierData);
+        });
+        const payload = {
+            id: id,
+            birthSex: [
+                {
+                    ...selectedSexOption,
+                    code: selectedSexOption?.value,
+                    display: selectedSexOption?.label,
+                    system: selectedSexOption?.system,
+                },
+            ],
+
+            genderIdentity: [
+                {
+                    ...selectedGenderIdentity,
+                    code: selectedGenderIdentity?.value,
+                    display: selectedGenderIdentity?.show,
+                    text: selectedGenderIdentity?.label,
+                },
+            ],
+            sexParameterForClinicalUse: [
+                {
+                    ...selectedSexualOrientation,
+                    code: selectedSexualOrientation?.value,
+                    display: selectedSexualOrientation?.show,
+                    text: selectedSexualOrientation?.label,
+                    system: selectedSexualOrientation?.system,
+                },
+            ],
+            personalPronouns: [
+                {
+                    ...selectedPersonalPronouns,
+                    code: selectedPersonalPronouns?.value,
+                    display: selectedPersonalPronouns?.show,
+                    text: selectedPersonalPronouns?.label,
+                    system: selectedPersonalPronouns?.system,
+                },
+            ],
+            // ✅ Fixing Race
+            race: [
+                {
+                    ...selectedRaceOption,
+                    code: selectedRaceOption?.code,
+                    display: selectedRaceOption?.display,
+                    text: selectedRaceOption?.display,
+                },
+            ],
+            // ✅ Fixing Ethnicity
+            ethnicity: [
+                {
+                    ...eth,
+                    text: eth?.display,
+                },
+            ],
+            // ✅ Fixing Tribal Entity
+            tribalAffiliation: [
+                {
+                    ...tri,
+                    text: tri?.display,
+                },
+            ],
+            // ✅ Fixing Marital Status Structure
+            maritalStatus: [
+                {
+                    ...selectedMaritalStatus,
+                    code: selectedMaritalStatus?.value,
+                    display: selectedMaritalStatus?.show,
+                    text: selectedMaritalStatus?.label,
+                    system: selectedMaritalStatus?.system,
+                },
+            ],
+            // ✅ Fixing Preferred Language Structure
+            ...(data?.preferredLanguage && {
+                communication: [
+                    {
+                        language: {
+                            coding: [
+                                {
+                                    system: 'urn:ietf:bcp:47',
+                                    code: data.preferredLanguage,
+                                    display: data.languageDisplay || '',
+                                },
+                            ],
+                        },
+                        preferred: true,
+                    },
+                ],
+            }),
+            ...(data?.notes && { notes: data.notes }),
+
+            contact: [
+                {
+                    relationship: [
+                        {
+                            coding: [rela], //code:'I" , system:url, display:'Ins Company
+                            text: data?.emergencyContactName,
+                        },
+                    ],
+                    telecom: [
+                        {
+                            system: 'phone',
+                            value: data?.emergencyContactPhone?.replace(/\D/g, ''),
+                            use: 'home',
+                        },
+                    ],
+                },
+            ],
+            // ✅ Fixing Employer Address (No latitude/longitude/timeZone)
+            employerDetails: {
+                employerName: data?.employerName,
+                employerPhone: data?.employerPhone?.replace(/\D/g, ''),
+                employmentStatus: data?.employmentStatus,
+                occupation: data?.occupation,
+                workLocation: data?.employerAddress
+                    ? {
+                        address: {
+                            line: [data?.employerAddress],
+                            city: data?.employerCity,
+                            state: data?.employerStateName,
+                            postalCode: data?.employerZip,
+                            country: 'United States',
+                        },
+                    }
+                    : {},
+            },
+            identifier: finalIdentifiers,
+            ...(demographicAddresses && { address: demographicAddresses }),
+            ...(data?.notes && { notes: data.notes }),
         };
-        dispatch(updatePatientsAction({ key: encryptMessage(enrichedData) }))
+        dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
-
-    const getGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
-                return null;
-            }
-        }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedLocations(data?.results);
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
-    const getMailingGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
-                return null;
-            }
-        }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedMailingLocations(data?.results);
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
 
     const getEmployerGeolocation = (e) => {
         const addressToSearch = e.target.value;
         async function fetchGeocodeData(location) {
             const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+                location
+            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
                 const response = await fetch(url);
@@ -270,115 +378,183 @@ const Demographicdetails = ({ patientId }) => {
                 const data = await response.json();
                 return data;
             } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
+                console.error('Failed to fetch geocode data:', error);
                 return null;
             }
         }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedEmployerLocations(data?.results);
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
+        fetchGeocodeData(addressToSearch).then((data) => {
+            if (data) {
+                setSearchedEmployerLocations(data?.results);
+            } else {
+            }
+        });
+    };
+
+    const formattedEthnicityOptions = ethnicityOptions.map((ethnicity) => ({
+        value: ethnicity, // Code as the value
+        label: ethnicity.display, // Display text as the label
+    }));
+    const formattedTribleOptions = tribalEntitiesOptions.map((tribal) => ({
+        value: tribal, // Code as the value
+        label: tribal.display, // Display text as the label
+    }));
+    const relationshipOption = dataList?.map((relation) => ({
+        value: relation, // Code as the value
+        label: relation.display, // Display text as the label
+    }));
+
+    const [eth, setEth] = useState(null); // Store selected ethnicity
+    const handleEthnicityChange = (selectedOption) => {
+        setEth(selectedOption?.value); // Store value in state
+    };
+    const [rela, setRela] = useState(null); // Store selected relationship
+    const handleRelationChange = (selectedOption) => {
+        setRela(selectedOption ? selectedOption.value : '');
+    };
+    const [tri, setTri] = useState(null); // Store selected tribal entity
+    const handleTribalChange = (selectedOption) => {
+        setTri(selectedOption ? selectedOption.value : '');
+    };
+    const selectedEthnicityOption =
+        formattedEthnicityOptions.find((option) => option?.value?.code === eth?.[0]?.code) ||
+        formattedEthnicityOptions.find((option) => option?.value?.display === eth);
+    const selectedTribleOption =
+        formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) ||
+        formattedTribleOptions.find((option) => option?.value?.code == tri);
+    const selectedRelationOption =
+        relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
+        relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
+
     return (
-        <div className="scroll-container" style={{ overflow: "scroll", height: "65vh" }}>
-            <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
-                <Row>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Patient National ID Number</Form.Label>
-                            <Form.Control placeholder="Patient National ID Number" type="text" {...register('nationalIdNumber')} />
-                        </Form.Group>
-                    </Col>
+        <Form className="" onSubmit={handleSubmit(onSubmit)}>
+            <div
+                className=" scroll-container "
+                style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
+                <IdentifierForm
+                    defaultIdentifiers={[
+                        {
+                            label: 'National Provider Identifier (NPI)',
+                            value: 'http://hl7.org/fhir/sid/us-npi',
+                            code: 'NPI',
+                        },
+                    ]}
+                    identifiers={identifiers}
+                    setIdentifiers={setIdentifiers}
+                />
+
+                <hr className="mt-0" />
+                <Row className="pb-2">
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
-                            <Form.Select
-                                {...register('sex')} >
-                                <option value="">Select Sex</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-
+                            <Form.Select {...register('sex')}>
+                                <option value="" hidden>
+                                    Select Sex
+                                </option>
+                                {sexAssignedAtBirthOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
+
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Gender Identity</Form.Label>
-                            <Form.Select
-                                {...register('genderIdentity')} >
-                                <option value="">Select Gender Identity</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Male-to-Female (MTF)/Transgender Female/Trans Woman">
-                                    Male-to-Female (MTF)/Transgender Female/Trans Woman
+                            <Form.Select {...register('genderIdentity')}>
+                                <option value="" hidden>
+                                    Select
                                 </option>
-                                <option value="Female-to-Male (FTM)/Transgender Male/Trans Man">
-                                    Female-to-Male (FTM)/Transgender Male/Trans Man
-                                </option>
-                                <option value="Genderqueer">Genderqueer</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Choose not to disclose">Choose not to disclose</option>
+                                {genderIdentityOptions?.map((option) => (
+                                    <option key={option?.value} value={option?.value}>
+                                        {option?.show}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+                    </Col>
 
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
+                            <Form.Select {...register('sexParameter')}>
+                                <option value="" hidden>
+                                    Select
+                                </option>
+                                {sexParameterOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.show}
+                                    </option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sexual Orientation</Form.Label>
-                            <Form.Select
-                                {...register('sexualOrientation')} >
-                                <option value="">Select Sexual Orientation</option>
-                                <option value="Heterosexual">Heterosexual</option>
-                                <option value="Lesbian or gay">Lesbian or gay</option>
-                                <option value="Bisexual">Bisexual</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Choose not to disclose">Choose not to disclose</option>
-
+                            <Form.Label className="mb-0">Personal Pronouns</Form.Label>
+                            <Form.Select {...register('personalPronouns')}>
+                                <option value="" hidden>
+                                    Select Pronouns
+                                </option>
+                                {personalPronounsOptions?.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.show}
+                                    </option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Race</Form.Label>
-                            <Form.Select
-                                {...register('race')} >
+                            <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
-                                <option value="American Indian or Alaska Native'">American Indian or Alaska Native'</option>
-                                <option value="Asian">Asian</option>
-                                <option value="Black or African American">Black or African American</option>
-                                <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
-                                <option value="White">White</option>
-                                <option value="Other Race">Other Race</option>
+                                {raceOptions.map((race) => (
+                                    <option key={race.code} value={race.display} className="text-capitalize">
+                                        {race.display}
+                                    </option>
+                                ))}
                                 <option value="Declined To Specify">Declined To Specify</option>
                             </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Race SubCategories</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Race SubCategories" {...register('raceSubcategories')} />
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
                             <Form.Label className="mb-0">Ethnicity</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Ethnicity" {...register('ethnicity')} />
+                            <Select
+                                options={formattedEthnicityOptions}
+                                isSearchable
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="&nbsp; Select"
+                                // value={
+                                // formattedEthnicityOptions.find((option) => option?.value?.display === eth||option?.value?.display === eth?.display) || null
+                                // } // Show selected value
+                                value={selectedEthnicityOption}
+                                onChange={handleEthnicityChange}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: '0px',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        paddingBottom: '5px',
+                                    }),
+                                }}
+                            />
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Preferred Language</Form.Label>
-                            <Form.Select
-                                {...register('preferredLanguage',
-                                )}
-                            >
+                            <Form.Select {...register('preferredLanguage')}>
                                 <option value="">Select Preferred Language</option>
                                 <option value="English">English</option>
                                 <option value="Chinese">Chinese</option>
@@ -397,499 +573,87 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Patient Student Status</Form.Label>
-                            <Form.Select
-                                {...register('patientStudentStatus',
-                                )}
-                            >
-                                <option value="">Select Patient Student Status</option>
-                                <option value="Employed">Employed</option>
-                                <option value="Full-time Student">Full-time Student</option>
-                                <option value="Not a Student">Not a Student</option>
-                                <option value="Part-time Student">Part-time Student</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-                </Row>
-                <hr />
-                <Row>
-                    <Col sm={12}>
-                        <Row>
-                            <Col sm={12} className=''>
-                                <span className='text-black fw-semibold form-label'>Primary Address</span>
-                            </Col>
-                            <Col sm={6}>
-                                <Row className='position-relative'>
-                                    <Col sm={12}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">Address</Form.Label>
-                                            <div style={{ position: 'relative' }}>
-                                                <Form.Control
-                                                    type="text"
-                                                    {...register('primaryAddress', {
-                                                    })}
-                                                    // value={searchedLocations}
-                                                    onChange={(e) => {
-                                                        getGeolocation(e);
-                                                        setFocused(true);
-                                                        clearErrors('primaryAddress');
-                                                    }}
-
-                                                    onFocus={() => setFocused(true)}
-                                                    onBlur={() => {
-                                                        setTimeout(() => setFocused(false), 200);
-                                                    }}
-                                                    placeholder="Search for address"
-                                                    autoComplete="off"
-                                                />
-                                                <div
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '100%',
-                                                        left: 0,
-                                                        width: '100%',
-                                                        maxHeight: '150px',
-                                                        zIndex: 111,
-                                                        backgroundColor: '#fff',
-                                                        border: '1px solid #ced4da',
-                                                        borderTop: 'none',
-                                                    }}
-                                                    className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
-                                                >
-                                                    {searchedLocations?.map((data, index) => (
-                                                        <p
-                                                            key={index}
-                                                            onClick={() => {
-                                                                setValue('primaryZip', data?.components?.postcode)
-                                                                setValue('primaryStateName', data?.components?.state_code)
-                                                                setValue('primaryStreet', data?.components?.road)
-                                                                setLatitude(data?.bounds?.southwest?.lat);
-                                                                setPrimaryCitySearch(data?.components?.county)
-                                                                setLongitude(data?.bounds?.southwest?.lng);
-                                                                setValue('primaryAddress', data?.formatted)
-                                                                setFocused(false);
-                                                                setValue('primaryTimeZone', data?.annotations?.timezone?.name)
-                                                                handleStateSelection(data?.components?.state_code, 'primary')
-                                                            }}
-                                                            style={{
-                                                                margin: 0,
-                                                                padding: '8px 12px',
-                                                                cursor: 'pointer',
-                                                            }}
-                                                            className="hover-bg-change text-black"
-                                                        >
-                                                            {data?.formatted}
-                                                        </p>
-                                                    ))}
-                                                    {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                </div>
-                                            </div>
-                                            {errors.address && <span className="text-danger">{errors.address.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Latitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={latitude}
-                                                placeholder="Latitude"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Longitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={longitude}
-                                                placeholder="Longitude" />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Time Zone</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('primaryTimeZone')}
-                                                placeholder="Time Zone"
-                                            />
-                                            {errors.primaryTimeZone && <span className="text-danger">{errors.primaryTimeZone.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0' >State</Form.Label>
-                                            <Form.Select
-                                                {...register('primaryStateName')}
-                                                onChange={(e) => handleStateSelection(e.target.value, 'primary')}
-                                            >
-                                                <option value='' hidden>State</option>
-                                                {statesData?.states?.map((data) => (
-                                                    <option
-                                                        key={data?.name}
-                                                        data-key={data?.id}
-                                                        value={data?.state_code}
-                                                    >
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.stateName && <span className="text-danger">{errors.stateName.message}</span>}
-                                        </Form.Group>
-
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>City</Form.Label>
-                                            <Form.Select
-                                                disabled={store?.getCitiesReducer?.loading}
-                                                {...register('primaryCity')}
-                                            >
-                                                <option value='' hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                {cities1?.map((data) => (
-                                                    <option key={data?.name} value={data?.name}>
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.city && <span className="text-danger">{errors.city.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Street</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('primaryStreet')}
-                                                placeholder="Street" />
-                                            {errors.primaryStreet && <span className="text-danger">{errors.primaryStreet.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Zip</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('primaryZip', {
-                                                    minLength: {
-                                                        value: 5,
-                                                        message: 'ZIP code must be at least 5 characters long',
-                                                    },
-                                                    pattern: {
-                                                        value: /^[0-9]+$/,
-                                                        message: 'ZIP code must contain numbers only',
-                                                    },
-                                                })}
-                                                placeholder="Zip"
-                                                maxLength={5}
-                                            />
-                                            {errors.primaryZip && <span className="text-danger">{errors.primaryZip.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-                <hr />
-                <Row>
-                    <Col sm={12}>
-                        <Row>
-                            <Col sm={12} className=''>
-                                <span className='text-black fw-semibold form-label'>Mailing Address</span>
-                                <Form.Check
-                                    type="checkbox"
-                                    label="Same as Primary Address"
-                                    onChange={(e) => {
-
-                                        if (e.target.checked) {
-                                            setSameAsPrimary(true);
-                                            setValue('mailingAddress', getValues('primaryAddress'));
-                                            setValue('mailingZip', getValues('primaryZip'));
-                                            setValue('mailingStreet', getValues('primaryStreet'));
-                                            setValue('mailingTimeZone', getValues('primaryTimeZone'));
-                                            setMailingLatitude(latitude);
-                                            setMailingLongitude(longitude);
-                                        } else {
-                                            setSameAsPrimary(false)
-                                            setValue('mailingAddress', '');
-                                            setValue('mailingZip', '');
-                                            setValue('mailingStreet', '');
-                                            setValue('mailingTimeZone', '');
-                                            setMailingLatitude(null);
-                                            setMailingLongitude(null);
-                                        }
-                                    }}
-                                />
-                            </Col>
-                            <Col sm={6}>
-                                <Row className='position-relative'>
-                                    <Col sm={12}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">Address</Form.Label>
-                                            <div style={{ position: 'relative' }}>
-                                                <Form.Control
-                                                    type="text"
-                                                    {...register('mailingAddress', {
-                                                    })}
-                                                    onChange={(e) => {
-                                                        getMailingGeolocation(e);
-                                                        setMailingFocused(true);
-                                                        clearErrors('address');
-                                                    }}
-
-                                                    onFocus={() => setMailingFocused(true)}
-                                                    onBlur={() => {
-                                                        setTimeout(() => setMailingFocused(false), 200);
-                                                    }}
-                                                    placeholder="Search for address"
-                                                    autoComplete="off"
-                                                />
-                                                <div
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '100%',
-                                                        left: 0,
-                                                        width: '100%',
-                                                        maxHeight: '150px',
-                                                        zIndex: 111,
-                                                        backgroundColor: '#fff',
-                                                        border: '1px solid #ced4da',
-                                                        borderTop: 'none',
-                                                    }}
-                                                    className={`scroll-container hover-bg-change ${searchedMailingLocations?.length === 0 || !mailingFocused ? 'd-none' : ''}`}
-                                                >
-                                                    {searchedMailingLocations?.map((data, index) => (
-                                                        <p
-                                                            key={index}
-                                                            onClick={() => {
-                                                                setValue('mailingZip', data?.components?.postcode)
-                                                                setValue('mailingStateName', data?.components?.state_code)
-                                                                setMailingLatitude(data?.bounds?.southwest?.lat);
-                                                                setMailingCitySearch(data?.components?.county)
-                                                                setMailingLongitude(data?.bounds?.southwest?.lng);
-                                                                setValue('mailingAddress', data?.formatted)
-                                                                setMailingFocused(false);
-                                                                setValue('mailingStreet', data?.components?.road)
-                                                                setValue('mailingTimeZone', data?.annotations?.timezone?.name)
-                                                            }}
-                                                            style={{
-                                                                margin: 0,
-                                                                padding: '8px 12px',
-                                                                cursor: 'pointer',
-                                                            }}
-                                                            className="hover-bg-change text-black"
-                                                        >
-                                                            {data?.formatted}
-                                                        </p>
-                                                    ))}
-                                                    {searchedMailingLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                </div>
-                                            </div>
-                                            {errors.mailingAddress && <span className="text-danger">{errors.mailingAddress.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Latitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={mailingLatitude}
-                                                placeholder="Latitude"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Longitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={mailingLongitude}
-                                                placeholder="Longitude" />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Time Zone</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('mailingTimeZone')}
-                                                placeholder="Time Zone"
-                                            />
-                                            {errors.mailingTimeZone && <span className="text-danger">{errors.mailingTimeZone.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0' >State</Form.Label>
-                                            {sameAsPrimary ?
-                                                <Form.Control value={statesData?.states?.find((data) => data?.state_code === getValues('primaryStateName'))?.name} readOnly />
-                                                :
-                                                <>
-                                                    <Form.Select
-                                                        {...register('mailingStateName')}
-                                                        onChange={(e) => handleStateSelection(e.target.value, 'mailing')}
-                                                    >
-                                                        <option value='' hidden>State</option>
-                                                        {statesData?.states?.map((data) => (
-                                                            <option
-                                                                key={data?.name}
-                                                                data-key={data?.id}
-                                                                value={data?.state_code}
-                                                            >
-                                                                {data?.name}
-                                                            </option>
-                                                        ))}
-                                                    </Form.Select>
-                                                    {errors.stateName && <span className="text-danger">{errors.stateName.message}</span>}
-                                                </>
-                                            }
-
-                                        </Form.Group>
-
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>City</Form.Label>
-                                            {sameAsPrimary ?
-                                                <Form.Control value={cities1?.find((data) => data?._id === getValues('primaryCity'))?.name} readOnly />
-                                                :
-                                                <>
-                                                    <Form.Select
-                                                        disabled={store?.getCitiesReducer?.loading}
-                                                        {...register('mailingCity')}
-
-                                                    >
-                                                        <option value='' hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                        {cities2?.map((data) => (
-                                                            <option key={data?.name} value={data?.name}>
-                                                                {data?.name}
-                                                            </option>
-                                                        ))}
-                                                    </Form.Select>
-                                                    {errors.city && <span className="text-danger">{errors.city.message}</span>}
-                                                </>
-                                            }
-
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Street</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('mailingStreet')}
-                                                placeholder="Street" />
-                                            {errors.street && <span className="text-danger">{errors.street.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Zip</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('mailingZip', {
-                                                    minLength: {
-                                                        value: 5,
-                                                        message: 'ZIP code must be at least 5 characters long',
-                                                    },
-                                                    pattern: {
-                                                        value: /^[0-9]+$/,
-                                                        message: 'ZIP code must contain numbers only',
-                                                    },
-                                                })}
-                                                placeholder="Zip"
-                                                maxLength={5}
-                                            />
-                                            {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-                <hr />
-                <Row>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Notes</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Notes" {...register('notes')} />
+                            <Form.Label className="mb-0">Tribal Entity</Form.Label>
+                            <Select
+                                options={formattedTribleOptions} // Use the formatted array
+                                isSearchable
+                                className="basic-single"
+                                classNamePrefix="select"
+                                // value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
+                                value={selectedTribleOption}
+                                placeholder="&nbsp; Select "
+                                onChange={handleTribalChange}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: '0px',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        paddingBottom: '5px',
+                                    }),
+                                }}
+                            />
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label htmlFor="marital" className="mb-0">Marital Status</Form.Label>
-                            <Form.Select
-                                id="marital"
-                                {...register('maritalStatus')}
-                            >
+                            <Form.Label htmlFor="marital" className="mb-0">
+                                Marital Status
+                            </Form.Label>
+                            <Form.Select id="marital" {...register('maritalStatus')}>
                                 <option value="">Select marital status</option>
-                                <option value="Single">Single</option>
-                                <option value="Married">Married</option>
-                                <option value="Divorced">Divorced</option>
-                                <option value="Widowed">Widowed</option>
-                                <option value="Other">Other</option>
+                                {maritalStatusOptions.map((option) => (
+                                    <option key={option.value} value={option?.show}>
+                                        {option.show}
+                                    </option>
+                                ))}
                             </Form.Select>
-                            {errors.maritalStatus && <span className="text-danger">{errors.maritalStatus.message}</span>}
+                            {errors.maritalStatus && (
+                                <span className="text-danger">{errors.maritalStatus.message}</span>
+                            )}
                         </Form.Group>
                     </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">EPSDT Services</Form.Label>
-                            <Form.Select
-                                {...register('epsdtServices')}
-                            >
-                                <option value="">Select EPSDT Services</option>
-                                <option value="Children">Children</option>
-                                <option value="Family Planning">Family Planning</option>
-                                <option value="Children / Family Planning">Children / Family Planning</option>
-                            </Form.Select>
-                            {errors.epsdtServices && <span className="text-danger">{errors.epsdtServices.message}</span>}
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">EPSDT Referral Condition </Form.Label>
-                            <Form.Select {...register('epsdtReferralCondition')} >
-                                <option value="">Select EPSDT Referral Condition</option>
-                                <option value="AV">Available - Not Used</option>
-                                <option value="NU">Not Used</option>
-                                <option value="S2">Under Treatment</option>
-                                <option value="ST">New Services Requested</option>
-                                <option value="Other">Other</option>
-                            </Form.Select>
-                            {errors.epsdtReferralCondition && <span className="text-danger">{errors.epsdtReferralCondition.message}</span>}
-                        </Form.Group>
+                </Row>
+                <hr />
+                <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
+                <hr />
+
+                <Row className="mt-1 pb-2">
+                    <Col sm={12}>
+                        <h5>Emergency Contact Details</h5>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Emergency Contact Name</Form.Label>
-                            <Form.Control {...register('emergencyContactName')} type="text" placeholder="Enter Emergency Contact Name" />
+                            <Form.Control
+                                {...register('emergencyContactName')}
+                                type="text"
+                                placeholder="Enter Emergency Contact Name"
+                            />
+                            {errors.emergencyContactName && (
+                                <span className="text-danger">{errors.emergencyContactName.message}</span>
+                            )}
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group className="mb-0 position-relative">
-                            <Form.Label className='mb-0'>Emergency Contact Phone </Form.Label>
+                            <Form.Label className="mb-0">Emergency Contact Phone </Form.Label>
                             <Form.Group>
                                 <InputGroup>
-                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                    <InputGroup.Text
+                                        className="ps-3 pe-1 fw-bold text-black"
+                                        style={{ height: '33px' }}>
+                                        &nbsp;+1
+                                    </InputGroup.Text>{' '}
+                                    {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
-                                        height={'33px'}
+                                        style={{ height: '33px' }}
                                         {...register('emergencyContactPhone', {
                                             pattern: {
                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -897,12 +661,12 @@ const Demographicdetails = ({ patientId }) => {
                                             },
                                             maxLength: {
                                                 value: 13, // Includes characters for (XXX)XXX-XXXX
-                                                message: 'Contact must not exceed 13 characters'
+                                                message: 'Contact must not exceed 13 characters',
                                             },
                                             minLength: {
                                                 value: 13,
-                                                message: 'Contact must not be less than 13 characters'
-                                            }
+                                                message: 'Contact must not be less than 13 characters',
+                                            },
                                         })}
                                         onChange={(e) => {
                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
@@ -918,7 +682,7 @@ const Demographicdetails = ({ patientId }) => {
                                             e.target.value = formattedValue; // Update input value
                                             clearErrors('emergencyContactPhone'); // Clear validation errors
                                         }}
-                                        placeholder="(123)456-7890"
+                                        placeholder="(XXX)XXX-XXXX"
                                         maxLength={14}
                                         onKeyPress={(event) => {
                                             // Only allow numeric characters (0-9)
@@ -930,20 +694,38 @@ const Demographicdetails = ({ patientId }) => {
                                 </InputGroup>
                             </Form.Group>
 
-                            <div
-                                className='position-absolute ' style={{ top: '50%', left: '1%' }}
-                            >
-                                <img
-                                    src={us}
-                                    alt="country code flag"
-                                    width={20} />
+                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                <img src={us} alt="country code flag" width={20} />
                             </div>
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
-                            <Form.Control {...register('emergencyContactRelation')} type="text" placeholder="Enter Emergency Contact Relation" />
+                            <Select
+                                options={relationshipOption} // Use the formatted array
+                                isSearchable
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="&nbsp; Select "
+                                // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
+                                value={selectedRelationOption}
+                                onChange={handleRelationChange}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: '0px',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        paddingBottom: '5px',
+                                    }),
+                                }}
+                            />
                         </Form.Group>
                     </Col>
                 </Row>
@@ -951,26 +733,38 @@ const Demographicdetails = ({ patientId }) => {
                 <Row>
                     <Col sm={12}>
                         <Row>
-                            <Col sm={12} className=''>
-                                <span className='text-black fw-semibold form-label'>Employer Details</span>
+                            <Col sm={12} className="mt-1">
+                                <h5>Employer Details</h5>
                             </Col>
                             <Col sm={12}>
                                 <Row>
-                                    <Col sm={6}>
+                                    <Col sm={3}>
                                         <Form.Group>
                                             <Form.Label className="mb-0">Employer Name</Form.Label>
-                                            <Form.Control {...register('employerName')} type="text" placeholder="Enter Employer Name" />
+                                            <Form.Control
+                                                {...register('employerName')}
+                                                type="text"
+                                                placeholder="Enter Employer Name"
+                                            />
+                                            {errors.employerName && (
+                                                <span className="text-danger">{errors.employerName.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
-                                    <Col sm={6}>
+                                    <Col sm={3}>
                                         <Form.Group className="mb-0 position-relative">
-                                            <Form.Label className='mb-0'>Employer Phone </Form.Label>
+                                            <Form.Label className="mb-0">Employer Phone </Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
-                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                                    <InputGroup.Text
+                                                        className="ps-3 pe-1 fw-bold text-black"
+                                                        style={{ height: '33px' }}>
+                                                        &nbsp;+1
+                                                    </InputGroup.Text>{' '}
+                                                    {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
-                                                        height={'33px'}
+                                                        style={{ height: '33px' }}
                                                         {...register('employerPhone', {
                                                             pattern: {
                                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -978,12 +772,12 @@ const Demographicdetails = ({ patientId }) => {
                                                             },
                                                             maxLength: {
                                                                 value: 13, // Includes characters for (XXX)XXX-XXXX
-                                                                message: 'Contact must not exceed 13 characters'
+                                                                message: 'Contact must not exceed 13 characters',
                                                             },
                                                             minLength: {
                                                                 value: 13,
-                                                                message: 'Contact must not be less than 13 characters'
-                                                            }
+                                                                message: 'Contact must not be less than 13 characters',
+                                                            },
                                                         })}
                                                         onChange={(e) => {
                                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
@@ -999,7 +793,7 @@ const Demographicdetails = ({ patientId }) => {
                                                             e.target.value = formattedValue; // Update input value
                                                             clearErrors('employerPhone'); // Clear validation errors
                                                         }}
-                                                        placeholder="(123)456-7890"
+                                                        placeholder="(XXX)XXX-XXXX"
                                                         maxLength={14}
                                                         onKeyPress={(event) => {
                                                             if (!/[0-9]/.test(event.key)) {
@@ -1007,37 +801,70 @@ const Demographicdetails = ({ patientId }) => {
                                                             }
                                                         }}
                                                     />
+                                                    {errors.employerPhone && (
+                                                        <span className="text-danger">
+                                                            {errors.employerPhone.message}
+                                                        </span>
+                                                    )}
                                                 </InputGroup>
                                             </Form.Group>
 
-                                            <div
-                                                className='position-absolute ' style={{ top: '50%', left: '1%' }}
-                                            >
-                                                <img
-                                                    src={us}
-                                                    alt="country code flag"
-                                                    width={20} />
+                                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                                <img src={us} alt="country code flag" width={20} />
                                             </div>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={3}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className="mb-1">Employment Status</Form.Label>
+                                            <Form.Select {...register('employmentStatus')}>
+                                                <option value="">Select Employment Status</option>
+                                                <option value="employed">Employed</option>
+                                                <option value="self-employed">Self-Employed</option>
+                                                <option value="unemployed">Unemployed</option>
+                                                <option value="retired">Retired</option>
+                                                <option value="student">Student</option>
+                                                <option value="unknown">Unknown</option>
+                                            </Form.Select>
+                                            {errors.employmentStatus && (
+                                                <span className="text-danger">{errors.employmentStatus.message}</span>
+                                            )}
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={3}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className="mb-1">Occupation</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Enter Occupation"
+                                                {...register('occupation', {
+                                                    minLength: {
+                                                        value: 2,
+                                                        message: 'Occupation must be at least 2 characters long',
+                                                    },
+                                                })}
+                                            />
+                                            {errors.occupation && (
+                                                <span className="text-danger">{errors.occupation.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                 </Row>
                             </Col>
                             <Col sm={6}>
-                                <Row className='position-relative'>
+                                <Row className="position-relative">
                                     <Col sm={12}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">Address</Form.Label>
                                             <div style={{ position: 'relative' }}>
                                                 <Form.Control
                                                     type="text"
-                                                    {...register('employerAddress', {
-                                                    })}
+                                                    {...register('employerAddress', {})}
                                                     onChange={(e) => {
                                                         getEmployerGeolocation(e);
                                                         setEmployerFocused(true);
                                                         clearErrors('employerAddress');
                                                     }}
-
                                                     onFocus={() => setEmployerFocused(true)}
                                                     onBlur={() => {
                                                         setTimeout(() => setEmployerFocused(false), 200);
@@ -1057,20 +884,28 @@ const Demographicdetails = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused ? 'd-none' : ''}`}
-                                                >
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
                                                             onClick={() => {
-                                                                setValue('employerZip', data?.components?.postcode)
-                                                                setValue('employerStateName', data?.components?.state_code)
-                                                                setValue('employerStreet', data?.components?.road)
-                                                                setValue('employerTimeZone', data?.annotations?.timezone?.name)
-                                                                setEmployerCitySearch(data?.components?.county)
+                                                                setValue('employerZip', data?.components?.postcode);
+                                                                setValue(
+                                                                    'employerStateName',
+                                                                    data?.components?.state_code
+                                                                );
+                                                                setValue('employerStreet', data?.components?.road);
+                                                                setValue(
+                                                                    'employerTimeZone',
+                                                                    data?.annotations?.timezone?.name
+                                                                );
+                                                                setEmployerCitySearch(data?.components?.county);
                                                                 setEmployerLatitude(data?.bounds?.southwest?.lat);
                                                                 setEmployerLongitude(data?.bounds?.southwest?.lng);
-                                                                setValue('employerAddress', data?.formatted)
+                                                                setValue('employerAddress', data?.formatted);
                                                                 setEmployerFocused(false);
                                                             }}
                                                             style={{
@@ -1078,46 +913,59 @@ const Demographicdetails = ({ patientId }) => {
                                                                 padding: '8px 12px',
                                                                 cursor: 'pointer',
                                                             }}
-                                                            className="hover-bg-change text-black"
-                                                        >
+                                                            className="hover-bg-change text-black">
                                                             {data?.formatted}
                                                         </p>
                                                     ))}
-                                                    {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                    {searchedLocations?.length === 0 && (
+                                                        <p className="text-muted px-2 py-1">No results found</p>
+                                                    )}
                                                 </div>
                                             </div>
-                                            {errors.employerAddress && <span className="text-danger">{errors.employerAddress.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Latitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={employerLatitude}
-                                                placeholder="Latitude"
-                                            />
+                                            {errors.employerAddress && (
+                                                <span className="text-danger">{errors.employerAddress.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className='mb-0'>Longitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={employerLongitude}
-                                                placeholder="Longitude" />
+                                            <Form.Label className="mb-0">State</Form.Label>
+                                            <Form.Select {...register('employerStateName')}>
+                                                <option value="" hidden>
+                                                    State
+                                                </option>
+                                                {statesData?.states?.map((data) => (
+                                                    <option
+                                                        key={data?.name}
+                                                        data-key={data?.id}
+                                                        value={data?.state_code}>
+                                                        {data?.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                            {errors.employerStateName && (
+                                                <span className="text-danger">{errors.employerStateName.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className='mb-0'>Time Zone</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('employerTimeZone')}
-                                                placeholder="Time Zone"
-                                            />
-                                            {errors.employerTimeZone && <span className="text-danger">{errors.employerTimeZone.message}</span>}
+                                            <Form.Label className="mb-0">City</Form.Label>
+                                            <Form.Select
+                                                disabled={store?.getCitiesReducer?.loading}
+                                                {...register('employerCity')}>
+                                                <option hidden value="">
+                                                    {store?.getCitiesReducer?.cities4?.loading ? 'Loading...' : 'City'}
+                                                </option>
+                                                {cities4?.map((data) => (
+                                                    <option key={data?.name} value={data?.name}>
+                                                        {data?.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                            {errors.employerCity && (
+                                                <span className="text-danger">{errors.employerCity.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                 </Row>
@@ -1126,59 +974,11 @@ const Demographicdetails = ({ patientId }) => {
                                 <Row>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className='mb-0' >State</Form.Label>
-                                            <Form.Select
-                                                {...register('employerStateName')}
-                                                onChange={(e) => handleStateSelection(e, 'employer')}
-                                            >
-                                                <option value=' ' hidden>State</option>
-                                                {statesData?.states?.map((data) => (
-                                                    <option
-                                                        key={data?.name}
-                                                        data-key={data?.id}
-                                                        value={data?.state_code}
-                                                    >
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.employerStateName && <span className="text-danger">{errors.employerStateName.message}</span>}
-                                        </Form.Group>
-
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>City</Form.Label>
-                                            <Form.Select
-                                                disabled={store?.getCitiesReducer?.loading}
-                                                {...register('employerCity')}
-                                            >
-                                                <option value='' hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                {cities3?.map((data) => (
-                                                    <option key={data?.name} value={data?.name}>
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.employerCity && <span className="text-danger">{errors.employerCity.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Street</Form.Label>
+                                            <Form.Label className="mb-0">Postal Code </Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                {...register('employerStreet')}
-                                                placeholder="Street" />
-                                            {errors.employerStreet && <span className="text-danger">{errors.employerStreet.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Zip</Form.Label>
-                                            <Form.Control
-                                                type="text"
+                                                placeholder="Postal code"
+                                                maxLength={5}
                                                 {...register('employerZip', {
                                                     minLength: {
                                                         value: 5,
@@ -1189,10 +989,24 @@ const Demographicdetails = ({ patientId }) => {
                                                         message: 'ZIP code must contain numbers only',
                                                     },
                                                 })}
-                                                placeholder="Zip"
-                                                maxLength={5}
+                                                onKeyDown={(e) => {
+                                                    if (
+                                                        !/[0-9]/.test(e.key) &&
+                                                        ![
+                                                            'Backspace',
+                                                            'Tab',
+                                                            'ArrowLeft',
+                                                            'ArrowRight',
+                                                            'Delete',
+                                                        ].includes(e.key)
+                                                    ) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
-                                            {errors.employerZip && <span className="text-danger">{errors.employerZip.message}</span>}
+                                            {errors.employerZip && (
+                                                <span className="text-danger">{errors.employerZip.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                 </Row>
@@ -1200,16 +1014,31 @@ const Demographicdetails = ({ patientId }) => {
                         </Row>
                     </Col>
                 </Row>
-                <Row className="my-2">
-                    <Col className="d-flex justify-content-end">
-                        <Button className="custom-buttons btn-height" disabled={store?.updatePatientsReducer?.loading} type="submit">Save</Button>
+                <hr />
+                <Row>
+                    <Col sm={6}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Notes</Form.Label>
+                            <Form.Control type="text" placeholder="Enter Notes" {...register('notes')} />
+                            {errors.notes && <span className="text-danger">{errors.notes.message}</span>}
+                        </Form.Group>
                     </Col>
                 </Row>
-            </Form >
-
-        </div>
-
-
+            </div>
+            <div className="d-flex gap-2 align-items-end justify-content-end my-2">
+                <Button
+                    className="custom-buttons btn-height"
+                    disabled={store?.updatePatientsReducer?.loading}
+                    style={{ width: '70px' }}
+                    type="submit">
+                    {store?.updatePatientsReducer?.loading ? (
+                        <Spinner animation="border" variant="primary" size="sm" />
+                    ) : (
+                        'Update'
+                    )}
+                </Button>
+            </div>
+        </Form>
     );
 };
 

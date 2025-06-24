@@ -5,9 +5,10 @@ import { Button, Collapse, Modal } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { findAllParent, findMenuItem } from '../helpers/menu';
-import { logoutUser, resetAuth } from '../redux/actions';
+import { logoutUser } from '../redux/actions';
 import { useDispatch } from 'react-redux';
-import { APICore, setAuthorization } from '../helpers/api/apiCore';
+import logo from '../assets/images/logo.png';
+import logo_sm from '../assets/images/logo_sm.png';
 
 const MenuItemWithChildren = ({ item, linkClassName, subMenuClassNames, activeMenuItems, toggleMenu }) => {
     const [open, setOpen] = useState(activeMenuItems.includes(item.key));
@@ -91,33 +92,31 @@ const MenuItem = ({ item, className, linkClassName }) => {
 };
 
 const MenuItemLink = ({ item, className }) => {
-    const api = new APICore();
-
-    const [show, setShow] = useState(false)
-    const handleCheckLogout = (data) => {
-        if (data === 'Logout') {
-            setShow(true);
-        }
-
-    }
+    const [show, setShow] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handleLogout = () => {
-        dispatch(logoutUser())
-        navigate('account/logout')
-        // api.setLoggedInUser(null);
-        // setAuthorization(null);
-    }
+        dispatch(logoutUser());
+        navigate('account/logout');
+    };
+
     const closeModal = () => {
-       window.location.reload();
-    }
+        setShow(false);
+    };
+
+    const handleClick = (e) => {
+        if (item.label === 'Logout') {
+            e.preventDefault(); // prevent navigation
+            setShow(true);
+        }
+    };
+
     return (
         <Link
             to={{ pathname: item.url }}
             target={item.target}
             className={classNames('side-nav-link-ref', 'side-sub-nav-link', className)}
-            onClick={() => handleCheckLogout(item.label)}
             data-menu-key={item.key}>
             {item.icon && <i className={item.icon}></i>}
             {item.badge && (
@@ -129,25 +128,7 @@ const MenuItemLink = ({ item, className }) => {
                 </span>
             )}
             <span> {item.label} </span>
-            <Modal centered show={show} onHide={closeModal}>
-                <Modal.Body>
-                    <div className="p-4" style={{ maxWidth: '500px', width: '100%' }}>
-                        <div className="card-body text-center">
-                            <h4 className="card-title">Are you sure you want to logout!</h4>
-                            <div className="d-flex justify-content-center gap-3">
-                                <Button className="cancel-button" onClick={closeModal}>
-                                    Cancel
-                                </Button>
-                                <Button type="button" className="custom-buttons " onClick={handleLogout}>
-                                    Logout
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
         </Link>
-
     );
 };
 
@@ -159,15 +140,15 @@ type AppMenuProps = {
     menuItems: Array<any>,
 };
 
-const AppMenu = ({ menuItems }: AppMenuProps): React$Element<React$FragmentType> => {
+const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$FragmentType> => {
     let location = useLocation();
     const menuRef = useRef(null);
-
+    const navigate = useNavigate();
     const [activeMenuItems, setActiveMenuItems] = useState([]);
 
     /*
-    * toggle the menus
-    */
+     * toggle the menus
+     */
     const toggleMenu = (menuItem, show) => {
         if (show && menuItem.key !== 'logout') {
             setActiveMenuItems([menuItem['key'], ...findAllParent(menuItems, menuItem)]);
@@ -207,40 +188,59 @@ const AppMenu = ({ menuItems }: AppMenuProps): React$Element<React$FragmentType>
     return (
         <>
             <ul className="side-nav" ref={menuRef} id="main-side-menu">
-                {(menuItems || []).map((item, idx) => {
-                    return (
-                        <React.Fragment key={idx}>
-                            {item.isTitle ? (
-                                <li className="side-nav-title side-nav-item">{item.label}</li>
-                            ) : (
-                                <>
-                                    {item.children ? (
-                                        <MenuItemWithChildren
-                                            item={item}
-                                            toggleMenu={toggleMenu}
-                                            subMenuClassNames="side-nav-second-level"
-                                            activeMenuItems={activeMenuItems}
-                                            linkClassName="side-nav-link"
-                                        />
-                                    ) : (
-                                        <MenuItem
-                                            item={item}
-                                            linkClassName={classNames('side-nav-link', {
-                                                'menuitem-active':
-                                                    activeMenuItems.includes(item.key) && item.key !== 'logout',
-                                            })}
-                                            className={activeMenuItems.includes(item.key) && item.key !== 'logout' ? 'menuitem-active' : ''}
-                                        />
-                                    )}
-                                </>
-                            )}
-                        </React.Fragment>
-                    );
-                })}
+                <li className="text-center navbar-nav mb-2 py-3" style={{ top: 0 }}>
+                    {isCondensed === true ? (
+                        <img
+                            src={logo_sm}
+                            alt=""
+                            height="25"
+                            className="logo-condensed px-2"
+                            onClick={() => navigate('/apps/patients/list')}
+                        />
+                    ) : (
+                        <img src={logo} alt="" height="25" className="logo-full px-4" onClick={() => navigate('/apps/patients/list')} />
+                    )}
+                </li>
+                <div className={!isCondensed ? 'scroll-container' : ''} style={{ height: '73vh' }}>
+                    {' '}
+                    {(menuItems || []).map((item, idx) => {
+                        return (
+                            <React.Fragment key={idx}>
+                                {item.isTitle ? (
+                                    <li className="side-nav-title side-nav-item">{item.label}</li>
+                                ) : (
+                                    <>
+                                        {item.children ? (
+                                            <MenuItemWithChildren
+                                                item={item}
+                                                toggleMenu={toggleMenu}
+                                                subMenuClassNames="side-nav-second-level"
+                                                activeMenuItems={activeMenuItems}
+                                                linkClassName="side-nav-link"
+                                            />
+                                        ) : (
+                                            <MenuItem
+                                                item={item}
+                                                linkClassName={classNames('side-nav-link', {
+                                                    'menuitem-active':
+                                                        activeMenuItems.includes(item.key) && item.key !== 'logout',
+                                                })}
+                                                className={
+                                                    activeMenuItems.includes(item.key) && item.key !== 'logout'
+                                                        ? 'menuitem-active'
+                                                        : ''
+                                                }
+                                            />
+                                        )}
+                                    </>
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
+                </div>
             </ul>
         </>
     );
 };
-
 
 export default AppMenu;

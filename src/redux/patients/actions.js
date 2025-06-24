@@ -64,3 +64,29 @@ export const updateInsuranceAction = (data): AuthAction => ({
 export const resetUpdateAction = (): LayoutAction => ({
     type: PatientsActionTypes.RESET_UPDATE_STATUS,
 });
+
+// UPLOAD DOCUMENTS
+export const uploadPatientDocumentsAction = (data): AuthAction => ({
+    type: PatientsActionTypes.UPLOAD_DOCUMENTS,
+    data
+});
+
+export const updatePatientDocumentsAction = (data): AuthAction => ({
+    type: PatientsActionTypes.UPDATE_DOCUMENTS,
+    data
+});
+
+export const deletePatientDocumentsAction = (data): AuthAction => ({
+    type: PatientsActionTypes.DELETE_DOCUMENTS,
+    data
+});
+
+export const getDocumentsAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_DOCUMENTS,
+    data
+});
+
+export const getDocumentByIdAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_DOCUMENTS_BY_ID,
+    data
+});

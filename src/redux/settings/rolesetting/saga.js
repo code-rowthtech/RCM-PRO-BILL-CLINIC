@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { RoleActionTypes } from './constants';
 import { decryptMessage } from '../../../cryptoUtils';
 import ToastHandle from '../../../helpers/ToastMessage';
@@ -19,11 +19,15 @@ function* createRoleDataFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
-            ToastHandle(decryptedData.message,'success')
+            ToastHandle(decryptedData.message, 'success')
 
             yield put({
                 type: RoleActionTypes.CREATE_ROLE_DATA_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: RoleActionTypes.CREATE_ROLE_DATA_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -78,11 +82,15 @@ function* updateRoleDataFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
-            ToastHandle(decryptedData.message,'success')
+            ToastHandle(decryptedData.message, 'success')
 
             yield put({
                 type: RoleActionTypes.UPDATE_ROLE_DATA_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: RoleActionTypes.UPDATE_ROLE_DATA_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -91,7 +99,7 @@ function* updateRoleDataFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error,'danger')
+        ToastHandle(error, 'danger')
         yield put({
             type: RoleActionTypes.UPDATE_ROLE_DATA_ERROR,
             payload: error,

@@ -38,14 +38,21 @@ export const createVitalsReducer = (state = CREATE_VITALS_DATA_INITIAL_STATE, ac
                 data: action.payload,
                 loading: false
             }
+        case VitalsActionTypes.CREATE_VITALS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case VitalsActionTypes.CREATE_VITALS_ERROR:
             return {
-                data: action.payload,
+                data: action?.payload,
                 loading: false,
-            }
-        default: return state
+            };
+        default:
+            return { ...state };
     }
-}
+};
+
 
 export const updateVitalsReducer = (state = UPDATE_VITALS_DATA_INITIAL_STATE, action) => {
     switch (action.type) {
