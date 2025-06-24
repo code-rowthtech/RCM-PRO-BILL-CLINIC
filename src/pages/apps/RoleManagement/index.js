@@ -258,13 +258,10 @@ const RoleManagement = () => {
                                                     </td>
                                                     <td className=" " style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <div className="d-flex gap-2">
-                                                            <FiEdit
-                                                                className="fs-4 cursor-pointer"
-                                                                onClick={() => {
+                                                            <i className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-secondary"   onClick={() => {
                                                                     setDataToEdit(data);
                                                                     setAddDepartmentModal(true);
-                                                                }}
-                                                            />
+                                                                }}></i>
                                                         </div>
                                                     </td>
                                                 </tr>
