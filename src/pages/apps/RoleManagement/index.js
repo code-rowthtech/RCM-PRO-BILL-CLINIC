@@ -189,7 +189,7 @@ const RoleManagement = () => {
                                 <Table
                                     responsive
                                     className="table-centered table-nowrap mb-0  rounded"
-                                    style={{ height: roleData?.length === 0 ? '100vh' : 'auto' }}>
+                                    style={{ height: roleData?.length === 0 ? '40vh' : 'auto' }}>
                                     <thead className="text-white">
                                         <tr>
                                             <th className="text-white" style={{ fontSize: '13px' }}>

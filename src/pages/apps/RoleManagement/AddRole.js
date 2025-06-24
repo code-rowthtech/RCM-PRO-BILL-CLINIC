@@ -156,6 +156,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
         } else {
             dispatch(createRolesAction({ key: `${encryptMessage(data)}` }));
         }
+        console.log('Form submitted with data:', data);
     };
 
     const [showModal, setShowModal] = useState(false);
@@ -604,7 +605,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 size="sm"
                                                 role="status"
                                                 aria-hidden="true"
-                                                className="me-2"
                                             />
                                         </>
                                     ) : (
