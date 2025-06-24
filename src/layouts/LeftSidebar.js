@@ -351,7 +351,7 @@ const LeftSidebar = ({
                             <ul style={{ listStyle: 'none' }} className="px-0">
                                 <li className="text-center  py-3 ">
                                     <img
-                                        onClick={() => navigate('/')}
+                                        onClick={() => navigate('/apps/patients/list')}
                                         className="cursor-pointer"
                                         src={logo}
                                         alt=""
@@ -626,7 +626,7 @@ const LeftSidebar = ({
                                 <li className="text-center py-3 ">
                                     <img
                                         className="cursor-pointer"
-                                        onClick={() => navigate('/')}
+                                        onClick={() => navigate('/apps/patients/lis')}
                                         src={logo_sm}
                                         alt=""
                                         height="30"
