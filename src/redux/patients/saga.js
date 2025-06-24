@@ -120,6 +120,10 @@ function* createPatientsFunction(data) {
                 type: PatientsActionTypes.CREATE_PATIENTS_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: PatientsActionTypes.CREATE_PATIENTS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: PatientsActionTypes.CREATE_PATIENTS_ERROR,
@@ -149,9 +153,9 @@ function* createResponsiblePartyFunction(data) {
                 type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_SUCCESS,
                 payload: { ...decryptedData },
             });
-              yield put({
+            yield put({
                 type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_RESET,
-                payload: { ...decryptedData },
+                payload: {},
             });
         } else {
             yield put({
@@ -182,10 +186,10 @@ function* updateResponsiblePartyFunction(data) {
                 type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_SUCCESS,
                 payload: { ...decryptedData },
             });
-             yield put({
+            yield put({
                 type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_RESET,
-                payload: { ...decryptedData },
-            }); 
+                payload: {},
+            });
         } else {
             yield put({
                 type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_ERROR,
@@ -243,7 +247,7 @@ function* updatePatientsFunction(data) {
             });
             yield put({
                 type: PatientsActionTypes.UPDATE_PATIENTS_RESET,
-                payload: { ...decryptedData },
+                payload: {},
             });
         } else {
             yield put({
@@ -274,6 +278,10 @@ function* updateInsuranceFunction(data) {
                 type: PatientsActionTypes.UPDATE_INSURANCE_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: PatientsActionTypes.UPDATE_INSURANCE_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: PatientsActionTypes.UPDATE_INSURANCE_ERROR,
@@ -303,6 +311,10 @@ function* createInsuranceFunction(data) {
             yield put({
                 type: PatientsActionTypes.CREATE_INSURANCE_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: PatientsActionTypes.CREATE_INSURANCE_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -500,12 +512,12 @@ function* getDocumentsByIdFunction(data) {
     }
 }
 
-export function* callResetUpdate() {
-    put({
-        type: PatientsActionTypes.RESET_UPDATE_STATUS,
-        payload: {},
-    });
-}
+// export function* callResetUpdate() {
+//     put({
+//         type: PatientsActionTypes.RESET_UPDATE_STATUS,
+//         payload: {},
+//     });
+// }
 
 export function* watchGetPatients() {
     yield takeEvery(PatientsActionTypes.GET_PATIENTS, getPatientsFunction);
@@ -569,9 +581,9 @@ export function* watchGetDocumentById() {
     yield takeEvery(PatientsActionTypes.GET_DOCUMENTS_BY_ID, getDocumentsByIdFunction);
 }
 
-export function* watchresetState() {
-    yield takeEvery(PatientsActionTypes.RESET_UPDATE_STATUS, callResetUpdate);
-}
+// export function* watchresetState() {
+//     yield takeEvery(PatientsActionTypes.RESET_UPDATE_STATUS, callResetUpdate);
+// }
 
 function* patientsSaga() {
     yield all([
@@ -591,7 +603,7 @@ function* patientsSaga() {
         fork(watchGetDocuments),
         fork(watchDeleteDocuments),
         fork(watchGetDocumentById),
-        fork(watchresetState),
+        // fork(watchresetState),
     ]);
 }
 export default patientsSaga;

@@ -70,11 +70,6 @@ export const getDoctorsRolesReducer = (state = GET_DOCTORS_ROLES_INITIAL_STATE, 
                 data: action.payload,
                 loading: false
             }
-        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
         default: return state
     }
 }
@@ -101,7 +96,7 @@ export const createtDoctorsReducer = (state = CREATE_DOCTORS_INITIAL_STATE, acti
                 data: action.payload,
                 loading: false
             }
-        default: return state
+        default: return { ...state }
     }
 }
 export const getDoctorDetailsReducer = (state = GET_DOCTORS_DETAILS_INITIAL_STATE, action) => {
@@ -121,11 +116,6 @@ export const getDoctorDetailsReducer = (state = GET_DOCTORS_DETAILS_INITIAL_STAT
                 data: action.payload,
                 loading: false
             }
-        // case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-        //     return {
-        //         data: [],
-        //         loading: false
-        //     }
         default: return state
     }
 }
@@ -152,7 +142,7 @@ export const createtDoctorsDetailReducer = (state = CREATE_DOCTOR_DETAILS_INITIA
                 data: action.payload,
                 loading: false
             }
-        default: return state
+        default: return { ...state }
     }
 }
 
@@ -168,7 +158,7 @@ export const addReferringDoctorReducer = (state = ADD_REFERRING_DOCTOR_DETAILS_I
                 data: action.payload,
                 loading: false
             }
-            case DoctorsActionTypes.ADD_REFERRING_DOCTOR_RESET:
+        case DoctorsActionTypes.ADD_REFERRING_DOCTOR_RESET:
             return {
                 data: [],
                 loading: false,
@@ -178,6 +168,6 @@ export const addReferringDoctorReducer = (state = ADD_REFERRING_DOCTOR_DETAILS_I
                 data: action.payload,
                 loading: false
             }
-        default: return state
+        default: return { ...state }
     }
 }

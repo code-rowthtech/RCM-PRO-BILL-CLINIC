@@ -244,9 +244,9 @@ const TemplatesPage = () => {
                                                     <i
                                                         onClick={() => openEditModal(template)}
                                                         className="mdi mdi-square-edit-outline me-1 cursor-pointer fs-4"></i>
-                                                    <i
+                                                    {/* <i
                                                         style={{ cursor: 'not-allowed' }}
-                                                        className="bi bi-trash text-danger me-1 fs-5"></i>
+                                                        className="bi bi-trash text-danger me-1 fs-5"></i> */}
                                                 </td>
                                             </tr>
                                         ))

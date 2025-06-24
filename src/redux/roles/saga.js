@@ -192,13 +192,13 @@ function* getUserFunction(data) {
     }
 }
 
-export function* callStateEmpty() {
-    put({
-        type: RolesActionTypes.STATE_EMPTY_INTIAL_STATE,
-        payload: {},
-    });
+// export function* callStateEmpty() {
+//     put({
+//         type: RolesActionTypes.STATE_EMPTY_INTIAL_STATE,
+//         payload: {},
+//     });
 
-}
+// }
 
 export function* watchCreateRoles() {
     yield takeEvery(RolesActionTypes.CREATE_ROLES, createRolesFunction);
@@ -217,16 +217,16 @@ export function* watchGetRoles() {
 export function* watchDeleteRoles() {
     yield takeEvery(RolesActionTypes.DELETE_ROLES, deleteRolesFunction);
 }
-export function* watchresetState() {
-    yield takeEvery(RolesActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
-}
+// export function* watchresetState() {
+//     yield takeEvery(RolesActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
+// }
 export function* watchGetUser() {
     yield takeEvery(RolesActionTypes.GET_USER, getUserFunction);
 }
 
 function* rolesSaga() {
     yield all([
-        fork(watchCreateRoles), fork(watchUpdateRoles), fork(watchGetRoles), fork(watchresetState), fork(watchGetUser), fork(watchDeleteRoles), fork(watchViewPassword)
+        fork(watchCreateRoles), fork(watchUpdateRoles), fork(watchGetRoles), fork(watchGetUser), fork(watchDeleteRoles), fork(watchViewPassword)
     ]);
 }
 export default rolesSaga;
