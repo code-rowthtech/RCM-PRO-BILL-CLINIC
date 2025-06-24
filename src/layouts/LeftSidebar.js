@@ -626,7 +626,7 @@ const LeftSidebar = ({
                                 <li className="text-center py-3 ">
                                     <img
                                         className="cursor-pointer"
-                                        onClick={() => navigate('/apps/patients/lis')}
+                                        onClick={() => navigate('/apps/patients/list')}
                                         src={logo_sm}
                                         alt=""
                                         height="30"
