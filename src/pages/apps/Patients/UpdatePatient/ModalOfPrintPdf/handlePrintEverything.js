@@ -453,8 +453,7 @@ width: 100%;
             <img src=${loggedInUser?.logo?.split('?')[0]}/>
                 <h1>Patient Summary</h1>
             </div>
-${printData?.toBePrinted?.some((data) => data === 'Patient Details') ?
-            ` <div class="patient-info">
+             <div class="patient-info">
                 <h2>Patient Information</h2>
                 <div class="patient-details">
                     <div class="detail-item">
@@ -482,10 +481,8 @@ ${printData?.toBePrinted?.some((data) => data === 'Patient Details') ?
                         <span class="detail-value">${addressString}</span>
                     </div>
                 </div>
-            </div>`
-            :
-            ''
-        }
+            </div>
+          
 
         ${printData?.toBePrinted?.some((data) => data === 'Responsible Party') ?
             ` <div class="patient-info">
@@ -837,26 +834,27 @@ ${printData?.toBePrinted?.some((data) => data === 'Patient Details') ?
         }
        
         ${printData?.toBePrinted?.some((data) => data === "Encounter") ?
-            ` <div class="patient-info">
-                   <h2>Encounter Data</h2>
+            printData?.encounterData?.map((dataEncounter, index) => (
+                ` <div class="patient-info">
+                   <h2>${index + 1}.</h2>
 
                 <div class="summary-headers">
                     <b class="detail-label">
-                     ${printData?.encounterData?.class?.coding?.[0]?.display || printData?.encounterData?.class?.text}
+                     ${dataEncounter?.class?.coding?.[0]?.display || dataEncounter?.class?.text}
                     </b>
                      <div class="detail-value">
                      <p>
-                     ${formatDate(printData?.encounterData?.period?.start)}
+                     ${formatDate(dataEncounter?.period?.start)}
                      </p>
-                     <p class="${statusClass(printData?.encounterData?.status?.toLowerCase())}">
-                     ${capitalizeFirst(printData?.encounterData?.status)}
+                     <p class="${statusClass(dataEncounter?.status?.toLowerCase())}">
+                     ${capitalizeFirst(dataEncounter?.status)}
                      </p>
                      </div>
              </div>
-             <p>Type: ${printData?.encounterData?.type?.[0]?.coding?.[0]?.display || printData?.encounterData?.type?.[0]?.text}</p>
+             <p>Type: ${dataEncounter?.type?.[0]?.coding?.[0]?.display || dataEncounter?.type?.[0]?.text}</p>
              <br/>
-             ${printData?.encounterData?.data?.map((encData, index) => (
-                `
+             ${dataEncounter?.data?.map((encData, index) => (
+                    `
                   <div class='patient-info'>
              <h2>${index + 1}. ${encData?.type}</h2>
              <div>
@@ -864,8 +862,9 @@ ${printData?.toBePrinted?.some((data) => data === 'Patient Details') ?
              </div>
              </div>
                 `
-            ))}
+                ))}
             </div > `
+            ))
             :
             ''
         }
