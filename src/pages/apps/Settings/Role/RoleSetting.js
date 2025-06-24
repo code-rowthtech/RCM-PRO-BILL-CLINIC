@@ -315,7 +315,7 @@ const RoleSetting = () => {
                                                                         setShowUpdateModal(true);
                                                                         setDataToUpdate(data);
                                                                     }}>
-                                                                    <i className="mdi mdi-square-edit-outline"></i>
+                                                                    <i className="mdi mdi-square-edit-outline fs-4 cursor-pointer"></i>
                                                                 </Link>
                                                                 {/* <i
                                                                     onClick={() => toggleRow(index)}

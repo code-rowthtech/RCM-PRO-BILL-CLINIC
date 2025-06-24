@@ -493,7 +493,10 @@ const NewPractice = () => {
                 identifierType: item.type,
                 use: item.use,
                 value: item.number,
-                ...(item?.file && { documents: { url: item.file.url, fileName: item.file.name || '' } }),
+                documents: item.file
+                    ? { url: item.file.url?.url, fileName: item?.file.url?.name || '' }
+                    : { url: item.file?.url, fileName: item?.file?.name || '' },
+                // ...(item?.file && { documents: { url: item.file.url, fileName: item.file.name || '' } }),
                 expirationDate: item.expiry,
                 status: 'active',
                 system: 'urn:oid:2.16.840.1.113883.4.7',
@@ -508,6 +511,7 @@ const NewPractice = () => {
         };
 
         dispatch(createSubClinicAction({ key: encryptMessage(newPayload) }));
+        console.log(newPayload, 'newPayload');
     };
 
     useEffect(() => {
@@ -683,6 +687,7 @@ const NewPractice = () => {
 
     const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
+    console.log(constantIdentifiers,'constantIdentifiers');
     const [constantContact, setConstantContact] = useState([]);
     const [name, setName] = useState({
         use: '',
@@ -1236,7 +1241,7 @@ const NewPractice = () => {
                                                                                   ? item.file.name.slice(0, 25) + '...'
                                                                                   : item.file.name
                                                                               : 'Upload Document'}
-                                                                              
+
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {(item?.file?.url ||
                                                                                 clinicsDataGet?.orgLogo?.url) && (

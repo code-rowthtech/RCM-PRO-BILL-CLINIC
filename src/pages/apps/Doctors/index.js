@@ -26,8 +26,8 @@ const Doctors = () => {
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.result);
     const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
     useEffect(() => {
-            dispatch(getDoctorsAction({ status: status, search: search, page: skip, limit: 10 }));
-    }, [dispatch, skip,status, search]);
+        dispatch(getDoctorsAction({ status: status, search: search, page: skip, limit: 10 }));
+    }, [dispatch, skip, status, search]);
 
     const closeStatusModal = () => setStatusModal(false); // Close status change modal
     const filteredDoctors = doctorDetails;
@@ -95,7 +95,7 @@ const Doctors = () => {
                                                 <FormInput
                                                     type="text"
                                                     value={search}
-                                                    placeholder='Search...'
+                                                    placeholder="Search..."
                                                     onChange={(e) => {
                                                         const currentValue = e.target.value;
                                                         setSearch(currentValue);
@@ -382,7 +382,7 @@ const Doctors = () => {
                                                                     <Link
                                                                         to={`/apps/providers/new-doctor?id=${data?._id}`}
                                                                         className="text-black cursor-pointer ps-2">
-                                                                        <FiEdit className="fs-4 cursor-pointer" />
+                                                                        <i className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-secondary"></i>
                                                                     </Link>
                                                                 </div>
                                                             </td>
