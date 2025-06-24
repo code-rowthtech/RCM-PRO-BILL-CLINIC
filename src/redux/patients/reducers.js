@@ -94,11 +94,6 @@ export const getPatientsReducer = (state = GET_PATIENTS_INITIAL_STATE, action) =
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
         default: return state
     }
 }
@@ -117,11 +112,6 @@ export const getPatientsByAppointmentReducer = (state = GET_PATIENTS_BY_APPOINTM
         case PatientsActionTypes.GET_PATIENTS_BY_APPOINTMENT_ERROR:
             return {
                 data: action.payload,
-                loading: false
-            }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false
             }
         default: return state
@@ -162,17 +152,17 @@ export const createPatientsReducer = (state = CREATE_PATIENTS_INITIAL_STATE, act
                 data: action.payload,
                 loading: false
             }
+        case PatientsActionTypes.CREATE_PATIENTS_RESET:
+            return {
+                data: [],
+                loading: false
+            }
         case PatientsActionTypes.CREATE_PATIENTS_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
-        default: return state
+        default: return { ...state }
     }
 }
 export const createResponsiblePartyReducer = (state = CREATE_RESPONSIBLE_PARTY_INITIAL_STATE, action) => {
@@ -187,18 +177,18 @@ export const createResponsiblePartyReducer = (state = CREATE_RESPONSIBLE_PARTY_I
                 data: action.payload,
                 loading: false
             }
-            case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_RESET:    
+        case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_RESET:
             return {
                 data: [],
                 loading: false
-                }
+            }
         case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-     
-        default: return state
+
+        default: return { ...state }
     }
 }
 
@@ -214,20 +204,17 @@ export const updateResponsiblePartyReducer = (state = UPDATE_RESPONSIBLE_PARTY_I
                 data: action.payload,
                 loading: false
             }
+        case PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_RESET:
+            return {
+                data: [],
+                loading: false
+            }
         case PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.RESET_UPDATE_STATUS:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    status: null, // or whatever the initial state should be
-                },
-            };
-        default: return state
+        default: return { ...state }
     }
 }
 
@@ -246,11 +233,6 @@ export const getResponsiblePartyReducer = (state = GET_RESPONSIBLE_PARTY_INITIAL
         case PatientsActionTypes.GET_RESPONSIBLE_PARTY_ERROR:
             return {
                 data: action.payload,
-                loading: false
-            }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false
             }
         default: return state
@@ -295,11 +277,11 @@ export const updatePatientsReducer = (state = UPDATE_PATIENTS_INITIAL_STATE, act
                 data: action.payload,
                 loading: false
             }
-            case PatientsActionTypes.UPDATE_PATIENTS_RESET:
+        case PatientsActionTypes.UPDATE_PATIENTS_RESET:
             return {
                 data: [],
                 loading: false
-                }
+            }
         case PatientsActionTypes.UPDATE_PATIENTS_ERROR:
             return {
                 data: action.payload,
@@ -321,17 +303,17 @@ export const createInsuranceReducer = (state = CREATE_INSURANCE_INITIAL_STATE, a
                 data: action.payload,
                 loading: false
             }
+        case PatientsActionTypes.CREATE_INSURANCE_RESET:
+            return {
+                data: [],
+                loading: false
+            }
         case PatientsActionTypes.CREATE_INSURANCE_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
-        default: return state
+        default: return { ...state }
     }
 }
 
@@ -352,11 +334,6 @@ export const getInsuranceByIdReducer = (state = GET_INSURANCE_BY_PATIENT_ID_INIT
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
         default: return state
     }
 }
@@ -373,20 +350,17 @@ export const updateInsuranceReducer = (state = UPDATE_INSURANCE_INITIAL_STATE, a
                 data: action.payload,
                 loading: false
             }
+        case PatientsActionTypes.UPDATE_INSURANCE_RESET:
+            return {
+                data: [],
+                loading: false
+            }
         case PatientsActionTypes.UPDATE_INSURANCE_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case PatientsActionTypes.RESET_UPDATE_STATUS:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    status: null, // or whatever the initial state should be
-                },
-            };
-        default: return state
+        default: return { ...state }
     }
 }
 

@@ -340,7 +340,7 @@ const Patients = () => {
                                                             <Link
                                                                 to={`/apps/patients/update-patient?id=${data?._id}`}
                                                                 className="action-icon">
-                                                                <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
+                                                                <i className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-secondary"></i>
                                                             </Link>
                                                         </td>
                                                     </tr>

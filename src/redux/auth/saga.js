@@ -158,14 +158,14 @@ function* verifyEmailFunction({ payload }) {
 }
 
 function* setChangePasswordChange({ payload }) {
-    const { oldPassword, token, newPassword } = payload;
-    const confirmpasswordPayload = {
-        newPassword: newPassword,
-        oldPassword: oldPassword,
-    }
-    // const encryptedNewPassword = {
-    //     key: encryptMessage(confirmpasswordPayload)
+    // const { oldPassword, newPassword } = payload;
+    // const confirmpasswordPayload = {
+    //     newPassword: newPassword,
+    //     oldPassword: oldPassword,
     // }
+    // // const encryptedNewPassword = {
+    // //     key: encryptMessage(confirmpasswordPayload)
+    // // }
 
     try {
         const response = yield call(confirmPasswordApi, payload);

@@ -42,12 +42,13 @@ const Demographicdetails = ({
         getValues,
     } = useForm();
     const [longitude, setLongitude] = useState(null);
+    console.log(gender,'gender')
     const [latitude, setLatitude] = useState(null);
     const [mailingLongitude, setMailingLongitude] = useState(null);
     const [mailingLatitude, setMailingLatitude] = useState(null);
     const [employerLongitude, setEmployerLongitude] = useState(null);
     const [demographicAddresses, setDemographicAddresses] = useState([
-        { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
     const [employerLatitude, setEmployerLatitude] = useState(null);
     const [focused, setFocused] = useState(false);
@@ -317,6 +318,43 @@ const Demographicdetails = ({
         setTri(selectedOption ? selectedOption.value : '');
     };
     const [identifiers, setIdentifiers] = useState([]);
+
+    // Autofill sex/gender-related fields if gender prop is provided
+    useEffect(() => {
+        if (gender) {
+            // Set Sex
+            const sexOption = sexAssignedAtBirthOptions?.find(opt => opt.value === gender || opt.label.toLowerCase() === gender.toLowerCase());
+            if (sexOption) setValue('sex', sexOption.value);
+            // Set Gender Identity
+            const genderIdOption = genderIdentityOptions?.find(opt => opt.show.toLowerCase() === gender.toLowerCase() || opt.value === gender);
+            if (genderIdOption) setValue('genderIdentity', genderIdOption.show);
+            // Set Sex Parameter for Clinical Use
+            let sexParamOption = null;
+            if (gender) {
+                // Try to match exact value or label (case-insensitive)
+                sexParamOption = sexParameterOptions?.find(opt =>
+                    (opt.value && opt.value.toLowerCase() === `${gender.toLowerCase()}-typical`) ||
+                    (opt.show && opt.show.toLowerCase() === `${gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase()}-typical`)
+                );
+                // Fallback: contains logic
+                if (!sexParamOption) {
+                    sexParamOption = sexParameterOptions?.find(opt =>
+                        (opt.value && opt.value.toLowerCase().includes(gender.toLowerCase())) ||
+                        (opt.show && opt.show.toLowerCase().includes(gender.toLowerCase()))
+                    );
+                }
+                if (sexParamOption) setValue('sexParameter', sexParamOption.show);
+            }
+            // Set Personal Pronouns
+            // Example: for male, set 'He/Him/His', for female, set 'She/Her', etc.
+            let pronoun = '';
+            if (gender.toLowerCase() === 'male') pronoun = 'He/Him';
+            else if (gender.toLowerCase() === 'female') pronoun = 'She/Her';
+            else if (gender.toLowerCase() === 'other') pronoun = 'They/Them';
+            else if (gender.toLowerCase() === 'unknown') pronoun = '';
+            if (pronoun) setValue('personalPronouns', pronoun);
+        }
+    }, [gender, setValue]);
 
     return (
         <>

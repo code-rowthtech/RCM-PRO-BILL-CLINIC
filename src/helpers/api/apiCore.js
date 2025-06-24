@@ -1,12 +1,12 @@
 import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 
-import config from '../../config';
+// import config from '../../config';
 import { decryptMessage, encryptMessage } from '../../cryptoUtils';
 
 // content type
 axios.defaults.headers.post['Content-Type'] = 'application/json';
-axios.defaults.baseURL = config.API_URL;
+axios.defaults.baseURL = process?.env?.REACT_APP_API_URL;
 axios.interceptors.response.use(
     (response) => {
         return response; // Directly return the response if successful

@@ -14,7 +14,7 @@ export function getNoteCategoriesApi(params: any): any {
 
 export function updateNoteCategoriesApi(params: any): any {
     const { data } = params;
-    return api.update(`${URL.updateNoteCategories}${data?.id}`,data);
+    return api.update(`${URL.updateNoteCategories}${data?.id}`, data);
 }
 
 export function createNoteTypeSettingsApi(params: any): any {
@@ -23,13 +23,12 @@ export function createNoteTypeSettingsApi(params: any): any {
 }
 
 export function getNoteTypeSettingsApi(params: any): any {
-    const { data } = params;
     return api.get(`${URL.getNoteCategories}`);
 }
 
 export function updateNoteTypeSettingsApi(params: any): any {
     const { data } = params;
-    return api.update(`${URL.updateNoteCategories}${data?.id}`,data);
+    return api.update(`${URL.updateNoteCategories}${data?.id}`, data);
 }
 
 // settings tabs
@@ -43,5 +42,5 @@ export function getSettingsTabsApi(params: any): any {
 }
 export function updateSettingsTabsApi(params: any): any {
     const { data } = params;
-    return api.update(`${URL.createnoteTypeSettings}`,data);
+    return api.update(`${URL.createnoteTypeSettings}`, data);
 }

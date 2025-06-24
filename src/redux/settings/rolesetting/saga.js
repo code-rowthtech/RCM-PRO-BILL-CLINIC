@@ -107,13 +107,13 @@ function* updateRoleDataFunction(data) {
     }
 }
 
-export function* callStateEmpty() {
-    put({
-        type: RoleActionTypes.STATE_EMPTY_INTIAL_STATE,
-        payload: {},
-    });
+// export function* callStateEmpty() {
+//     put({
+//         type: RoleActionTypes.STATE_EMPTY_INTIAL_STATE,
+//         payload: {},
+//     });
 
-}
+// }
 
 
 export function* watchCreateRoleData() {
@@ -129,16 +129,16 @@ export function* watchUpdateRoleData() {
 
 
 
-export function* watchresetState() {
-    yield takeEvery(RoleActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
-}
+// export function* watchresetState() {
+//     yield takeEvery(RoleActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
+// }
 
 function* settingsRoleSaga() {
     yield all([
         fork(watchCreateRoleData),
         fork(watchGetRoleData),
         fork(watchUpdateRoleData),
-        fork(watchresetState),
+        // fork(watchresetState),
     ]);
 }
 export default settingsRoleSaga;

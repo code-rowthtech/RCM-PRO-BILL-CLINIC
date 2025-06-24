@@ -61,9 +61,9 @@ export const updateInsuranceAction = (data): AuthAction => ({
     type: PatientsActionTypes.UPDATE_INSURANCE,
     data
 });
-export const resetUpdateAction = (): LayoutAction => ({
-    type: PatientsActionTypes.RESET_UPDATE_STATUS,
-});
+// export const resetUpdateAction = (): LayoutAction => ({
+//     type: PatientsActionTypes.RESET_UPDATE_STATUS,
+// });
 
 // UPLOAD DOCUMENTS
 export const uploadPatientDocumentsAction = (data): AuthAction => ({

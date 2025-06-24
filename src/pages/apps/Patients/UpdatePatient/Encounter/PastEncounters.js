@@ -19,7 +19,7 @@ const PastEncounters = ({ encounterTabs, setEncounterTabs, setActiveTab, setExpa
 
     return (
         <div className="container py-1">
-            {store?.getEncounterReducer?.loading ?
+            {store?.getPastEncounterReducer?.loading ?
                 <div className="row">
                     <div className="col-12 py-3 d-flex align-items-center justify-content-center">
                         <Spinner />

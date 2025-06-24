@@ -173,7 +173,7 @@ function* addReferringDoctorFunction(data) {
                 type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_SUCCESS,
                 payload: { ...decryptedData },
             });
-              yield put({
+            yield put({
                 type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_RESET,
                 payload: { ...decryptedData },
             });
@@ -192,13 +192,13 @@ function* addReferringDoctorFunction(data) {
     }
 }
 
-export function* callStateEmpty() {
-    put({
-        type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
-        payload: {},
-    });
+// export function* callStateEmpty() {
+//     put({
+//         type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
+//         payload: {},
+//     });
 
-}
+// }
 
 
 export function* watchGetDoctors() {
@@ -221,9 +221,9 @@ export function* watchGetDoctorDetails() {
     yield takeEvery(DoctorsActionTypes.GET_DOCTORS_DETAILS, getDoctorDetailsFunction);
 }
 
-export function* watchresetState() {
-    yield takeEvery(DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
-}
+// export function* watchresetState() {
+//     yield takeEvery(DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
+// }
 
 export function* watchAddReferringDoctor() {
     yield takeEvery(DoctorsActionTypes.ADD_REFERRING_DOCTOR, addReferringDoctorFunction);
@@ -232,7 +232,7 @@ export function* watchAddReferringDoctor() {
 function* doctorsSaga() {
     yield all([
         fork(watchGetDoctors),
-        fork(watchresetState),
+        // fork(watchresetState),
         fork(watchCreateDoctors),
         fork(watchGetDoctorsRoles),
         fork(watchCreateDoctorsDeatil),

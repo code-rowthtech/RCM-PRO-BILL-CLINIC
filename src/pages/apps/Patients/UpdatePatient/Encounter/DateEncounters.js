@@ -17,6 +17,7 @@ import PastEncounters from './PastEncounters';
 import { string } from 'prop-types';
 import { Controller } from 'react-hook-form';
 import ToastHandle from '../../../../../helpers/ToastMessage';
+import ChangeNoteTypeModal from './ChangeNoteTypeModal';
 
 const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType,
     isAccordionOpen, encounterAction, encounterId,
@@ -138,17 +139,32 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     };
 
     // Apply template values to form
+    // useEffect(() => {
+    //     if (!selectedFromList) return;
+    //     console.log(selectedFromList, 'selectedFromList')
+    //     setTimeout(() => {
+    //         ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach((section) => {
+    //             if (selectedFromList?.[section]) {
+    //                 setValue(section, selectedFromList[section]);
+    //             }
+    //         });
+    //     }, 0);
+    // }, [selectedFromList, setValue]);
     useEffect(() => {
         if (!selectedFromList) return;
 
         setTimeout(() => {
-            ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach((section) => {
+            ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach((section) => {
+
+                const fieldName = section === 'Care Plan' ? 'CarePlan' : section;
                 if (selectedFromList?.[section]) {
-                    setValue(section, selectedFromList[section]);
+                    document.getElementById(section === 'Care Plan' ? 'CarePlan' : section)?.scrollIntoView({ behavior: 'smooth' });
+                    setValue(fieldName, selectedFromList[section]);
                 }
             });
         }, 0);
     }, [selectedFromList, setValue]);
+
 
 
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
@@ -231,7 +247,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
                         <h5>{name}</h5>
                         {['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].map(section => (
-                            <Form.Group className="mb-2" key={section}>
+                            <Form.Group className="mb-2" key={section} id={section}>
                                 <Form.Label className="mb-1 d-flex justify-content-between align-items-center gap-2">
                                     <div className='col-10 d-flex align-items-center gap-1'>
                                         <span>{section === 'CarePlan' ? 'Care Plan' : section}</span>
@@ -472,6 +488,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
             } else {
                 dispatch(createEncounterAction({ key: encryptMessage(payload) }));
+                // dispatch(createEncounterAction(payload));
             }
         }
 
@@ -479,6 +496,16 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
     const [isSessionRunning, setIsSessionRunning] = useState(false);
     const [stopwatchTime, setStopwatchTime] = useState(0);
+    const [notesTypeModal, setNotesTypeModal] = useState(false);
+    const [selectedNoteType, setSelectedNoteType] = useState(null);
+
+    const closeNoteTypeModal = () => {
+        setNotesTypeModal(false);
+    }
+    const confirmSelection = () => {
+        setNoteType(selectedNoteType?.value);
+        handleNotesTypeChange?.(selectedNoteType);
+    }
     const intervalRef = useRef(null);
 
     const Stopwatch = React.memo(({ isRunning, time, onToggle }) => {
@@ -651,8 +678,12 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                             placeholder="Select"
                                             value={notesTypeOptions?.find(option => option?.value === noteType) || null}
                                             onChange={(selected) => {
-                                                setNoteType(selected?.value);
-                                                handleNotesTypeChange?.(selected);
+                                                if (selected) {
+                                                    setNotesTypeModal(true);
+                                                    setSelectedNoteType(selected);
+                                                }
+                                                // setNoteType(selected?.value);
+                                                // handleNotesTypeChange?.(selected);
                                             }}
                                             inputValue={searchNoteType}
                                             onInputChange={(value) => setSearchNoteType(value)}
@@ -674,6 +705,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                             }}
                                         />
                                     </Form.Group>
+                                    <ChangeNoteTypeModal showModal={notesTypeModal} closeModal={closeNoteTypeModal} onConfirm={confirmSelection} />
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
@@ -788,11 +820,19 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                     </Form.Group>
                                 </Col>
                             </Row>
-                            <NoteFormFields
-                                selectedFromList={selectedFromList}
-                                data={notesFields}
-                                control={control}
-                            />
+                            {store?.getEncounterNotesFieldsReducer?.loading ?
+                                <div className="row">
+                                    <div style={{ height: '35vh' }} className="col-12 d-flex align-items-center justify-content-center">
+                                        <Spinner />
+                                    </div>
+                                </div>
+                                :
+                                <NoteFormFields
+                                    selectedFromList={selectedFromList}
+                                    data={notesFields}
+                                    control={control}
+                                />
+                            }
                             <div className="row">
                                 <div className="col-12 d-flex justify-content-end gap-2 py-2">
                                     {/* <Stopwatch

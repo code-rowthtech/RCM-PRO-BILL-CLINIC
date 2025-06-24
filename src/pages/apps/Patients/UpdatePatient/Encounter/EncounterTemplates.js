@@ -7,9 +7,10 @@ import { Badge } from 'react-bootstrap';
 import { IoSearchSharp } from 'react-icons/io5';
 import { FormInput } from '../../../../../components';
 import { getTemplateAction } from '../../../../../redux/actions';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import TemplateModal from '../../../NotesAndTemplates/Modals/TemplateModal';
+import { Link } from 'react-router-dom';
 
 const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
     const store = useSelector((state) => state);
@@ -25,7 +26,11 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
         setShowModal(false);
         setTemplateToEdit(null);
     }
-
+    useEffect(() => {
+        if (!templatesData?.length) {
+            dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
+        }
+    }, []);
     return (
         <Row className=' position-relative'>
             {selectedTemplate ?

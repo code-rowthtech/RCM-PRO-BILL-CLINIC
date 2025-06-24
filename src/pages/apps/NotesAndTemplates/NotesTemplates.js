@@ -97,14 +97,14 @@ const TemplatesPage = () => {
                                             }`}>
                                         Inactive
                                     </Button>
-                                    <Button
+                                    {/* <Button
                                         onClick={() => setActiveStatus('archive')}
                                         className={` active_inactive_buttons text-nowrap ${activeStatus === 'archive'
                                             ? ' text-white py-'
                                             : 'bg-white border-primary text-dark py-'
                                             }`}>
                                         Archived
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </Col>
                             <Col sm={6} className="text-end mt-md-0 mt-2 mt-sm-0">
@@ -182,15 +182,15 @@ const TemplatesPage = () => {
                             </div>
                         ) : (
                             <Table responsive className="table-centered table-nowrap mb-0 rounded">
-                                <thead className="table-light">
+                                <thead className="">
                                     <tr>
-                                        <th className="text-white">Title</th>
-                                        <th className="text-white">Note Type</th>
-                                        <th className="text-white">Category</th>
-                                        <th className="text-white">Related Practices</th>
-                                        <th className="text-white">Status</th>
-                                        <th className="text-white">Last Used</th>
-                                        <th className="text-white">Actions</th>
+                                        <th>Title</th>
+                                        <th>Note Type</th>
+                                        <th>Category</th>
+                                        <th>Related Practices</th>
+                                        <th>Status</th>
+                                        <th>Last Used</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -244,9 +244,9 @@ const TemplatesPage = () => {
                                                     <i
                                                         onClick={() => openEditModal(template)}
                                                         className="mdi mdi-square-edit-outline me-1 cursor-pointer fs-4"></i>
-                                                    <i
+                                                    {/* <i
                                                         style={{ cursor: 'not-allowed' }}
-                                                        className="bi bi-trash text-danger me-1 fs-5"></i>
+                                                        className="bi bi-trash text-danger me-1 fs-5"></i> */}
                                                 </td>
                                             </tr>
                                         ))

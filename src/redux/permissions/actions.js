@@ -21,7 +21,7 @@ export const updatePermissionAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydActionPermission = (): LayoutAction => ({
-    type: PermissionsActionTypes.STATE_EMPTY_INTIAL_STATE,
+// export const stateEmptydActionPermission = (): LayoutAction => ({
+//     type: PermissionsActionTypes.STATE_EMPTY_INTIAL_STATE,
 
-});
+// });

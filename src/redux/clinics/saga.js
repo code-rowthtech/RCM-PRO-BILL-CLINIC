@@ -4,7 +4,6 @@ import {
     createClinicApi,
     getClinicApi,
     getClinicByIdApi,
-    updateClinicApi,
     getStateByCountry,
     getCityByStateApi,
     addSubscriptionPlanApi,

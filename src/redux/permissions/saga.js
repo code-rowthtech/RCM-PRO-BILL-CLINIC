@@ -23,6 +23,10 @@ function* addPermissionsFunction(data) {
                 type: PermissionsActionTypes.CREATE_PERMISSIONS_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: PermissionsActionTypes.CREATE_PERMISSIONS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: PermissionsActionTypes.CREATE_PERMISSIONS_ERROR,
@@ -78,6 +82,10 @@ function* deletePermissionsFunction(data) {
                 type: PermissionsActionTypes.DELETE_PERMISSIONS_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: PermissionsActionTypes.DELETE_PERMISSIONS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: PermissionsActionTypes.DELETE_PERMISSIONS_ERROR,
@@ -105,6 +113,10 @@ function* updatePermissionsFunction(data) {
                 type: PermissionsActionTypes.UPDATE_PERMISSIONS_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: PermissionsActionTypes.UPDATE_PERMISSIONS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: PermissionsActionTypes.UPDATE_PERMISSIONS_ERROR,
@@ -119,13 +131,13 @@ function* updatePermissionsFunction(data) {
     }
 }
 
-export function* callStateEmpty() {
-    put({
-        type: PermissionsActionTypes.STATE_EMPTY_INTIAL_STATE,
-        payload: {},
-    });
+// export function* callStateEmpty() {
+//     put({
+//         type: PermissionsActionTypes.STATE_EMPTY_INTIAL_STATE,
+//         payload: {},
+//     });
 
-}
+// }
 
 
 export function* watchpermissionsDataCreate() {
@@ -140,9 +152,9 @@ export function* watchpermissionsDataDelete() {
 export function* watchpermissionsDataUpdate() {
     yield takeEvery(PermissionsActionTypes.UPDATE_PERMISSIONS, updatePermissionsFunction);
 }
-export function* watchresetState() {
-    yield takeEvery(PermissionsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
-}
+// export function* watchresetState() {
+//     yield takeEvery(PermissionsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
+// }
 
 function* permissionsSaga() {
     yield all([
@@ -150,7 +162,7 @@ function* permissionsSaga() {
         fork(watchpermissionsDataGet),
         fork(watchpermissionsDataDelete),
         fork(watchpermissionsDataUpdate),
-        fork(watchresetState),
+        // fork(watchresetState),
     ]);
 }
 export default permissionsSaga;
