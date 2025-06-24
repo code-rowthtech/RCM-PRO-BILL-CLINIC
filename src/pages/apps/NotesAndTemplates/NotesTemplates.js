@@ -182,15 +182,15 @@ const TemplatesPage = () => {
                             </div>
                         ) : (
                             <Table responsive className="table-centered table-nowrap mb-0 rounded">
-                                <thead className="table-light">
+                                <thead className="">
                                     <tr>
-                                        <th className="text-white">Title</th>
-                                        <th className="text-white">Note Type</th>
-                                        <th className="text-white">Category</th>
-                                        <th className="text-white">Related Practices</th>
-                                        <th className="text-white">Status</th>
-                                        <th className="text-white">Last Used</th>
-                                        <th className="text-white">Actions</th>
+                                        <th>Title</th>
+                                        <th>Note Type</th>
+                                        <th>Category</th>
+                                        <th>Related Practices</th>
+                                        <th>Status</th>
+                                        <th>Last Used</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>

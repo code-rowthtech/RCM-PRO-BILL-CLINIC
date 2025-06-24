@@ -129,10 +129,10 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
         <Modal className='templateModal' show={show} onHide={() => {
             onHide();
             reset();
-            setTags([])
+            setTags([]);
         }} size="xl" centered backdrop="static">
             <Modal.Header className="p-0 pb-0 d-flex justify-content-center">
-                <Modal.Title className="fw-semibold ">
+                <Modal.Title className="fw-semibold py-1 ">
                     {template?._id ? 'Update' : "Create"} Template
                 </Modal.Title>
             </Modal.Header>

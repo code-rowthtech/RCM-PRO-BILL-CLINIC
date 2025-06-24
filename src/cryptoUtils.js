@@ -15,7 +15,6 @@ export function encryptMessage(text) {
 
 // Function to decrypt a message
 export function decryptMessage(encryptedText) {
-
     const decipher = new nodeRSA(privateKey, "pkcs1");
     const decrypted = decipher.decrypt(encryptedText, "utf8");
     return decrypted;

@@ -307,16 +307,12 @@ const RoleSetting = () => {
                                                             </td>
                                                             <td
                                                                 className="py-1"
-                                                                style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                <Link
-                                                                    to="#"
-                                                                    className="action-icon"
-                                                                    onClick={() => {
-                                                                        setShowUpdateModal(true);
-                                                                        setDataToUpdate(data);
-                                                                    }}>
-                                                                    <i className="mdi mdi-square-edit-outline"></i>
-                                                                </Link>
+                                                            >
+
+                                                                <i onClick={() => {
+                                                                    setShowUpdateModal(true);
+                                                                    setDataToUpdate(data);
+                                                                }} className="mdi fs-5 mdi-square-edit-outline"></i>
                                                                 {/* <i
                                                                     onClick={() => toggleRow(index)}
                                                                     className="mdi mdi-eye fs-4"></i> */}
