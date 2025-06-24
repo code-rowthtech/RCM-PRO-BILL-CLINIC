@@ -175,7 +175,6 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     }, [docPreviewUrl]);
 
     const handlePreview = (file) => {
-        console.log(file,"file")
         if (file?.localPreviewUrl && /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file.fileName)) {
             setDocPreviewUrl(file.localPreviewUrl);
             setShowDocPreview(true);
@@ -275,8 +274,8 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                     .click()
                                                             }
                                                             className={`custom-file-upload d-flex justify-content-between align-items-center cursor-pointer form-control ${qualification.degreeName || qualification.degreeFile
-                                                                    ? ''
-                                                                    : 'custom-form-fields'
+                                                                ? ''
+                                                                : 'custom-form-fields'
                                                                 }`}
                                                             style={{ minHeight: '30px' }}>
                                                             <span>
@@ -441,8 +440,8 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                 .click()
                                                                         }
                                                                         className={`custom-file-upload justify-content-between cursor-pointer form-control ${data?.document?.fileName || data.degreeFile
-                                                                                ? ''
-                                                                                : 'custom-form-fields'
+                                                                            ? ''
+                                                                            : 'custom-form-fields'
                                                                             }`}>
                                                                         <span>
                                                                             {documentUploading[index]
