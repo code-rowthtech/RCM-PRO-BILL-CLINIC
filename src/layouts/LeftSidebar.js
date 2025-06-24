@@ -18,9 +18,7 @@ import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 import { IoMdAdd } from 'react-icons/io';
 import logo from '../assets/images/logo.png';
 import logo_sm from '../assets/images/logo_sm.png';
-import { FaUserCircle } from 'react-icons/fa';
 import { FaChevronDown } from 'react-icons/fa6';
-import classNames from 'classnames';
 import metadata from '../metadata.json';
 
 type SideBarContentProps = {
@@ -132,9 +130,7 @@ const LeftSidebar = ({
                 status: activeTab,
                 search: search,
             };
-            if (!appointmentsData) {
-                dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }));
-            }
+            dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }));
             if (!doctorDetails) {
                 dispatch(getDoctorsAction({ status: true, search: '', page: 1, limit: 20 }));
             }
@@ -216,13 +212,6 @@ const LeftSidebar = ({
                             ) : (
                                 <div className="info-color px-2 py-1 align-items-center">
                                     <button
-                                        // data-toggle={
-                                        //     // ele.label === 'Tasks' ||
-                                        //     // ele.label === 'Billing' ||
-                                        //      ele.label === 'Help & Support' ? "tooltip" : ''} data-placement="top" title={
-                                        //         // ele.label === 'Tasks' ||
-                                        //         // ele.label === 'Billing' ||
-                                        //         ele.label === 'Help & Support' ? "In Progress" : ''}
                                         onClick={() =>
                                             isLogout ? handleCheckLogout(ele.label) : navigate(ele.redirectTo)
                                         }
@@ -362,7 +351,7 @@ const LeftSidebar = ({
                             <ul style={{ listStyle: 'none' }} className="px-0">
                                 <li className="text-center  py-3 ">
                                     <img
-                                        onClick={() => navigate('/')}
+                                        onClick={() => navigate('/apps/patients/list')}
                                         className="cursor-pointer"
                                         src={logo}
                                         alt=""
@@ -370,8 +359,6 @@ const LeftSidebar = ({
                                     />
                                 </li>
                                 <li className="px-1 mb-1 d-flex gap-1 align-items-center">
-                                    {/* <input type="text" className='form-control' onChange={(e) => setSearch(e.target.value)} placeholder="Search..." /> */}
-                                    {/* <Button className='custom-buttons' onClick={togglePriorityDropdown} ><i className="bi bi-filter"></i></Button> */}
                                     <Form.Select
                                         className="text-capitalize"
                                         onChange={(e) => setSelectedDoctor(e.target.value)}>
@@ -639,7 +626,7 @@ const LeftSidebar = ({
                                 <li className="text-center py-3 ">
                                     <img
                                         className="cursor-pointer"
-                                        onClick={() => navigate('/')}
+                                        onClick={() => navigate('/apps/patients/list')}
                                         src={logo_sm}
                                         alt=""
                                         height="30"

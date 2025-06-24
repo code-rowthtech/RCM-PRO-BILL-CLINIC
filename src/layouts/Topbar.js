@@ -190,7 +190,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                                 <i className="mdi mdi-menu fs-3 " />
                             </button>
                             {/* Display the user-friendly page title */}
-                            <h5 className="">{pageTitle}</h5>
+                            <h5 className="mt-2">{pageTitle}</h5>
                         </div>
                     )}
 

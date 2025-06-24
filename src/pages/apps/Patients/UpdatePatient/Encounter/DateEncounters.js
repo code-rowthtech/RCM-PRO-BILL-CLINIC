@@ -17,6 +17,7 @@ import PastEncounters from './PastEncounters';
 import { string } from 'prop-types';
 import { Controller } from 'react-hook-form';
 import ToastHandle from '../../../../../helpers/ToastMessage';
+import ChangeNoteTypeModal from './ChangeNoteTypeModal';
 
 const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType,
     isAccordionOpen, encounterAction, encounterId,
@@ -479,6 +480,16 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
     const [isSessionRunning, setIsSessionRunning] = useState(false);
     const [stopwatchTime, setStopwatchTime] = useState(0);
+    const [notesTypeModal, setNotesTypeModal] = useState(false);
+    const [selectedNoteType, setSelectedNoteType] = useState(null);
+
+    const closeNoteTypeModal = () => {
+        setNotesTypeModal(false);
+    }
+    const confirmSelection = () => {
+        setNoteType(selectedNoteType?.value);
+        handleNotesTypeChange?.(selectedNoteType);
+    }
     const intervalRef = useRef(null);
 
     const Stopwatch = React.memo(({ isRunning, time, onToggle }) => {
@@ -651,8 +662,12 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                             placeholder="Select"
                                             value={notesTypeOptions?.find(option => option?.value === noteType) || null}
                                             onChange={(selected) => {
-                                                setNoteType(selected?.value);
-                                                handleNotesTypeChange?.(selected);
+                                                if (selected) {
+                                                    setNotesTypeModal(true);
+                                                    setSelectedNoteType(selected);
+                                                }
+                                                // setNoteType(selected?.value);
+                                                // handleNotesTypeChange?.(selected);
                                             }}
                                             inputValue={searchNoteType}
                                             onInputChange={(value) => setSearchNoteType(value)}
@@ -674,6 +689,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                             }}
                                         />
                                     </Form.Group>
+                                    <ChangeNoteTypeModal showModal={notesTypeModal} closeModal={closeNoteTypeModal} onConfirm={confirmSelection} />
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
@@ -788,11 +804,19 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                     </Form.Group>
                                 </Col>
                             </Row>
-                            <NoteFormFields
-                                selectedFromList={selectedFromList}
-                                data={notesFields}
-                                control={control}
-                            />
+                            {store?.getEncounterNotesFieldsReducer?.loading ?
+                                <div className="row">
+                                    <div style={{ height: '35vh' }} className="col-12 d-flex align-items-center justify-content-center">
+                                        <Spinner />
+                                    </div>
+                                </div>
+                                :
+                                <NoteFormFields
+                                    selectedFromList={selectedFromList}
+                                    data={notesFields}
+                                    control={control}
+                                />
+                            }
                             <div className="row">
                                 <div className="col-12 d-flex justify-content-end gap-2 py-2">
                                     {/* <Stopwatch

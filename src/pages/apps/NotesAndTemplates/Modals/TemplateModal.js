@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Modal, Form, Button, Badge,
 } from 'react-bootstrap';
@@ -16,15 +16,21 @@ import { createTemplateAction, getTemplateAction, updateTemplateAction } from '.
 import { encryptMessage } from '../../../../cryptoUtils';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import TemplateSection from './TemplateSection';
+import useQuillWordLimit from '../../../../helpers/quillWordLimit';
+import Spinner from '../../../../constants/Spinner';
+
 const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
-    const { control, register, handleSubmit, reset } = useForm();
+    const { control, register, handleSubmit, reset, setValue, watch } = useForm();
     const dispatch = useDispatch();
+    const quillRef = useRef(null);
     const store = useSelector((state) => state);
     const createResponse = store?.createTemplateReducer?.data?.success;
     const updateResponse = store?.updateTemplateReducer?.data?.success;
     const practiceOptions = practiceTypeOptions?.map((data) => ({
         label: data?.type, value: data?.type, description: data?.description
     }));
+    const MAX_WORDS = 300;
+    const WAX_WORD_LENGTH = 45;
 
     const [tags, setTags] = useState([]);
     const [activeTab, setActiveTab] = useState('details');
@@ -106,14 +112,27 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
         }
     };
 
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
+    });
+
     return (
         <Modal className='templateModal' show={show} onHide={() => {
             onHide();
             reset();
-            setTags([])
+            setTags([]);
         }} size="xl" centered backdrop="static">
             <Modal.Header className="p-0 pb-0 d-flex justify-content-center">
-                <Modal.Title className="fw-semibold ">
+                <Modal.Title className="fw-semibold py-1 ">
                     {template?._id ? 'Update' : "Create"} Template
                 </Modal.Title>
             </Modal.Header>
@@ -293,8 +312,24 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                             <div className="row mb-2 pe-0" style={{ height: 'calc(60vh - 120px)', display: 'flex', flexDirection: 'column' }}>
                                 <div className="col-md-12 pe-0  flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
                                     <Form.Group controlId="description" className="flex-grow-1 d-flex flex-column mb-0">
-                                        <Form.Label className="fw-medium mb-1">
-                                            Description
+                                        <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                            <div>
+                                                Description{' '}
+
+                                            </div>
+                                            <small className="text-muted">
+                                                {(() => {
+                                                    const content = watch('description') || '';
+                                                    const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                                    const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                    const wordCount = words?.length > MAX_WORDS ? MAX_WORDS : words?.length;
+                                                    return (
+                                                        <div>
+                                                            <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                        </div>
+                                                    );
+                                                })()}
+                                            </small>
                                         </Form.Label>
                                         <div className="flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
                                             <Controller
@@ -302,6 +337,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                                 control={control}
                                                 render={({ field: { onChange, value } }) => (
                                                     <ReactQuill
+                                                        ref={quillRef}
                                                         value={value}
                                                         onChange={(content, delta, source) => {
                                                             if (source === 'user') {
@@ -339,12 +375,16 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                     Cancel
                                 </Button>
                                 <Button type='submit' className='custom-buttons' disabled={store?.createTemplateReducer?.loading || store?.updateTemplateReducer?.loading}>
-                                    Save Template
+                                    {store?.createTemplateReducer?.loading || store?.updateTemplateReducer?.loading ?
+                                        <Spinner className='spinner-border-sm' color='white' />
+                                        :
+                                        `Save Template`
+                                    }
                                 </Button>
                             </div>
                         </div>
                     </Form> :
-                    <TemplateSection template={template} sectionsId={sectionsId} show={show} onHide={onHide} reset={reset} setTags={setTags} />
+                    <TemplateSection template={template} setActiveTab={setActiveTab} sectionsId={sectionsId} show={show} onHide={onHide} reset={reset} setTags={setTags} />
                 }
             </Modal.Body>
 

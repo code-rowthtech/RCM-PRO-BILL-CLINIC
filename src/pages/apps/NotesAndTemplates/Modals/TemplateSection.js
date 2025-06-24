@@ -1,13 +1,14 @@
-import { Badge, ChevronDown, ChevronUp, Plus, Trash } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Plus, Trash } from 'lucide-react';
 import { Accordion, Button, Card, Form, ListGroup, Row, Col } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { updateTemplateAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { TiTick } from 'react-icons/ti';
+import Spinner from '../../../../constants/Spinner';
 
-const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
+const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, setTags }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const updateResponse = store?.updateTemplateReducer?.data?.success;
@@ -34,6 +35,7 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
         if (updateResponse == true && sectionsId || updateResponse == true && template?._id) {
             onHide();
             reset();
+            setActiveTab('details');
             setTags([]);
             setItems([])
         }
@@ -79,38 +81,6 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
                 archived: false
             });
         }
-    };
-
-    const handleRemoveItem = (sectionIndex, itemIndex) => {
-        const updatedItems = [...items];
-        updatedItems[sectionIndex].list = updatedItems[sectionIndex].list.filter(
-            (_, i) => i !== itemIndex
-        );
-
-        setItems(prev => ({
-            ...prev,
-            updatedItems
-        }));
-    };
-
-    const handleMoveItem = (sectionIndex, itemIndex, direction) => {
-        const updatedItems = [...items];
-        const section = updatedItems[sectionIndex];
-
-        if (
-            (direction === 'up' && itemIndex === 0) ||
-            (direction === 'down' && itemIndex === section.list.length - 1)
-        ) {
-            return;
-        }
-
-        const newIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1;
-
-        // Swap items
-        [section.list[itemIndex], section.list[newIndex]] =
-            [section.list[newIndex], section.list[itemIndex]];
-
-        setItems(updatedItems);
     };
 
     const updateTemplateSection = () => {
@@ -240,6 +210,7 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
                                                         })}
                                                         placeholder=" "
                                                         required
+                                                        maxLength={1000}
                                                     />
                                                 </Form.Group>
                                             </div>
@@ -291,9 +262,18 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
             </div>
             <div className='d-flex gap-1 justify-content-end  align-items-end' style={{ height: '8%' }}>
                 <Button onClick={() => {
-                    onHide(); reset(); setItems([])
+                    onHide();
+                    reset();
+                    setItems([]);
+                    setActiveTab('details');
                 }} className='custom-buttons'>Cancel</Button>
-                <Button disabled={items?.length < 1} onClick={updateTemplateSection} className='custom-buttons'>Save Template</Button>
+                <Button disabled={items?.length < 1 || store?.updateTemplateReducer?.loading} onClick={updateTemplateSection} className='custom-buttons'>
+                    {store?.updateTemplateReducer?.loading ?
+                        <Spinner className='spinner-border-sm' color='white' />
+                        :
+                        `Save Template`
+                    }
+                </Button>
             </div>
         </div>
     )

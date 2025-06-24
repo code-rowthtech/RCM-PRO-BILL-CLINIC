@@ -2,9 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { getAlcoholHistoryAction, getEncounterAction, getFamilyGeneticAction, getMedicalHistoryAction, getMedicationAction, getSurgicalHistoryAction, getTobaccooAction, getVitalsByPatientIdAction } from '../../../../../redux/actions';
-import { handlePrintPatientSummary } from '../../../../../helpers/printPatientSummary';
 import { handlePrintEverything } from './handlePrintEverything';
-import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 import { getProblemListAction } from '../../../../../redux/ProblemList/action';
 import { useSearchParams } from 'react-router-dom';
 import { getAllergiesOfPatientAction } from '../../../../../redux/allergyList/action';
@@ -14,13 +12,12 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const [printOptions, setPrintOptions] = useState([]);
-    const [selectedEncounter, setSelectedEncounter] = useState('');
-    const [skip, setSkip] = useState(1);
-
+    const [selectedEncounter, setSelectedEncounter] = useState([]);
+    // const [skip, setSkip] = useState(1);
     const encounters = store?.getEncounterReducer?.data?.encounters || [];
 
     const patientInfoOptions = useMemo(() => [
-        'Patient Details', 'Responsible Party', 'Referring Doctor'
+        'Responsible Party', 'Referring Doctor'
     ], []);
 
     const clinicalReviewOptions = useMemo(() => [
@@ -32,8 +29,8 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
     ], []);
 
     useEffect(() => {
-        dispatch(getEncounterAction({ patientId: id, skip }));
-    }, [dispatch, id, skip]);
+        dispatch(getEncounterAction({ patientId: id, skip: 1 }));
+    }, [dispatch, id]);
 
     const handleCheckboxChange = (option) => {
         const skip = 1;
@@ -87,12 +84,16 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
         store?.getSurgicalHistoryReducer?.loading;
 
     return (
-        <Modal show={show} centered onHide={onHide} size="lg" className="print_documents_modal">
+        <Modal show={show} centered onHide={() => {
+            onHide();
+            setPrintOptions([]);
+            setSelectedEncounter([]);
+        }} size="lg" className="print_documents_modal">
             <Modal.Header closeButton className="px-2 py-0">
                 <Modal.Title>Print Patient Summary</Modal.Title>
             </Modal.Header>
 
-            <Modal.Body className="px-2 py-1 scroll-container" style={{ maxHeight: 'calc(50vh - 120px)' }}>
+            <Modal.Body className="px-2 py-1 scroll-container   " style={{ maxHeight: 'calc(50vh - 120px)' }}>
                 <div className="d-flex gap-4 mb-2">
                     {[['Patient Information', patientInfoOptions],
                     ['Clinical Review', clinicalReviewOptions],
@@ -123,7 +124,7 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                 <div className="border-top pt-0 scroll-container" style={{ maxHeight: '200px' }}>
                     <h5 className="fw-bold mb-2 mt-0 sticky-top bg-white py-2">Select Encounter</h5>
                     <div className="d-flex flex-wrap gap-4 pb-2">
-                        {encounters.map((encounter) => {
+                        {/* {encounters?.map((encounter) => {
                             const encounterId = encounter?._id;
                             const encounterDate = encounter?.period?.start
                                 ? new Date(encounter.period.start).toISOString().split('T')[0]
@@ -133,7 +134,7 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                                 <div className="form-check d-flex align-items-center" key={encounterId}>
                                     <input
                                         className="form-check-input me-2"
-                                        type="radio"
+                                        type="checkbox"
                                         name="encounter-radio"
                                         id={`encounter-${encounterId}`}
                                         checked={selectedEncounter?._id === encounterId}
@@ -149,7 +150,46 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                                     </label>
                                 </div>
                             );
+                        })} */}
+
+                        {encounters?.map((encounter) => {
+                            const encounterId = encounter?._id;
+                            const encounterDate = encounter?.period?.start
+                                ? new Date(encounter.period.start).toISOString().split('T')[0]
+                                : 'No Date Available';
+
+                            const isSelected = selectedEncounter.some(e => e._id === encounterId);
+
+                            return (
+                                <div className="form-check d-flex align-items-center" key={encounterId}>
+                                    <input
+                                        className="form-check-input me-2"
+                                        type="checkbox"
+                                        name="encounter-checkbox"
+                                        id={`encounter-${encounterId}`}
+                                        checked={isSelected}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                // Add to selectedEncounter if not already there
+                                                setSelectedEncounter(prev => [...prev, encounter]);
+                                                setPrintOptions(prev =>
+                                                    prev.includes('Encounter') ? prev : [...prev, 'Encounter']
+                                                );
+                                            } else {
+                                                // Remove from selectedEncounter
+                                                setSelectedEncounter(prev =>
+                                                    prev.filter(e => e._id !== encounterId)
+                                                );
+                                            }
+                                        }}
+                                    />
+                                    <label className="form-check-label" htmlFor={`encounter-${encounterId}`}>
+                                        {encounterDate}
+                                    </label>
+                                </div>
+                            );
                         })}
+
                     </div>
                 </div>
             </Modal.Body>
@@ -158,8 +198,12 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                 <div className="d-flex justify-content-between align-items-center w-100">
                     <small className="text-muted">{printOptions.length} sections selected</small>
                     <div className="d-flex">
-                        <Button variant="" onClick={onHide} disabled={isLoading || printOptions?.length === 0} className="me-2 custom-buttons text-white">
-                            Preview Report
+                        <Button variant="" onClick={() => {
+                            onHide();
+                            setPrintOptions([]);
+                            setSelectedEncounter([]);
+                        }} disabled={isLoading || printOptions?.length === 0} className="me-2 custom-buttons text-white">
+                            Cancel
                         </Button>
                         <Button
                             variant="primary"
@@ -167,6 +211,8 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                             onClick={() => {
                                 handlePrintEverything(printData);
                                 onHide();
+                                setPrintOptions([]);
+                                setSelectedEncounter([]);
                             }}
                             disabled={isLoading || printOptions?.length === 0}
                         >

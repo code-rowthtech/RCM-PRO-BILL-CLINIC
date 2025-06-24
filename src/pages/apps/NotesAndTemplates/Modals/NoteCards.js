@@ -40,13 +40,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
         const current = updated.find((n) => n._id === id);
         sendUpdate(id, current);
     };
-    const handleNoteTypeBlur = (id, value) => {
-        if (!value.trim() || value.trim().length < 2) return;
-        const updated = noteTypes.map((note) => (note._id === id ? { ...note, noteType: value.trim() } : note));
-        setNoteTypes(updated);
-        const current = updated.find((n) => n._id === id);
-        sendUpdate(id, current);
-    };
+
     const handleDefaultChange = (id) => {
         const updated = noteTypes.map((note) => ({
             ...note,
