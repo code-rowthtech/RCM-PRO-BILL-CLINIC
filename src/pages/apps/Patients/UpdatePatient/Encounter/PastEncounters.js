@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { getEncounterAction, getEncounterByIdAction, getPastEncounterAction } from '../../../../../redux/actions';
+import { getEncounterByIdAction, getPastEncounterAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import { Card } from 'react-bootstrap';
@@ -15,7 +15,7 @@ const PastEncounters = ({ encounterTabs, setEncounterTabs, setActiveTab, setExpa
     const encountersData = store?.getPastEncounterReducer?.data?.encounters;
     useEffect(() => {
         dispatch(getPastEncounterAction({ patientId: id }));
-    }, [dispatch]);
+    }, [dispatch, id]);
 
     return (
         <div className="container py-1">
@@ -38,33 +38,25 @@ const PastEncounters = ({ encounterTabs, setEncounterTabs, setActiveTab, setExpa
                                         type: 'updateEncounter',
                                     };
                                     dispatch(getEncounterByIdAction({ encounterId: encounter?._id }));
-                                    setEncounterTabs([...encounterTabs, newTab]);
-                                    setActiveTab(newTab.id);
+                                    const existingTab = encounterTabs.find((data) => data?.id === newTab?.id);
+                                    if (existingTab) {
+                                        setActiveTab(existingTab?.id);
+                                    } else {
+                                        setEncounterTabs([...encounterTabs, newTab]);
+                                        setActiveTab(newTab.id);
+                                    }
                                 }}
                                 key={encounter?._id} className="mb-2 border cursor-pointer">
-                                <Card.Body className='px-2 py-1' style={{ height: 'fit-content' }}>
-                                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-                                        <div className='mb-0 pb-0'>
-                                            <h3 className="h5 mb-1 text-black">
-                                                {encounter.type[0]?.text || 'Medical Visit'}
-                                            </h3>
-                                            <small className="text-muted mb-0">
-                                                {format(new Date(encounter?.period?.start), 'MMM dd, yyyy')}
-                                            </small>
-                                        </div>
-
-                                        <div className="d-flex align-items-center mb-0 mt-md-0">
-                                            <div>
-                                                <p className="mb-0 fw-bold text-black">
-                                                    {encounter?.providerId?.name[0]?.text || 'Unknown Provider'}
-                                                </p>
-                                                <small className="text-muted mb-0">
-                                                    {encounter?.class?.text || 'General Practice'}
-                                                </small>
-                                            </div>
-                                        </div>
+                                <div className='row d-flex align-items-center justify-content-between px-2 py-1'>
+                                    <div className="col-6">
+                                        <h6 className='my-0 fw-bold'>{encounter.type[0]?.text || 'N/A'}</h6>
+                                        <small className='fw-semibold fs-6'>{format(new Date(encounter?.period?.start), 'MMM dd, yyyy')}</small>
                                     </div>
-                                </Card.Body>
+                                    <div className="col-6 text-end">
+                                        <h6 className='my-0 fw-bold'>{encounter?.providerId?.name[0]?.text || 'Unknown Provider'}</h6>
+                                        <small className='fw-semibold fs-6'>{encounter?.class?.text || 'N/A'}</small>
+                                    </div>
+                                </div>
                             </Card>
                         ))}
                     </div>

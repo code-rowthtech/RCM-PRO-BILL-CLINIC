@@ -240,7 +240,6 @@ const Demographicdetails = ({
             ...(data?.notes && { notes: data.notes }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'demographic payload');
     };
 
     useEffect(() => {
@@ -804,8 +803,8 @@ const Demographicdetails = ({
                                                         borderTop: 'none',
                                                     }}
                                                     className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
+                                                        ? 'd-none'
+                                                        : ''
                                                         }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
