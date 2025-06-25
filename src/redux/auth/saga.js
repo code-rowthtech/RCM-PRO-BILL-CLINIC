@@ -30,6 +30,7 @@ function* login({ payload }) {
         const response = yield call(loginApi, encryptedPayload);
 
         const user = JSON.parse(decryptMessage(response?.data?.data));
+        console.log(user, 'useruseruser')
         const userData = {
             name: user?.name,
             permission: user?.permission,

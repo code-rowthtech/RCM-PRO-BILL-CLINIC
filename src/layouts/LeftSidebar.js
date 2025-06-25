@@ -481,22 +481,34 @@ const LeftSidebar = ({
                                                             <div>
                                                                 <p className="mb-0">
                                                                     {
-                                                                        new Date(appointment?.start)
-                                                                            .toISOString()
-                                                                            .split('T')[0]
+                                                                        appointment?.start?.toLocaleString('en-US', {
+                                                                            year: 'numeric',
+                                                                            month: '2-digit',
+                                                                            day: '2-digit',
+                                                                            hour: '2-digit',
+                                                                            minute: '2-digit',
+                                                                            hour12: true,
+                                                                        })
                                                                     }
                                                                     &nbsp; (
-                                                                    {appointment?.start
-                                                                        .split('T')[1]
-                                                                        .split(':')
-                                                                        .slice(0, 2)
-                                                                        .join(':') +
+                                                                    {appointment?.toLocaleString('en-US', {
+                                                                        year: 'numeric',
+                                                                        month: '2-digit',
+                                                                        day: '2-digit',
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit',
+                                                                        hour12: true,
+                                                                    }) +
                                                                         '-' +
-                                                                        appointment?.end
-                                                                            .split('T')[1]
-                                                                            .split(':')
-                                                                            .slice(0, 2)
-                                                                            .join(':')}
+                                                                        appointment?.end?.toLocaleString('en-US', {
+                                                                            year: 'numeric',
+                                                                            month: '2-digit',
+                                                                            day: '2-digit',
+                                                                            hour: '2-digit',
+                                                                            minute: '2-digit',
+                                                                            hour12: true,
+                                                                        })
+                                                                    }
                                                                     )
                                                                 </p>
                                                                 <p className="mb-0">
@@ -551,12 +563,11 @@ const LeftSidebar = ({
                                                 <div className="d-flex flex-column">
                                                     <p className="mb-0 text-capitalize" style={{ fontSize: '12px' }}>
                                                         (
-                                                        {data?.start.split('T')[1].split(':').slice(0, 2).join(':') +
+                                                        {new Date(data?.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
                                                             '-' +
-                                                            data?.end.split('T')[1].split(':').slice(0, 2).join(':')}
+                                                            new Date(data?.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                         )
-                                                    </p>
-                                                    <p
+                                                    </p>                                                    <p
                                                         className="mb-0 fw-semibold text-capitalize"
                                                         style={{ fontSize: '10px', color: statusColors[data?.status] }}>
                                                         {data?.status}

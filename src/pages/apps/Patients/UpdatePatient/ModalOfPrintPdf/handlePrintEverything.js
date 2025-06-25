@@ -1,6 +1,6 @@
-import { loggedInUser } from "../../../../../helpers/api/loggedInUser";
 
-export const handlePrintEverything = (printData) => {
+export const handlePrintEverything = async (printData) => {
+
     const originalContent = document?.body?.innerHTML;
     const addressData = printData?.patientDetails?.address;
     const relatedAddressData = printData?.patientDetails?.relatedPerson?.address;
@@ -194,6 +194,9 @@ export const handlePrintEverything = (printData) => {
                     padding: 20px;
                     margin-bottom: 30px;
                     border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
                 }
 
                 .header h1 {
@@ -201,7 +204,9 @@ export const handlePrintEverything = (printData) => {
                     font-weight: 600;
                     margin-bottom: 8px;
                 }
-
+.header img{
+border-radius: 100%;
+}
                 .header-info {
                     display: flex;
                     justify-content: space-between;
@@ -450,8 +455,30 @@ width: 100%;
         </head>
         <body>
             <div class="header">
-            <img src=${loggedInUser?.logo?.split('?')[0]}/>
+            <img height='60' crossOrigin="anonymous" alt="Dynamic" width='65' src='https://probill-ehr.s3.eu-north-1.amazonaws.com/Medical-healthy-clinic-logo-concept-by-DEEMKA-STUDIO-1.jpg'/>
                 <h1>Patient Summary</h1>
+            </div>
+             <div class="patient-info">
+                <h2>Clinic Information</h2>
+                <div class="patient-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Name</span>
+                        <span class="detail-value">${printData?.clinicDetails?.name || 'Not available'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">${printData?.clinicDetails?.userId?.email || 'Not available'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">${printData?.clinicDetails?.telecom?.find((data) => data?.system === 'phone')?.value || 'Not available'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Address</span>
+                        <span class="detail-value">${printData?.clinicDetails?.address?.[0]?.line + ', ' + printData?.clinicDetails?.address?.[0]?.city + ', ' + printData?.clinicDetails?.address?.[0]?.country || 'Not available'}</span>
+                    </div>
+                   
+                </div>
             </div>
              <div class="patient-info">
                 <h2>Patient Information</h2>
