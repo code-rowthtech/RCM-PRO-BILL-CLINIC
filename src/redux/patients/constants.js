@@ -1,5 +1,5 @@
 export const PatientsActionTypes = {
-    RESET_UPDATE_STATUS: '@@/layout/RESET_UPDATE_STATUS',
+    // RESET_UPDATE_STATUS: '@@/layout/RESET_UPDATE_STATUS',
 
 
     GET_PATIENTS: 'GET_PATIENTS',

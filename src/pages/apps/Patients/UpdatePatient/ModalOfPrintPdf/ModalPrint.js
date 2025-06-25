@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
-import { getAlcoholHistoryAction, getEncounterAction, getFamilyGeneticAction, getMedicalHistoryAction, getMedicationAction, getSurgicalHistoryAction, getTobaccooAction, getVitalsByPatientIdAction } from '../../../../../redux/actions';
+import { getAlcoholHistoryAction, getClinicAction, getEncounterAction, getFamilyGeneticAction, getMedicalHistoryAction, getMedicationAction, getSurgicalHistoryAction, getTobaccooAction, getVitalsByPatientIdAction } from '../../../../../redux/actions';
 import { handlePrintEverything } from './handlePrintEverything';
 import { getProblemListAction } from '../../../../../redux/ProblemList/action';
 import { useSearchParams } from 'react-router-dom';
 import { getAllergiesOfPatientAction } from '../../../../../redux/allergyList/action';
+import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
+import { encryptMessage } from '../../../../../cryptoUtils';
 
 const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
     const dispatch = useDispatch();
@@ -13,6 +15,8 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
     const patientId = searchParams.get('id');
     const [printOptions, setPrintOptions] = useState([]);
     const [selectedEncounter, setSelectedEncounter] = useState([]);
+    const clinicDetails = store?.getClinicsReducer?.data?.clinic;
+
     // const [skip, setSkip] = useState(1);
     const encounters = store?.getEncounterReducer?.data?.encounters || [];
 
@@ -31,6 +35,12 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
     useEffect(() => {
         dispatch(getEncounterAction({ patientId: id, skip: 1 }));
     }, [dispatch, id]);
+
+    useEffect(() => {
+        if (!clinicDetails) {
+            dispatch(getClinicAction({ key: encryptMessage({ clinicId: loggedInUser?.clinicId }) }));
+        }
+    }, [clinicDetails])
 
     const handleCheckboxChange = (option) => {
         const skip = 1;
@@ -74,6 +84,7 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
         alcoholHistory: store?.getAlcoholHistoryReducer?.data?.data,
         medicalHistory: store?.getMedicalHistoryReducer?.data?.medicalHistory,
         surgicalHistory: store?.getSurgicalHistoryReducer?.data?.result,
+        clinicDetails: clinicDetails,
     }), [printOptions, patientDetails, selectedEncounter, store]);
 
     const isLoading = store?.getVitalsByPatientIdReducer?.loading ||

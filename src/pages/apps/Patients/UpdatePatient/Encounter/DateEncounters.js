@@ -139,17 +139,32 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     };
 
     // Apply template values to form
+    // useEffect(() => {
+    //     if (!selectedFromList) return;
+    //     console.log(selectedFromList, 'selectedFromList')
+    //     setTimeout(() => {
+    //         ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach((section) => {
+    //             if (selectedFromList?.[section]) {
+    //                 setValue(section, selectedFromList[section]);
+    //             }
+    //         });
+    //     }, 0);
+    // }, [selectedFromList, setValue]);
     useEffect(() => {
         if (!selectedFromList) return;
 
         setTimeout(() => {
-            ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach((section) => {
+            ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach((section) => {
+
+                const fieldName = section === 'Care Plan' ? 'CarePlan' : section;
                 if (selectedFromList?.[section]) {
-                    setValue(section, selectedFromList[section]);
+                    document.getElementById(section === 'Care Plan' ? 'CarePlan' : section)?.scrollIntoView({ behavior: 'smooth' });
+                    setValue(fieldName, selectedFromList[section]);
                 }
             });
         }, 0);
     }, [selectedFromList, setValue]);
+
 
 
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
@@ -232,7 +247,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
                         <h5>{name}</h5>
                         {['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].map(section => (
-                            <Form.Group className="mb-2" key={section}>
+                            <Form.Group className="mb-2" key={section} id={section}>
                                 <Form.Label className="mb-1 d-flex justify-content-between align-items-center gap-2">
                                     <div className='col-10 d-flex align-items-center gap-1'>
                                         <span>{section === 'CarePlan' ? 'Care Plan' : section}</span>
@@ -473,6 +488,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
             } else {
                 dispatch(createEncounterAction({ key: encryptMessage(payload) }));
+                // dispatch(createEncounterAction(payload));
             }
         }
 

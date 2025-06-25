@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { NotesCategoriesActionTypes } from './constants';
@@ -210,12 +210,12 @@ function* updateSettingsTabsFunction(data) {
     }
 }
 
-export function* callResetUpdate() {
-    put({
-        type: NotesCategoriesActionTypes.RESET_UPDATE_STATUS,
-        payload: {},
-    });
-}
+// export function* callResetUpdate() {
+//     put({
+//         type: NotesCategoriesActionTypes.RESET_UPDATE_STATUS,
+//         payload: {},
+//     });
+// }
 
 export function* watchCreateNoteCategories() {
     yield takeEvery(NotesCategoriesActionTypes.CREATE_NOTE_CATEGORIES, createNoteCategoriesFunction);

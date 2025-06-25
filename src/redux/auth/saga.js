@@ -30,6 +30,7 @@ function* login({ payload }) {
         const response = yield call(loginApi, encryptedPayload);
 
         const user = JSON.parse(decryptMessage(response?.data?.data));
+        console.log(user, 'useruseruser')
         const userData = {
             name: user?.name,
             permission: user?.permission,
@@ -158,14 +159,14 @@ function* verifyEmailFunction({ payload }) {
 }
 
 function* setChangePasswordChange({ payload }) {
-    const { oldPassword, token, newPassword } = payload;
-    const confirmpasswordPayload = {
-        newPassword: newPassword,
-        oldPassword: oldPassword,
-    }
-    // const encryptedNewPassword = {
-    //     key: encryptMessage(confirmpasswordPayload)
+    // const { oldPassword, newPassword } = payload;
+    // const confirmpasswordPayload = {
+    //     newPassword: newPassword,
+    //     oldPassword: oldPassword,
     // }
+    // // const encryptedNewPassword = {
+    // //     key: encryptMessage(confirmpasswordPayload)
+    // // }
 
     try {
         const response = yield call(confirmPasswordApi, payload);

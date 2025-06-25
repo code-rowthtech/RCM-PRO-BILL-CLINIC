@@ -18,7 +18,7 @@ export const updateRoleDataAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydActionRoleTypes = (): LayoutAction => ({
-    type: RoleActionTypes.STATE_EMPTY_INTIAL_STATE,
+// export const stateEmptydActionRoleTypes = (): LayoutAction => ({
+//     type: RoleActionTypes.STATE_EMPTY_INTIAL_STATE,
 
-});
+// });

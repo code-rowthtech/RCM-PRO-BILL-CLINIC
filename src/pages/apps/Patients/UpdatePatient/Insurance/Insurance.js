@@ -23,7 +23,7 @@ const Insurance = ({ patientId, isAccordionOpen }) => {
     useEffect(() => {
         if (updateInsuranceSuccess === 200) {
             dispatch(getInsuranceByPatientAction({ key: encryptMessage({ patientId: id }) }));
-            dispatch(resetUpdateAction())
+            // dispatch(resetUpdateAction())
         }
     }, [updateInsuranceSuccess])
     const handleTabChange = (tab) => {

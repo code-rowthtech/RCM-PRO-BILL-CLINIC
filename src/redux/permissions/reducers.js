@@ -30,17 +30,17 @@ export const createPermissionsDataReducer = (state = CREATE_PERMISSIONS_DATA_INI
                 data: action.payload,
                 loading: false
             }
+        case PermissionsActionTypes.CREATE_PERMISSIONS_RESET:
+            return {
+                data: [],
+                loading: false
+            }
         case PermissionsActionTypes.CREATE_PERMISSIONS_ERROR:
             return {
                 data: action.payload,
                 loading: false,
             }
-        case PermissionsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false,
-            }
-        default: return state
+        default: return { ...state };
     }
 }
 export const getPermissionsDataReducer = (state = GET_PERMISSIONS_DATA_INITIAL_STATE, action) => {
@@ -75,17 +75,17 @@ export const deletePermissionsDataReducer = (state = DELETE_PERMISSIONS_DATA_INI
                 data: action.payload,
                 loading: false
             }
+        case PermissionsActionTypes.DELETE_PERMISSIONS_RESET:
+            return {
+                data: action.payload,
+                loading: false
+            }
         case PermissionsActionTypes.DELETE_PERMISSIONS_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case PermissionsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: DELETE_PERMISSIONS_DATA_INITIAL_STATE,
-                loading: false
-            }
-        default: return state
+        default: return { ...state }
     }
 }
 
@@ -101,16 +101,16 @@ export const updatePermissionsDataReducer = (state = UPDATE_PERMISSIONS_DATA_INI
                 data: action.payload,
                 loading: false
             }
+        case PermissionsActionTypes.UPDATE_PERMISSIONS_RESET:
+            return {
+                data: [],
+                loading: false
+            }
         case PermissionsActionTypes.UPDATE_PERMISSIONS_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case PermissionsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: UPDATE_PERMISSIONS_DATA_INITIAL_STATE,
-                loading: false
-            }
-        default: return state
+        default: return { ...state }
     }
 }

@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { AppointmentActionTypes } from './constants';
 import { createAppointmentApi, getAppointmentByIdApi, getAppointmentsApi, getPractitionerScheduleApi, getPractitionerSlotsApi, rescheduleAppointmentApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
@@ -16,7 +16,8 @@ function* createAppointmentFunction(data) {
             payload: {},
         });
         const response = yield call(createAppointmentApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = response.data.data;
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success')
             yield put({
@@ -132,6 +133,35 @@ function* getPractitionerSlotsFunction(data) {
         });
     }
 }
+// function* getAppointmentsFunction(data) {
+//     try {
+//         yield put({
+//             type: AppointmentActionTypes.GET_APPOINTMENT_LOADING,
+//             payload: {},
+//         });
+//         const response = yield call(getAppointmentsApi, data);
+//         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+//         if (response.status === 201) {
+//             ToastHandle(decryptedData?.message, 'success')
+//             yield put({
+//                 type: AppointmentActionTypes.GET_APPOINTMENT_SUCCESS,
+//                 payload: { ...decryptedData },
+//             });
+//         } else {
+//             yield put({
+//                 type: AppointmentActionTypes.GET_APPOINTMENT_ERROR,
+//                 payload: { ...decryptedData },
+//             });
+//         }
+//     } catch (error) {
+//         yield put({
+//             type: AppointmentActionTypes.GET_APPOINTMENT_ERROR,
+//             payload: error,
+//         });
+//     }
+// }
+
 function* getAppointmentsFunction(data) {
     try {
         yield put({
@@ -139,8 +169,7 @@ function* getAppointmentsFunction(data) {
             payload: {},
         });
         const response = yield call(getAppointmentsApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
+        const decryptedData = response.data.data;
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success')
             yield put({
