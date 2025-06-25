@@ -112,6 +112,7 @@ const Login = (): React$Element<any> => {
                         label={t('Password')}
                         type="password"
                         name="password"
+                        className=''
                         onCopy={(e) => e.preventDefault()}
                         onCut={(e) => e.preventDefault()}
                         onPaste={(e) => e.preventDefault()}

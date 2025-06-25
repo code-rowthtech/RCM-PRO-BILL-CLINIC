@@ -48,15 +48,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     } = useForm();
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
     const updateId = searchParams.get('updateid');
-    const [selectedState, setSelectedState] = useState(null);
+    // const [selectedState, setSelectedState] = useState(null);
     const [subClinic, setSubClinic] = useState('');
     const [logo, setLogo] = useState(null);
-    const [accreditationLogo, setAccreditationLogo] = useState(null);
-    const [addType, setAddType] = useState('');
+    // const [accreditationLogo, setAccreditationLogo] = useState(null);
+    // const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showModalPic, setShowModalPic] = useState(false);
@@ -77,13 +77,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [showModalPic, modalFileUrl]);
     const closeModal = () => setShowModal(false);
-    const [posDetails, setPosDetails] = useState([{ name: '', email: '', role: '', contact: '', fileName: '' }]);
-    const [stateDetails, setStateDetails] = useState([{ name: '', number: '', url: null, fileName: '' }]);
-    const [longitude, setLongitude] = useState(null);
-    const [longitude1, setLongitude1] = useState(null);
-    const [latitude, setLatitude] = useState(null);
-    const [latitude1, setLatitude1] = useState(null);
-    const [stateToSelect, setStateToSelect] = useState(null);
+    // const [longitude, setLongitude] = useState(null);
+    // const [longitude1, setLongitude1] = useState(null);
+    // const [latitude, setLatitude] = useState(null);
+    // const [latitude1, setLatitude1] = useState(null);
+    // const [stateToSelect, setStateToSelect] = useState(null);
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
     const createResponse = store?.createClinicsReducer?.data?.status;
@@ -95,34 +93,34 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
-    const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+    // const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
     const [practiceAddresses, setPracticeAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-    const handleStateSelection = (e, addressType, index) => {
-        const selectedOption = e.target.selectedOptions[0];
-        const stateId = selectedOption.getAttribute('data-key');
-        // Update the addresses state first
-        const updatedAddresses = [...addresses];
-        updatedAddresses[index] = {
-            ...updatedAddresses[index],
-            state: e.target.value,
-        };
-        setAddresses(updatedAddresses);
-        // Then fetch cities based on address type
-        if (addressType === 'physical') {
-            dispatch(getCitiesAction({ state_code: stateId, name: '', limit: 25, skip: '' }));
-        } else if (addressType === 'postal') {
-            dispatch(getCities2Action({ state_code: stateId, name: '', limit: 25, skip: '' }));
-        } else {
-            dispatch(getCities3Action({ state_code: stateId, name: '', limit: 25, skip: '' }));
-        }
-    };
+    // const handleStateSelection = (e, addressType, index) => {
+    //     const selectedOption = e.target.selectedOptions[0];
+    //     const stateId = selectedOption.getAttribute('data-key');
+    //     // Update the addresses state first
+    //     const updatedAddresses = [...addresses];
+    //     updatedAddresses[index] = {
+    //         ...updatedAddresses[index],
+    //         state: e.target.value,
+    //     };
+    //     setAddresses(updatedAddresses);
+    //     // Then fetch cities based on address type
+    //     if (addressType === 'physical') {
+    //         dispatch(getCitiesAction({ state_code: stateId, name: '', limit: 25, skip: '' }));
+    //     } else if (addressType === 'postal') {
+    //         dispatch(getCities2Action({ state_code: stateId, name: '', limit: 25, skip: '' }));
+    //     } else {
+    //         dispatch(getCities3Action({ state_code: stateId, name: '', limit: 25, skip: '' }));
+    //     }
+    // };
 
     useEffect(() => {
         dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_id?.clinicId }) }));
         dispatch(getSubClinicAction());
-        dispatch(getStatesByCountryAction());
+        // dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
     const setField = (key, value) => value && setValue(key, value);
@@ -337,68 +335,68 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [clinicsDataGet, setValue]);
 
-    const [searchedLocations, setSearchedLocations] = useState(null);
+    // const [searchedLocations, setSearchedLocations] = useState(null);
     // const [searchedLocations2, setSearchedLocations2] = useState(null);
 
-    const getGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-                location
-            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+    // const getGeolocation = (e) => {
+    //     const addressToSearch = e.target.value;
+    //     async function fetchGeocodeData(location) {
+    //         const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
+    //         const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+    //             location
+    //         )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
-            try {
-                const response = await fetch(url);
+    //         try {
+    //             const response = await fetch(url);
 
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
+    //             if (!response.ok) {
+    //                 throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
+    //             }
 
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Failed to fetch geocode data:', error);
-                return null;
-            }
-        }
-        fetchGeocodeData(addressToSearch).then((data) => {
-            if (data) {
-                setSearchedLocations(data?.results);
-            }
-        });
-    };
+    //             const data = await response.json();
+    //             return data;
+    //         } catch (error) {
+    //             console.error('Failed to fetch geocode data:', error);
+    //             return null;
+    //         }
+    //     }
+    //     fetchGeocodeData(addressToSearch).then((data) => {
+    //         if (data) {
+    //             setSearchedLocations(data?.results);
+    //         }
+    //     });
+    // };
 
-    const [selectedLocation, setSelectedLocation] = useState(null);
+    // const [selectedLocation, setSelectedLocation] = useState(null);
 
-    useEffect(() => {
-        if (selectedLocation) {
-            setLatitude(selectedLocation?.bounds?.southwest?.lat);
-            setLongitude(selectedLocation?.bounds?.southwest?.lng);
-            setValue('address', selectedLocation?.formatted);
-            const stateId =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
-            const selectedState =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-            setValue('stateName', selectedState);
-            const countyName = selectedLocation?.components?.county;
-            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
-        }
-    }, [selectedLocation, setValue, statesData, dispatch]);
-    useEffect(() => {
-        if (cities1) {
-            const selectedCounty =
-                cities1 &&
-                cities1.find(
-                    (data) =>
-                        data?.name === selectedLocation?.components?.county ||
-                        clinicsDataGet?.userId?.primaryAddress?.city?.name
-                )?._id;
-            setValue('city', selectedCounty);
-        }
-    }, [cities1]);
+    // useEffect(() => {
+    //     if (selectedLocation) {
+    //         setLatitude(selectedLocation?.bounds?.southwest?.lat);
+    //         setLongitude(selectedLocation?.bounds?.southwest?.lng);
+    //         setValue('address', selectedLocation?.formatted);
+    //         const stateId =
+    //             statesData?.states &&
+    //             statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
+    //         const selectedState =
+    //             statesData?.states &&
+    //             statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
+    //         setValue('stateName', selectedState);
+    //         const countyName = selectedLocation?.components?.county;
+    //         dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
+    //     }
+    // }, [selectedLocation, setValue, statesData, dispatch]);
+    // useEffect(() => {
+    //     if (cities1) {
+    //         const selectedCounty =
+    //             cities1 &&
+    //             cities1.find(
+    //                 (data) =>
+    //                     data?.name === selectedLocation?.components?.county ||
+    //                     clinicsDataGet?.userId?.primaryAddress?.city?.name
+    //             )?._id;
+    //         setValue('city', selectedCounty);
+    //     }
+    // }, [cities1]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics;
     const [statesMenu, setStatesMenu] = useState(false);
     const menuRef = useRef(null); // Reference for the menu
