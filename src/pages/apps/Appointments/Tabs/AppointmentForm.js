@@ -28,7 +28,7 @@ import Spinner from '../../../../constants/Spinner';
 
 // Utils and data
 import { encryptMessage } from '../../../../cryptoUtils';
-import { appointmentTypeOptions } from '../../../../utils/DataSets/apppointmenttype.data';
+import { appointmentTypeOptions, timezoneOptions } from '../../../../utils/DataSets/apppointmenttype.data';
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
 import { appointmentRecurrence, appointmentStatus } from '../../../../utils/DataSets/commonData';
 import DateUtils from '../../../../utils/dateUtils'; // Import DateUtils
@@ -41,6 +41,9 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
     const daysNumberDaily = watch('daysNumberDaily') || 1;
     const dailyOccurrenceDate = watch('dailyOccurrenceDate');
     const startDate = watch('scheduled');
+    // const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // console.log("User Time Zone:", timeZone);
+
 
     // Calculate dates whenever dependencies change
     useEffect(() => {
@@ -316,15 +319,33 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     } = useForm({
         defaultValues: {
             scheduled: new Date().toISOString().split('T')[0],
-            startTime: '10:00',
+            startTime: new Date().toLocaleTimeString('en-US', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'America/New_York'
+            }),
+            timezone: 'America/New_York',
             duration: 30,
         },
     });
 
-    // Refs for frequently accessed values
+    // Add effect to update time when timezone changes
+    useEffect(() => {
+        const timezone = watch('timezone');
+        if (timezone) {
+            setValue('startTime', new Date().toLocaleTimeString('en-US', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: timezone
+            }));
+        }
+    }, [watch('timezone'), setValue]);    // Refs for frequently accessed values
     const watchedDoctorName = watch('doctorName');
     const watchedPatient = watch('patient');
     const watchedAppointmentType = watch('appointmentType');
+    const watchedtimezone = watch('timezone');
     const watchedScheduled = watch('scheduled');
     const watchedStartTime = watch('startTime');
     const watchedDuration = watch('duration');
@@ -540,6 +561,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             appointmentType: appointmentTypePayload,
             doctorId: data?.doctorName,
             start: startDateTime.toISOString(),
+            timeZone: data?.timezone,
             end: endDateTime.toISOString(),
             created: new Date().toISOString(),
             minutesDuration: data.duration,
@@ -744,6 +766,29 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 )}
                             </Form.Group>
                         </Col>
+                        <Col sm={6}>
+                            <Form.Group className="mb-1" controlId="timezone">
+                                <Form.Label className="mb-0">
+                                    TimeZone <span className="text-danger">*</span>
+                                </Form.Label>
+                                <Form.Select
+                                    className="form-select"
+                                    {...register('timezone', { required: 'TimeZone is required' })}
+                                    data-has-value={!!watchedtimezone}>
+                                    <option value="" hidden>
+                                        Select
+                                    </option>
+                                    {timezoneOptions.map((option) => (
+                                        <option defaultValue='America/New_York' key={option?.value} value={option?.value}>
+                                            {option?.show}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                                {errors.timezone && (
+                                    <p className="text-danger">{errors.timezone.message}</p>
+                                )}
+                            </Form.Group>
+                        </Col>
                         <Toast
                             show={showToast}
                             onClose={() => setShowToast(false)}
@@ -773,7 +818,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                             className=""
                                             {...register('scheduled', { required: 'Scheduled date is required' })}
                                             value={scheduledDate}
-                                            // disabled={!watchedDoctorName}
                                             min={new Date().toISOString().split('T')[0]}
                                             onChange={(e) => setScheduledDate(e.target.value)}
                                             onClick={handleDisabledClick}
@@ -782,7 +826,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     </span>
                                 </OverlayTrigger>
                             </Form.Group>
-
                             <Form.Group className="mb-1" style={{ width: '100px' }} controlId="starttime">
                                 <Form.Label className="mb-0">Start Time</Form.Label>
                                 <OverlayTrigger
@@ -888,7 +931,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     </option>
                                     {consultationRoomData && consultationRoomData.length > 0 ? (
                                         consultationRoomData?.map((room) => (
-                                            <option key={room?._id} value={room?._id}>
+                                            <option key={room?._id} value={room?._id} selected={room?._id === consultationRoomData[0]?._id}>
                                                 {room?.name}
                                             </option>
                                         ))
@@ -911,7 +954,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     data-has-value={!!watchedStatus}
                                     className="form-select"
                                     {...register('status', { required: 'Status is required' })}
-                                    defaultValue="Scheduled">
+                                    defaultValue="proposed">
                                     <option value="" key={''} hidden>
                                         Select Status
                                     </option>
