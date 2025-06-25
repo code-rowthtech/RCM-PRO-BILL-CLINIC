@@ -493,10 +493,10 @@ const NewPractice = () => {
                 identifierType: item.type,
                 use: item.use,
                 value: item.number,
-                documents: item.file
-                    ? { url: item.file.url?.url, fileName: item?.file.url?.name || '' }
-                    : { url: item.file?.url, fileName: item?.file?.name || '' },
-                // ...(item?.file && { documents: { url: item.file.url, fileName: item.file.name || '' } }),
+                // documents: item.file
+                //     ? { url: item.file.url?.url, fileName: item?.file.url?.name || '' }
+                //     : { url: item.file?.url, fileName: item?.file?.name || '' },
+                ...(item?.file && { documents: { url: item?.file?.url, fileName: item?.file?.name || '' } }),
                 expirationDate: item.expiry,
                 status: 'active',
                 system: 'urn:oid:2.16.840.1.113883.4.7',
