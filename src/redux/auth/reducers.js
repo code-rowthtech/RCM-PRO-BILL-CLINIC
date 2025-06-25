@@ -2,8 +2,6 @@
 import { AuthActionTypes } from './constants';
 
 import { APICore } from '../../helpers/api/apiCore';
-import { verifyToken } from './actions';
-import { decryptMessage } from '../../cryptoUtils';
 
 const api = new APICore();
 

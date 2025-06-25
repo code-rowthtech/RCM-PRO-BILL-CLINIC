@@ -1,5 +1,5 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
-import {  createTaskApi, getClinicEmployeesApi, getTaskApi, getTaskDetailsApi, updateTaskApi,  } from './api';
+import { createTaskApi, getClinicEmployeesApi, getTaskApi, getTaskDetailsApi, updateTaskApi, } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { ClinicNotesActionTypes } from './constants';

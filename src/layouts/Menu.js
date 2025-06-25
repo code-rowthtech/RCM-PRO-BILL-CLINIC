@@ -188,7 +188,7 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
     return (
         <>
             <ul className="side-nav" ref={menuRef} id="main-side-menu">
-                <li className="text-center navbar-nav mb-2 py-3" style={{ top: 0 }}>
+                <li className="text-center navbar-nav mb-1  pb-1 pt-3" style={{ top: 0 }}>
                     {isCondensed === true ? (
                         <img
                             src={logo_sm}
@@ -198,7 +198,7 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
                             onClick={() => navigate('/apps/patients/list')}
                         />
                     ) : (
-                        <img src={logo} alt="" height="25" className="logo-full px-4" onClick={() => navigate('/apps/patients/list')} />
+                        <img src={logo} alt="" height="25" className="px-4" onClick={() => navigate('/apps/patients/list')} />
                     )}
                 </li>
                 <div className={!isCondensed ? 'scroll-container' : ''} style={{ height: '73vh' }}>

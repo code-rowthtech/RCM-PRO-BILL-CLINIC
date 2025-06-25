@@ -17,7 +17,7 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
     const encounters = store?.getEncounterReducer?.data?.encounters || [];
 
     const patientInfoOptions = useMemo(() => [
-        'Patient Details', 'Responsible Party', 'Referring Doctor'
+        'Responsible Party', 'Referring Doctor'
     ], []);
 
     const clinicalReviewOptions = useMemo(() => [

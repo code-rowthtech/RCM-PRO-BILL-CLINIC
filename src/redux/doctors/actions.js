@@ -14,10 +14,10 @@ export const getDoctorsrolesAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydActionDoctors = (): LayoutAction => ({
-    type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
+// export const stateEmptydActionDoctors = (): LayoutAction => ({
+//     type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
 
-});
+// });
 
 export const createDoctorAction = (data): LayoutAction => ({
     type: DoctorsActionTypes.CREATE_DOCTORS,

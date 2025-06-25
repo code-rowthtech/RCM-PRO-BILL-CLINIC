@@ -1282,16 +1282,16 @@ option {
     padding-top: 0px !important;
     padding-bottom: 0px !important;
 }
-.logout-icon{
+.logout-icon {
     width: 140px;
 }
 .account-pages {
-  background-image: url('assets/images/bg-pattern-light.svg'); /* Adjust path as needed */
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  width: 100%;
-  align-items: center;
-  display: flex;
-  min-height: 100vh;
+    background-image: url('assets/images/bg-pattern-light.svg'); /* Adjust path as needed */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    min-height: 100vh;
 }

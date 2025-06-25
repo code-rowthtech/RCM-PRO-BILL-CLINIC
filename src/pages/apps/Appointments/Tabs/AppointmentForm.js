@@ -428,8 +428,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     'dailyOccurrenceDate',
                     appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate
                         ? new Date(appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate)
-                              ?.toISOString()
-                              .split('T')[0]
+                            ?.toISOString()
+                            .split('T')[0]
                         : ''
                 );
                 setValue('daysNumberDaily', appointmentDetails?.recurrenceTemplate?.every);
@@ -442,8 +442,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     'weeklyOccurrenceDate',
                     appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate
                         ? new Date(appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate)
-                              ?.toISOString()
-                              .split('T')[0]
+                            ?.toISOString()
+                            .split('T')[0]
                         : ''
                 );
                 setValue('weekInterval', appointmentDetails?.recurrenceTemplate?.every);
@@ -545,16 +545,16 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             minutesDuration: data.duration,
             examRoom: data?.consultationRoom,
             ...(appointmentReason?.text ||
-            appointmentReason?.display === appointmentDetails?.reason?.[0]?.coding?.[0]?.display
+                appointmentReason?.display === appointmentDetails?.reason?.[0]?.coding?.[0]?.display
                 ? {}
                 : {
-                      reason: [
-                          {
-                              coding: appointmentReason,
-                              text: appointmentReason?.display,
-                          },
-                      ],
-                  }),
+                    reason: [
+                        {
+                            coding: appointmentReason,
+                            text: appointmentReason?.display,
+                        },
+                    ],
+                }),
             status: data?.status,
             slot: data?.startTime,
             ...recurrenceTemplate,
@@ -564,6 +564,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             dispatch(rescheduleAppointmentAction({ id, key: encryptMessage(payload) }));
         } else {
             dispatch(createAppointmentAction({ key: encryptMessage(payload) }));
+            // dispatch(createAppointmentAction(payload));
         }
     };
 
@@ -917,8 +918,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     {(id
                                         ? appointmentStatus
                                         : appointmentStatus.filter((data) =>
-                                              ['proposed', 'booked', 'arrived', 'checked-in'].includes(data.code)
-                                          )
+                                            ['proposed', 'booked', 'arrived', 'checked-in'].includes(data.code)
+                                        )
                                     ).map((data, index) => (
                                         <option value={data.code} key={index}>
                                             {data.display}
@@ -1057,8 +1058,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             <ConsultationModal
                 show={consultationModal}
                 onClose={closeConsultationModal}
-                // defaultValues={edit}
-                // isEdit={!!edit}
+            // defaultValues={edit}
+            // isEdit={!!edit}
             />
         </div>
     );

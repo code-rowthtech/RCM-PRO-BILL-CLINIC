@@ -31,7 +31,7 @@ export const deleteRolesAction = (id): AuthAction => ({
     id
 });
 
-export const stateEmptydActionRoles = (): AuthAction => ({
-    type: RolesActionTypes.STATE_EMPTY_INTIAL_STATE,
+// export const stateEmptydActionRoles = (): AuthAction => ({
+//     type: RolesActionTypes.STATE_EMPTY_INTIAL_STATE,
 
-});
+// });

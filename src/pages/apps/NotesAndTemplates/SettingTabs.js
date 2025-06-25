@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Card, Col, Form, Row, Button, Offcanvas, Modal, Spinner } from 'react-bootstrap';
+import { Card, Col, Form, Row, Button, Offcanvas, Modal } from 'react-bootstrap';
 import { MdAddCircleOutline } from 'react-icons/md';
 import './settingtabs.css';
 import { FiInfo } from 'react-icons/fi';
@@ -12,6 +12,7 @@ import {
 } from '../../../redux/noteCategories/action';
 import { loggedInUser } from '../../../helpers/api/loggedInUser';
 import { encryptMessage } from '../../../cryptoUtils';
+import Spinner from '../../../constants/Spinner';
 
 const NOTE_TYPE_OPTIONS = {
     'Encounter-Based': [
@@ -86,13 +87,11 @@ const NOTE_TYPE_OPTIONS = {
 const SettingTabs = ({ noteType }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const ClinicId = loggedInUser?.clinicId;
     const settingData = store?.getSettingsTabsReducer?.data?.data?.displaySettings?.mainPanel;
     const createResponse = store?.createSettingsTabsReducer?.data?.status;
     const updateSettingsStatus = store?.updateSettingsTabsReducer?.data?.status;
 
-    // Local state for sections
-    const [activeSectionsByType, setActiveSectionsByType] = useState({});
+    const [activeSections, setActiveSections] = useState([]);
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [offcanvasSections, setOffcanvasSections] = useState([]);
     const [showCanvas, setShowCanvas] = useState(false);
@@ -100,14 +99,8 @@ const SettingTabs = ({ noteType }) => {
     const [customFieldData, setCustomFieldData] = useState({ fieldName: '', inputType: '' });
     const hasSettings = !!store?.getSettingsTabsReducer?.data?.data?._id;
 
-    // Helper to get current sections for the note type
-    const getCurrentSections = () => activeSectionsByType[noteType?.noteType] || [];
-    const updateCurrentSections = (newSections) => {
-        setActiveSectionsByType((prev) => ({
-            ...prev,
-            [noteType?.noteType]: newSections,
-        }));
-    };
+    const getCurrentSections = () => activeSections;
+    const updateCurrentSections = (newSections) => setActiveSections(newSections);
 
     // Helper to transform local sections to API format
     const getTransformedSections = (sections) =>
@@ -170,19 +163,17 @@ const SettingTabs = ({ noteType }) => {
     // When Redux data changes, sync local state
     useEffect(() => {
         if (Array.isArray(settingData) && settingData.length > 0) {
-            const sections =
-                settingData[0]?.sections?.map((s, idx) => ({
-                    id: s._id || s.id || `${noteType.noteType}-${idx}`,
-                    label: s.name,
-                    visible: s.isShown,
-                    minimized: s.isMinimized,
-                    name: s.name,
-                    ...(s.inputType && { inputType: s.inputType }),
-                })) || [];
-            setActiveSectionsByType((prev) => ({
-                ...prev,
-                [noteType?.noteType]: sections,
-            }));
+            const sections = settingData[0]?.sections?.map((s, idx) => ({
+                id: s._id || s.id || `${noteType.noteType}-${idx}`,
+                label: s.name,
+                visible: s.isShown,
+                minimized: s.isMinimized,
+                name: s.name,
+                ...(s.inputType && { inputType: s.inputType }),
+            })) || [];
+            setActiveSections(sections);
+        } else {
+            setActiveSections([]);
         }
     }, [settingData, noteType]);
 
@@ -195,29 +186,23 @@ const SettingTabs = ({ noteType }) => {
             }));
             options.push({ id: 'custom', label: 'Custom' });
             setOffcanvasSections(options);
-
-            if (!activeSectionsByType[noteType.noteType]) {
-                setActiveSectionsByType((prev) => ({
-                    ...prev,
-                    [noteType.noteType]: [],
-                }));
-            }
         } else {
             setOffcanvasSections([{ id: 'custom', label: 'Custom' }]);
         }
-        // eslint-disable-next-line
     }, [noteType]);
 
     // Fetch settings on mount and after create/update
     useEffect(() => {
-        dispatch(getSettingsTabAction({ noteId: noteType?._id }));
-    }, [dispatch, noteType]);
+        if (noteType?._id) {
+            dispatch(getSettingsTabAction({ noteId: noteType._id }));
+        }
+    }, [dispatch, noteType?._id]);
 
     useEffect(() => {
-        if (createResponse === 201 || updateSettingsStatus === 200) {
-            dispatch(getSettingsTabAction({ noteId: noteType?._id }));
+        if ((createResponse === 201 || updateSettingsStatus === 200) && noteType?._id) {
+            dispatch(getSettingsTabAction({ noteId: noteType._id }));
         }
-    }, [createResponse, updateSettingsStatus, dispatch, noteType]);
+    }, [createResponse, updateSettingsStatus, dispatch, noteType?._id]);
 
     // Custom field input
     const handleInputChange = (e) => {
@@ -226,45 +211,46 @@ const SettingTabs = ({ noteType }) => {
     };
 
     // Add custom field
-const handleAddCustomField = () => {
-    const { fieldName, inputType } = customFieldData;
-    if (!fieldName || !inputType) return;
+    const handleAddCustomField = () => {
+        const { fieldName, inputType } = customFieldData;
+        if (!fieldName || !inputType) return;
 
-    const newSection = {
-        id: `custom-${Date.now()}`,
-        label: fieldName,
-        inputType,
-        visible: true,
-        minimized: false,
-    };
-    // Do NOT updateCurrentSections here!
-    saveSectionsAPI([...getCurrentSections(), newSection]);
-    setCustomFieldData({ fieldName: '', inputType: '' });
-    setShowCustomFields(false);
-    setShowCanvas(false);
-};
-
-  // Add section from offcanvas
-const handleOffcanvasCardClick = (section) => {
-    if (section.id === 'custom') {
-        setShowCustomFields((prev) => !prev);
-        return;
-    }
-    const currentSections = getCurrentSections();
-    const isAlreadyAdded = currentSections.some((s) => s.id === section.id);
-    if (!isAlreadyAdded) {
         const newSection = {
-            id: section.id,
-            label: section.label,
+            id: `custom-${Date.now()}`,
+            label: fieldName,
+            inputType,
             visible: true,
             minimized: false,
         };
         // Do NOT updateCurrentSections here!
-        // Just call the API, then wait for GET API to update state
-        saveSectionsAPI([...currentSections, newSection]);
-        setOffcanvasSections((prev) => prev.filter((s) => s.id !== section.id));
-    }
-};
+        saveSectionsAPI([...getCurrentSections(), newSection]);
+        setCustomFieldData({ fieldName: '', inputType: '' });
+        setShowCustomFields(false);
+        setShowCanvas(false);
+    };
+
+    // Add section from offcanvas
+    const handleOffcanvasCardClick = (section) => {
+        if (section.id === 'custom') {
+            setShowCustomFields((prev) => !prev);
+            return;
+        }
+        const currentSections = getCurrentSections();
+        const isAlreadyAdded = currentSections.some((s) => s.id === section.id);
+        if (!isAlreadyAdded) {
+            const newSection = {
+                id: section.id,
+                label: section.label,
+                visible: true,
+                minimized: false,
+            };
+            // Do NOT updateCurrentSections here!
+            // Just call the API, then wait for GET API to update state
+            saveSectionsAPI([...currentSections, newSection]);
+            setOffcanvasSections((prev) => prev.filter((s) => s.id !== section.id));
+        }
+    };
+
 
     return (
         <Row className="scroll-container mt-0 " style={{ height: '85vh', overflowY: 'scroll' }}>
@@ -288,94 +274,92 @@ const handleOffcanvasCardClick = (section) => {
                     </Row>
                     <Row className="mt-1">
                         {/* {store?.getSettingsTabsReducer?.loading ? (
-                            <div
-                                className="text-center my-4 d-flex justify-content-center align-items-center"
-                                style={{ height: '200px' }}>
-                                <Spinner animation="border" variant="primary" />
+                            <div className="text-center my-4 d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
+                                <Spinner />
                             </div>
                         ) : ( */}
-                            <Col md={getCurrentSections()?.length>0?8:12} >
-                                <Droppable droppableId="active-sections">
-                                    {(provided) => (
-                                        <div {...provided.droppableProps} ref={provided.innerRef}>
-                                            {getCurrentSections().length === 0 && (
-                                                <div className="d-flex flex-column justify-content-center align-items-center" >
-                                                    <span style={{ fontSize: 40, color: '#adb5bd' }} className="">
-                                                        <i className="bi bi-folder-x" />{' '}
-                                                        {/* Bootstrap Icons, or use any icon library */}
-                                                    </span>
-                                                    <p className="text-secondary mt-  mb-0" style={{ fontSize: 18 }}>
-                                                        No sections available
-                                                    </p>
-                                                    <small className="text-muted">
-                                                        Click the{' '}
-                                                        <MdAddCircleOutline style={{ verticalAlign: 'middle' }} />{' '}
-                                                        button to add a section.
-                                                    </small>
-                                                </div>
-                                            )}
-                                            {getCurrentSections().map((section, index) => (
-                                                <Draggable key={section.id} draggableId={section.id} index={index}>
-                                                    {(provided) => (
-                                                        <div
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-                                                            className="mb-2">
-                                                            <Card className="draggable-card p-2">
-                                                                <div className="w-100 d-flex justify-content-between align-items-center">
-                                                                    <div className="d-flex align-items-center">
-                                                                        <span className="me-2 fw-bold">
-                                                                            {index + 1}
-                                                                        </span>
-                                                                        <strong>{section.label}</strong>
-                                                                    </div>
-                                                                    <div className="d-flex align-items-center gap-2">
-                                                                        <Form.Check
-                                                                            type="switch"
-                                                                            id={`minimize-${section.id}`}
-                                                                            checked={!!section.minimized}
-                                                                            label="Minimize"
-                                                                            onChange={() =>
-                                                                                toggleSectionProperty(
-                                                                                    section.id,
-                                                                                    'minimized'
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                        <Form.Check
-                                                                            type="switch"
-                                                                            id={`visible-${section.id}`}
-                                                                            checked={
-                                                                                section.visible !== undefined
-                                                                                    ? section.visible
-                                                                                    : true
-                                                                            }
-                                                                            label="Visible"
-                                                                            onChange={() =>
-                                                                                toggleSectionProperty(
-                                                                                    section.id,
-                                                                                    'visible'
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                        <span
-                                                                            className="drag-icon"
-                                                                            style={{ cursor: 'grab' }}>
-                                                                            ≡
-                                                                        </span>
-                                                                    </div>
+                        <Col md={getCurrentSections()?.length > 0 ? 8 : 12}>
+                            <Droppable droppableId="active-sections">
+                                {(provided) => (
+                                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                                        {getCurrentSections().length === 0 && (
+                                            <div className="d-flex flex-column justify-content-center align-items-center" >
+                                                <span style={{ fontSize: 40, color: '#adb5bd' }} className="">
+                                                    <i className="bi bi-folder-x" />{' '}
+                                                    {/* Bootstrap Icons, or use any icon library */}
+                                                </span>
+                                                <p className="text-secondary mt-  mb-0" style={{ fontSize: 18 }}>
+                                                    No sections available
+                                                </p>
+                                                <small className="text-muted">
+                                                    Click the{' '}
+                                                    <MdAddCircleOutline style={{ verticalAlign: 'middle' }} />{' '}
+                                                    button to add a section.
+                                                </small>
+                                            </div>
+                                        )}
+                                        {getCurrentSections().map((section, index) => (
+                                            <Draggable key={section.id} draggableId={section.id} index={index}>
+                                                {(provided) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                        className="mb-2">
+                                                        <Card className="draggable-card p-2">
+                                                            <div className="w-100 d-flex justify-content-between align-items-center">
+                                                                <div className="d-flex align-items-center">
+                                                                    <span className="me-2 fw-bold">
+                                                                        {index + 1}
+                                                                    </span>
+                                                                    <strong>{section.label}</strong>
                                                                 </div>
-                                                            </Card>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
-                                        </div>
-                                    )}
-                                </Droppable>
-                            </Col>
+                                                                <div className="d-flex align-items-center gap-2">
+                                                                    <Form.Check
+                                                                        type="switch"
+                                                                        id={`minimize-${section.id}`}
+                                                                        checked={!!section.minimized}
+                                                                        label="Minimize"
+                                                                        onChange={() =>
+                                                                            toggleSectionProperty(
+                                                                                section.id,
+                                                                                'minimized'
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <Form.Check
+                                                                        type="switch"
+                                                                        id={`visible-${section.id}`}
+                                                                        checked={
+                                                                            section.visible !== undefined
+                                                                                ? section.visible
+                                                                                : true
+                                                                        }
+                                                                        label="Visible"
+                                                                        onChange={() =>
+                                                                            toggleSectionProperty(
+                                                                                section.id,
+                                                                                'visible'
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <span
+                                                                        className="drag-icon"
+                                                                        style={{ cursor: 'grab' }}>
+                                                                        ≡
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </Card>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        </Col>
                         {/* )} */}
                     </Row>
                 </DragDropContext>
