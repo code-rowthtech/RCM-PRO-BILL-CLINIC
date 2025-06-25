@@ -194,7 +194,7 @@ const MedicalHistory = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'end',
-                            justifyContent: 'space-between',
+                            // justifyContent: 'space-between',
                         }}>
                         <Row className="g-3">
                             <Col xs={12}>
@@ -298,7 +298,7 @@ const MedicalHistory = () => {
                                                 }}
                                                 theme="snow"
                                                 placeholder="Enter detailed notes here..."
-                                                style={{ height: '30vh', backgroundColor: 'white' }}
+                                                style={{ height: '24vh', backgroundColor: 'white' }}
                                                 modules={{
                                                     toolbar: [
                                                         [{ header: [1, 2, false] }],
@@ -319,7 +319,7 @@ const MedicalHistory = () => {
                             </Col>
                         </Row>
 
-                        <div className="d-flex justify-content-end mt-0">
+                        <div className="d-flex justify-content-end mt-5">
                             <Button
                                 type="submit"
                                 variant="primary"

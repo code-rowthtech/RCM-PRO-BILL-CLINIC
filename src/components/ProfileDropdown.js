@@ -107,7 +107,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                     className="nav-link  border-0 dropdown-toggle  nav-user arrow-none me-0">
                     <span className="account-user-avatar">
                         {logo ? (
-                            <img src={logo} className="rounded-circle object-fit-cover " style={{marginLeft:'-8px', marginTop:'3px'}} alt="user" />
+                            <img src={logo} className="rounded-circle object-fit-cover " style={{marginLeft:'-8px', marginTop:''}} alt="user" />
                         ) : (
                             <FaUserCircle className="rounded-circle fs-1  text-dark" />
                         )}

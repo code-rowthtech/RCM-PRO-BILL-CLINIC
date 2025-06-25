@@ -162,7 +162,7 @@ const Tobacco = () => {
                     <Form
                         onSubmit={handleSubmit(onSubmit)}
                         style={{
-                            minHeight: 'calc(100vh - 340px)',
+                            // minHeight: 'calc(100vh - 340px)',
                             height: 'auto',
                             display: 'flex',
                             flexDirection: 'column',
@@ -265,7 +265,7 @@ const Tobacco = () => {
                                                 }}
                                                 theme="snow"
                                                 placeholder="Enter detailed notes here..."
-                                                style={{ height: '35vh', backgroundColor: 'white' }}
+                                                style={{ height: '24vh', backgroundColor: 'white' }}
                                                 modules={{
                                                     toolbar: [
                                                         [{ header: [1, 2, false] }],
@@ -286,7 +286,7 @@ const Tobacco = () => {
                             </Col>
                         </Row>
 
-                        <div className="d-flex justify-content-end mt-0">
+                        <div className="d-flex justify-content-end mt-5">
                             <Button
                                 type="submit"
                                 variant="primary"

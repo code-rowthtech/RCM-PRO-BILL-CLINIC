@@ -209,7 +209,7 @@ const SurgicalHistory = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'end',
-                            justifyContent: 'space-between',
+                            // justifyContent: 'space-between',
                         }}>
                         <Row className="g-3">
                             <Col sm={12}>
@@ -325,7 +325,7 @@ const SurgicalHistory = () => {
                                                 }}
                                                 theme="snow"
                                                 placeholder="Enter detailed notes here..."
-                                                style={{ height: '30vh', backgroundColor: 'white' }}
+                                                style={{ height: '24vh', backgroundColor: 'white' }}
                                                 modules={{
                                                     toolbar: [
                                                         [{ header: [1, 2, false] }],
@@ -347,7 +347,7 @@ const SurgicalHistory = () => {
                                 </Form.Group>
                             </Col>
                         </Row>
-                        <div className="d-flex justify-content-end mt-2">
+                        <div className="d-flex justify-content-end mt-5">
                             <Button
                                 type="submit"
                                 variant="primary"

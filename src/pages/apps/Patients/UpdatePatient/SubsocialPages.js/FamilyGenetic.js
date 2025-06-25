@@ -249,7 +249,7 @@ const FamilyHistory = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'end',
-                            justifyContent: 'space-between',
+                            // justifyContent: 'space-between',
                         }}>
                         <Row className="g-3">
                             <Col md={6}>
@@ -447,7 +447,7 @@ const FamilyHistory = () => {
                                 type="submit"
                                 variant="primary"
                                 disabled={isLoading}
-                                className="px-2 py-1 custom-buttons">
+                                className="px-2 py-1 mt-4 custom-buttons">
                                 {toEdit ? 'Update' : 'Add Record'}
                             </Button>
                         </div>

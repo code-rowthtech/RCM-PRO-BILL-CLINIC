@@ -91,7 +91,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    const [identifierDocument, setIdentifierDocumnent] = useState(false);
+    // const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
     // const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
     const [practiceAddresses, setPracticeAddresses] = useState([
@@ -552,21 +552,21 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         });
     };
 
-    const handleAddressChange = (index, field, value) => {
-        if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
-            ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
-            return; // Prevent selection
-        }
+    // const handleAddressChange = (index, field, value) => {
+    //     if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
+    //         ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
+    //         return; // Prevent selection
+    //     }
 
-        // if(addresses?.some((address) => address?.use === field)) {}
-        const updatedAddresses = [...addresses];
-        if (field === 'line') {
-            updatedAddresses[index].line[0] = value; // update street address
-        } else {
-            updatedAddresses[index][field] = value;
-        }
-        setAddresses(updatedAddresses);
-    };
+    //     // if(addresses?.some((address) => address?.use === field)) {}
+    //     const updatedAddresses = [...addresses];
+    //     if (field === 'line') {
+    //         updatedAddresses[index].line[0] = value; // update street address
+    //     } else {
+    //         updatedAddresses[index][field] = value;
+    //     }
+    //     setAddresses(updatedAddresses);
+    // };
     // State for POCs (at least one default POC)
     const [pocs, setPocs] = useState([
         {
@@ -650,7 +650,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         if (!selectedFile) return;
 
         try {
-            const url = await handleUpload(selectedFile, setIdentifierDocumnent); // Upload file
+            const url = await handleUpload(selectedFile); // Upload file
             setConstantIdentifiers((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
