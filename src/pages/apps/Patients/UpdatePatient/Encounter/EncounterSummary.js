@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Accordion, Col, Modal, Row, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import './Encounter.css'
 import Spinner from '../../../../../constants/Spinner';
-import { FiFilter } from 'react-icons/fi';
 import { defaultVitals } from '../../../../../utils/DataSets/commonData2';
 import AddAllergy from '../../Task Tabs/AddAllergy';
 import AddProblem from '../../Task Tabs/AddProblem';
@@ -86,19 +85,14 @@ const EncounterSummary = () => {
         ? store.getFamilyGeneticReducer.data.familyMedicalHistory
         : [];
 
-
-
     const socialHistoryData = {
         tobaccoHistory: tobaccoHistory.slice(0, 2),
         familyGeneticHistory: familyGeneticHistory.slice(0, 2)
     }
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
-    const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const problemData = store?.getProblemListReducer?.data?.problems;
-    const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
-    const disabledDates = patientVitals?.map(vital => vital.effectiveDateTime) || [];
 
     const groupedVitals = patientVitals && patientVitals?.reduce((acc, vitalGroup) => {
         const date = vitalGroup.effectiveDateTime;
@@ -254,17 +248,9 @@ const EncounterSummary = () => {
         return value || '-';
     };
 
-
-    // const formatTwoDigits = (n) => n.toString().padStart(2, '0');
-    // const [visitDateTime, setVisitDateTime] = useState({
-    //     date: now.toISOString().split('T')[0], // "YYYY-MM-DD"
-    //     time: `${formatTwoDigits(now.getHours())}:${formatTwoDigits(now.getMinutes())}`, // "HH:mm"
-    // });
-
     return (
         <Row className='position-relative'>
-            <Col sm={12} className='mt-0 mt-0' >
-
+            <Col sm={12} className='mt-1' >
                 <Accordion activeKey={activeKey} onSelect={handleToggle}>
                     {sortedSubMenuItems.map((menuItem) => {
                         if (!menuItem?.hide) return null; // Skip hidden items
@@ -359,7 +345,6 @@ const EncounterSummary = () => {
                                                             </li>
                                                         ))}
                                                     </ul>
-
                                                 )}
                                             </div>
                                         ) : (
@@ -379,7 +364,6 @@ const EncounterSummary = () => {
                                             </Modal.Body>
                                         </Modal>
                                     </Accordion.Body>
-
                                 );
                                 break;
 

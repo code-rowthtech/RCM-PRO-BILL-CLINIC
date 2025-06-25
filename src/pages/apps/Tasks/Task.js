@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Form, OverlayTrigger, Row, Table } from 'react-bootstrap';
 import { FiFileText, FiUploadCloud } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
@@ -213,7 +213,9 @@ const Task = () => {
                                             userTasks?.tasks?.map((task, index) => (
                                                 <tr className="border-bottom">
                                                     <td>{index + 1}</td>
-                                                    <td>{task?.description}</td>
+                                                    <td title={task?.description} className='cursor-pointer'>
+                                                        {task?.description?.length > 30 ? task?.description?.slice(0, 29) + '...' : task?.description}
+                                                    </td>
                                                     <td className="text-capitalize">
                                                         {task?.assignedById?.name?.text}
                                                     </td>
