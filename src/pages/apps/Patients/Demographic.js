@@ -805,6 +805,7 @@ const Demographicdetails = ({
                                                     className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
                                                         ? 'd-none'
                                                         : ''
+
                                                         }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
@@ -977,7 +978,7 @@ const Demographicdetails = ({
                         className="custom-buttons"
                         type="submit">
                         {store?.updatePatientsReducer?.loading ? (
-                            <Spinner animation="border" variant="primary" size="sm" />
+                            <Spinner animation="border" variant="primary" size="sm" className='text-white' />
                         ) : (
                             ' Save & Continue Editing'
                         )}

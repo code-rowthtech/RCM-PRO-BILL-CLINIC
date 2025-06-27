@@ -111,6 +111,31 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
         };
     }, []);
 
+    // Add this useEffect to auto-calculate medicationEnd
+    useEffect(() => {
+        const periodUnit = watch('periodUnit');
+        const period = Number(watch('period'));
+        const frequency = Number(watch('frequency'));
+        const startDate = watch('medicationStart');
+
+        if (!periodUnit || !period || !frequency || !startDate) return;
+
+        let endDate = new Date(startDate);
+        if (periodUnit === 'days') {
+            endDate.setDate(endDate.getDate() + (period * frequency));
+        } else if (periodUnit === 'weeks') {
+            endDate.setDate(endDate.getDate() + (period * frequency * 7));
+        } else if (periodUnit === 'months') {
+            endDate.setMonth(endDate.getMonth() + (period * frequency));
+        } else if (periodUnit === 'hours') {
+            // For hours, if it crosses midnight, move to next day
+            endDate.setHours(endDate.getHours() + (period * frequency));
+        }
+        // Format to yyyy-mm-dd for input type="date"
+        const formattedEndDate = endDate.toISOString().split('T')[0];
+        setValue('medicationEnd', formattedEndDate);
+    }, [watch('periodUnit'), watch('period'), watch('frequency'), watch('medicationStart')]);
+
     // FUNCTIONS 
     const handleAddProblemClose = () => setShowAddProblemModal(false);
 

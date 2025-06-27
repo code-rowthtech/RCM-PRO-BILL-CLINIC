@@ -50,7 +50,7 @@ function* rescheduleAppointmentFunction(data) {
             payload: {},
         });
         const response = yield call(rescheduleAppointmentApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = response.data.data;
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success')
             yield put({

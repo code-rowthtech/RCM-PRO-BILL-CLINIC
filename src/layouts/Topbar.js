@@ -170,7 +170,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                         )}
                         <li
                             onClick={() => setTaskModal(true)}
-                            className="text-primary fw-bolder fs-3 cursor-pointer"
+                            className="text-primary fw-bolder fs-3 cursor-pointer ms-2"
                             title="Add New Task">
                             <MdAddCircleOutline />
                         </li>
