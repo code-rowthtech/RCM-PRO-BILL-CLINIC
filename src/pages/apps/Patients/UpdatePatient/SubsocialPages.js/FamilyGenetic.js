@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Col, Row, Form, Button, Card, ListGroup, Accordion } from 'react-bootstrap';
+import { Col, Row, Form, Button, Card, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,7 +29,7 @@ import useQuillWordLimit from '../../../../../helpers/quillWordLimit';
 import ToastHandle from '../../../../../helpers/ToastMessage';
 
 const MAX_WORDS = 1000;
-const WAX_WORD_LENGTH = 45;
+const MAX_WORD_LENGTH = 45;
 
 const FamilyHistory = () => {
     const dispatch = useDispatch();
@@ -81,7 +81,7 @@ const FamilyHistory = () => {
     useQuillWordLimit({
         quillRef,
         maxWords: MAX_WORDS,
-        maxWordLength: WAX_WORD_LENGTH,
+        maxWordLength: MAX_WORD_LENGTH,
         onLimitExceed: handleLimitExceed,
         setValue,
         fieldName: 'note',
@@ -144,7 +144,6 @@ const FamilyHistory = () => {
         setToEdit(null);
         setSearchQuery('');
     };
-
 
     const closeDeleteModal = () => {
         setToDelete(null);
@@ -233,309 +232,303 @@ const FamilyHistory = () => {
     };
 
     return (
-        <Row className="py-0 m-auto">
-            {/* Left Side - Form */}
-            <Col md={6} className="d-flex flex-column border-end px-0 pe-2 scroll-container">
-                <Card.Body className="p-0 pt-2">
-                    {/* <Card.Title className="border-bottom pb-2 pt-0 mb-1">
-                            <h5 className="fw-semibold mb-0">Add Family Medical History</h5>
-                        </Card.Title> */}
-
-                    <Form
-                        onSubmit={handleSubmit(onSubmit)}
-                        style={{
-                            minHeight: 'calc(100vh - 340px)',
-                            height: 'auto',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'end',
-                            justifyContent: 'space-between',
-                        }}>
-                        <Row className="g-3">
-                            <Col md={6}>
-                                <Form.Group controlId="relationship">
-                                    <Form.Label className="fw-medium mb-0">Relationship</Form.Label>
-                                    <Select
-                                        options={relationshipOption}
-                                        isSearchable
-                                        className="basic-single"
-                                        classNamePrefix="select"
-                                        placeholder="Select relationship"
-                                        value={
-                                            rela ? relationshipOption.find((opt) => opt.value.code === rela.code) : null
-                                        }
-                                        onChange={handleRelationChange}
-                                        styles={{
-                                            control: (provided) => ({
-                                                ...provided,
-                                                minHeight: '30px',
-                                                border: '0px',
-                                            }),
-                                        }}
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group controlId="name">
-                                    <Form.Label className="fw-medium mb-0">Name</Form.Label>
-                                    <Form.Control
-                                        {...register('name', { required: 'Name is required' })}
-                                        className="form-control-sm"
-                                    />
-                                </Form.Group>
-                            </Col>
-
-                            <Col md={6} className="mt-0">
-                                <Form.Group controlId="dob">
-                                    <Form.Label className="fw-medium mb-0">Date of Birth</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        {...register('dob', { required: 'Date of birth is required' })}
-                                        className="form-control-sm"
-                                        max={new Date().toISOString().slice(0, 10)}
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={6} className="mt-0">
-                                <Form.Group controlId="sex">
-                                    <Form.Label className="fw-medium mb-0">Sex</Form.Label>
-                                    <Form.Select
-                                        {...register('sex', { required: 'Sex is required' })}
-                                        className="form-select-sm">
-                                        <option value="" disabled>
-                                            Select Sex
-                                        </option>
-                                        {sexAssignedAtBirthOptions.map((option) => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-
-                            <Col md={6} className="mt-0">
-                                <Form.Group controlId="problem">
-                                    <Form.Label className="fw-medium mb-0">Condition</Form.Label>
-                                    <Controller
-                                        name="problem"
-                                        control={control}
-                                        rules={{ required: 'Condition is required' }}
-                                        render={({ field }) => (
-                                            <Select
-                                                {...field}
-                                                classNamePrefix="select"
-                                                options={formattedOptions}
-                                                value={selectedProblem}
-                                                onChange={(selected) => {
-                                                    field.onChange(selected);
-                                                    setSelectedProblem(selected);
-                                                }}
-                                                onInputChange={(value) => setSearchQuery(value)}
-                                                placeholder="Search condition"
-                                                isClearable
-                                                isSearchable
-                                                styles={{
-                                                    control: (provided) => ({
-                                                        ...provided,
-                                                        minHeight: '30px',
-                                                        border: '0px',
-                                                    }),
-                                                }}
-                                            />
-                                        )}
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={6} className="mt-0">
-                                <Form.Group controlId="deceased">
-                                    <Form.Label className="fw-medium mb-0">Deceased</Form.Label>
-                                    <div>
-                                        <Form.Check
-                                            inline
-                                            label="Yes"
-                                            type="radio"
-                                            value="yes"
-                                            {...register('deceased')}
-                                            className="form-check-inline"
-                                        />
-                                        <Form.Check
-                                            inline
-                                            label="No"
-                                            type="radio"
-                                            value="no"
-                                            {...register('deceased')}
-                                            className="form-check-inline"
-                                            defaultChecked
-                                        />
-                                    </div>
-                                </Form.Group>
-                            </Col>
-
-                            {isDeceased && (
+        <Row className="g-0 m-0" style={{ height: 'calc(100vh - 150px)' }}>
+            {/* Left: Form Section */}
+            <Col md={6} className="d-flex flex-column border-end px-0 pe-2" style={{ height: '100%' }}>
+                <div className="h-100">
+                    <Card.Body className="d-flex flex-column px-2 py-0" style={{ overflowY: 'auto' }}>
+                        <Form onSubmit={handleSubmit(onSubmit)} className="flex-grow-1 d-flex flex-column">
+                            <Row className="">
                                 <Col md={6}>
-                                    <Form.Group controlId="dateOfDeath">
-                                        <Form.Label className="fw-medium mb-0">Date of Death</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            {...register('dateOfDeath')}
-                                            className="form-control-sm"
-                                            max={new Date().toISOString().split('T')[0]}
+                                    <Form.Group controlId="relationship">
+                                        <Form.Label className="fw-medium mb-1">Relationship</Form.Label>
+                                        <Select
+                                            options={relationshipOption}
+                                            isSearchable
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            placeholder="Select relationship"
+                                            value={
+                                                rela ? relationshipOption.find((opt) => opt.value.code === rela.code) : null
+                                            }
+                                            onChange={handleRelationChange}
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    minHeight: '30px',
+                                                    border: '0px',
+                                                }),
+                                            }}
                                         />
                                     </Form.Group>
                                 </Col>
-                            )}
+                                <Col md={6}>
+                                    <Form.Group controlId="name">
+                                        <Form.Label className="fw-medium mb-1">Name</Form.Label>
+                                        <Form.Control
+                                            {...register('name', { required: 'Name is required' })}
+                                            className="form-control-sm"
+                                        />
+                                    </Form.Group>
+                                </Col>
 
-                            <Col xs={12} className="mt-0">
-                                <Form.Group controlId="notes">
-                                    <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                <Col md={6}>
+                                    <Form.Group controlId="dob">
+                                        <Form.Label className="fw-medium mb-1">Date of Birth</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            {...register('dob', { required: 'Date of birth is required' })}
+                                            className="form-control-sm"
+                                            max={new Date().toISOString().slice(0, 10)}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group controlId="sex">
+                                        <Form.Label className="fw-medium mb-1">Sex</Form.Label>
+                                        <Form.Select
+                                            {...register('sex', { required: 'Sex is required' })}
+                                            className="form-select-sm">
+                                            <option value="" disabled>
+                                                Select Sex
+                                            </option>
+                                            {sexAssignedAtBirthOptions.map((option) => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+
+                                <Col md={6}>
+                                    <Form.Group controlId="problem">
+                                        <Form.Label className="fw-medium mb-1">Condition</Form.Label>
+                                        <Controller
+                                            name="problem"
+                                            control={control}
+                                            rules={{ required: 'Condition is required' }}
+                                            render={({ field }) => (
+                                                <Select
+                                                    {...field}
+                                                    classNamePrefix="select"
+                                                    options={formattedOptions}
+                                                    value={selectedProblem}
+                                                    onChange={(selected) => {
+                                                        field.onChange(selected);
+                                                        setSelectedProblem(selected);
+                                                    }}
+                                                    onInputChange={(value) => setSearchQuery(value)}
+                                                    placeholder="Search condition"
+                                                    isClearable
+                                                    isSearchable
+                                                    styles={{
+                                                        control: (provided) => ({
+                                                            ...provided,
+                                                            minHeight: '30px',
+                                                            border: '0px',
+                                                        }),
+                                                    }}
+                                                />
+                                            )}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group controlId="deceased">
+                                        <Form.Label className="fw-medium mb-1">Deceased</Form.Label>
                                         <div>
-                                            Notes{' '}
-                                            <span
-                                                style={{ cursor: 'pointer' }}
-                                                title="Notes Suggestions"
-                                                onClick={handleEditorFocus}>
-                                                ✨
-                                            </span>
-                                        </div>
-                                        <small className="text-muted">
-                                            {(() => {
-                                                const content = watch('note') || '';
-                                                const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
-                                                const words = plainText?.split(/\s+/)?.filter(Boolean);
-                                                const wordCount = words?.length;
-                                                return (
-                                                    <div>
-                                                        <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
-                                                    </div>
-                                                );
-                                            })()}
-                                        </small>
-                                    </Form.Label>
-                                    <Controller
-                                        name="note"
-                                        control={control}
-                                        render={({ field: { onChange, value } }) => (
-                                            <ReactQuill
-                                                ref={quillRef}
-                                                value={value}
-                                                onChange={onChange}
-                                                theme="snow"
-                                                placeholder="Enter detailed notes here..."
-                                                style={{ height: '20vh', backgroundColor: 'white' }}
-                                                modules={{
-                                                    toolbar: [
-                                                        [{ header: [1, 2, false] }],
-                                                        ['bold', 'italic', 'underline', 'strike'],
-                                                        [{ list: 'ordered' }, { list: 'bullet' }],
-                                                        ['clean'],
-                                                    ],
-                                                }}
+                                            <Form.Check
+                                                inline
+                                                label="Yes"
+                                                type="radio"
+                                                value="yes"
+                                                {...register('deceased')}
+                                                className="form-check-inline"
                                             />
-                                        )}
-                                    />
-                                    <SuggestionOffcanvas
-                                        show={showSuggestions}
-                                        onClose={() => setShowSuggestions(false)}
-                                        onSelect={handleSuggestionSelect}
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <div className="d-flex justify-content-end align-items-end pe-1 py-2">
-                            <Button
-                                type="submit"
-                                variant="primary"
-                                disabled={isLoading}
-                                className="px-2 py-1 custom-buttons">
-                                {toEdit ? 'Update' : 'Add Record'}
-                            </Button>
-                        </div>
-                    </Form>
-                </Card.Body>
-            </Col>
+                                            <Form.Check
+                                                inline
+                                                label="No"
+                                                type="radio"
+                                                value="no"
+                                                {...register('deceased')}
+                                                className="form-check-inline"
+                                                defaultChecked
+                                            />
+                                        </div>
+                                    </Form.Group>
+                                </Col>
 
-            {/* Right Side - Display */}
-            <Col md={6} className="d-flex flex-column px-0 scroll-container">
-                <Card.Body className="ps-2 py-1 p-0">
-                    {isLoading && !familyGeneticHistory?.length ? (
-                        <div className="text-center py-4">
-                            <Spinner />
-                        </div>
-                    ) : familyGeneticHistory?.length === 0 ? (
-                        <div className="text-center py-4 text-muted">
-                            <i className="bi bi-journal-x fs-1"></i>
-                            <p className="mt-2 mb-0">No family records found</p>
-                        </div>
-                    ) : (
-                        <Accordion alwaysOpen flush>
-                            {familyGeneticHistory.map((item, index) => (
-                                <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
-                                    <Accordion.Header>
-                                        <div
-                                            className="d-flex justify-content-between align-items-center w-100"
-                                            style={{ marginRight: '-19px' }}>
-                                            <div className="d-flex align-items-center gap-1 p-2 pe-0">
-                                                <span className="text-black fs-6 tab-font-family fw-semibold">
-                                                    {index + 1}.
-                                                </span>
-                                                <span className="fw-normal fs-6 tab-font-family text-black">
-                                                    {item.name || 'Unnamed'} (
-                                                    {item.relationship?.coding?.[0]?.display || 'Unknown'})
-                                                </span>
-                                                <span className="fw-normal fs-6 tab-font-family text-black">
-                                                    had {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'}
+                                {isDeceased && (
+                                    <Col md={6}>
+                                        <Form.Group controlId="dateOfDeath">
+                                            <Form.Label className="fw-medium mb-1">Date of Death</Form.Label>
+                                            <Form.Control
+                                                type="date"
+                                                {...register('dateOfDeath')}
+                                                className="form-control-sm"
+                                                max={new Date().toISOString().split('T')[0]}
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                )}
+
+                                <Col xs={12} className="flex-grow-1 d-flex flex-column">
+                                    <Form.Group controlId="notes" className="flex-grow-1 d-flex flex-column">
+                                        <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                            <div>
+                                                Notes{' '}
+                                                <span
+                                                    style={{ cursor: 'pointer' }}
+                                                    title="Notes Suggestions"
+                                                    onClick={handleEditorFocus}>
+                                                    ✨
                                                 </span>
                                             </div>
-
-                                            <div className="d-flex gap-2 px-2" onClick={(e) => e.stopPropagation()}>
-                                                <i
-                                                    className="bi bi-trash text-danger cursor-pointer"
-                                                    onClick={() => {
-                                                        setToDelete(item?._id);
-                                                        setDeleteModal(true);
-                                                    }}
-                                                    title="Delete"
-                                                />
-                                                {toEdit && toEdit._id === item._id ? (
-                                                    <i
-                                                        className="bi bi-x-lg text-danger cursor-pointer"
-                                                        onClick={() => handleReset()}
-                                                        title="Cancel"
-                                                    />
-                                                ) : (
-                                                    <i
-                                                        className="bi bi-pencil text-info cursor-pointer"
-                                                        onClick={() => setToEdit(item)}
-                                                        title="Edit"
+                                            <small className="text-muted">
+                                                {(() => {
+                                                    const content = watch('note') || '';
+                                                    const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                                    const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                    const wordCount = words?.length;
+                                                    return (
+                                                        <div>
+                                                            <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                        </div>
+                                                    );
+                                                })()}
+                                            </small>
+                                        </Form.Label>
+                                        <div className="flex-grow-1 d-flex flex-column">
+                                            <Controller
+                                                name="note"
+                                                control={control}
+                                                render={({ field: { onChange, value } }) => (
+                                                    <ReactQuill
+                                                        ref={quillRef}
+                                                        value={value}
+                                                        onChange={onChange}
+                                                        theme="snow"
+                                                        placeholder="Enter detailed notes here..."
+                                                        style={{ height: '24vh', backgroundColor: 'white' }}
+                                                        modules={{
+                                                            toolbar: [
+                                                                [{ header: [1, 2, false] }],
+                                                                ['bold', 'italic', 'underline', 'strike'],
+                                                                [{ list: 'ordered' }, { list: 'bullet' }],
+                                                                ['clean'],
+                                                            ],
+                                                        }}
                                                     />
                                                 )}
-                                            </div>
+                                            />
                                         </div>
-                                    </Accordion.Header>
+                                        <SuggestionOffcanvas
+                                            show={showSuggestions}
+                                            onClose={() => setShowSuggestions(false)}
+                                            onSelect={handleSuggestionSelect}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-                                    <Accordion.Body className="pt-0 p-2">
-                                        <div className="mb-2">
-                                            {item.note?.[0]?.text ? (
-                                                <div
-                                                    className="ql-editor p-1 rounded scroll-container"
-                                                    dangerouslySetInnerHTML={{ __html: item.note[0].text }}
-                                                    style={{
-                                                        fontSize: '0.875rem',
-                                                        maxHeight: '150px',
-                                                        overflowY: 'auto',
-                                                    }}
-                                                />
-                                            ) : (
-                                                <span className="ms-2 text-muted fst-italic"> No notes available</span>
-                                            )}
-                                        </div>
-                                    </Accordion.Body>
-                                </Accordion.Item>
-                            ))}
-                        </Accordion>
-                    )}
-                </Card.Body>
+                            <div className="mt-5 d-flex justify-content-end">
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    disabled={isLoading}
+                                    className="px-3 py-1 custom-buttons">
+                                    {toEdit ? 'Update' : 'Add Record'}
+                                </Button>
+                            </div>
+                        </Form>
+                    </Card.Body>
+                </div>
+            </Col>
+
+            {/* Right: History Section */}
+            <Col md={6} className="d-flex flex-column px-0" style={{ height: '100%' }}>
+                <div className="h-100">
+                    <div className="p-0" style={{ overflowY: 'auto' }}>
+                        {isLoading && !familyGeneticHistory?.length ? (
+                            <div className="text-center py-4">
+                                <Spinner />
+                            </div>
+                        ) : familyGeneticHistory?.length === 0 ? (
+                            <div className="text-center py-4 text-muted">
+                                <i className="bi bi-journal-x fs-1"></i>
+                                <p className="mt-2 mb-0">No family records found</p>
+                            </div>
+                        ) : (
+                            <Accordion alwaysOpen flush className="h-100">
+                                {familyGeneticHistory.map((item, index) => (
+                                    <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
+                                        <Accordion.Header>
+                                            <div
+                                                className="d-flex justify-content-between align-items-center w-100"
+                                                style={{ marginRight: '-19px' }}>
+                                                <div className="d-flex align-items-center gap-1 p-2 pe-0">
+                                                    <span className="text-black fs-6 tab-font-family fw-semibold">
+                                                        {index + 1}.
+                                                    </span>
+                                                    <span className="fw-normal fs-6 tab-font-family text-black">
+                                                        {item.name || 'Unnamed'} (
+                                                        {item.relationship?.coding?.[0]?.display || 'Unknown'})
+                                                    </span>
+                                                    <span className="fw-normal fs-6 tab-font-family text-black">
+                                                        had {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'}
+                                                    </span>
+                                                </div>
+
+                                                <div className="d-flex gap-2 px-2" onClick={(e) => e.stopPropagation()}>
+                                                    <i
+                                                        className="bi bi-trash text-danger cursor-pointer"
+                                                        onClick={() => {
+                                                            setToDelete(item?._id);
+                                                            setDeleteModal(true);
+                                                        }}
+                                                        title="Delete"
+                                                    />
+                                                    {toEdit && toEdit._id === item._id ? (
+                                                        <i
+                                                            className="bi bi-x-lg text-danger cursor-pointer"
+                                                            onClick={() => handleReset()}
+                                                            title="Cancel"
+                                                        />
+                                                    ) : (
+                                                        <i
+                                                            className="bi bi-pencil text-info cursor-pointer"
+                                                            onClick={() => setToEdit(item)}
+                                                            title="Edit"
+                                                        />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </Accordion.Header>
+
+                                        <Accordion.Body className="pt-0 p-2">
+                                            <div className="mb-2">
+                                                {item.note?.[0]?.text ? (
+                                                    <div
+                                                        className="ql-editor p-1 rounded"
+                                                        dangerouslySetInnerHTML={{ __html: item.note[0].text }}
+                                                        style={{
+                                                            fontSize: '0.875rem',
+                                                            maxHeight: '150px',
+                                                            overflowY: 'auto',
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <span className="ms-2 text-muted fst-italic"> No notes available</span>
+                                                )}
+                                            </div>
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+                                ))}
+                            </Accordion>
+                        )}
+                    </div>
+                </div>
             </Col>
 
             <DeletionModal

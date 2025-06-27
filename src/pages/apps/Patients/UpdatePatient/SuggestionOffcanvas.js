@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 const SuggestionOffcanvas = ({ show, onClose, onSelect }) => {
     const store = useSelector((state) => state);
     const suggestions = store?.createSuggestionsReducer?.data?.data;
+    console.log("Suggestions:", suggestions);
     const loading = store?.createSuggestionsReducer?.loading;
     const [copiedIndex, setCopiedIndex] = useState(null);
     const handleCopy = (text, index) => {
@@ -57,9 +58,9 @@ const SuggestionOffcanvas = ({ show, onClose, onSelect }) => {
                                 <div className="row p-0 m-0">
                                     <div className="col-12 py-0 m-0 text-end">
                                         <span
-                                            // size="sm"
                                             className={`ms-2 ${copiedIndex === index ? 'text-success ' : 'text-info'} copy-btn`}
                                             onClick={() => handleCopy(data?.text, index)}
+                                            title={copiedIndex === index ? 'Copied!' : 'Copy to clipboard'}
                                         >
                                             {copiedIndex === index ? <FaCheck /> : <FaCopy />}
                                         </span>

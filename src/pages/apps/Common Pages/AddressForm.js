@@ -307,6 +307,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                                 data.components?.city ||
                                                 data.components?.town ||
                                                 data.components?.village ||
+                                                data.components?.normalize_city||
                                                 '';
 
                                             // Dispatch city load based on address type

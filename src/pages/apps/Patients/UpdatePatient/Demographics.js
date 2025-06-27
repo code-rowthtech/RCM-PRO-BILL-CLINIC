@@ -952,16 +952,20 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">City</Form.Label>
                                             <Form.Select
-                                                disabled={store?.getCitiesReducer?.loading}
+                                                disabled={store?.getCitiesReducer?.loading || store?.getCitiesReducer?.cities4?.loading}
                                                 {...register('employerCity')}>
-                                                <option hidden value="">
-                                                    {store?.getCitiesReducer?.cities4?.loading ? 'Loading...' : 'City'}
-                                                </option>
-                                                {cities4?.map((data) => (
-                                                    <option key={data?.name} value={data?.name}>
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
+                                                {(store?.getCitiesReducer?.loading || store?.getCitiesReducer?.cities4?.loading) ? (
+                                                    <option value="" hidden>Loading...</option>
+                                                ) : (
+                                                    <>
+                                                        <option value="" hidden>City</option>
+                                                        {cities4?.map((data) => (
+                                                            <option key={data?.name} value={data?.name}>
+                                                                {data?.name}
+                                                            </option>
+                                                        ))}
+                                                    </>
+                                                )}
                                             </Form.Select>
                                             {errors.employerCity && (
                                                 <span className="text-danger">{errors.employerCity.message}</span>

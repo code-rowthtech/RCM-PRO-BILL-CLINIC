@@ -52,7 +52,7 @@ export const bodySite = [
     {
         code: "unknown",
         system: "http://terminology.hl7.org/codeSystem/data-absent-reason",
-        display: "Unksown"
+        display: "Unknown"
     },
     {
         code: "OTH",
