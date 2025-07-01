@@ -66,6 +66,10 @@ function* changeEmailFunction(data) {
                 type: ClinicsActionTypes.CHANGE_EMAIL_SUCCESS,
                 payload: { ...decryptedData },
             });
+             yield put({
+                type: ClinicsActionTypes.CHANGE_EMAIL_RESET,
+                payload: {},
+            });    
         } else {
             yield put({
                 type: ClinicsActionTypes.CHANGE_EMAIL_ERROR,
