@@ -123,7 +123,6 @@ export const deleteAllergyList = `${BaseRoute}/deleteAllergy`;
 export const getAllergiesOfAPatient = `${BaseRoute}/getAllergiesOfAPatient`;
 export const getAllergyDetails = `${BaseRoute}/getAllergyDetails`;
 
-
 // vitals
 export const createVitals = `${BaseRoute}/addVitals`;
 export const getVitals = `${BaseRoute}/getAllVitals`;
@@ -158,12 +157,12 @@ export const getSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 export const deleteSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 // ALCOHOL HISTORY
 export const alcoholHistory = `${BaseRoute}/alcoholHistory`;
-
 // Surgical 
 export const createMedicalHistory = `${BaseRoute}/medicalHistory`;
 export const updateMedicalHistory = `${BaseRoute}/medicalHistory`;
 export const getMedicalHistory = `${BaseRoute}/medicalHistory`;
 export const deleteMedicalHistory = `${BaseRoute}/medicalHistory`;
+
 // ICD CODES
 export const icdProcedures = `${BaseRoute}/codes/pcs`;
 

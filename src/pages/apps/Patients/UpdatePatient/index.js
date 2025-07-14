@@ -79,6 +79,7 @@ const UpdatePatientIndex = () => {
     const [expanded, setExpanded] = useState(false);
     const [createEncounter, setCreateEncounter] = useState(false);
     const isAccordionOpen = activeKey === '0'; // true or false
+    console.log(isAccordionOpen,'isAccordionOpenisAccordionOpen')
 
     const toggleSubmenu = (label) => {
         setActiveSubmenu((prev) => (prev === label ? null : label));
