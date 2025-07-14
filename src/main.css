@@ -857,8 +857,17 @@ table {
 }
 
 .topbar-dropdown-menu {
-    right: -40% !important;
+    right: -10% !important;
+    margin-top: 10px !important;
     transform: translateY(40%) !important;
+}
+.nav-user .account-user-avatar {
+    position: absolute;
+    top: calc(20px * 0.3);
+    left: 6px;
+}
+.dropdown-toggle::after {
+    display: none !important;
 }
 .content-page {
     padding-top: 50px !important;

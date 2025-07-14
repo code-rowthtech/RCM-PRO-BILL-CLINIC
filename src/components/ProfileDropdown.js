@@ -71,9 +71,9 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const userName = user?.name || '';
     const changedLogo = sessionStorage.getItem('logo');
     const logo = changedLogo || user?.logo;
-    const handleOtpGeneration = () => {
-        dispatch(changeEmailAction());
-    };
+    // const handleOtpGeneration = () => {
+    //     dispatch(changeEmailAction());
+    // };
 
     // Handle input changes
     const handleChange = (value, index) => {
@@ -94,22 +94,19 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
             document.getElementById(`otp-${index - 1}`).focus();
         }
     };
-    const onSubmit = () => { };
+    const onSubmit = () => {};
     return (
         <>
-            <Dropdown show={dropdownOpen} onToggle={toggleDropdown} drop="down" align="end">
+            <Dropdown align="end">
                 <Dropdown.Toggle
                     variant="link"
                     id="dropdown-profile"
-                    as={Link}
-                    to="#"
-                    onClick={toggleDropdown}
-                    className="nav-link  border-0 dropdown-toggle  nav-user arrow-none me-0">
+                    className="nav-link border-0 dropdown-toggle nav-user arrow-none me-0">
                     <span className="account-user-avatar">
                         {logo ? (
-                            <img src={logo} className="rounded-circle object-fit-cover " style={{marginLeft:'-8px', marginTop:''}} alt="user" />
+                            <img src={logo} className="rounded-circle object-fit-cover" alt="user" />
                         ) : (
-                            <FaUserCircle className="rounded-circle fs-1  text-dark" />
+                            <FaUserCircle className="rounded-circle fs-1 text-dark" />
                         )}
                     </span>
                 </Dropdown.Toggle>
@@ -134,10 +131,12 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                                 </Link>
                             );
                         })}
-                        <Link to="#" onClick={handleOtpGeneration} className="dropdown-item notify-item">
+                        {/* <div to="#" 
+                        onClick={handleOtpGeneration} 
+                        className="dropdown-item notify-item">
                             <i className="mdi mdi-email-edit cursor-pointer me-1"></i>
                             <span>Change Email</span>
-                        </Link>
+                        </div> */}
                     </div>
                 </Dropdown.Menu>
                 <Modal centered show={show} onHide={closeModal}>

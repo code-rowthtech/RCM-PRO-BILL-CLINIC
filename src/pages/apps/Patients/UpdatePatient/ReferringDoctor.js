@@ -33,6 +33,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
     ]);
     const [submissionType, setSubmissionType] = useState(null);
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
+    console.log(patientDetails,'patents')
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
 
     const primaryState = watch('primaryStateName');

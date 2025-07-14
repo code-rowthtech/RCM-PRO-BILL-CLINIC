@@ -19,6 +19,7 @@ import { createSuggestionAction } from '../../../../../redux/suggestions/action'
 import Spinner from '../../../../../constants/Spinner';
 
 const UpdateProblem = ({ onCancel, problem }) => {
+    console.log(problem,'problem')
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const store = useSelector((state) => state);

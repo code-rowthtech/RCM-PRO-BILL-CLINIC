@@ -81,9 +81,9 @@ const UpdateAllergy = ({ onCancel }) => {
         setCode(allergyDetails?.code?.coding[0]);
         if (allergyDetails?.appointmentId) {
             setSelectMode('appointment');
-            const selected = appointments.find(
+            const selected = appointments?.find(
                 (appt) =>
-                    appt._id === allergyDetails.appointmentId._id || appt.id === allergyDetails.appointmentId.id
+                    appt?._id === allergyDetails?.appointmentId?._id || appt?.id === allergyDetails?.appointmentId?.id
             );
             if (selected) {
                 setValue('appointment', JSON.stringify(selected));
