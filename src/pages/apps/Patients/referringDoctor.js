@@ -2,11 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Row, InputGroup, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    getStatesByCountryAction,
-    getCitiesAction,
-    addReferringDoctorAction,
-} from '../../../redux/actions';
+import { getStatesByCountryAction, getCitiesAction, addReferringDoctorAction } from '../../../redux/actions';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddressForm from '../Common Pages/AddressForm';
@@ -161,9 +157,7 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
                             Phone <span className="text-danger">*</span>
                         </Form.Label>
                         <InputGroup>
-                            <InputGroup.Text className="ps-3 pe-1 fw-bold text-black" style={{ height: '33px' }}>
-                                &nbsp;+1
-                            </InputGroup.Text>
+                            <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">+1</InputGroup.Text>
                             <Form.Control
                                 type="tel"
                                 {...register('phone', {
@@ -183,10 +177,15 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
                         </InputGroup>
                         <div
                             className="position-absolute"
-                            style={{ top: '54%', left: '1%', transform: 'translateY(-16%)' }}>
-                            <img src={us} alt="country code flag" width={20} />
+                            style={{
+                                left: '10px',
+                                top: '35px',
+                                transform: 'translateY(-50%)',
+                                zIndex: 1
+                            }}>
+                            <img src={us} alt="flag" width={20} />
                         </div>
-                        {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
+                        {errors.phone && <span className="text-danger d-block">{errors.phone.message}</span>}
                     </Form.Group>
                 </Col>
             </Row>

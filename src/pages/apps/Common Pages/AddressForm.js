@@ -44,8 +44,8 @@ const AddressForm = ({ addresses, setAddresses }) => {
         }
 
         // Find the first available address type
-        const usedTypes = addresses.map((address) => address.type);
-        const availableType = addressTypes.find((type) => !usedTypes.includes(type)) || addressTypes[0];
+        const usedTypes = addresses?.map((address) => address?.type);
+        const availableType = addressTypes?.find((type) => !usedTypes?.includes(type)) || addressTypes[0];
 
         setAddresses([
             ...addresses,
@@ -488,7 +488,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                     </Col>
                     {addresses.length > 1 && index !== 0 && (
                         <CiCircleMinus
-                            style={{ top: '80%', right: '49%' }}
+                            style={{ top: '27%', right: '-1%' }}
                             onClick={() => removeAddress(index)}
                             className="text-danger px-0 cursor-pointer position-absolute w-auto fs-5 "
                         />

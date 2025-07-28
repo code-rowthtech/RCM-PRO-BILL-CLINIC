@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, Col, Form, Modal, Row, Spinner, Table } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -15,6 +15,7 @@ import ToastHandle from '../../../helpers/ToastMessage';
 
 const ModalTask = ({ show, handleClose, taskId }) => {
     const store = useSelector((state) => state);
+    const [skip, setSkip] = useState(1);
     const dispatch = useDispatch();
     const MAX_WORDS = 1000;
     const WAX_WORD_LENGTH = 45;
@@ -73,7 +74,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
             const doctorPayload = { status: '', search: '' };
             dispatch(getDoctorsAction(doctorPayload));
             dispatch(getPatientsAction(data));
-            dispatch(getMastersDataAction({ status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
+            dispatch(getMastersDataAction({ status: '', category: 'task-category', limit: 10, skip: skip, search: '' }));
             dispatch(getRolesAction({
                 clinicId: clinicId,
                 limit: 10,

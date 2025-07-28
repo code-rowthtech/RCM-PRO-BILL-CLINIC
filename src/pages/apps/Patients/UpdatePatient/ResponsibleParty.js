@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
@@ -38,7 +38,9 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
             setValue('title', patientDetails?.relatedPerson?.name?.[0]?.prefix);
             setValue('fullName', patientDetails?.relatedPerson?.name?.find((data) => data?.use === 'official')?.text);
             setValue('gender', patientDetails?.gender);
-            setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0]);
+            // setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0]);
+              setRela(patientDetails.relatedPerson?.relationship?.[0]?.coding?.[0] ?? null);
+
             setValue(
                 'dateOfBirth',
                 patientDetails?.relatedPerson?.dateOfBirth
@@ -107,9 +109,11 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
         label: relation.display,
     }));
     const [rela, setRela] = useState(null);
-    const handleRelationChange = (selectedOption) => {
-        setRela(selectedOption ? selectedOption.value : '');
-    };
+      const handleRelationChange  = (opt) => setRela(opt?.value ?? null);
+        const selectedRelationOption = useMemo(
+              () => relationshipOption.find((o) => o.value.code == rela?.code) ?? null,
+              [rela, relationshipOption]
+          );
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <div
@@ -178,11 +182,9 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
-                                onChange={handleRelationChange}
-                                value={
-                                    relationshipOption.find((option) => option?.value?.display === rela?.display) ||
-                                    null
-                                } // Show selected value
+                                value={selectedRelationOption}
+                                                                onChange={handleRelationChange}
+
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,

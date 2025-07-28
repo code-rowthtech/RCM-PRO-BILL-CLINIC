@@ -84,7 +84,7 @@ const ProblemList = () => {
                                             <td>{index + 1}</td>
                                             <td>{data?.code?.coding?.[0]?.display || 'N/A'}</td>
                                             <td>{data?.code?.coding?.[0]?.code || 'N/A'}</td>
-                                            <td>{new Date(data?.onsetDateTime).toLocaleDateString('en-GB')}</td>
+                                            <td>{new Date(data?.onsetDateTime).toLocaleDateString('en-GB') || 'N/A'}</td>
                                             <td>{data.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>
                                             <td>
                                                 <i

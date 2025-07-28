@@ -8,7 +8,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
 import { getRoleDataAction, getRolesAction, updateRolesAction } from '../../../redux/actions';
 import Paginations from '../../../helpers/Paginations';
-import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
+import { getMastersDataAction } from '../../../redux/settings/action';
 import { IoSearchSharp } from 'react-icons/io5';
 import { IoMdClose } from 'react-icons/io';
 
@@ -38,8 +38,7 @@ const RoleManagement = () => {
         );
     }, [dispatch, status, searchQuery, skip]);
     useEffect(() => {
-        dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: '', search: '' }));
-        dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: '', search: '' }));
+        dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: skip, search: '' }));
         dispatch(
             getRoleDataAction({
                 clinicId: clinicId,
@@ -258,7 +257,9 @@ const RoleManagement = () => {
                                                     </td>
                                                     <td className=" " style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <div className="d-flex gap-2">
-                                                            <i className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-secondary"   onClick={() => {
+                                                            <i
+                                                                className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-secondary"
+                                                                onClick={() => {
                                                                     setDataToEdit(data);
                                                                     setAddDepartmentModal(true);
                                                                 }}></i>

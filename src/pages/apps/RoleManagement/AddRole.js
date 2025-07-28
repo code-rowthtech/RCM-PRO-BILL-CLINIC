@@ -12,6 +12,7 @@ import Adddepartment from './Adddepartment';
 import us from '../../../assets/images/flags/us.jpg';
 import { useSearchParams } from 'react-router-dom';
 import { updateRolesReducer } from '../../../redux/roles/reducers';
+import ToastHandle from '../../../helpers/ToastMessage';
 
 const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => {
     const dispatch = useDispatch();
@@ -306,27 +307,27 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 minLength: dataToEdit
                                                     ? false
                                                     : {
-                                                        value: 8,
-                                                        message: 'Password must be at least 8 characters',
-                                                    },
+                                                          value: 8,
+                                                          message: 'Password must be at least 8 characters',
+                                                      },
                                                 maxLength: dataToEdit
                                                     ? false
                                                     : {
-                                                        value: 16,
-                                                        message: 'Password must not exceed 16 characters',
-                                                    },
+                                                          value: 16,
+                                                          message: 'Password must not exceed 16 characters',
+                                                      },
                                                 validate: dataToEdit
                                                     ? false
                                                     : {
-                                                        noEmpty: (value) =>
-                                                            value.trim() !== '' ||
-                                                            'Password cannot be empty or only spaces',
-                                                        noSpacesBeforeText: (value) =>
-                                                            !/^\s/.test(value) || 'First character cannot be a space',
-                                                        isStrong: (value) =>
-                                                            strongRegex.test(value) ||
-                                                            'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
-                                                    },
+                                                          noEmpty: (value) =>
+                                                              value.trim() !== '' ||
+                                                              'Password cannot be empty or only spaces',
+                                                          noSpacesBeforeText: (value) =>
+                                                              !/^\s/.test(value) || 'First character cannot be a space',
+                                                          isStrong: (value) =>
+                                                              strongRegex.test(value) ||
+                                                              'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
+                                                      },
                                             })}
                                             onChange={(e) => {
                                                 handlePasswordChange(e);
@@ -360,9 +361,9 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 validate: dataToEdit
                                                     ? false
                                                     : {
-                                                        matchPassword: (value) =>
-                                                            value === watch('password') || 'Passwords do not match',
-                                                    },
+                                                          matchPassword: (value) =>
+                                                              value === watch('password') || 'Passwords do not match',
+                                                      },
                                             })}
                                             onChange={() => trigger('confirmPassword')}
                                             maxLength={16}
@@ -426,28 +427,28 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 'phone',
                                                 !id
                                                     ? {
-                                                        required: dataToEdit ? false : 'Contact number is required',
-                                                        pattern: {
-                                                            value: /^[0-9()\-\s]*$/,
-                                                            message: 'Contact must be numeric only',
-                                                        },
-                                                        maxLength: {
-                                                            value: 13, // (XXX)XXX-XXXX is 13 chars
-                                                            message: 'Contact must not exceed 10 digits',
-                                                        },
-                                                        minLength: {
-                                                            value: 13,
-                                                            message: 'Contact must not be less than 10 digits',
-                                                        },
-                                                        validate: {
-                                                            noEmpty: (value) =>
-                                                                value.trim() !== '' ||
-                                                                'Contact cannot be empty or only spaces',
-                                                            noSpacesBeforeText: (value) =>
-                                                                !/^\s/.test(value) ||
-                                                                'First character cannot be a space',
-                                                        },
-                                                    }
+                                                          required: dataToEdit ? false : 'Contact number is required',
+                                                          pattern: {
+                                                              value: /^[0-9()\-\s]*$/,
+                                                              message: 'Contact must be numeric only',
+                                                          },
+                                                          maxLength: {
+                                                              value: 13, // (XXX)XXX-XXXX is 13 chars
+                                                              message: 'Contact must not exceed 10 digits',
+                                                          },
+                                                          minLength: {
+                                                              value: 13,
+                                                              message: 'Contact must not be less than 10 digits',
+                                                          },
+                                                          validate: {
+                                                              noEmpty: (value) =>
+                                                                  value.trim() !== '' ||
+                                                                  'Contact cannot be empty or only spaces',
+                                                              noSpacesBeforeText: (value) =>
+                                                                  !/^\s/.test(value) ||
+                                                                  'First character cannot be a space',
+                                                          },
+                                                      }
                                                     : {}
                                             )}
                                             placeholder="(845)567-9292"
@@ -522,20 +523,22 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                         Designation <span className="text-danger">*</span>
                                         <i
                                             className="bi bi-plus-circle text-primary ms-1"
-                                            style={{ fontSize: '0.9rem' }}
+                                            style={{ fontSize: '0.9rem', cursor: 'pointer' }}
                                             onClick={() => setAddDesiginationModal(true)}></i>
                                     </Form.Label>
+
                                     <Form.Select
                                         {...register('designation', {
                                             required: dataToEdit ? false : 'Designation is required',
                                         })}
-                                        className={`text-dark border border-secondary ${desigination ? ' custom-date-input-select' : 'custom-date-input'}`}>
+                                        className={`text-dark border border-secondary ${desigination ? ' custom-date-input-select' : 'custom-date-input'}`}
+                                        disabled={!designationDataLoading && designationData?.length === 0}>
                                         {designationDataLoading ? (
-                                            <div className="d-flex justify-content-center">
-                                                <div className="spinner-border" role="status">
-                                                    <span className="visually-hidden">Loading...</span>
-                                                </div>
-                                            </div>
+                                            <option>Loading...</option>
+                                        ) : designationData?.length === 0 ? (
+                                            <option value="" hidden>
+                                                No designations available
+                                            </option>
                                         ) : (
                                             <>
                                                 <option value="" className="select" hidden>
@@ -552,11 +555,13 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                             </>
                                         )}
                                     </Form.Select>
+
                                     {errors.designation && (
                                         <span className="text-danger fs-6">{errors.designation.message}</span>
                                     )}
                                 </Form.Group>
                             </Col>
+
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label className="mb-0 d-flex align-items-center">
@@ -564,23 +569,26 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                         <span className="text-danger">*</span>
                                         <i
                                             className="bi bi-plus-circle text-primary ms-1"
-                                            style={{ fontSize: '0.9rem' }}
+                                            style={{ fontSize: '0.9rem', cursor: 'pointer' }}
                                             onClick={() => setShowModal(true)}></i>
                                     </Form.Label>
+
                                     <Form.Select
                                         {...register('roleId', {
                                             required: dataToEdit ? false : 'Role is required',
                                         })}
-                                        className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}>
+                                        className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}
+                                        disabled={decryptedRolesData?.length === 0}>
                                         <option value="" className="select" hidden>
-                                            Select Role
+                                            {decryptedRolesData?.length === 0 ? 'No roles available' : 'Select Role'}
                                         </option>
                                         {decryptedRolesData?.map((data) => (
-                                            <option className="text-capitalize" key={data._id} value={data._id}>
-                                                {data.name}
+                                            <option className="text-capitalize" key={data?._id} value={data?._id}>
+                                                {data?.name}
                                             </option>
                                         ))}
                                     </Form.Select>
+
                                     {errors.roleId && <span className="text-danger fs-6">{errors.roleId.message}</span>}
                                 </Form.Group>
                             </Col>

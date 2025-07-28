@@ -4,7 +4,12 @@ import { Button, Card, Col, Form, Modal, Row, InputGroup, Spinner } from 'react-
 import { FiDownloadCloud, FiEye, FiUploadCloud } from 'react-icons/fi';
 import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { createPatientsAction, getPatientByIdAction, getResponsiblePartyAction } from '../../../redux/patients/actions';
+import {
+    createPatientsAction,
+    getPatientByIdAction,
+    getPatientsAction,
+    getResponsiblePartyAction,
+} from '../../../redux/patients/actions';
 import { useForm, Controller } from 'react-hook-form';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
@@ -61,6 +66,7 @@ const NewPatient = () => {
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const [submissionType, setSubmissionType] = useState(null);
     const [smShow, setSmShow] = useState(false);
@@ -91,6 +97,7 @@ const NewPatient = () => {
     const [showModalPic, setShowModalPic] = useState(false);
     const [modalFileUrl, setModalFileUrl] = useState('');
     const [imageLoading, setImageLoading] = useState(true);
+    const [skip, setSkip] = useState(1);
 
     const handleShowModal = (url) => {
         setModalFileUrl(url);
@@ -195,8 +202,10 @@ const NewPatient = () => {
     useEffect(() => {
         if (createResponse === 201) {
             setPatientId(createPatientResponse?._id);
+            const data = { clinicId, page: skip, limit: 10, search };
+            dispatch(getPatientsAction(data));
         }
-    }, [createResponse]);
+    }, [createResponse, dispatch, skip, search, clinicId]);
     useEffect(() => {
         if (id) {
             const payload = {
@@ -285,7 +294,6 @@ const NewPatient = () => {
         }
     }, [stateToSelect]);
 
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [showCellPhone, setShowCellPhone] = useState(false);
     const [showOfficePhone, setShowOfficePhone] = useState(false);
     const [showAltEmail, setShowAltEmail] = useState(false);

@@ -584,7 +584,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             slot: data?.startTime,
             ...recurrenceTemplate,
         };
-        console.log(payload, 'appointment payload');
         if (id && appointmentDetails) {
             dispatch(rescheduleAppointmentAction({ id, key: encryptMessage(payload) }));
         } else {
@@ -604,10 +603,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     // Handle new patient modal
     const handlePlusIconClick = useCallback(() => setShowModal(true), []);
     const handleCloseModal = useCallback(() => setShowModal(false), []);
-
-    // Handle delete all
-    const handleDeleteAll = useCallback(() => reset(), [reset]);
-
+    
     // Appointment reason handling
     const formattedReasonOptions = useMemo(
         () =>
@@ -707,7 +703,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         onClick={handlePlusIconClick}
                                     />
                                 </div>
-
                                 {errors.patient && (
                                     <span className="text-danger" style={{ display: 'block', marginTop: '2px' }}>
                                         {errors.patient.message}
@@ -872,6 +867,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 <Form.Check
                                     type="checkbox"
                                     label="Repeat"
+                                    checked={repeat}
                                     value={repeat}
                                     disabled={appointmentDetails?.repeat && id}
                                     style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
@@ -880,6 +876,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     }}
                                 />
                             </Form.Group>
+                            
                         </Col>
                         <Col sm={6}>
                             <Form.Group>
