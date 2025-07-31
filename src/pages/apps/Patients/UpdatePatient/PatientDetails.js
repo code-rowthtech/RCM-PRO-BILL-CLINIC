@@ -22,6 +22,9 @@ import Spinner from '../../../../constants/Spinner';
 const calculateAge = (dob) => {
     const birthDate = new Date(dob);
     const today = new Date();
+    if (isNaN(birthDate.getTime())) {
+        return '0.0';
+    }
 
     let years = today.getFullYear() - birthDate.getFullYear();
     let months = today.getMonth() - birthDate.getMonth();
@@ -36,11 +39,13 @@ const calculateAge = (dob) => {
     if (today.getDate() < birthDate.getDate()) {
         months--;
     }
+
+    // Ensure months is non-negative after adjustment
     if (months < 0) {
         months += 12;
     }
 
-    return `${years}.${months}`;
+    return `${String(years).padStart(2, '0')}.${String(months).padStart(2, '0')}`;
 };
 
 const PatientDetails = ({ patientId, isAccordionOpen }) => {
@@ -512,27 +517,27 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                             />
                         </Form.Group>
                     </div>
-                    <Col md={3}>
+                    <Col md={3} className="mb-2">
                         <Form.Group>
-                            <Form.Label className="mb-0">Patient Date of Birth</Form.Label>
+                            <Form.Label className="mb-0">Date of Birth</Form.Label>
                             <Form.Control
                                 type="date"
-                                max={new Date().toISOString().split('T')[0]} // Restricts future dates
                                 {...register('dateOfBirth')}
                                 onChange={(e) => {
                                     const calculatedAge = calculateAge(e.target.value);
                                     setAge(calculatedAge);
+                                    setValue('approxAge', calculatedAge); // Set the calculated age in approxAge field
                                 }}
+                                max={new Date().toISOString().split('T')[0]} // Restricts future dates
                             />
                         </Form.Group>
-                    </Col>
+                    </Col>{' '}
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Approx age</Form.Label>
                             <Form.Control type="text" placeholder="Approx. age" {...register('approxAge')} />
                         </Form.Group>
                     </Col>
-
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label htmlFor="gender" className="mb-0">
@@ -543,8 +548,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                 {...register(
                                     'gender'
                                     //  { required: 'Gender is required' }
-                                )}
-                               >
+                                )}>
                                 <option value="unknown">Unknown</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
@@ -564,16 +568,18 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                 className={`custom-file-upload justify-content-between cursor-pointer ${
                                     logoName || profileUploading ? '' : 'custom-form-fields'
                                 }`}
-                                style={{ backgroundColor: '#d9ddd6', opacity: profileUploading ? 0.7 : 1, pointerEvents: profileUploading ? 'none' : 'auto' }}>
+                                style={{
+                                    backgroundColor: '#d9ddd6',
+                                    opacity: profileUploading ? 0.7 : 1,
+                                    pointerEvents: profileUploading ? 'none' : 'auto',
+                                }}>
                                 {profileUploading
-                                    ? (
-                                     'Uploading...'
-                                    )
+                                    ? 'Uploading...'
                                     : logoName
-                                        ? logoName.length > 25
-                                            ? `${logoName.substring(0, 22)}...`
-                                            : logoName.split('/').pop().slice(0, 30) + '...'
-                                        : 'Upload Patient Chart Photo'}
+                                      ? logoName.length > 25
+                                          ? `${logoName.substring(0, 22)}...`
+                                          : logoName.split('/').pop().slice(0, 30) + '...'
+                                      : 'Upload Patient Chart Photo'}
                                 <p className="mb-0">
                                     <FiUploadCloud />
                                 </p>

@@ -404,7 +404,7 @@ const AddAllergy = ({ onCancel }) => {
                             <Controller
                                 name="note"
                                 control={control}
-                                defaultValue="<ul><li></li></ul>"
+                                // defaultValue="<ul><li></li></ul>"
                                 render={({ field: { onChange, value } }) => (
                                     <ReactQuill
                                         ref={quillRef}

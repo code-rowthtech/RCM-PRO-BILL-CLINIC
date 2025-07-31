@@ -19,25 +19,18 @@ import {
 } from '../../../redux/sub clinic/actions';
 // import ResetPassword from './ResetPassword';
 import {
-    getCities2Action,
-    getCities3Action,
     getCitiesAction,
     getClinicAction,
     getClinicTypeAction,
-    getDoctorsrolesAction,
     getRoleDataAction,
     getStatesByCountryAction,
 } from '../../../redux/actions';
-import ToastHandle from '../../../helpers/ToastMessage';
-import { handleFirstSpace } from '../../../helpers/noSpace';
-import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 import AddressForm from '../Common Pages/AddressForm';
+import TelecomFrom from '../Common Pages/TelecomFrom';
 const NewPractice = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [isModalRequest, setIsModalRequest] = useState(false);
-    // const idUpdateDataSubClinics = searchParams.get('id');
-    // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('personalDetails');
     const [show, setShow] = useState(false);
     const [passShow, setPassShow] = useState(false);
@@ -47,7 +40,7 @@ const NewPractice = () => {
     const [subPracticeAddresses, setSubPracticeAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-    // const [smShow, setSmShow] = useState(false);
+    const [subPracticeTelecom, setSubPracticeTelecom] = useState([{ system: '', value: '', use: '' }]);
     const [btnShow, setBtnShow] = useState(true);
     const [showModalPic, setShowModalPic] = useState(false); // State to control modal visibility
 
@@ -81,39 +74,18 @@ const NewPractice = () => {
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' },
     ]);
-    const [stateDetails, setStateDetails] = useState([{ name: '', number: '', url: null, fileName: '' }]);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const accreditationFileInputRef = useRef([]);
-    const [taxonomyCodes, setTaxonomyCodes] = useState(['']);
-    const [usePrimaryAsMailing, setUsePrimaryAsMailing] = useState(false);
     const store = useSelector((state) => state);
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
-    const statesData = store?.getStatesReducer?.data;
-    const citiesData = [store?.getSubClinicCityReducer];
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    const cities = store?.getCitiesReducer?.cities1?.data?.cities;
-    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-    const statecode = statesData?.states?.state_code;
     const createLoading = store?.createSubClinicsReducer?.loading;
     const createResponseOfSubClinics = store?.createSubClinicsReducer?.data?.status;
     const updateLoading = store?.updateSubClinicReducer?.loading;
-    const [searchedLocations, setSearchedLocations] = useState([]);
-    const [searchedLocations2, setSearchedLocations2] = useState(null);
-    const [focused, setFocused] = useState(false);
-    const [focused2, setFocused2] = useState(false);
-    const [latitude, setLatitude] = useState('');
-    const [latitude1, setLatitude1] = useState(null);
-    const [longitude, setLongitude] = useState('');
-    const [longitude1, setLongitude1] = useState(null);
-    const [stateToSelect, setStateToSelect] = useState('');
-    const [selectedState, setSelectedState] = useState(null);
-    const [selectedCity, setSelectedCity] = useState('');
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [imageLoading, setImageLoading] = useState(true);
-    const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
 
     useEffect(() => {
         dispatch(getStatesByCountryAction());
@@ -123,91 +95,8 @@ const NewPractice = () => {
             setImageLoading(true);
         }
     }, [showModalPic, modalFileUrl]);
-    useEffect(() => {
-        if (latitude && longitude) {
-            setFocused(false);
-        }
-    }, [latitude, longitude]);
 
-    const getGeolocation = async (e) => {
-        const addressToSearch = e.target.value;
 
-        if (!addressToSearch) {
-            setSearchedLocations([]);
-            return;
-        }
-
-        const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-        const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-            addressToSearch
-        )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Error fetching data: ${response.status}`);
-            }
-            const data = await response.json();
-            setSearchedLocations(data.results || []);
-        } catch (error) {
-            console.error('Failed to fetch geocode data:', error);
-        }
-    };
-    const getGeolocation2 = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-                location
-            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-            try {
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                return data; // Return the geocoding data
-            } catch (error) {
-                console.error('Failed to fetch geocode data:', error);
-                return null; // Return null in case of error
-            }
-        }
-        fetchGeocodeData(addressToSearch).then((data) => {
-            if (data) {
-                setSearchedLocations2(data?.results);
-            } else {
-            }
-        });
-    };
-    useEffect(() => {
-        if (stateToSelect) {
-            dispatch(getCitiesAction({ state_code: stateToSelect, name: '', limit: 25, skip: '' }));
-        }
-    }, [stateToSelect]);
-
-    const handleStateSelection = (e) => {
-        const selectedOption = e.target.selectedOptions[0];
-        const key = JSON.parse(selectedOption.getAttribute('data-key'));
-        dispatch(getCitiesAction({ state_code: key, name: '', limit: 25, skip: '' }));
-    };
-
-    const handleCitySelection = (e) => {
-        const city = e.target.value;
-        if (city) {
-            setSelectedCity(city);
-        }
-    };
-    const stateGeoLocation = 'stateName';
-    useEffect(() => {
-        if (stateGeoLocation) {
-            setStateToSelect(
-                statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation)
-            );
-        }
-    }, [stateGeoLocation]);
     const {
         register,
         handleSubmit,
@@ -239,40 +128,14 @@ const NewPractice = () => {
     useEffect(() => {
         dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_MainId?.clinicId }) }));
     }, [dispatch]);
-    const handleAccreditationInputChange = (e, field, index) => {
-        const value = e.target.value;
-        setAccreditationDetails((prevDetails) => {
-            const updatedDetails = [...prevDetails];
-            updatedDetails[index] = {
-                ...updatedDetails[index],
-                [field]: value,
-            };
-            return updatedDetails;
-        });
-    };
-    const [newaccreditationLogo, setNewAccreditationLogo] = useState(false);
-    const handleAccreditationChange = async (e, index) => {
-        const selectedFile = e.target.files[0];
-        try {
-            const url = await handleUpload(selectedFile, setNewAccreditationLogo);
-            setAccreditationDetails((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
-                    url: url?.url?.split('?')[0],
-                    fileName: selectedFile.name,
-                };
-                return updatedDetails;
-            });
-        } catch (error) {}
-    };
+ 
     const [formData, setFormData] = useState({
         clinicname: '',
         clinicType: '',
         email: '',
         contactPerson: '',
     });
-    const setField = (key, value) => value && setValue(key, value);
+    // const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         if (clinicsDataGet) {
             setValue('clinicType', clinicsDataGet?.orgType);
@@ -328,7 +191,7 @@ const NewPractice = () => {
                 }));
             }
 
-            setConstantContact(contacts);
+            setSubPracticeTelecom(contacts);
 
             // ✅ Set Addresses
             setSubPracticeAddresses(
@@ -378,7 +241,7 @@ const NewPractice = () => {
                 ]
             );
         }
-    }, [clinicsDataGet, setValue, stateDetails, clinectypes]);
+    }, [clinicsDataGet, setValue, clinectypes]);
 
     const formDataChange = (field, value) => {
         const updatedFormData = { ...formData, [field]: value };
@@ -392,23 +255,7 @@ const NewPractice = () => {
 
         // setIsButtonDisabled(!areAllFieldsFilled);
     };
-    const handleAddAccreditation = () => {
-        const isIncomplete = accreditationDetails.some(
-            (clinicsDataGet) => !clinicsDataGet.name || !clinicsDataGet.number || !clinicsDataGet.url
-        );
-        if (isIncomplete) {
-            ToastHandle('Please fill all the fields before adding a new one', 'danger');
-            return;
-        }
-        setAccreditationDetails([...accreditationDetails, { name: '', number: '', url: null }]);
-    };
 
-    const handleRemoveAccreditation = (index) => {
-        setAccreditationDetails((prevDetails) => {
-            const updatedDetails = prevDetails.filter((_, i) => i !== index);
-            return updatedDetails;
-        });
-    };
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -419,58 +266,8 @@ const NewPractice = () => {
         }
     };
 
-    const handleAddTaxonomy = () => {
-        const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
-
-        if (lastCode) {
-            const validCodes = taxonomyCodes.filter((code) => code.trim() !== '');
-            setTaxonomyCodes([...validCodes, '']);
-        } else {
-            ToastHandle('Please complete the current Taxonomy Code field before adding another.', 'danger');
-        }
-    };
-    const handleRemoveTaxonomy = (index) => {
-        setTaxonomyCodes((prev) => {
-            const updatedCodes = prev.filter((_, i) => i !== index);
-            return updatedCodes.length > 0 ? updatedCodes : [''];
-        });
-    };
-    const handleTaxonomyChange = (index, value) => {
-        const updatedCodes = [...taxonomyCodes];
-        updatedCodes[index] = value;
-        setTaxonomyCodes(updatedCodes);
-    };
     const [posDetails, setPosDetails] = useState([{ name: '', email: '', role: '', contact: '', fileName: '' }]);
 
-    const handleAddPOS = () => {
-        const isIncomplete = posDetails.some((pos) => !pos.name || !pos.role || !pos.contact || !pos.email);
-
-        if (isIncomplete) {
-            ToastHandle('Please fill all the fields before adding a new one', 'danger');
-            return;
-        }
-        setPosDetails([...posDetails, { name: '', email: '', role: '', contact: '' }]);
-    };
-
-    const handleRemovePOS = (index) => {
-        setPosDetails((prevDetails) => {
-            const updatedDetails = prevDetails.filter((_, i) => i !== index);
-            return updatedDetails;
-        });
-    };
-
-    const handlePOSInputChange = (e, field, index) => {
-        const value = e.target.value;
-        setPosDetails((prevDetails) => {
-            const updatedDetails = [...prevDetails];
-            updatedDetails[index] = {
-                ...updatedDetails[index],
-                [field]: value,
-            };
-            return updatedDetails;
-        });
-    };
-    const getRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
     useEffect(() => {
         dispatch(
             getRoleDataAction({ clinicId: clinic_id, createdById: '', limit: 10, search: '', page: 1, status: true })
@@ -503,11 +300,11 @@ const NewPractice = () => {
                 sliceName: item.type,
                 issuingAuthority: item.issuingAuthority,
             })),
-            telecom: constantContact,
+            telecom: subPracticeTelecom,
             address: subPracticeAddresses,
             poc: pocs,
             flag: 'subClinic',
-            ...(posDetails && { pos: posDetails }),
+            // ...(posDetails && { pos: posDetails }),
         };
 
         dispatch(createSubClinicAction({ key: encryptMessage(newPayload) }));
@@ -522,139 +319,6 @@ const NewPractice = () => {
         }
     }, [createResponseOfSubClinics]);
 
-    const [selectedLocation, setSelectedLocation] = useState(null);
-    const [selectedLocation2, setSelectedLocation2] = useState(null);
-
-    useEffect(() => {
-        if (selectedLocation) {
-            setLatitude(selectedLocation?.bounds?.southwest?.lat);
-            setLongitude(selectedLocation?.bounds?.southwest?.lng);
-            setValue('address', selectedLocation?.formatted);
-            const stateId =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
-            const selectedState =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-            setValue('stateName', selectedState);
-            const countyName = selectedLocation?.components?.county;
-            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
-        }
-        if (selectedLocation2) {
-            setLatitude1(selectedLocation2?.bounds?.southwest?.lat);
-            setLongitude1(selectedLocation2?.bounds?.southwest?.lng);
-            setValue('mailingAddress', selectedLocation2?.formatted);
-            const stateId =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?.id;
-            const selectedState =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?._id;
-            setValue('mailingStateName', selectedState);
-            const countyName = selectedLocation2?.components?.county;
-            dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }));
-        }
-    }, [dispatch, selectedLocation, selectedLocation2, setValue, statesData]);
-    useEffect(() => {
-        if (cities) {
-            const selectedCounty =
-                cities &&
-                cities.find(
-                    (event) =>
-                        event?.name === selectedLocation?.components?.county ||
-                        clinicsDataGet?.userId?.primaryAddress?.city?.name
-                )?._id;
-            setValue('city', selectedCounty);
-        }
-        if (cities2) {
-            const selectedCounty1 =
-                cities2 &&
-                cities2.find(
-                    (event) =>
-                        event?.name === selectedLocation2?.components?.county ||
-                        clinicsDataGet?.userId?.mailingAddress?.city?.name
-                )?._id;
-            setValue('mailingCity', selectedCounty1);
-        }
-    }, [cities, cities2, setValue]);
-    const [selectedStates, setSelectedStates] = useState([]);
-    const [statesMenu, setStatesMenu] = useState(false);
-    const handleCheckboxChange = (stateName) => {
-        setSelectedStates((prev) => {
-            const updatedStates = prev.includes(stateName)
-                ? prev.filter((name) => name !== stateName)
-                : [...prev, stateName]; // Add state if checked
-
-            setStateDetails((prevDetails) => {
-                const newDetails = updatedStates.map(
-                    (state) =>
-                        prevDetails.find((detail) => detail.name === state) || {
-                            name: state,
-                            number: '',
-                            url: null,
-                            fileName: '',
-                        }
-                );
-                return newDetails;
-            });
-
-            return updatedStates;
-        });
-    };
-
-    const handleStateInputChange = (e, field, index) => {
-        const value = e.target.value;
-        setStateDetails((prevDetails) => {
-            const updatedDetails = [...prevDetails];
-            updatedDetails[index] = {
-                ...updatedDetails[index],
-                [field]: value,
-            };
-            return updatedDetails;
-        });
-    };
-    const [stateLogoUpload, setStateLogoUpload] = useState(false);
-
-    const handleStateChange = async (e, index) => {
-        const selectedFile = e.target.files[0];
-        try {
-            const url = await handleUpload(selectedFile, setStateLogoUpload);
-            setStateDetails((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
-                    url: url?.url?.split('?')[0],
-                    fileName: selectedFile.name,
-                };
-                return updatedDetails;
-            });
-        } catch (error) {
-            console.error('Error during file upload:', error);
-        }
-    };
-
-    const handleRemoveState = (index) => {
-        setStateDetails((prevDetails) => {
-            const updatedDetails = prevDetails.filter((_, i) => i !== index);
-            setSelectedStates(updatedDetails.map((detail) => detail.name));
-            return updatedDetails;
-        });
-    };
-    const menuRef = useRef(null);
-    const containerRef = useRef(null);
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (containerRef.current && !containerRef.current.contains(event.target)) {
-                setStatesMenu(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
     // new changes
     const defaultIdentifiers = ['NPI', 'CLIA', 'NAIC'];
     const defaultIssuingAuthority = [
@@ -668,7 +332,6 @@ const NewPractice = () => {
         'Other',
     ];
     const contactDetails = ['phone', 'email'];
-    const addressUses = ['work', 'temp', 'old', 'billing', 'mailing', 'primary'];
     const uses = ['usual', 'old', 'temp', 'secondary', 'official'];
     const identifierOptions = [
         'NPI',
@@ -685,10 +348,7 @@ const NewPractice = () => {
         'Facility ID',
     ];
 
-    const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
-    console.log(constantIdentifiers,'constantIdentifiers');
-    const [constantContact, setConstantContact] = useState([]);
     const [name, setName] = useState({
         use: '',
         text: '',
@@ -701,8 +361,6 @@ const NewPractice = () => {
     const [addresses, setAddresses] = useState([
         { use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }, // Default address
     ]);
-    const [activeAddressIndex, setActiveAddressIndex] = useState(null);
-    const [addressFocused, setAddressFocused] = useState(false);
     // Load Default Identifiers & Contacts
     useEffect(() => {
         setConstantIdentifiers(
@@ -715,13 +373,6 @@ const NewPractice = () => {
                 use: '',
             }))
         );
-        setConstantContact(
-            contactDetails.map((system) => ({
-                system,
-                value: '',
-                use: '',
-            }))
-        );
     }, []);
 
     // Function to Add New Fields
@@ -731,27 +382,13 @@ const NewPractice = () => {
             { type: '', number: '', file: '', expiry: '', issuingAuthority: '', use: '' },
         ]);
     };
-    const addContactDetails = () => {
-        setConstantContact([...constantContact, { system: '', value: '', use: '' }]);
-    };
-    const addAddress = () => {
-        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }]);
-    };
 
     // Function to Remove Fields
     const removeIdentifier = (index) => {
         if (index < defaultIdentifiers.length) return;
         setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
     };
-    const removeContact = (index) => {
-        if (index < contactDetails.length) return;
-        setConstantContact(constantContact.filter((_, i) => i !== index));
-    };
-    const removeAddress = (index) => {
-        if (addresses.length > 1) {
-            setAddresses(addresses.filter((_, i) => i !== index));
-        }
-    };
+
 
     // Function to Handle Changes
     const handleChange = (index, field, value) => {
@@ -759,20 +396,7 @@ const NewPractice = () => {
         updatedIdentifiers[index][field] = value;
         setConstantIdentifiers(updatedIdentifiers);
     };
-    const handleContactChange = (index, field, value) => {
-        const updatedContacts = [...constantContact];
-        updatedContacts[index][field] = value;
-        setConstantContact(updatedContacts);
-    };
-    const handleAddressChange = (index, field, value) => {
-        const updatedAddresses = [...addresses];
-        if (field === 'line') {
-            updatedAddresses[index].line[0] = value; // update street address
-        } else {
-            updatedAddresses[index][field] = value;
-        }
-        setAddresses(updatedAddresses);
-    };
+
     // State for POCs (at least one default POC)
     const [pocs, setPocs] = useState([
         {
@@ -802,12 +426,6 @@ const NewPractice = () => {
             target[keys[keys.length - 1]] = value;
             return updatedPocs;
         });
-    };
-
-    const handleNameArrayChange = (index, field, value) => {
-        const updatedPocs = [...pocs];
-        updatedPocs[index].name[field] = [value];
-        setPocs(updatedPocs);
     };
 
     // Function to handle Telecom (Contact) field changes inside POCs
@@ -842,22 +460,6 @@ const NewPractice = () => {
     const removePoc = (index) => {
         if (pocs.length > 1) {
             setPocs(pocs.filter((_, i) => i !== index));
-        }
-    };
-
-    // Function to add a new telecom contact inside a POC
-    const addTelecom = (pocIndex) => {
-        const updatedPocs = [...pocs];
-        updatedPocs[pocIndex].telecom.push({ system: 'phone', value: '', use: 'work' });
-        setPocs(updatedPocs);
-    };
-
-    // Function to remove a telecom contact inside a POC
-    const removeTelecom = (pocIndex, telecomIndex) => {
-        const updatedPocs = [...pocs];
-        if (updatedPocs[pocIndex].telecom.length > 1) {
-            updatedPocs[pocIndex].telecom = updatedPocs[pocIndex].telecom.filter((_, i) => i !== telecomIndex);
-            setPocs(updatedPocs);
         }
     };
 
@@ -1345,160 +947,10 @@ const NewPractice = () => {
                                                     </Col>
                                                 </Row>
                                                 <hr className="mb-1" />
-                                                <Row>
-                                                    <Col sm={12}>
-                                                        <Row className="">
-                                                            <Col sm={12}>
-                                                                <h5>
-                                                                    Contact Details
-                                                                    <span
-                                                                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                                        onClick={addContactDetails}></span>
-                                                                </h5>
-                                                            </Col>
-                                                        </Row>
-
-                                                        <Row>
-                                                            <Col sm={4}>
-                                                                <Form.Label>Contact Type</Form.Label>
-                                                            </Col>
-                                                            <Col sm={4}>
-                                                                <Form.Label>Value </Form.Label>
-                                                            </Col>
-                                                            <Col sm={4}>
-                                                                <Form.Label>Use</Form.Label>
-                                                            </Col>
-                                                        </Row>
-
-                                                        {constantContact.map((item, index) => (
-                                                            <Row key={index} className="mb-2">
-                                                                <Col sm={4}>
-                                                                    <Form.Select
-                                                                        className="text-capitalize"
-                                                                        value={item.system}
-                                                                        data-has-value={
-                                                                            !!watch(`constantContact[${index}].system`)
-                                                                        }
-                                                                        {...register(
-                                                                            `constantContact[${index}].system`
-                                                                        )}
-                                                                        onChange={(e) =>
-                                                                            handleContactChange(
-                                                                                index,
-                                                                                'system',
-                                                                                e.target.value
-                                                                            )
-                                                                        }
-                                                                        disabled={contactDetails.includes(item.type)}>
-                                                                        <option value="" disabled>
-                                                                            Select Contact Type
-                                                                        </option>
-                                                                        {contactOptions.map((option) => (
-                                                                            <option
-                                                                                className="text-capitalize"
-                                                                                key={option}
-                                                                                value={option}>
-                                                                                {option}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Form.Select>
-                                                                </Col>
-
-                                                                <Col sm={4}>
-                                                                    {item.system === 'phone' ? (
-                                                                        <InputGroup className="position-relative">
-                                                                            {/* Country Code Prefix */}
-                                                                            <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">
-                                                                                +1
-                                                                            </InputGroup.Text>
-                                                                            {/* Phone Input */}
-                                                                            <Form.Control
-                                                                                type="tel"
-                                                                                placeholder="(123)456-7890"
-                                                                                value={formatDisplayValue(item.value)}
-                                                                                onChange={(e) =>
-                                                                                    handleContactChange(
-                                                                                        index,
-                                                                                        'value',
-                                                                                        e.target.value
-                                                                                    )
-                                                                                }
-                                                                                maxLength={14}
-                                                                                onKeyPress={(event) => {
-                                                                                    if (!/[0-9]/.test(event.key))
-                                                                                        event.preventDefault();
-                                                                                }}
-                                                                                style={{ paddingLeft: '40px' }}
-                                                                            />
-                                                                            {/* Flag Icon */}
-                                                                            <div
-                                                                                className="position-absolute"
-                                                                                style={{
-                                                                                    left: '10px',
-                                                                                    top: '50%',
-                                                                                    transform: 'translateY(-50%)',
-                                                                                }}>
-                                                                                <img src={us} alt="flag" width={20} />
-                                                                            </div>
-                                                                        </InputGroup>
-                                                                    ) : (
-                                                                        <Form.Control
-                                                                            type={
-                                                                                item.system === 'email'
-                                                                                    ? 'email'
-                                                                                    : 'text'
-                                                                            }
-                                                                            placeholder={
-                                                                                item.system === 'email'
-                                                                                    ? 'Enter email'
-                                                                                    : 'Enter value'
-                                                                            }
-                                                                            value={item.value || ''}
-                                                                            onChange={(e) =>
-                                                                                handleContactChange(
-                                                                                    index,
-                                                                                    'value',
-                                                                                    e.target.value
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    )}
-                                                                </Col>
-
-                                                                <Col sm={4} className="position-relative">
-                                                                    <Form.Select
-                                                                        value={item.use}
-                                                                        data-has-value={
-                                                                            !!watch(`constantContact[${index}].use`)
-                                                                        }
-                                                                        {...register(`constantContact[${index}].use`)}
-                                                                        onChange={(e) =>
-                                                                            handleContactChange(
-                                                                                index,
-                                                                                'use',
-                                                                                e.target.value
-                                                                            )
-                                                                        }>
-                                                                        <option value="">Select Option</option>{' '}
-                                                                        {/* Placeholder option */}
-                                                                        <option value="temp">Temp</option>
-                                                                        <option value="work">Work</option>
-                                                                        <option value="old">Old</option>
-                                                                        {/* Add more options as needed */}
-                                                                    </Form.Select>
-                                                                    {index >= contactDetails.length && (
-                                                                        <span
-                                                                            className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                                            style={{ right: '-1%', top: '12%' }}
-                                                                            onClick={() => removeContact(index)}>
-                                                                            <CiCircleMinus />
-                                                                        </span>
-                                                                    )}
-                                                                </Col>
-                                                            </Row>
-                                                        ))}
-                                                    </Col>
-                                                </Row>
+                                                <TelecomFrom
+                                                    constantContact={subPracticeTelecom}
+                                                    setConstantContact={setSubPracticeTelecom}
+                                                />
                                                 <hr className="mb-1" />
                                                 <AddressForm
                                                     addresses={subPracticeAddresses}

@@ -25,7 +25,7 @@ type AppProps = {};
  * Main app component
  */
 
-// color Changing of select options
+// color Changing of select options and date inputs
 function useSelectColorWatcher() {
   useEffect(() => {
     const updateSelectColors = () => {
@@ -33,6 +33,12 @@ function useSelectColorWatcher() {
       selects.forEach(select => {
         const value = select.value.trim();
         select.style.color = value === '' ? '#0908084f' : 'black';
+      });
+      
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      dateInputs.forEach(input => {
+        const value = input.value.trim();
+        input.style.color = value === '' ? '#0908084f' : 'black';
       });
     };
 
@@ -67,12 +73,22 @@ function useSelectColorWatcher() {
       selects.forEach(select => {
         select.addEventListener('change', handleChange);
       });
+      
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      dateInputs.forEach(input => {
+        input.addEventListener('change', handleChange);
+      });
     };
 
     const detachListeners = () => {
       const selects = document.querySelectorAll('.form-select');
       selects.forEach(select => {
         select.removeEventListener('change', handleChange);
+      });
+      
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      dateInputs.forEach(input => {
+        input.removeEventListener('change', handleChange);
       });
     };
 

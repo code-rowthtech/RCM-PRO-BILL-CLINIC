@@ -189,7 +189,7 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
                     </Form.Group>
                 </Col>
             </Row>
-            <hr />
+            {/* <hr /> */}
             <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
             <Row className="mt-2">
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">

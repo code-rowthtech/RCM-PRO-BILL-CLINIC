@@ -55,7 +55,7 @@ const calculateAge = (dob) => {
     return `${String(years).padStart(2, '0')}.${String(months).padStart(2, '0')}`;
 };
 
-const NewPatient = () => {
+const NewPatient = ({ isModal }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('updateid');
@@ -547,11 +547,11 @@ const NewPatient = () => {
                             </ul>
                         </div>
                         <div className="d-flex">
-                            {activeTab === 'responsible' && (
+                            {/* {activeTab === 'responsible' && (
                                 <Button className="me-2 custom-buttons " onClick={() => handleTabChange('responsible')}>
                                     Payment
                                 </Button>
-                            )}
+                            )} */}
 
                             {/* <Button className="me-2">
                                 Clear
@@ -559,9 +559,11 @@ const NewPatient = () => {
                             <Button className="me-2">
                                 Set Password
                             </Button> */}
-                            <Button className="cancel-button" onClick={() => navigate(-1)}>
-                                Back
-                            </Button>
+                            {!isModal && (
+                                <Button className="cancel-button" onClick={() => navigate(-1)}>
+                                    Back
+                                </Button>
+                            )}
                         </div>
                     </div>
 

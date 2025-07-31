@@ -37,6 +37,7 @@ import { FormInput } from '../../../../components';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
 import { components } from 'react-select';
 import AddressForm from '../../Common Pages/AddressForm';
+import TelecomFrom from '../../Common Pages/TelecomFrom';
 
 const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const {
@@ -53,7 +54,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
     const updateId = searchParams.get('updateid');
     // const [selectedState, setSelectedState] = useState(null);
-    const [subClinic, setSubClinic] = useState('');
     const [logo, setLogo] = useState(null);
     // const [accreditationLogo, setAccreditationLogo] = useState(null);
     // const [addType, setAddType] = useState('');
@@ -97,26 +97,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [practiceAddresses, setPracticeAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-    // const handleStateSelection = (e, addressType, index) => {
-    //     const selectedOption = e.target.selectedOptions[0];
-    //     const stateId = selectedOption.getAttribute('data-key');
-    //     // Update the addresses state first
-    //     const updatedAddresses = [...addresses];
-    //     updatedAddresses[index] = {
-    //         ...updatedAddresses[index],
-    //         state: e.target.value,
-    //     };
-    //     setAddresses(updatedAddresses);
-    //     // Then fetch cities based on address type
-    //     if (addressType === 'physical') {
-    //         dispatch(getCitiesAction({ state_code: stateId, name: '', limit: 25, skip: '' }));
-    //     } else if (addressType === 'postal') {
-    //         dispatch(getCities2Action({ state_code: stateId, name: '', limit: 25, skip: '' }));
-    //     } else {
-    //         dispatch(getCities3Action({ state_code: stateId, name: '', limit: 25, skip: '' }));
-    //     }
-    // };
-
+        const [practiceTelecom, setPracticeTelecom] = useState([{ system: '', value: '', use: '' }]);
+    
     useEffect(() => {
         dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_id?.clinicId }) }));
         dispatch(getSubClinicAction());
@@ -179,7 +161,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 }));
             }
 
-            setConstantContact(contacts);
+            setPracticeTelecom(contacts);
 
             // ✅ Set Addresses
             const newAddresses = clinicsDataGet?.address?.map((addr) => ({
@@ -226,14 +208,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         );
                     }
                 });
-            }
-            // addresses?.map((data) => (
-            //     data?.use === 'primary' ?
-            //         dispatch(getCitiesAction({ state_code: statesData?.states?.find((item) => item?.name === data?.state)?.id, name: data?.city, limit: 25, skip: '' })) :
-            //         data?.use === 'postal' ?
-            //             dispatch(getCities2Action({ state_code: statesData?.states?.find((item) => item?.name === data?.state)?.id, name: data?.city, limit: 25, skip: '' })) :
-            //             dispatch(getCities3Action({ state_code: statesData?.states?.find((item) => item?.name === data?.state)?.id, name: data?.city, limit: 25, skip: '' }))
-            // ))
+            }   
             // ✅ Set POCs (Point of Contacts)
             setPocs(
                 clinicsDataGet?.poc?.map((pocs) => ({
@@ -306,7 +281,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 sliceName: item.type,
                 issuingAuthority: item.issuingAuthority,
             })),
-            telecom: constantContact,
+            telecom: practiceTelecom,
             address: practiceAddresses,
             poc: pocs,
         };
@@ -335,68 +310,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [clinicsDataGet, setValue]);
 
-    // const [searchedLocations, setSearchedLocations] = useState(null);
-    // const [searchedLocations2, setSearchedLocations2] = useState(null);
-
-    // const getGeolocation = (e) => {
-    //     const addressToSearch = e.target.value;
-    //     async function fetchGeocodeData(location) {
-    //         const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-    //         const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-    //             location
-    //         )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-    //         try {
-    //             const response = await fetch(url);
-
-    //             if (!response.ok) {
-    //                 throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-    //             }
-
-    //             const data = await response.json();
-    //             return data;
-    //         } catch (error) {
-    //             console.error('Failed to fetch geocode data:', error);
-    //             return null;
-    //         }
-    //     }
-    //     fetchGeocodeData(addressToSearch).then((data) => {
-    //         if (data) {
-    //             setSearchedLocations(data?.results);
-    //         }
-    //     });
-    // };
-
-    // const [selectedLocation, setSelectedLocation] = useState(null);
-
-    // useEffect(() => {
-    //     if (selectedLocation) {
-    //         setLatitude(selectedLocation?.bounds?.southwest?.lat);
-    //         setLongitude(selectedLocation?.bounds?.southwest?.lng);
-    //         setValue('address', selectedLocation?.formatted);
-    //         const stateId =
-    //             statesData?.states &&
-    //             statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
-    //         const selectedState =
-    //             statesData?.states &&
-    //             statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-    //         setValue('stateName', selectedState);
-    //         const countyName = selectedLocation?.components?.county;
-    //         dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
-    //     }
-    // }, [selectedLocation, setValue, statesData, dispatch]);
-    // useEffect(() => {
-    //     if (cities1) {
-    //         const selectedCounty =
-    //             cities1 &&
-    //             cities1.find(
-    //                 (data) =>
-    //                     data?.name === selectedLocation?.components?.county ||
-    //                     clinicsDataGet?.userId?.primaryAddress?.city?.name
-    //             )?._id;
-    //         setValue('city', selectedCounty);
-    //     }
-    // }, [cities1]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics;
     const [statesMenu, setStatesMenu] = useState(false);
     const menuRef = useRef(null); // Reference for the menu
@@ -445,7 +358,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
     const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
-    const [constantContact, setConstantContact] = useState([]);
     const [name, setName] = useState({
         use: '',
         text: '',
@@ -472,13 +384,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 use: '',
             }))
         );
-        setConstantContact(
-            contactDetails.map((system) => ({
-                system,
-                value: '',
-                use: '',
-            }))
-        );
     }, []);
 
     const addIdentifier = () => {
@@ -487,28 +392,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             { type: '', number: '', file: '', expiry: '', issuingAuthority: '', use: '' },
         ]);
     };
-    const addContactDetails = () => {
-        setConstantContact([...constantContact, { system: '', value: '', use: '' }]);
-    };
-    const addAddress = () => {
-        if (addresses?.length === 3) {
-            ToastHandle('Maximun 3 addresses are allowed.', 'danger');
-            return;
-        }
-        setAddresses([
-            ...addresses,
-            { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' },
-        ]);
-    };
 
     const removeIdentifier = (index) => {
         if (index < defaultIdentifiers.length) return;
         setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
     };
-    const removeContact = (index) => {
-        if (index < contactDetails.length) return;
-        setConstantContact(constantContact.filter((_, i) => i !== index));
-    };
+ 
     const removeAddress = (index) => {
         if (addresses.length > 1) {
             setAddresses(addresses.filter((_, i) => i !== index));
@@ -520,28 +409,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         updatedIdentifiers[index][field] = value;
         setConstantIdentifiers(updatedIdentifiers);
     };
-    const handleContactChange = (index, field, value) => {
-        const updatedContacts = [...constantContact];
-
-        if (field === 'value' && updatedContacts[index].system === 'phone') {
-            // Remove non-numeric characters
-            let rawValue = value.replace(/\D/g, '');
-            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
-
-            // Format as (XXX)XXX-XXXX
-            const formattedValue = rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
-                if (p3) return `(${p1})${p2}-${p3}`;
-                if (p2) return `(${p1})${p2}`;
-                return `(${p1}`;
-            });
-
-            updatedContacts[index][field] = formattedValue; // Store formatted phone number
-        } else {
-            updatedContacts[index][field] = value; // Store other fields as they are
-        }
-
-        setConstantContact(updatedContacts);
-    };
+ 
     const formatDisplayValue = (value) => {
         if (!value) return '';
         const rawValue = value.replace(/\D/g, '');
@@ -552,21 +420,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         });
     };
 
-    // const handleAddressChange = (index, field, value) => {
-    //     if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
-    //         ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
-    //         return; // Prevent selection
-    //     }
-
-    //     // if(addresses?.some((address) => address?.use === field)) {}
-    //     const updatedAddresses = [...addresses];
-    //     if (field === 'line') {
-    //         updatedAddresses[index].line[0] = value; // update street address
-    //     } else {
-    //         updatedAddresses[index][field] = value;
-    //     }
-    //     setAddresses(updatedAddresses);
-    // };
     // State for POCs (at least one default POC)
     const [pocs, setPocs] = useState([
         {
@@ -650,7 +503,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         if (!selectedFile) return;
 
         try {
-            const url = await handleUpload(selectedFile); // Upload file
+            const url = await handleUpload(selectedFile,setImageLoading); // Upload file
             setConstantIdentifiers((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -684,9 +537,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 <>
                     <Form onSubmit={handleSubmit(SubmitData)}>
                         <Row>
-                            <Col sm={12} className="mb-2">
-                                <b>{subClinic}</b>
-                            </Col>
+                        
                             <Col sm={3}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">
@@ -1078,381 +929,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </Col>
                             </Row>
                             <hr className="mb-1" />
-                            <Row>
-                                <Col sm={12}>
-                                    <Row className="">
-                                        <Col sm={12}>
-                                            <h5>
-                                                Contact Details
-                                                <span
-                                                    className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                    onClick={addContactDetails}></span>
-                                            </h5>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col sm={4}>
-                                            <Form.Label>Contact Type</Form.Label>
-                                        </Col>
-                                        <Col sm={4}>
-                                            <Form.Label>Value </Form.Label>
-                                        </Col>
-                                        <Col sm={4}>
-                                            <Form.Label>Use</Form.Label>
-                                        </Col>
-                                    </Row>
-
-                                    {constantContact.map((item, index) => (
-                                        <Row key={index} className="mb-2">
-                                            <Col sm={4}>
-                                                <Form.Select
-                                                    className="text-capitalize"
-                                                    value={item.system}
-                                                    {...register(`constantContact[${index}].system`)}
-                                                    onChange={(e) =>
-                                                        handleContactChange(index, 'system', e.target.value)
-                                                    }
-                                                    disabled={contactDetails.includes(item.type)}>
-                                                    <option value="" disabled>
-                                                        Select Contact Type
-                                                    </option>
-                                                    {contactOptions.map((option) => (
-                                                        <option className="text-capitalize" key={option} value={option}>
-                                                            {option}
-                                                        </option>
-                                                    ))}
-                                                </Form.Select>
-                                            </Col>
-                                            <Col sm={4}>
-                                                {item.system === 'phone' ? (
-                                                    <InputGroup className="position-relative">
-                                                        {/* Country Code Prefix */}
-                                                        <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">
-                                                            +1
-                                                        </InputGroup.Text>
-                                                        {/* Phone Input */}
-                                                        <Form.Control
-                                                            type="tel"
-                                                            placeholder="(123)456-7890"
-                                                            value={formatDisplayValue(item.value)}
-                                                            onChange={(e) =>
-                                                                handleContactChange(index, 'value', e.target.value)
-                                                            }
-                                                            maxLength={14}
-                                                            onKeyPress={(event) => {
-                                                                if (!/[0-9]/.test(event.key)) event.preventDefault();
-                                                            }}
-                                                            style={{ paddingLeft: '40px' }}
-                                                        />
-                                                        {/* Flag Icon */}
-                                                        <div
-                                                            className="position-absolute"
-                                                            style={{
-                                                                left: '10px',
-                                                                top: '50%',
-                                                                transform: 'translateY(-50%)',
-                                                            }}>
-                                                            <img src={us} alt="flag" width={20} />
-                                                        </div>
-                                                    </InputGroup>
-                                                ) : (
-                                                    <Form.Control
-                                                        type={item.system === 'email' ? 'email' : 'text'}
-                                                        placeholder={
-                                                            item.system === 'email' ? 'Enter email' : 'Enter value'
-                                                        }
-                                                        value={item.value || ''}
-                                                        onChange={(e) =>
-                                                            handleContactChange(index, 'value', e.target.value)
-                                                        }
-                                                    />
-                                                )}
-                                            </Col>
-
-                                            <Col sm={4} className="position-relative">
-                                                <Form.Select
-                                                    value={item.use}
-                                                    {...register(`constantContact[${index}].use`)}
-                                                    onChange={(e) => handleContactChange(index, 'use', e.target.value)}>
-                                                    <option value="">Select Option</option> {/* Placeholder option */}
-                                                    <option value="temp">Temp</option>
-                                                    <option value="work">Work</option>
-                                                    <option value="old">Old</option>
-                                                    {/* Add more options as needed */}
-                                                </Form.Select>
-                                                {index >= contactDetails.length && (
-                                                    <span
-                                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                        style={{ right: '-1%', top: '12%' }}
-                                                        onClick={() => removeContact(index)}>
-                                                        <CiCircleMinus />
-                                                    </span>
-                                                )}
-                                            </Col>
-                                        </Row>
-                                    ))}
-                                </Col>
-                            </Row>
+                             <TelecomFrom constantContact={practiceTelecom} setConstantContact={setPracticeTelecom}/>
                             <hr className="mb-1" />
-                            {/* <Row>
-                                <Col sm={12}>
-                                    <h5>
-                                        Address Details
-                                        <span
-                                            className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                            onClick={addAddress}></span>
-                                    </h5>
-                                </Col>
-                            </Row>
-                            {addresses.map((item, index) => (
-                                <Row key={index} className="mb-2">
-                                    <Col sm={4} className="mb-2">
-                                        <Form.Label className="mb-1">Use</Form.Label>
-                                        <Form.Select
-                                            value={item?.type}
-                                            className="text-capitalize"
-                                            {...register(`address[${index}].type`)}
-                                            onChange={(e) => handleAddressChange(index, 'type', e.target.value)}>
-                                            <option value="">Select</option>
-                                            {addressTypes.map((data) => (
-                                                <option key={data} className="text-capitalize" value={data}>
-                                                    {data}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Col>
-                                    <Col sm={4} className="mb-2">
-                                        <Form.Label className="mb-1">Use</Form.Label>
-                                        <Form.Select
-                                            value={item.use}
-                                            className="text-capitalize"
-                                            {...register(`address[${index}].use`)}
-                                            onChange={(e) => handleAddressChange(index, 'use', e.target.value)}>
-                                            <option value="">Select</option>
-                                            {addressUses.map((use) => (
-                                                <option key={use} className="text-capitalize" value={use}>
-                                                    {use}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Col>
-                                    <Col sm={4} className="mb-2 position-relative">
-                                        <Form.Label className="mb-1">Address</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            placeholder="Street Address"
-                                            value={item.line[0]}
-                                            onChange={(e) => {
-                                                handleAddressChange(index, 'line', e.target.value);
-                                                // Set active index so suggestions appear for this address
-                                                setActiveAddressIndex(index);
-                                                setAddressFocused(true);
-                                                // Call your geolocation API with the current input value
-                                                getGeolocation(e)?.then((data) => {
-                                                    // Expecting your getGeolocation to return an object with results
-                                                    if (data && data.results) {
-                                                        setSearchedLocations(data.results);
-                                                    }
-                                                });
-                                            }}
-                                            onFocus={() => {
-                                                setActiveAddressIndex(index);
-                                                setAddressFocused(true);
-                                            }}
-                                            onBlur={() => {
-                                                setTimeout(() => setAddressFocused(false), 200);
-                                            }}
-                                        />
-                                        {activeAddressIndex === index &&
-                                            addressFocused &&
-                                            searchedLocations?.length > 0 && (
-                                                <div
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '100%',
-                                                        left: 0,
-                                                        width: '100%',
-                                                        maxHeight: '150px',
-                                                        overflowY: 'auto',
-                                                        zIndex: 111,
-                                                        backgroundColor: '#fff',
-                                                        border: '1px solid #ced4da',
-                                                        borderTop: 'none',
-                                                    }}>
-                                                    {searchedLocations?.map((data, suggestionIndex) => (
-                                                        <p
-                                                            key={suggestionIndex}
-                                                            onMouseEnter={() =>
-                                                                setActiveSuggestionIndex(suggestionIndex)
-                                                            }
-                                                            onClick={() => {
-                                                                const state = statesData?.states?.find(
-                                                                    (s) => s.name === data.components?.state
-                                                                );
-                                                                const stateCode = state?.id;
-                                                                const cityName =
-                                                                    data.components?.city ||
-                                                                    data.components?.town ||
-                                                                    data.components?.village ||
-                                                                    '';
-
-                                                                // Dispatch city load based on address type
-                                                                if (item?.type === 'physical') {
-                                                                    dispatch(
-                                                                        getCitiesAction({
-                                                                            state_code: stateCode,
-                                                                            name: cityName,
-                                                                            limit: 25,
-                                                                            skip: '',
-                                                                        })
-                                                                    );
-                                                                } else if (item?.type === 'postal') {
-                                                                    dispatch(
-                                                                        getCities2Action({
-                                                                            state_code: stateCode,
-                                                                            name: cityName,
-                                                                            limit: 25,
-                                                                            skip: '',
-                                                                        })
-                                                                    );
-                                                                } else {
-                                                                    dispatch(
-                                                                        getCities3Action({
-                                                                            state_code: stateCode,
-                                                                            name: cityName,
-                                                                            limit: 25,
-                                                                            skip: '',
-                                                                        })
-                                                                    );
-                                                                }
-                                                                // Update address
-                                                                const newAddress = {
-                                                                    ...item,
-                                                                    line: [data.formatted || ''],
-                                                                    state: data.components?.state || '',
-                                                                    city: cityName, // Set the city name
-                                                                    postalCode: data.components?.postcode || '',
-                                                                    country: data.components?.country || '',
-                                                                };
-
-                                                                const updatedAddresses = [...addresses];
-                                                                updatedAddresses[index] = newAddress;
-                                                                setAddresses(updatedAddresses);
-
-                                                                // Clear suggestions
-                                                                setSearchedLocations([]);
-                                                                setAddressFocused(false);
-                                                            }}
-                                                            style={{
-                                                                margin: 0,
-                                                                padding: '8px 12px',
-                                                                cursor: 'pointer',
-                                                                backgroundColor:
-                                                                    suggestionIndex === activeSuggestionIndex
-                                                                        ? '#f0f0f0'
-                                                                        : '#fff',
-                                                            }}
-                                                            className="hover-bg-change text-black">
-                                                            {data.formatted}
-                                                        </p>
-                                                    ))}
-                                                </div>
-                                            )}
-                                    </Col>
-                                    <Col sm={4} className="mb-2">
-                                        <Form.Label className="mb-1">State</Form.Label>
-                                        <Form.Select
-                                            {...register(`address[${index}].state`)}
-                                            value={item?.state}
-                                            onChange={(e) => {
-                                                handleStateSelection(e, item?.type, index);
-                                                const updatedAddresses = [...addresses];
-                                                updatedAddresses[index] = {
-                                                    ...updatedAddresses[index],
-                                                    state: e.target.value,
-                                                };
-                                                setAddresses(updatedAddresses);
-                                            }}>
-                                            <option value="">Select State</option>
-                                            {statesData?.states?.map((data) => (
-                                                <option key={data?.name} data-key={data?.id} value={data?.name}>
-                                                    {data?.name}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Col>
-                                    <Col sm={4} className="mb-2">
-                                        <Form.Label className="mb-1">City</Form.Label>
-                                        <Form.Select
-                                            {...register(`address[${index}].city`)}
-                                            value={item?.city}
-                                            onChange={(e) => {
-                                                const updatedAddresses = [...addresses];
-                                                updatedAddresses[index] = {
-                                                    ...updatedAddresses[index],
-                                                    city: e.target.value,
-                                                };
-                                                setAddresses(updatedAddresses);
-                                            }}>
-                                            <option value="">
-                                                {store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}
-                                            </option>
-                                            {(() => {
-                                                const cities =
-                                                    item?.type === 'physical'
-                                                        ? cities1
-                                                        : item?.type === 'postal'
-                                                            ? cities2
-                                                            : cities3;
-
-                                                return cities?.map((data) => (
-                                                    <option key={data?._id} value={data?.name}>
-                                                        {data?.name}
-                                                    </option>
-                                                ));
-                                            })()}
-                                        </Form.Select>
-                                    </Col>
-                                    <Col sm={4} className="position-relative">
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className="mb-1">Postal Code</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                value={item?.postalCode}
-                                                placeholder="Postal Code"
-                                                {...register(`address[${index}].postalCode`, {
-                                                    minLength: {
-                                                        value: 5,
-                                                        message: 'Postal code must be at least 5 characters long',
-                                                    },
-                                                    pattern: {
-                                                        value: /^[0-9]+$/,
-                                                        message: 'Postal code must contain numbers only',
-                                                    },
-                                                })}
-                                                onChange={(e) =>
-                                                    handleAddressChange(index, 'postalCode', e.target.value)
-                                                }
-                                                maxLength={5}
-                                                onKeyPress={handleFirstSpace}
-                                            />
-                                            {addresses.length > 1 && index !== 0 && (
-                                                <span
-                                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                    style={{ right: '-2%', top: '42%' }}
-                                                    onClick={() => removeAddress(index)}>
-                                                    <CiCircleMinus />
-                                                </span>
-                                            )}
-                                            {errors?.address?.[index]?.postalCode && (
-                                                <span className="text-danger">
-                                                    {errors.address[index].postalCode.message}
-                                                </span>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            ))} */}
                             <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses} />
                             <hr className="mb-1" />
                             <Row>

@@ -48,6 +48,7 @@ const ForgetPassword = (): React$Element<any> => {
         passwordReset: state.Auth.passwordReset,
         resetPasswordSuccess: state.Auth.resetPasswordSuccess,
     }));
+    console.log('resetPasswordSuccess', resetPasswordSuccess);
     /*
      * form validation schema
      */
@@ -80,7 +81,7 @@ const ForgetPassword = (): React$Element<any> => {
                     </p>
                 </div>
 
-                {resetPasswordSuccess && <Alert variant="success">{resetPasswordSuccess?.massage}</Alert>}
+                {resetPasswordSuccess && <Alert variant="success">{resetPasswordSuccess?.message}</Alert>}
 
                 {error && (
                     <Alert variant="danger" className="my-2">

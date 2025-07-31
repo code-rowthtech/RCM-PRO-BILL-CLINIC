@@ -35,13 +35,14 @@ const AddHoliday = () => {
             dispatch(getDoctorsAction(payload));
             navigate('/apps/schedule/list');
         }
-    }, [addResponse, status, skip , ]);
+    }, [addResponse, status, skip]);
     const {
         register,
         control,
         handleSubmit,
         reset,
         formState: { errors },
+        watch,
     } = useForm();
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
@@ -64,10 +65,10 @@ const AddHoliday = () => {
             search: doctorSearch,
             status: status,
             page: skip,
-            limit:10,
+            limit: 10,
         };
         dispatch(getDoctorsAction(payload));
-    }, [dispatch, doctorSearch , status, skip]);
+    }, [dispatch, doctorSearch, status, skip]);
 
     const handleInputChange = (data, type) => {
         if (type === 'doctor') {
@@ -107,30 +108,32 @@ const AddHoliday = () => {
                                             <Form.Label className="mb-0">
                                                 Provider Name<span className="text-danger">*</span>
                                             </Form.Label>
-                                          <Controller
-    name="doctor"
-    control={control}
-    rules={{ required: 'Please select the provider' }}
-    render={({ field }) => (
-        <Select
-            {...field}
-            classNamePrefix="select"
-            isLoading={store?.getDoctorsReducer?.loading}
-            isClearable={true}
-            isSearchable={true}
-            options={doctorOptions}
-            onChange={(val) => {
-                field.onChange(val);
-                setSelectedDoctor(val); // update local state if needed
-            }}
-            onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
-            placeholder="Select Provider Name"
-        />
-    )}
-/>
-{errors.doctor && <span className="text-danger">{errors.doctor.message}</span>}
-
-                                        
+                                            <Controller
+                                                name="doctor"
+                                                control={control}
+                                                rules={{ required: 'Please select the provider' }}
+                                                render={({ field }) => (
+                                                    <Select
+                                                        {...field}
+                                                        classNamePrefix="select"
+                                                        isLoading={store?.getDoctorsReducer?.loading}
+                                                        isClearable={true}
+                                                        isSearchable={true}
+                                                        options={doctorOptions}
+                                                        onChange={(val) => {
+                                                            field.onChange(val);
+                                                            setSelectedDoctor(val); // update local state if needed
+                                                        }}
+                                                        onInputChange={(inputValue) =>
+                                                            handleInputChange(inputValue, 'doctor')
+                                                        }
+                                                        placeholder="Select Provider Name"
+                                                    />
+                                                )}
+                                            />
+                                            {errors.doctor && (
+                                                <span className="text-danger">{errors.doctor.message}</span>
+                                            )}
                                         </Form.Group>
 
                                         <Form.Group className="mb-1">
@@ -141,6 +144,14 @@ const AddHoliday = () => {
                                                 type="date"
                                                 {...register('tillDate', {
                                                     required: 'Till date is required',
+                                                    validate: (value) => {
+                                                        const fromDate = watch('fromDate');
+                                                        if (!fromDate) return true; // skip check if fromDate not filled yet
+                                                        return (
+                                                            new Date(value) >= new Date(fromDate) ||
+                                                            'Till date must be after From date'
+                                                        );
+                                                    },
                                                 })}
                                             />
                                             {errors.tillDate && (
@@ -158,6 +169,14 @@ const AddHoliday = () => {
                                                 type="date"
                                                 {...register('fromDate', {
                                                     required: 'From date is required',
+                                                    validate: (value) => {
+                                                        const tillDate = watch('tillDate');
+                                                        if (!tillDate) return true;
+                                                        return (
+                                                            new Date(value) <= new Date(tillDate) ||
+                                                            'From date must be before Till date'
+                                                        );
+                                                    },
                                                 })}
                                             />
                                             {errors.fromDate && (
@@ -191,8 +210,7 @@ const AddHoliday = () => {
                                         className="custom-buttons"
                                         disabled={store?.createScheduleReducer?.loading}
                                         type="submit"
-                                        style={{width:'55px'}}
-                                        >
+                                        style={{ width: '55px' }}>
                                         {store?.createScheduleReducer?.loading ? (
                                             <Spinner className="spinner-border-sm" color="white" />
                                         ) : (

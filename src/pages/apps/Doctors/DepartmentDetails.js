@@ -121,6 +121,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
         };
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
     };
+
     useEffect(() => {
 
         if (createResponse === 200) {
@@ -130,6 +131,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
             dispatch(getDoctorDetailsAction(payload))
         }
     }, [createResponse])
+
     useEffect(() => {
         if (doctorDetails && updateId) {
             const updatedTaxonomyCodes = doctorDetails?.taxonomy?.map((item, index) => ({

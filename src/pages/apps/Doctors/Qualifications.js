@@ -89,18 +89,31 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     }));
 
     const onsubmit = (data) => {
-        const qualificationData = qualifications?.map((item) => ({
-            code: item?.degreeName?.data || item?.degreeName,
-            documents: item?.degreeFile,
-            issuer: item?.issuerOrganisation,
-        }));
-        const payload = {
-            ...(updateId ? { doctorId: id } : { doctorId: docId }),
-            qualification: qualificationData,
-            otherDocuments: documents,
-        };
-        dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
+    const qualificationData = qualifications?.map((item) => {
+        const qualification = {};
+        if (item?.degreeName?.data || item?.degreeName) qualification.code = item?.degreeName?.data || item?.degreeName;
+        if (item?.degreeFile) qualification.documents = item?.degreeFile;
+        if (item?.issuerOrganisation) qualification.issuer = item?.issuerOrganisation;
+        return qualification;
+    });
+
+    const filteredDocuments = documents.map(doc => {
+        const filtered = {};
+        if (doc.name) filtered.name = doc.name;
+        if (doc.number) filtered.number = doc.number; 
+        if (doc.issuingAuthority) filtered.issuingAuthority = doc.issuingAuthority;
+        if (doc.document) filtered.document = doc.document;
+        if (doc.note) filtered.note = doc.note;
+        return filtered;
+    });
+
+    const payload = {
+        ...(updateId ? { doctorId: id } : { doctorId: docId }),
+        qualification: qualificationData,
+        otherDocuments: filteredDocuments
     };
+    dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
+};
     useEffect(() => {
         if (doctorDetails && updateId) {
             // Set qualifications data
@@ -195,7 +208,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     };
     return (
         <>
-            <div className="container-fluid px-0">
+            <div className="container-fluid px-0 " >
                 <Form onSubmit={handleSubmit(onsubmit)}>
                     {store?.getDoctorDetailsReducer?.loading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '75vh' }}>
@@ -214,7 +227,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                         </h5>
                                         {qualifications?.map((qualification, index) => (
                                             <Row key={index} className="align-items-end g-3 mb-3">
-                                                   <Col md={4} xs={12}>
+                                                <Col md={4} xs={12}>
                                                     <Form.Group>
                                                         <Form.Label>Select Degree Name</Form.Label>
                                                         <Select
@@ -322,10 +335,10 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                         />
                                                     </Form.Group>
                                                 </Col>
-                                                <Col md={4} xs={12} className="position-relative">
-                                                    <Form.Group className="">
+                                                <Col md={4} xs={12}>
+                                                    <Form.Group className="position-relative">
                                                         <Form.Label>Issuer Organisation</Form.Label>
-                                                        <div className="d-flex align-items-center">
+                                                        <div className="d-flex align-items-center gap-2">
                                                             <Form.Control
                                                                 type="text"
                                                                 value={qualification.issuerOrganisation}
@@ -337,15 +350,11 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                     )
                                                                 }
                                                                 placeholder="Enter Issuer Organisation"
-                                                                style={{ paddingRight: '30px' }}
+                                                                className="flex-grow-1"
                                                             />
                                                             {index > 0 && (
                                                                 <CiCircleMinus
-                                                                    className="text-danger cursor-pointer fs-4 position-absolute"
-                                                                    style={{
-                                                                        right: '10px',
-                                                                        top: '35px',
-                                                                    }}
+                                                                    className="text-danger cursor-pointer fs-4"
                                                                     onClick={() => removeQualification(index)}
                                                                     title="Remove"
                                                                 />
