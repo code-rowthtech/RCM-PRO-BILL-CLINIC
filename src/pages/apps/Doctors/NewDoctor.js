@@ -345,7 +345,7 @@ const NewDoctor = () => {
     return (
         <>
             <div className="pt-1 pb-2 px-0">
-                <div className="container-fluid  px-0">
+                <div className="container-fluid px-0" style={{ overflowX: 'hidden' }}>
                     <Card className="px-md-3 py-md-2 " style={{ height: '90vh' }}>
                         <Card.Body className="py-0 px-0">
                             <div className="row">
@@ -430,8 +430,8 @@ const NewDoctor = () => {
                                                 <>
                                                     <div
                                                         className="col-12 mt-1 scroll-container"
-                                                        style={{ height: '75vh', overflow: 'scroll' }}>
-                                                        <div className="row">
+                                                        style={{ height: '75vh', overflow: 'scroll', overflowX: 'hidden' }}>
+                                                        <div className="row  px-0" style={{ overflowX: 'hidden' }}>
                                                             <div className="col-md-6 col-lg-3 col-sm-6  col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">

@@ -602,7 +602,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
 
     // Handle new patient modal
     const handlePlusIconClick = useCallback(() => setShowModal(true), []);
-    const handleCloseModal = useCallback(() => setShowModal(false), []);
+    const handleClosePatientModal = useCallback(() => setShowModal(false), []);
 
     // Appointment reason handling
     const formattedReasonOptions = useMemo(
@@ -646,7 +646,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     };
     const closeConsultationModal = () => {
         setConsultationModal(false);
-        reset();
     };
     const sanitizeScheduledDate = (inputDate) => {
         const today = new Date().setHours(0, 0, 0, 0);
@@ -1054,21 +1053,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                         </Row>
                     )}
                     <Row>
-                        <Col sm={12} className="d-flex justify-content-end my-2 gap-2">
-                            <Button
-                                className="cancel-button"
-                                disabled={
-                                    store?.createAppointmentReducer?.loading ||
-                                    store?.rescheduleAppointmentReducer?.loading
-                                }
-                                onClick={() => {
-                                    reset();
-                                    if (location?.pathname !== '/apps/appointments/list') {
-                                        navigate(-1);
-                                    }
-                                }}>
-                                Cancel
-                            </Button>
+                        <Col sm={12} className="d-flex justify-content-end my-2">
                             <Button
                                 className="custom-buttons"
                                 type="submit"
@@ -1088,7 +1073,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     </Row>
                 </Form>
             )}
-            <Modal show={showModal} onHide={handleCloseModal} size="xl" centered>
+            <Modal show={showModal} onHide={handleClosePatientModal} size="xl" centered>
                 <Modal.Header className="py-0 px-2 ">
                     <Modal.Title className="px-0 py-0">Add New Patient</Modal.Title>
                 </Modal.Header>
@@ -1102,9 +1087,9 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     className="px-0 py-0">
                     <style>{`::-webkit-scrollbar { display: none; }`}</style>
                     <div className="px-2">
-                        {activeTab === 'personalDetails' && <NewPatient isModal={true} patientId={patientId} />}
+                        {activeTab === 'personalDetails' && <NewPatient isModal={true} patientId={patientId} handleClosePatientModal={handleClosePatientModal} />}
                         {activeTab === 'responsible' && <Responsiblle patientId={patientId} />}
-                        {activeTab === 'insurance' && <Insurance patientId={patientId} />}
+                        {/* {activeTab === 'insurance' && <Insurance patientId={patientId} />} */}
                         {activeTab === 'demographicDetails' && <Demographicdetails patientId={patientId} />}
                         {activeTab === 'referringDoctor' && <ReferringDoctor patientId={patientId} />}
                     </div>

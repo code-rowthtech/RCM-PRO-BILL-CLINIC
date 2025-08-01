@@ -236,201 +236,212 @@ const FamilyHistory = () => {
             {/* Left: Form Section */}
             <Col md={6} className="d-flex flex-column border-end px-0 pe-2" style={{ height: '100%' }}>
                 <div className="h-100">
-                    <Card.Body className="d-flex flex-column px-2 py-0" style={{ overflowY: 'auto' }}>
-                        <Form onSubmit={handleSubmit(onSubmit)} className="flex-grow-1 d-flex flex-column">
-                            <Row className="">
-                                <Col md={6}>
-                                    <Form.Group controlId="relationship">
-                                        <Form.Label className="fw-medium mb-1">Relationship</Form.Label>
-                                        <Select
-                                            options={relationshipOption}
-                                            isSearchable
-                                            className="basic-single"
-                                            classNamePrefix="select"
-                                            placeholder="Select relationship"
-                                            value={
-                                                rela ? relationshipOption.find((opt) => opt.value.code === rela.code) : null
-                                            }
-                                            onChange={handleRelationChange}
-                                            styles={{
-                                                control: (provided) => ({
-                                                    ...provided,
-                                                    minHeight: '30px',
-                                                    border: '0px',
-                                                }),
-                                            }}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group controlId="name">
-                                        <Form.Label className="fw-medium mb-1">Name</Form.Label>
-                                        <Form.Control
-                                            {...register('name', { required: 'Name is required' })}
-                                            className="form-control-sm"
-                                        />
-                                    </Form.Group>
-                                </Col>
-
-                                <Col md={6}>
-                                    <Form.Group controlId="dob">
-                                        <Form.Label className="fw-medium mb-1">Date of Birth</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            {...register('dob', { required: 'Date of birth is required' })}
-                                            className="form-control-sm"
-                                            max={new Date().toISOString().slice(0, 10)}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group controlId="sex">
-                                        <Form.Label className="fw-medium mb-1">Sex</Form.Label>
-                                        <Form.Select
-                                            {...register('sex', { required: 'Sex is required' })}
-                                            className="form-select-sm">
-                                            <option value="" disabled>
-                                                Select Sex
-                                            </option>
-                                            {sexAssignedAtBirthOptions.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Form.Group>
-                                </Col>
-
-                                <Col md={6}>
-                                    <Form.Group controlId="problem">
-                                        <Form.Label className="fw-medium mb-1">Condition</Form.Label>
-                                        <Controller
-                                            name="problem"
-                                            control={control}
-                                            rules={{ required: 'Condition is required' }}
-                                            render={({ field }) => (
-                                                <Select
-                                                    {...field}
-                                                    classNamePrefix="select"
-                                                    options={formattedOptions}
-                                                    value={selectedProblem}
-                                                    onChange={(selected) => {
-                                                        field.onChange(selected);
-                                                        setSelectedProblem(selected);
-                                                    }}
-                                                    onInputChange={(value) => setSearchQuery(value)}
-                                                    placeholder="Search condition"
-                                                    isClearable
-                                                    isSearchable
-                                                    styles={{
-                                                        control: (provided) => ({
-                                                            ...provided,
-                                                            minHeight: '30px',
-                                                            border: '0px',
-                                                        }),
-                                                    }}
-                                                />
-                                            )}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group controlId="deceased">
-                                        <Form.Label className="fw-medium mb-1">Deceased</Form.Label>
-                                        <div>
-                                            <Form.Check
-                                                inline
-                                                label="Yes"
-                                                type="radio"
-                                                value="yes"
-                                                {...register('deceased')}
-                                                className="form-check-inline"
-                                            />
-                                            <Form.Check
-                                                inline
-                                                label="No"
-                                                type="radio"
-                                                value="no"
-                                                {...register('deceased')}
-                                                className="form-check-inline"
-                                                defaultChecked
-                                            />
-                                        </div>
-                                    </Form.Group>
-                                </Col>
-
-                                {isDeceased && (
+                    <div className="d-flex flex-column px-2 py-0">
+                        <Form
+                            onSubmit={handleSubmit(onSubmit)}
+                            className="flex-grow-1 d-flex flex-column"
+                            style={{ height: '100%' }}>
+                            <div className="scroll-container px-0" style={{ height: '41vh', overflowX: 'hidden' }}>
+                                <Row className="">
                                     <Col md={6}>
-                                        <Form.Group controlId="dateOfDeath">
-                                            <Form.Label className="fw-medium mb-1">Date of Death</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                {...register('dateOfDeath')}
-                                                className="form-control-sm"
-                                                max={new Date().toISOString().split('T')[0]}
+                                        <Form.Group controlId="relationship">
+                                            <Form.Label className="fw-medium mb-1">Relationship</Form.Label>
+                                            <Select
+                                                options={relationshipOption}
+                                                isSearchable
+                                                className="basic-single"
+                                                classNamePrefix="select"
+                                                placeholder="Select relationship"
+                                                value={
+                                                    rela
+                                                        ? relationshipOption.find((opt) => opt.value.code === rela.code)
+                                                        : null
+                                                }
+                                                onChange={handleRelationChange}
+                                                styles={{
+                                                    control: (provided) => ({
+                                                        ...provided,
+                                                        minHeight: '30px',
+                                                        border: '0px',
+                                                    }),
+                                                }}
                                             />
                                         </Form.Group>
                                     </Col>
-                                )}
+                                    <Col md={6}>
+                                        <Form.Group controlId="name">
+                                            <Form.Label className="fw-medium mb-1">Name</Form.Label>
+                                            <Form.Control
+                                                {...register('name', { required: 'Name is required' })}
+                                                placeholder="Enter Name"
+                                                className="form-control-sm"
+                                            />
+                                        </Form.Group>
+                                    </Col>
 
-                                <Col xs={12} className="flex-grow-1 d-flex flex-column">
-                                    <Form.Group controlId="notes" className="flex-grow-1 d-flex flex-column">
-                                        <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
-                                            <div>
-                                                Notes{' '}
-                                                <span
-                                                    style={{ cursor: 'pointer' }}
-                                                    title="Notes Suggestions"
-                                                    onClick={handleEditorFocus}>
-                                                    ✨
-                                                </span>
-                                            </div>
-                                            <small className="text-muted">
-                                                {(() => {
-                                                    const content = watch('note') || '';
-                                                    const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
-                                                    const words = plainText?.split(/\s+/)?.filter(Boolean);
-                                                    const wordCount = words?.length;
-                                                    return (
-                                                        <div>
-                                                            <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
-                                                        </div>
-                                                    );
-                                                })()}
-                                            </small>
-                                        </Form.Label>
-                                        <div className="flex-grow-1 d-flex flex-column">
+                                    <Col md={6}>
+                                        <Form.Group controlId="dob">
+                                            <Form.Label className="fw-medium mb-1">Date of Birth</Form.Label>
+                                            <Form.Control
+                                                type="date"
+                                                {...register('dob', { required: 'Date of birth is required' })}
+                                                className="form-control-sm"
+                                                max={new Date().toISOString().slice(0, 10)}
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group controlId="sex">
+                                            <Form.Label className="fw-medium mb-1">Sex</Form.Label>
+                                            <Form.Select
+                                                {...register('sex', { required: 'Sex is required' })}
+                                                className="form-select-sm">
+                                                <option value="" disabled>
+                                                    Select Sex
+                                                </option>
+                                                {sexAssignedAtBirthOptions.map((option) => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+
+                                    <Col md={6}>
+                                        <Form.Group controlId="problem">
+                                            <Form.Label className="fw-medium mb-1">Condition</Form.Label>
                                             <Controller
-                                                name="note"
+                                                name="problem"
                                                 control={control}
-                                                render={({ field: { onChange, value } }) => (
-                                                    <ReactQuill
-                                                        ref={quillRef}
-                                                        value={value}
-                                                        onChange={onChange}
-                                                        theme="snow"
-                                                        placeholder="Enter detailed notes here..."
-                                                        style={{ height: '24vh', backgroundColor: 'white' }}
-                                                        modules={{
-                                                            toolbar: [
-                                                                [{ header: [1, 2, false] }],
-                                                                ['bold', 'italic', 'underline', 'strike'],
-                                                                [{ list: 'ordered' }, { list: 'bullet' }],
-                                                                ['clean'],
-                                                            ],
+                                                rules={{ required: 'Condition is required' }}
+                                                render={({ field }) => (
+                                                    <Select
+                                                        {...field}
+                                                        classNamePrefix="select"
+                                                        options={formattedOptions}
+                                                        value={selectedProblem}
+                                                        onChange={(selected) => {
+                                                            field.onChange(selected);
+                                                            setSelectedProblem(selected);
+                                                        }}
+                                                        onInputChange={(value) => setSearchQuery(value)}
+                                                        placeholder="Search condition"
+                                                        isClearable
+                                                        isSearchable
+                                                        styles={{
+                                                            control: (provided) => ({
+                                                                ...provided,
+                                                                minHeight: '30px',
+                                                                border: '0px',
+                                                            }),
                                                         }}
                                                     />
                                                 )}
                                             />
-                                        </div>
-                                        <SuggestionOffcanvas
-                                            show={showSuggestions}
-                                            onClose={() => setShowSuggestions(false)}
-                                            onSelect={handleSuggestionSelect}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group controlId="deceased">
+                                            <Form.Label className="fw-medium mb-1">Deceased</Form.Label>
+                                            <div>
+                                                <Form.Check
+                                                    inline
+                                                    label="Yes"
+                                                    type="radio"
+                                                    value="yes"
+                                                    {...register('deceased')}
+                                                    className="form-check-inline"
+                                                />
+                                                <Form.Check
+                                                    inline
+                                                    label="No"
+                                                    type="radio"
+                                                    value="no"
+                                                    {...register('deceased')}
+                                                    className="form-check-inline"
+                                                    defaultChecked
+                                                />
+                                            </div>
+                                        </Form.Group>
+                                    </Col>
+
+                                    {isDeceased && (
+                                        <Col md={6}>
+                                            <Form.Group controlId="dateOfDeath">
+                                                <Form.Label className="fw-medium mb-1">Date of Death</Form.Label>
+                                                <Form.Control
+                                                    type="date"
+                                                    {...register('dateOfDeath')}
+                                                    className="form-control-sm"
+                                                    max={new Date().toISOString().split('T')[0]}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                    )}
+
+                                    <Col xs={12} className="flex-grow-1 d-flex flex-column">
+                                        <Form.Group controlId="notes" className="flex-grow-1 d-flex flex-column">
+                                            <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    Notes{' '}
+                                                    <span
+                                                        style={{ cursor: 'pointer' }}
+                                                        title="Notes Suggestions"
+                                                        onClick={handleEditorFocus}>
+                                                        ✨
+                                                    </span>
+                                                </div>
+                                                <small className="text-muted">
+                                                    {(() => {
+                                                        const content = watch('note') || '';
+                                                        const plainText = quillRef?.current
+                                                            ?.getEditor()
+                                                            ?.getText()
+                                                            ?.trim();
+                                                        const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                        const wordCount = words?.length;
+                                                        return (
+                                                            <div>
+                                                                <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </small>
+                                            </Form.Label>
+                                            <div className="flex-grow-1 d-flex flex-column">
+                                                <Controller
+                                                    name="note"
+                                                    control={control}
+                                                    render={({ field: { onChange, value } }) => (
+                                                        <ReactQuill
+                                                            ref={quillRef}
+                                                            value={value}
+                                                            onChange={onChange}
+                                                            theme="snow"
+                                                            placeholder="Enter detailed notes here..."
+                                                            style={{ height: '24vh', backgroundColor: 'white' }}
+                                                            modules={{
+                                                                toolbar: [
+                                                                    [{ header: [1, 2, false] }],
+                                                                    ['bold', 'italic', 'underline', 'strike'],
+                                                                    [{ list: 'ordered' }, { list: 'bullet' }],
+                                                                    ['clean'],
+                                                                ],
+                                                            }}
+                                                        />
+                                                    )}
+                                                />
+                                            </div>
+                                            <SuggestionOffcanvas
+                                                show={showSuggestions}
+                                                onClose={() => setShowSuggestions(false)}
+                                                onSelect={handleSuggestionSelect}
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            </div>
 
                             <div className="mt-5 d-flex justify-content-end">
                                 <Button
@@ -442,7 +453,7 @@ const FamilyHistory = () => {
                                 </Button>
                             </div>
                         </Form>
-                    </Card.Body>
+                    </div>
                 </div>
             </Col>
 
@@ -519,7 +530,10 @@ const FamilyHistory = () => {
                                                         }}
                                                     />
                                                 ) : (
-                                                    <span className="ms-2 text-muted fst-italic"> No notes available</span>
+                                                    <span className="ms-2 text-muted fst-italic">
+                                                        {' '}
+                                                        No notes available
+                                                    </span>
                                                 )}
                                             </div>
                                         </Accordion.Body>

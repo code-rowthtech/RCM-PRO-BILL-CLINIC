@@ -179,80 +179,104 @@ const Alcohol = () => {
             {/* Left: Form Section */}
             <Col md={6} className="d-flex flex-column border-end px-0 pe-2" style={{ height: '100%' }}>
                 <div className="h-100">
-                    <div className="d-flex flex-column px-2 py-0" style={{ overflowY: 'auto' }}>
-                        <Form onSubmit={handleSubmit(onSubmit)} className="flex-grow-1 d-flex flex-column">
-                            <Row className="">
-                                <Col sm={12}>
-                                    <Form.Group>
-                                        <Form.Label className="fw-medium mb-1">Alcohol Use Status</Form.Label>
-                                        <Form.Select {...register('useStatus', { required: true })} required>
-                                            <option value="">Select status</option>
-                                            <option value="Current User">Current User</option>
-                                            <option value="Former User">Former User</option>
-                                            <option value="Never Used">Never Used</option>
-                                            <option value="Unknown">Unknown</option>
-                                        </Form.Select>
-                                    </Form.Group>
-                                </Col>
+                    <div className="d-flex flex-column px-2 py-0">
+                        <Form
+                            onSubmit={handleSubmit(onSubmit)}
+                            className="flex-grow-1 d-flex flex-column"
+                             style={{ height: '100%' }}
+                           >
+                            <div className='scroll-container px-0' style={{ height: '40vh', overflowX:"hidden" }}>
+                                <Row className="">
+                                    <Col sm={12}>
+                                        <Form.Group>
+                                            <Form.Label className="fw-medium mb-1">Alcohol Use Status</Form.Label>
+                                            <Form.Select {...register('useStatus', { required: true })} required>
+                                                <option value="">Select status</option>
+                                                <option value="Current User">Current User</option>
+                                                <option value="Former User">Former User</option>
+                                                <option value="Never Used">Never Used</option>
+                                                <option value="Unknown">Unknown</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
 
-                                {watchUseStatus === 'Current User' && (
-                                    <>
-                                        <Col sm={6}>
-                                            <Form.Group>
-                                                <Form.Label className="fw-medium mb-1">
-                                                    Alcohol use frequency
-                                                </Form.Label>
-                                                <Form.Select {...register('frequency')} required>
-                                                    <option key="" value="">
-                                                        Select
-                                                    </option>
-                                                    {['Occasionally', 'Weekly', 'Daily', 'Heavy', 'Unknown']?.map(
-                                                        (data) => (
-                                                            <option value={data} key={data}>
-                                                                {data}
-                                                            </option>
-                                                        )
-                                                    )}
-                                                </Form.Select>
-                                            </Form.Group>
-                                        </Col>
-
-                                        <Col sm={6}>
-                                            <Form.Group>
-                                                <Form.Label className="fw-medium mb-1">
-                                                    Standard drinks per occasion
-                                                </Form.Label>
-                                                <Form.Select {...register('quantityPerOccasion')} required>
-                                                    <option key="" value="">
-                                                        Select
-                                                    </option>
-                                                    {['1 or 2', '3 or 4', '5 or 6', '7 to 9', '10 or more']?.map(
-                                                        (data) => (
-                                                            <option value={data} key={data}>
-                                                                {data}
-                                                            </option>
-                                                        )
-                                                    )}
-                                                </Form.Select>
-                                            </Form.Group>
-                                        </Col>
-
-                                        {heavyFrequency === 'Heavy' && (
+                                    {watchUseStatus === 'Current User' && (
+                                        <>
                                             <Col sm={6}>
                                                 <Form.Group>
                                                     <Form.Label className="fw-medium mb-1">
-                                                        Heavy intake frequency
+                                                        Alcohol use frequency
                                                     </Form.Label>
-                                                    <Form.Select {...register('heavyIntakeFrequency')} required>
+                                                    <Form.Select {...register('frequency')} required>
                                                         <option key="" value="">
                                                             Select
                                                         </option>
-                                                        {[
-                                                            'Less than monthly',
-                                                            'Monthly',
-                                                            'Weekly',
-                                                            'Daily or almost daily',
-                                                        ]?.map((data) => (
+                                                        {['Occasionally', 'Weekly', 'Daily', 'Heavy', 'Unknown']?.map(
+                                                            (data) => (
+                                                                <option value={data} key={data}>
+                                                                    {data}
+                                                                </option>
+                                                            )
+                                                        )}
+                                                    </Form.Select>
+                                                </Form.Group>
+                                            </Col>
+
+                                            <Col sm={6}>
+                                                <Form.Group>
+                                                    <Form.Label className="fw-medium mb-1">
+                                                        Standard drinks per occasion
+                                                    </Form.Label>
+                                                    <Form.Select {...register('quantityPerOccasion')} required>
+                                                        <option key="" value="">
+                                                            Select
+                                                        </option>
+                                                        {['1 or 2', '3 or 4', '5 or 6', '7 to 9', '10 or more']?.map(
+                                                            (data) => (
+                                                                <option value={data} key={data}>
+                                                                    {data}
+                                                                </option>
+                                                            )
+                                                        )}
+                                                    </Form.Select>
+                                                </Form.Group>
+                                            </Col>
+
+                                            {heavyFrequency === 'Heavy' && (
+                                                <Col sm={6}>
+                                                    <Form.Group>
+                                                        <Form.Label className="fw-medium mb-1">
+                                                            Heavy intake frequency
+                                                        </Form.Label>
+                                                        <Form.Select {...register('heavyIntakeFrequency')} required>
+                                                            <option key="" value="">
+                                                                Select
+                                                            </option>
+                                                            {[
+                                                                'Less than monthly',
+                                                                'Monthly',
+                                                                'Weekly',
+                                                                'Daily or almost daily',
+                                                            ]?.map((data) => (
+                                                                <option value={data} key={data}>
+                                                                    {data}
+                                                                </option>
+                                                            ))}
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                </Col>
+                                            )}
+
+                                            <Col sm={6}>
+                                                <Form.Group>
+                                                    <Form.Label className="fw-medium mb-1">
+                                                        What types of alcohol do you usually consume?
+                                                    </Form.Label>
+                                                    <Form.Select {...register('alcoholType')} required>
+                                                        <option key="" value="">
+                                                            Select
+                                                        </option>
+                                                        {['Beer', 'Wine', 'Spirits', 'Other', 'All']?.map((data) => (
                                                             <option value={data} key={data}>
                                                                 {data}
                                                             </option>
@@ -260,154 +284,137 @@ const Alcohol = () => {
                                                     </Form.Select>
                                                 </Form.Group>
                                             </Col>
-                                        )}
 
-                                        <Col sm={6}>
-                                            <Form.Group>
-                                                <Form.Label className="fw-medium mb-1">
-                                                    What types of alcohol do you usually consume?
+                                            <Col sm={6}>
+                                                <Form.Group>
+                                                    <Form.Label className="fw-medium mb-1">
+                                                        Do you experience dependence symptoms (e.g., craving,
+                                                        withdrawal)?
+                                                    </Form.Label>
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        label="Yes"
+                                                        {...register('hasDependenceSymptoms')}
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                        </>
+                                    )}
+
+                                    {watchUseStatus === 'Former User' && (
+                                        <>
+                                            <Col sm={6}>
+                                                <Form.Group>
+                                                    <Form.Label className="fw-medium mb-1">
+                                                        Age when you started using alcohol
+                                                    </Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        {...register('ageOfFirstUse', { valueAsNumber: true })}
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+
+                                            <Col sm={6}>
+                                                <Form.Group>
+                                                    <Form.Label className="fw-medium mb-1">
+                                                        Date of last alcohol use
+                                                    </Form.Label>
+                                                    <Form.Control
+                                                        type="date"
+                                                        max={new Date().toISOString().slice(0, 10)}
+                                                        {...register('lastUseDate')}
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+
+                                            <Col sm={12}>
+                                                <Form.Group>
+                                                    <Form.Label className="fw-medium mb-1">
+                                                        Reason for stopping alcohol use
+                                                    </Form.Label>
+                                                    <Form.Control
+                                                        as="textarea"
+                                                        rows={2}
+                                                        {...register('reasonForStopping')}
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                        </>
+                                    )}
+
+                                    {watchUseStatus !== 'Never Used' && (
+                                        <Col xs={12} className="flex-grow-1 d-flex flex-column">
+                                            <Form.Group controlId="notes" className="flex-grow-1 d-flex flex-column">
+                                                <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        Notes{' '}
+                                                        <span
+                                                            style={{ cursor: 'pointer' }}
+                                                            title="Notes Suggestions"
+                                                            onClick={handleEditorFocus}>
+                                                            ✨
+                                                        </span>
+                                                    </div>
+                                                    <small className="text-muted">
+                                                        {(() => {
+                                                            const content = watch('note') || '';
+                                                            const plainText = quillRef?.current
+                                                                ?.getEditor()
+                                                                ?.getText()
+                                                                ?.trim();
+                                                            const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                            const wordCount = words?.length;
+                                                            return (
+                                                                <div>
+                                                                    <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                                </div>
+                                                            );
+                                                        })()}
+                                                    </small>
                                                 </Form.Label>
-                                                <Form.Select {...register('alcoholType')} required>
-                                                    <option key="" value="">
-                                                        Select
-                                                    </option>
-                                                    {['Beer', 'Wine', 'Spirits', 'Other', 'All']?.map((data) => (
-                                                        <option value={data} key={data}>
-                                                            {data}
-                                                        </option>
-                                                    ))}
-                                                </Form.Select>
-                                            </Form.Group>
-                                        </Col>
 
-                                        <Col sm={6}>
-                                            <Form.Group>
-                                                <Form.Label className="fw-medium mb-1">
-                                                    Do you experience dependence symptoms (e.g., craving, withdrawal)?
-                                                </Form.Label>
-                                                <Form.Check
-                                                    type="checkbox"
-                                                    label="Yes"
-                                                    {...register('hasDependenceSymptoms')}
-                                                />
-                                            </Form.Group>
-                                        </Col>
-                                    </>
-                                )}
-
-                                {watchUseStatus === 'Former User' && (
-                                    <>
-                                        <Col sm={6}>
-                                            <Form.Group>
-                                                <Form.Label className="fw-medium mb-1">
-                                                    Age when you started using alcohol
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="number"
-                                                    {...register('ageOfFirstUse', { valueAsNumber: true })}
-                                                />
-                                            </Form.Group>
-                                        </Col>
-
-                                        <Col sm={6}>
-                                            <Form.Group>
-                                                <Form.Label className="fw-medium mb-1">
-                                                    Date of last alcohol use
-                                                </Form.Label>
-                                                <Form.Control
-                                                    type="date"
-                                                    max={new Date().toISOString().slice(0, 10)}
-                                                    {...register('lastUseDate')}
-                                                />
-                                            </Form.Group>
-                                        </Col>
-
-                                        <Col sm={12}>
-                                            <Form.Group>
-                                                <Form.Label className="fw-medium mb-1">
-                                                    Reason for stopping alcohol use
-                                                </Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    rows={2}
-                                                    {...register('reasonForStopping')}
-                                                />
-                                            </Form.Group>
-                                        </Col>
-                                    </>
-                                )}
-
-                                {watchUseStatus !== 'Never Used' && (
-                                    <Col xs={12} className="flex-grow-1 d-flex flex-column">
-                                        <Form.Group controlId="notes" className="flex-grow-1 d-flex flex-column">
-                                            <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    Notes{' '}
-                                                    <span
-                                                        style={{ cursor: 'pointer' }}
-                                                        title="Notes Suggestions"
-                                                        onClick={handleEditorFocus}>
-                                                        ✨
-                                                    </span>
+                                                <div className="flex-grow-1 d-flex flex-column">
+                                                    <Controller
+                                                        name="note"
+                                                        control={control}
+                                                        defaultValue="<ul><li></li></ul>"
+                                                        render={({ field: { onChange, value } }) => (
+                                                            <ReactQuill
+                                                                value={value}
+                                                                ref={quillRef}
+                                                                onChange={(content, delta, source) => {
+                                                                    if (source === 'user') {
+                                                                        onChange(content);
+                                                                    }
+                                                                }}
+                                                                theme="snow"
+                                                                placeholder="Enter detailed notes here..."
+                                                                style={{ height: '24vh', backgroundColor: 'white' }}
+                                                                modules={{
+                                                                    toolbar: [
+                                                                        [{ header: [1, 2, false] }],
+                                                                        ['bold', 'italic', 'underline', 'strike'],
+                                                                        [{ list: 'ordered' }, { list: 'bullet' }],
+                                                                        ['clean'],
+                                                                    ],
+                                                                }}
+                                                            />
+                                                        )}
+                                                    />
                                                 </div>
-                                                <small className="text-muted">
-                                                    {(() => {
-                                                        const content = watch('note') || '';
-                                                        const plainText = quillRef?.current
-                                                            ?.getEditor()
-                                                            ?.getText()
-                                                            ?.trim();
-                                                        const words = plainText?.split(/\s+/)?.filter(Boolean);
-                                                        const wordCount = words?.length;
-                                                        return (
-                                                            <div>
-                                                                <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
-                                                            </div>
-                                                        );
-                                                    })()}
-                                                </small>
-                                            </Form.Label>
-
-                                            <div className="flex-grow-1 d-flex flex-column">
-                                                <Controller
-                                                    name="note"
-                                                    control={control}
-                                                    defaultValue="<ul><li></li></ul>"
-                                                    render={({ field: { onChange, value } }) => (
-                                                        <ReactQuill
-                                                            value={value}
-                                                            ref={quillRef}
-                                                            onChange={(content, delta, source) => {
-                                                                if (source === 'user') {
-                                                                    onChange(content);
-                                                                }
-                                                            }}
-                                                            theme="snow"
-                                                            placeholder="Enter detailed notes here..."
-                                                            style={{ height: '24vh', backgroundColor: 'white' }}
-                                                            modules={{
-                                                                toolbar: [
-                                                                    [{ header: [1, 2, false] }],
-                                                                    ['bold', 'italic', 'underline', 'strike'],
-                                                                    [{ list: 'ordered' }, { list: 'bullet' }],
-                                                                    ['clean'],
-                                                                ],
-                                                            }}
-                                                        />
-                                                    )}
+                                                <SuggestionOffcanvas
+                                                    show={showSuggestions}
+                                                    onClose={() => setShowSuggestions(false)}
+                                                    onSelect={handleSuggestionSelect}
                                                 />
-                                            </div>
-                                            <SuggestionOffcanvas
-                                                show={showSuggestions}
-                                                onClose={() => setShowSuggestions(false)}
-                                                onSelect={handleSuggestionSelect}
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                )}
-                            </Row>
+                                            </Form.Group>
+                                        </Col>
+                                    )}
+                                </Row>
+                            </div>
 
-                            <div className="mt-5 d-flex justify-content-end">
+                            <div className="mt-5 d-flex justify-content-end"  style={{ height: '' }}>
                                 <Button
                                     variant="primary"
                                     type="submit"

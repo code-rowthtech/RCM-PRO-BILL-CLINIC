@@ -4,19 +4,18 @@ import { useForm } from 'react-hook-form';
 import { CiCircleMinus } from 'react-icons/ci';
 import us from '../../../assets/images/flags/us.jpg';
 
-
-const TelecomFrom = ({constantContact,setConstantContact}) => {
+const TelecomFrom = ({ constantContact, setConstantContact }) => {
     const contactDetails = ['phone', 'email'];
     const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
-        const {
-            control,
-            register,
-            setValue,
-            getValues,
-            handleSubmit,
-            formState: { errors },
-            watch,
-        } = useForm();
+    const {
+        control,
+        register,
+        setValue,
+        getValues,
+        handleSubmit,
+        formState: { errors },
+        watch,
+    } = useForm();
     useEffect(() => {
         setConstantContact(
             contactDetails.map((system) => ({
@@ -76,7 +75,6 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
             if (p2) return `(${p1})${p2}`;
             return `(${p1}`;
         });
-
     };
 
     return (
@@ -167,7 +165,7 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
                                 )}
                             </Col>
 
-                            <Col sm={4} className="position-relative">
+                            <Col sm={4} className={`position-relative  ${contactDetails?.length > 1 ? 'pe-4 d-flex align-items-center' : ''}`}>
                                 <Form.Select
                                     value={item.use}
                                     data-has-value={!!watch(`constantContact[${index}].use`)}
@@ -183,9 +181,9 @@ const TelecomFrom = ({constantContact,setConstantContact}) => {
                                 </Form.Select>
                                 {index >= contactDetails.length && (
                                     <span
-                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                        style={{ right: '-1%', top: '12%' }}
-                                        onClick={() => removeContact(index)}>
+                                        className="text-danger cursor-pointer fs-5 ms-2"
+                                        onClick={() => removeContact(index)}
+                                        title="Remove">
                                         <CiCircleMinus />
                                     </span>
                                 )}

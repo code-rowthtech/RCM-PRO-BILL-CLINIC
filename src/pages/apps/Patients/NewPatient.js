@@ -55,7 +55,7 @@ const calculateAge = (dob) => {
     return `${String(years).padStart(2, '0')}.${String(months).padStart(2, '0')}`;
 };
 
-const NewPatient = ({ isModal }) => {
+const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('updateid');
@@ -92,8 +92,8 @@ const NewPatient = ({ isModal }) => {
     const [btnShow, setBtnShow] = useState(true);
     const [stateToSelect, setStateToSelect] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    const [responsibleParty, setResponsibleParty] = useState('true');
-    const [referringPhysician, setReferringPhysician] = useState('true');
+    const [responsibleParty, setResponsibleParty] = useState('');
+    const [referringPhysician, setReferringPhysician] = useState('');
     const [showModalPic, setShowModalPic] = useState(false);
     const [modalFileUrl, setModalFileUrl] = useState('');
     const [imageLoading, setImageLoading] = useState(true);
@@ -559,7 +559,11 @@ const NewPatient = ({ isModal }) => {
                             <Button className="me-2">
                                 Set Password
                             </Button> */}
-                            {!isModal && (
+                            {isModal ? (
+                                <Button className="cancel-button" onClick={handleClosePatientModal}>
+                                    Close
+                                </Button>
+                            ) : (
                                 <Button className="cancel-button" onClick={() => navigate(-1)}>
                                     Back
                                 </Button>
@@ -861,8 +865,7 @@ const NewPatient = ({ isModal }) => {
                                             <Form.Select
                                                 as="select" // Use 'select' to make it a dropdown
                                                 id="patientstatus"
-                                                {...register('patientStatus')}
-                                                data-has-value={!!watch('patientStatus')}>
+                                                {...register('patientStatus')}>
                                                 <option value="Active">Active</option>
                                                 <option value="Inactive">Inactive</option>
                                                 <option value="Inactive-Deceased">Inactive-Deceased</option>
@@ -935,10 +938,7 @@ const NewPatient = ({ isModal }) => {
                                             <Form.Label htmlFor="title" className="mb-0">
                                                 Title
                                             </Form.Label>
-                                            <Form.Select
-                                                {...register('title')}
-                                                data-has-value={!!watch('title')}
-                                                aria-label="Select Title">
+                                            <Form.Select {...register('title')} aria-label="Select Title">
                                                 <option value="" hidden>
                                                     Select
                                                 </option>
@@ -1122,7 +1122,6 @@ const NewPatient = ({ isModal }) => {
                                             <Form.Label className="mb-0">Preferred Communication</Form.Label>
                                             <Form.Select
                                                 {...register('preferredCommunication')}
-                                                data-has-value={!!watch('preferredCommunication')}
                                                 aria-label="Select Title">
                                                 <option value="" hidden>
                                                     Select
@@ -1147,10 +1146,7 @@ const NewPatient = ({ isModal }) => {
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Reminder Language</Form.Label>
-                                            <Form.Select
-                                                {...register('reminderLanguage')}
-                                                data-has-value={!!watch('reminderLanguage')}
-                                                defaultValue="English">
+                                            <Form.Select {...register('reminderLanguage')} defaultValue="English">
                                                 <option value="English">English</option>
                                                 <option value="Spanish">Spanish</option>
                                                 <option value="French">French</option>
@@ -1160,10 +1156,8 @@ const NewPatient = ({ isModal }) => {
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Responsible Party</Form.Label>
-                                            <Form.Select
-                                                onChange={handleResponsibleChange}
-                                                data-has-value={!!responsibleParty}
-                                                value={responsibleParty}>
+                                            <Form.Select onChange={handleResponsibleChange} value={responsibleParty}>
+                                                <option value="">Select</option>
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>
@@ -1173,10 +1167,8 @@ const NewPatient = ({ isModal }) => {
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Referring Doctor</Form.Label>
-                                            <Form.Select
-                                                onChange={handleReferringChange}
-                                                data-has-value={!!referringPhysician}
-                                                value={referringPhysician}>
+                                            <Form.Select onChange={handleReferringChange} value={referringPhysician}>
+                                                <option value="">Select</option>
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>
@@ -1232,8 +1224,9 @@ const NewPatient = ({ isModal }) => {
                                             <Form.Label className="mb-0">Medical History Concent</Form.Label>
                                             <Form.Select
                                                 {...register('medicationHistoryConsent')}
-                                                data-has-value={!!watch('medicationHistoryConsent')}
-                                                defaultValue={'true'}>
+                                                // defaultValue={'true'}
+                                            >
+                                                <option value={''}>Select</option>
                                                 <option value={'true'}>Yes</option>
                                                 <option value={'false'}>No</option>
                                             </Form.Select>
@@ -1246,7 +1239,6 @@ const NewPatient = ({ isModal }) => {
                                             <Form.Select
                                                 {...register('paymentProfile')}
                                                 aria-label="Payment Profile"
-                                                data-has-value={!!watch('paymentProfile')}
                                                 defaultValue={'Cash'}>
                                                 <option value="Cash">Cash</option>
                                                 <option value="Insurance">Insurance</option>

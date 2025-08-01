@@ -208,7 +208,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     };
     return (
         <>
-            <div className="container-fluid px-0 " >
+            <div className="container-fluid px-0" style={{ overflowX: 'hidden' }}>
                 <Form onSubmit={handleSubmit(onsubmit)}>
                     {store?.getDoctorDetailsReducer?.loading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '75vh' }}>
@@ -216,7 +216,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                         </div>
                     ) : (
                         <>
-                            <div className="scroll-container" style={{ height: '75vh' }}>
+                            <div className="scroll-container" style={{ height: '75vh', overflowX: 'hidden', wordBreak: 'break-word' }}>
                                 <Row>
                                     <Col sm={12}>
                                         <h5 className="d-flex align-items-center">
@@ -226,7 +226,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                 onClick={addQualification}></span>
                                         </h5>
                                         {qualifications?.map((qualification, index) => (
-                                            <Row key={index} className="align-items-end g-3 mb-3">
+                                            <Row key={index} className="align-items-end g mb-3">
                                                 <Col md={4} xs={12}>
                                                     <Form.Group>
                                                         <Form.Label>Select Degree Name</Form.Label>
@@ -366,9 +366,9 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                         ))}
                                     </Col>
                                 </Row>
-                                <Row className="mt-2">
+                                <Row className="">
                                     <Col sm={12}>
-                                        <Row className="pe-0">
+                                        <div className="w-100" style={{ overflowX: 'hidden' }}>
                                             <h5>
                                                 Other Documents
                                                 <span
@@ -377,7 +377,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                             </h5>
                                             {documents?.map((data, index) => (
                                                 <>
-                                                    <Row key={data.id} className="pe-0">
+                                                    <Row key={data.id} className="g-2 mx-0">
                                                         <div className="col-md-3 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Document Name</Form.Label>
@@ -503,7 +503,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                 </Form.Group>
                                                             </div>
                                                         </div>
-                                                        <div className="col-md-3 col-12">
+                                                        <div className="col-md-3 mt-0 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Note</Form.Label>
                                                                 <Form.Control
@@ -536,7 +536,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                     </Row>
                                                 </>
                                             ))}
-                                        </Row>
+                                        </div>
                                     </Col>
                                 </Row>
                             </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useForm, Controller, Form } from 'react-hook-form';
-import { Button, Table, Spinner } from 'react-bootstrap';
+import { useForm, Controller } from 'react-hook-form';
+import { Button, Table, Spinner, Col, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     createTimingsAction,
@@ -214,29 +214,43 @@ const ScheduleTab = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
             {/* <p className="mt-0 form_heading">Edit Schedule</p> */}
             <div className="row">
-                <div className="col-md-3 col-sm-6 col-12 mb-1 responnsible-party-select">
-                    <label htmlFor="doctorName" className="form-label" style={{ fontWeight: 'bold' }}>
-                        Provider Name<span className="text-danger">*</span>
-                    </label>
-                    <Select
-                        className="basic-single"
-                        classNamePrefix="select"
-                        isLoading={store?.getDoctorsReducer?.loading}
-                        isClearable={true}
-                        isSearchable={true}
-                        onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
-                        onChange={(data) => handleSearchInputChange(data, 'doctor')}
-                        name="doctorName"
-                        options={doctorOptions}
-                        placeholder="Select Provider"
-                        getOptionLabel={(e) =>
-                            e.label.replace(/\b\w/g, (char) => char.toUpperCase())
-                        }
-                    />
-                </div>
+                <Col sm={3}>
+                    <Form.Group>
+                        <Form.Label className="mb-0">
+                            Provider Name <span className="text-danger ">*</span>
+                        </Form.Label>
+                        <Select
+                            options={doctorOptions} // Use the formatted array
+                            isLoading={store?.getDoctorsReducer?.loading}
+                            isSearchable={true}
+                            isClearable={true}
+                            onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
+                            onChange={(data) => handleSearchInputChange(data, 'doctor')}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            placeholder="&nbsp; Select "
+                            name="doctorName"
+                            getOptionLabel={(e) => e.label.replace(/\b\w/g, (char) => char.toUpperCase())}
+                            styles={{
+                                control: (provided) => ({
+                                    ...provided,
+                                    height: '30px',
+                                    minHeight: '30px',
+                                    border: '0px',
+                                }),
+                                placeholder: (provided) => ({
+                                    ...provided,
+                                    fontWeight: 'bold',
+                                    fontSize: '12px',
+                                    paddingBottom: '5px',
+                                }),
+                            }}
+                        />
+                    </Form.Group>
+                </Col>
 
-                <div className="col-md-3 col-sm-6 col-12 mb-1 ">
-                    <label htmlFor="perPatientTime" className="form-label" style={{ fontWeight: 'bold' }}>
+                <div className="col-md-3 col-sm-6 col-12 mb-1">
+                    <label htmlFor="perPatientTime" className="form-label mb-0" style={{ fontWeight: 'bold' }}>
                         Per Patient Time (in minutes) <span className="text-danger">*</span>
                     </label>
                     <input
@@ -256,7 +270,7 @@ const ScheduleTab = () => {
                     />
                 </div>
             </div>
-            <div className=' scroll-container' style={{ height: '60vh' }}>
+            <div className=" scroll-container" style={{ height: '60vh' }}>
                 <Table striped className="mt-2">
                     <thead>
                         <tr>
@@ -313,8 +327,9 @@ const ScheduleTab = () => {
                                                                     const value = e.target.value;
                                                                     setDays((prevDays) => {
                                                                         const updatedDays = [...prevDays];
-                                                                        updatedDays[dayIndex].slots[slotIndex].startTime =
-                                                                            value;
+                                                                        updatedDays[dayIndex].slots[
+                                                                            slotIndex
+                                                                        ].startTime = value;
                                                                         return updatedDays;
                                                                     });
                                                                 }}
@@ -344,8 +359,9 @@ const ScheduleTab = () => {
                                                         </td>
                                                         <td style={{ width: '20%' }}>
                                                             <span
-                                                                className={`uil-plus-circle plusicon fw-bold cursor-pointer ${day.slots.length >= 10 ? 'disabled' : ''
-                                                                    }`}
+                                                                className={`uil-plus-circle plusicon fw-bold cursor-pointer ${
+                                                                    day.slots.length >= 10 ? 'disabled' : ''
+                                                                }`}
                                                                 onClick={() =>
                                                                     day.slots.length < 10 && handleAddSlots(dayIndex)
                                                                 }></span>
@@ -368,7 +384,6 @@ const ScheduleTab = () => {
                     </tbody>
                 </Table>
             </div>
-
 
             <div className="d-flex justify-content-end pt-1">
                 <Button className="custom-buttons" disabled={store?.createScheduleReducer?.loading} type="submit">
