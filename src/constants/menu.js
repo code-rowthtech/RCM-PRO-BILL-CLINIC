@@ -98,12 +98,12 @@ const MENU_ITEMS = [
         icon: 'uil-lock-open-alt',
         url: '/apps/settings/list',
         children: [
-            {
-                key: 'department',
-                label: 'Department',
-                url: '/apps/settings/department',
-                parentKey: 'setting',
-            },
+            // {
+            //     key: 'department',
+            //     label: 'Department',
+            //     url: '/apps/settings/department',
+            //     parentKey: 'setting',
+            // },
             {
                 key: 'designation',
                 label: 'Designation',

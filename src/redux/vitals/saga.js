@@ -8,9 +8,6 @@ import ToastHandle from '../../helpers/ToastMessage';
  * @param {*} payload - username and password
  */
 
-
-
-
 function* createVitalsFunction(data) {
     try {
         yield put({
@@ -19,6 +16,7 @@ function* createVitalsFunction(data) {
         });
         const response = yield call(createVitalsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData,'decrypt');
         if (response.status === 201) {
             yield put({
                 type: VitalsActionTypes.CREATE_VITALS_SUCCESS,
@@ -36,6 +34,7 @@ function* createVitalsFunction(data) {
         }
     } catch (error) {
         ToastHandle(error, 'danger')
+        console.log(error, 'error');
         yield put({
             type: VitalsActionTypes.CREATE_VITALS_ERROR,
             payload: error,

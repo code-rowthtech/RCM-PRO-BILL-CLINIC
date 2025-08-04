@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Spinner, Table } from 'react-bootstrap';
+import { Col, OverlayTrigger, Spinner, Table, Tooltip } from 'react-bootstrap';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
@@ -41,7 +41,7 @@ const DoctorHoliday = () => {
     const deleteHandle = (id) => {
         dispatch(deleteScheduleAction(id));
     };
-  
+
     return (
         <div>
             <Table
@@ -90,7 +90,13 @@ const DoctorHoliday = () => {
                                     {holiday?.doctorId?.name[0]?.text + ' '}
                                 </td>
                                 <td className="text-capitalize " style={{ fontSize: '13px', fontWeight: '400' }}>
-                                    {holiday?.reason ? holiday?.reason : 'N/A'}
+                                    {(holiday?.reason?.length || 0) > 20 ? (
+                                        <OverlayTrigger placement="top" overlay={<Tooltip>{holiday.reason}</Tooltip>}>
+                                            <span style={{ cursor: 'pointer' }}>{holiday.reason.slice(0, 20)}...</span>
+                                        </OverlayTrigger>
+                                    ) : (
+                                        holiday?.reason || 'N/A'
+                                    )}
                                 </td>
                                 <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
                                     <div

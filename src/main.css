@@ -211,7 +211,7 @@ select.form-control:not([size]):not([multiple]) {
 }
 
 .form-control {
-    color: black !important;
+    color: black;
     font-weight: 400 !important;
     padding: 6px !important;
     font-size: 12px;
@@ -231,7 +231,7 @@ select.form-control:not([size]):not([multiple]) {
     color: black !important;
 } */
 
-.custom-form-fields,
+.custom-form-fields,.select__placeholder,.css-5pmyje-placeholder,
 .form-control::placeholder {
     color: #0908084f !important;
     font-size: 12px;
@@ -1315,3 +1315,4 @@ option {
     line-height: 1.2;
     vertical-align: middle;
 }
+

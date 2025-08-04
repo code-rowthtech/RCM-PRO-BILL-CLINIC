@@ -67,7 +67,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                     state: address?.state,
                     postalCode: address?.postalCode,
                     country: address?.country,
-                })) || []
+                })) || [{type:'', line: [''], city: '', state: '', postalCode: '', country: 'USA' }]
             );
         }
     }, []);

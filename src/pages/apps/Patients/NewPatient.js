@@ -4,7 +4,12 @@ import { Button, Card, Col, Form, Modal, Row, InputGroup, Spinner } from 'react-
 import { FiDownloadCloud, FiEye, FiUploadCloud } from 'react-icons/fi';
 import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { createPatientsAction, getPatientByIdAction, getResponsiblePartyAction } from '../../../redux/patients/actions';
+import {
+    createPatientsAction,
+    getPatientByIdAction,
+    getPatientsAction,
+    getResponsiblePartyAction,
+} from '../../../redux/patients/actions';
 import { useForm, Controller } from 'react-hook-form';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
@@ -50,7 +55,7 @@ const calculateAge = (dob) => {
     return `${String(years).padStart(2, '0')}.${String(months).padStart(2, '0')}`;
 };
 
-const NewPatient = () => {
+const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('updateid');
@@ -61,6 +66,7 @@ const NewPatient = () => {
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const [submissionType, setSubmissionType] = useState(null);
     const [smShow, setSmShow] = useState(false);
@@ -86,11 +92,12 @@ const NewPatient = () => {
     const [btnShow, setBtnShow] = useState(true);
     const [stateToSelect, setStateToSelect] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    const [responsibleParty, setResponsibleParty] = useState('true');
-    const [referringPhysician, setReferringPhysician] = useState('true');
+    const [responsibleParty, setResponsibleParty] = useState('');
+    const [referringPhysician, setReferringPhysician] = useState('');
     const [showModalPic, setShowModalPic] = useState(false);
     const [modalFileUrl, setModalFileUrl] = useState('');
     const [imageLoading, setImageLoading] = useState(true);
+    const [skip, setSkip] = useState(1);
 
     const handleShowModal = (url) => {
         setModalFileUrl(url);
@@ -195,8 +202,10 @@ const NewPatient = () => {
     useEffect(() => {
         if (createResponse === 201) {
             setPatientId(createPatientResponse?._id);
+            const data = { clinicId, page: skip, limit: 10, search };
+            dispatch(getPatientsAction(data));
         }
-    }, [createResponse]);
+    }, [createResponse, dispatch, skip, search, clinicId]);
     useEffect(() => {
         if (id) {
             const payload = {
@@ -285,7 +294,6 @@ const NewPatient = () => {
         }
     }, [stateToSelect]);
 
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [showCellPhone, setShowCellPhone] = useState(false);
     const [showOfficePhone, setShowOfficePhone] = useState(false);
     const [showAltEmail, setShowAltEmail] = useState(false);
@@ -539,11 +547,11 @@ const NewPatient = () => {
                             </ul>
                         </div>
                         <div className="d-flex">
-                            {activeTab === 'responsible' && (
+                            {/* {activeTab === 'responsible' && (
                                 <Button className="me-2 custom-buttons " onClick={() => handleTabChange('responsible')}>
                                     Payment
                                 </Button>
-                            )}
+                            )} */}
 
                             {/* <Button className="me-2">
                                 Clear
@@ -551,9 +559,15 @@ const NewPatient = () => {
                             <Button className="me-2">
                                 Set Password
                             </Button> */}
-                            <Button className="cancel-button" onClick={() => navigate(-1)}>
-                                Back
-                            </Button>
+                            {isModal ? (
+                                <Button className="cancel-button" onClick={handleClosePatientModal}>
+                                    Close
+                                </Button>
+                            ) : (
+                                <Button className="cancel-button" onClick={() => navigate(-1)}>
+                                    Back
+                                </Button>
+                            )}
                         </div>
                     </div>
 
@@ -851,8 +865,7 @@ const NewPatient = () => {
                                             <Form.Select
                                                 as="select" // Use 'select' to make it a dropdown
                                                 id="patientstatus"
-                                                {...register('patientStatus')}
-                                                data-has-value={!!watch('patientStatus')}>
+                                                {...register('patientStatus')}>
                                                 <option value="Active">Active</option>
                                                 <option value="Inactive">Inactive</option>
                                                 <option value="Inactive-Deceased">Inactive-Deceased</option>
@@ -925,10 +938,7 @@ const NewPatient = () => {
                                             <Form.Label htmlFor="title" className="mb-0">
                                                 Title
                                             </Form.Label>
-                                            <Form.Select
-                                                {...register('title')}
-                                                data-has-value={!!watch('title')}
-                                                aria-label="Select Title">
+                                            <Form.Select {...register('title')} aria-label="Select Title">
                                                 <option value="" hidden>
                                                     Select
                                                 </option>
@@ -1112,7 +1122,6 @@ const NewPatient = () => {
                                             <Form.Label className="mb-0">Preferred Communication</Form.Label>
                                             <Form.Select
                                                 {...register('preferredCommunication')}
-                                                data-has-value={!!watch('preferredCommunication')}
                                                 aria-label="Select Title">
                                                 <option value="" hidden>
                                                     Select
@@ -1137,10 +1146,7 @@ const NewPatient = () => {
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Reminder Language</Form.Label>
-                                            <Form.Select
-                                                {...register('reminderLanguage')}
-                                                data-has-value={!!watch('reminderLanguage')}
-                                                defaultValue="English">
+                                            <Form.Select {...register('reminderLanguage')} defaultValue="English">
                                                 <option value="English">English</option>
                                                 <option value="Spanish">Spanish</option>
                                                 <option value="French">French</option>
@@ -1150,10 +1156,8 @@ const NewPatient = () => {
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Responsible Party</Form.Label>
-                                            <Form.Select
-                                                onChange={handleResponsibleChange}
-                                                data-has-value={!!responsibleParty}
-                                                value={responsibleParty}>
+                                            <Form.Select onChange={handleResponsibleChange} value={responsibleParty}>
+                                                <option value="">Select</option>
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>
@@ -1163,10 +1167,8 @@ const NewPatient = () => {
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Referring Doctor</Form.Label>
-                                            <Form.Select
-                                                onChange={handleReferringChange}
-                                                data-has-value={!!referringPhysician}
-                                                value={referringPhysician}>
+                                            <Form.Select onChange={handleReferringChange} value={referringPhysician}>
+                                                <option value="">Select</option>
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>
@@ -1222,8 +1224,9 @@ const NewPatient = () => {
                                             <Form.Label className="mb-0">Medical History Concent</Form.Label>
                                             <Form.Select
                                                 {...register('medicationHistoryConsent')}
-                                                data-has-value={!!watch('medicationHistoryConsent')}
-                                                defaultValue={'true'}>
+                                                // defaultValue={'true'}
+                                            >
+                                                <option value={''}>Select</option>
                                                 <option value={'true'}>Yes</option>
                                                 <option value={'false'}>No</option>
                                             </Form.Select>
@@ -1236,7 +1239,6 @@ const NewPatient = () => {
                                             <Form.Select
                                                 {...register('paymentProfile')}
                                                 aria-label="Payment Profile"
-                                                data-has-value={!!watch('paymentProfile')}
                                                 defaultValue={'Cash'}>
                                                 <option value="Cash">Cash</option>
                                                 <option value="Insurance">Insurance</option>

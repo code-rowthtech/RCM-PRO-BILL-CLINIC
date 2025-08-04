@@ -343,14 +343,7 @@ const SurgicalHistory = () => {
                                         store?.updateSurgicalHistoryReducer?.loading
                                     }
                                     className="px-3 py-1 custom-buttons">
-                                    {store?.createSurgicalHistoryReducer?.loading ||
-                                    store?.updateSurgicalHistoryReducer?.loading ? (
-                                        <Spinner />
-                                    ) : toEdit ? (
-                                        'Update'
-                                    ) : (
-                                        'Add Record'
-                                    )}
+                                    {toEdit ? 'Update' : 'Add Record'}
                                 </Button>
                             </div>
                         </Form>

@@ -16,10 +16,12 @@ function* createAppointmentFunction(data) {
             payload: {},
         });
         const response = yield call(createAppointmentApi, data);
-        // const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        const decryptedData = response.data.data;
+        console.log('response', response)
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        // const decryptedData = response.data.data;
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success')
+            console.log('decryptedData', decryptedData)
             yield put({
                 type: AppointmentActionTypes.CREATE_APPOINTMENT_SUCCESS,
                 payload: { ...decryptedData },

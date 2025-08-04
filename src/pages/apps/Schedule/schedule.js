@@ -196,7 +196,7 @@ const Schedule = () => {
                                                     selectsRange
                                                     isClearable
                                                     placeholderText="Select a date range"
-                                                    className="date-picker-input border-0"
+                                                    className="date-picker-input  border-0"
                                                 />
                                                 <Button
                                                     className="custom-buttons d-none d-md-block"

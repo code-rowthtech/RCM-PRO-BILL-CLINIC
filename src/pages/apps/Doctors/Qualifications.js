@@ -5,7 +5,7 @@ import { createDoctorDetailAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { FiEye, FiInfo, FiUploadCloud } from 'react-icons/fi';
+import { FiEye, FiInfo, FiUploadCloud, FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import Select from 'react-select';
@@ -89,18 +89,31 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     }));
 
     const onsubmit = (data) => {
-        const qualificationData = qualifications?.map((item) => ({
-            code: item?.degreeName?.data || item?.degreeName,
-            documents: item?.degreeFile,
-            issuer: item?.issuerOrganisation,
-        }));
-        const payload = {
-            ...(updateId ? { doctorId: id } : { doctorId: docId }),
-            qualification: qualificationData,
-            otherDocuments: documents,
-        };
-        dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
+    const qualificationData = qualifications?.map((item) => {
+        const qualification = {};
+        if (item?.degreeName?.data || item?.degreeName) qualification.code = item?.degreeName?.data || item?.degreeName;
+        if (item?.degreeFile) qualification.documents = item?.degreeFile;
+        if (item?.issuerOrganisation) qualification.issuer = item?.issuerOrganisation;
+        return qualification;
+    });
+
+    const filteredDocuments = documents.map(doc => {
+        const filtered = {};
+        if (doc.name) filtered.name = doc.name;
+        if (doc.number) filtered.number = doc.number; 
+        if (doc.issuingAuthority) filtered.issuingAuthority = doc.issuingAuthority;
+        if (doc.document) filtered.document = doc.document;
+        if (doc.note) filtered.note = doc.note;
+        return filtered;
+    });
+
+    const payload = {
+        ...(updateId ? { doctorId: id } : { doctorId: docId }),
+        qualification: qualificationData,
+        otherDocuments: filteredDocuments
     };
+    dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
+};
     useEffect(() => {
         if (doctorDetails && updateId) {
             // Set qualifications data
@@ -193,9 +206,28 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
             setShowDocPreview(true);
         }
     };
+
+    const handleDownload = async (file) => {
+        if (!file?.url) return;
+        try {
+            const response = await fetch(file.url);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = file.fileName || 'document';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            window.open(file.url, '_blank');
+        } catch (error) {
+            window.open(file.url, '_blank');
+        }
+    };
     return (
         <>
-            <div className="container-fluid px-0">
+            <div className="container-fluid px-0" style={{ overflowX: 'hidden' }}>
                 <Form onSubmit={handleSubmit(onsubmit)}>
                     {store?.getDoctorDetailsReducer?.loading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '75vh' }}>
@@ -203,7 +235,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                         </div>
                     ) : (
                         <>
-                            <div className="scroll-container" style={{ height: '75vh' }}>
+                            <div className="scroll-container" style={{ height: '75vh', overflowX: 'hidden', wordBreak: 'break-word' }}>
                                 <Row>
                                     <Col sm={12}>
                                         <h5 className="d-flex align-items-center">
@@ -213,8 +245,8 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                 onClick={addQualification}></span>
                                         </h5>
                                         {qualifications?.map((qualification, index) => (
-                                            <Row key={index} className="align-items-end g-3 mb-3">
-                                                   <Col md={4} xs={12}>
+                                            <Row key={index} className="align-items-end g mb-3">
+                                                <Col md={4} xs={12}>
                                                     <Form.Group>
                                                         <Form.Label>Select Degree Name</Form.Label>
                                                         <Select
@@ -280,7 +312,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                             }`}
                                                             style={{ minHeight: '30px' }}>
                                                             <span>
-                                                                {degreeUploading[index]
+                                                                {degreeUploading[index] === true
                                                                     ? 'Uploading...'
                                                                     : qualification.degreeFile?.fileName
                                                                       ? qualification.degreeFile.fileName.length > 30
@@ -308,9 +340,17 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                             title="Preview"
                                                                         />
                                                                     )}
-                                                                <span className="mb-0 d-inline-flex align-items-center">
-                                                                    <FiUploadCloud />
-                                                                </span>
+                                                                {qualification.degreeFile?.url && (
+                                                                    <FiDownloadCloud
+                                                                        className="text-secondary"
+                                                                        style={{ cursor: 'pointer' }}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDownload(qualification.degreeFile);
+                                                                        }}
+                                                                        title="Download"
+                                                                    />
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <Form.Control
@@ -322,10 +362,10 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                         />
                                                     </Form.Group>
                                                 </Col>
-                                                <Col md={4} xs={12} className="position-relative">
-                                                    <Form.Group className="">
+                                                <Col md={4} xs={12}>
+                                                    <Form.Group className="position-relative">
                                                         <Form.Label>Issuer Organisation</Form.Label>
-                                                        <div className="d-flex align-items-center">
+                                                        <div className="d-flex align-items-center gap-2">
                                                             <Form.Control
                                                                 type="text"
                                                                 value={qualification.issuerOrganisation}
@@ -337,15 +377,11 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                     )
                                                                 }
                                                                 placeholder="Enter Issuer Organisation"
-                                                                style={{ paddingRight: '30px' }}
+                                                                className="flex-grow-1"
                                                             />
                                                             {index > 0 && (
                                                                 <CiCircleMinus
-                                                                    className="text-danger cursor-pointer fs-4 position-absolute"
-                                                                    style={{
-                                                                        right: '10px',
-                                                                        top: '35px',
-                                                                    }}
+                                                                    className="text-danger cursor-pointer fs-4"
                                                                     onClick={() => removeQualification(index)}
                                                                     title="Remove"
                                                                 />
@@ -357,9 +393,9 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                         ))}
                                     </Col>
                                 </Row>
-                                <Row className="mt-2">
+                                <Row className="">
                                     <Col sm={12}>
-                                        <Row className="pe-0">
+                                        <div className="w-100" style={{ overflowX: 'hidden' }}>
                                             <h5>
                                                 Other Documents
                                                 <span
@@ -368,7 +404,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                             </h5>
                                             {documents?.map((data, index) => (
                                                 <>
-                                                    <Row key={data.id} className="pe-0">
+                                                    <Row key={data.id} className="g-2 mx-0">
                                                         <div className="col-md-3 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Document Name</Form.Label>
@@ -448,7 +484,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                 : 'custom-form-fields'
                                                                         }`}>
                                                                         <span>
-                                                                            {documentUploading[index]
+                                                                            {documentUploading[index] === true
                                                                                 ? 'Uploading...'
                                                                                 : data?.document?.fileName
                                                                                   ? data.document.fileName.length > 25
@@ -457,7 +493,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                             25
                                                                                         ) + '...'
                                                                                       : data.document.fileName
-                                                                                  : 'Upload Degree'}
+                                                                                  : 'Upload Document'}
                                                                         </span>
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {data?.document?.url &&
@@ -476,9 +512,17 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                         title="Preview"
                                                                                     />
                                                                                 )}
-                                                                            <span className="mb-0 d-inline-flex align-items-center">
-                                                                                <FiUploadCloud />
-                                                                            </span>
+                                                                            {data?.document?.url && (
+                                                                                <FiDownloadCloud
+                                                                                    className="text-secondary"
+                                                                                    style={{ cursor: 'pointer' }}
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleDownload(data.document);
+                                                                                    }}
+                                                                                    title="Download"
+                                                                                />
+                                                                            )}
                                                                         </div>
                                                                     </div>
                                                                     <Form.Control
@@ -494,7 +538,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                 </Form.Group>
                                                             </div>
                                                         </div>
-                                                        <div className="col-md-3 col-12">
+                                                        <div className="col-md-3 mt-0 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Note</Form.Label>
                                                                 <Form.Control
@@ -527,7 +571,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                     </Row>
                                                 </>
                                             ))}
-                                        </Row>
+                                        </div>
                                     </Col>
                                 </Row>
                             </div>

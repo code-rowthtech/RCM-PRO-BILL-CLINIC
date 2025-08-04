@@ -106,9 +106,13 @@ const DoctorIdentifierForm = ({
     const handleIdentifierFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
-        setIdentifierDocument((prev) => ({ ...prev, [index]: true })); // Set loading state
+        
+        const setLoadingForIndex = (loading) => {
+            setIdentifierDocument((prev) => ({ ...prev, [index]: loading }));
+        };
+        
         try {
-            const url = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
+            const url = await handleUpload(selectedFile, setLoadingForIndex);
             setIdentifiers((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -157,10 +161,13 @@ const DoctorIdentifierForm = ({
     const handleLicensureFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
-        setLicensureDocument((prev) => ({ ...prev, [index]: true })); // Set loading state
+        
+        const setLoadingForIndex = (loading) => {
+            setLicensureDocument((prev) => ({ ...prev, [index]: loading }));
+        };
 
         try {
-            const url = await handleUpload(selectedFile, setLicensureDocument); // Upload file
+            const url = await handleUpload(selectedFile, setLoadingForIndex);
             setLicensure((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -176,56 +183,30 @@ const DoctorIdentifierForm = ({
             console.error('Error during file upload:', error);
         }
     };
-    useEffect(() => {
-        if (doctorDetails && updateId) {
-            const identifiersWithState =
-                doctorDetails?.identifier?.filter((item) => item?.hasOwnProperty('licenseState')) || [];
-            const identifiersWithoutState =
-                doctorDetails?.identifier?.filter((item) => !item?.hasOwnProperty('licenseState')) || [];
-            // Set qualifications data
-            const updatedIdentifiers = identifiersWithoutState?.map((item, index) => ({
-                expiry: item?.expiry ? new Date(item?.expiry).toISOString().split('T')[0] : '',
-                file: item?.documents?.[0],
-                issuingAuthority: item?.issuingAuthority,
-                number: item?.value,
-                system: '',
-                type: {
-                    code: item?.sliceName || '',
-                    label: item?.identifierType || '',
-                    value: item?.system || '',
-                },
-                file: item?.file?.[0],
-                status: item?.status || '',
-                ennumerationDate: item?.ennumerationDate
-                    ? new Date(item?.ennumerationDate).toISOString().split('T')[0]
-                    : '',
-            }));
-            const updatedLicensure = identifiersWithState?.map((item, index) => ({
-                expiry: item?.expiry ? new Date(item?.expiry).toISOString().split('T')[0] : '',
-                file: item?.documents?.[0],
-                issuingAuthority: item?.issuingAuthority,
-                number: item?.value,
-                system: '',
-                type: {
-                    code: item?.sliceName || '',
-                    label: item?.identifierType || '',
-                    value: item?.system || '',
-                },
-                file: item?.file?.[0],
-                licenseState: item?.licenseState || '',
-                status: item?.status || '',
-                ennumerationDate: item?.ennumerationDate
-                    ? new Date(item?.ennumerationDate).toISOString().split('T')[0]
-                    : '',
-            }));
-            setIdentifiers(updatedIdentifiers);
-            setLicensure(updatedLicensure);
-        }
-    }, [doctorDetails, statesData]);
+    // Remove this useEffect as data loading is now handled in parent component
     const handlePreview = (file) => {
-        if (file?.url && /\.(jpg|jpeg|png|svg)$/i.test(file.name)) {
+        if (file?.url) {
             setPreviewUrl(file.url);
             setShowPreview(true);
+        }
+    };
+
+    const handleDownload = async (file) => {
+        if (!file?.url) return;
+        try {
+            const response = await fetch(file.url);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = file.name || 'document';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            window.open(file.url, '_blank');
+        } catch (error) {
+            window.open(file.url, '_blank');
         }
     };
 
@@ -380,7 +361,7 @@ const DoctorIdentifierForm = ({
                                 item?.file?.name ? 'form-control' : 'custom-form-fields'
                             }`}>
                             <span>
-                                {identifierDocument[index]
+                                {identifierDocument[index] === true
                                     ? 'Uploading...'
                                     : item.file?.name
                                       ? item.file.name.length > 30
@@ -400,9 +381,17 @@ const DoctorIdentifierForm = ({
                                         title="Preview"
                                     />
                                 )}
-                                <span className="mb-0 d-inline-flex align-items-center">
-                                    <FiDownloadCloud />
-                                </span>
+                                {item.file?.url && (
+                                    <FiDownloadCloud
+                                        className="text-secondary"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDownload(item.file);
+                                        }}
+                                        title="Download"
+                                    />
+                                )}
                             </div>
                         </div>
 
@@ -555,7 +544,7 @@ const DoctorIdentifierForm = ({
                                 item?.file?.name ? 'form-control' : 'custom-form-fields'
                             }`}>
                             <span>
-                                {licensureDocument[index]
+                                {licensureDocument[index] === true
                                     ? 'Uploading...'
                                     : item.file?.name
                                       ? item.file.name.length > 30
@@ -575,9 +564,17 @@ const DoctorIdentifierForm = ({
                                         title="Preview"
                                     />
                                 )}
-                                <span className="mb-0 d-inline-flex align-items-center">
-                                    <FiDownloadCloud />
-                                </span>
+                                {item.file?.url && (
+                                    <FiDownloadCloud
+                                        className="text-secondary"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDownload(item.file);
+                                        }}
+                                        title="Download"
+                                    />
+                                )}
                             </div>
                         </div>
                         <Form.Control
@@ -598,36 +595,36 @@ const DoctorIdentifierForm = ({
                         )}
                     </Col>
                     {licensure?.length > 1 && index < licensure.length - 1}
-                    <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
-                        <Modal.Body>
-                            <div className="d-flex justify-content-center">
-                                <p className="fw-bold" style={{ color: '#6169D0' }}>
-                                    {' '}
-                                    File Preview
-                                </p>
-                            </div>
-                            <div
-                                style={{
-                                    overflow: 'hidden',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}>
-                                <img
-                                    src={previewUrl} // Set the source of the image
-                                    alt="File Preview"
-                                    style={{
-                                        maxWidth: '100%', // Ensures the image fits within the modal width
-                                        maxHeight: '100vh', // Prevents the image from exceeding the viewport height
-                                        objectFit: 'contain', // Ensures the image maintains its aspect ratio
-                                        display: 'block',
-                                    }}
-                                />
-                            </div>
-                        </Modal.Body>
-                    </Modal>
                 </Row>
             ))}
+            
+            <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
+                <Modal.Body>
+                    <div className="d-flex justify-content-center">
+                        <p className="fw-bold" style={{ color: '#6169D0' }}>
+                            File Preview
+                        </p>
+                    </div>
+                    <div
+                        style={{
+                            overflow: 'hidden',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                        <img
+                            src={previewUrl}
+                            alt="File Preview"
+                            style={{
+                                maxWidth: '100%',
+                                maxHeight: '100vh',
+                                objectFit: 'contain',
+                                display: 'block',
+                            }}
+                        />
+                    </div>
+                </Modal.Body>
+            </Modal>
         </>
     );
 };

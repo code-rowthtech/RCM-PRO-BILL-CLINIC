@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FiUploadCloud } from 'react-icons/fi';
@@ -113,8 +113,10 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
             setValue('preferredLanguage', patientDetails?.communication?.[0]?.language?.coding?.[0]?.code || '');
             // setValue('trible', patientDetails?.trible?.[0]?.code || '');
             // setValue('ethnicity', patientDetails?.ethnicity?.[0]?.value || '');
-            setEth(patientDetails?.ethnicity);
-            setTri(patientDetails?.tribalAffiliation);
+            setEth(patientDetails.ethnicity?.[0] ?? null);
+            setTri(patientDetails.tribalAffiliation?.[0] ?? null);
+            // setEth(patientDetails?.ethnicity);
+            // setTri(patientDetails?.tribalAffiliation);
             setValue('notes', patientDetails?.notes);
             setValue('maritalStatus', patientDetails?.maritalStatus?.[0]?.display || '');
             setValue('epsdtServices', patientDetails?.epsdtServices);
@@ -124,7 +126,8 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
             setValue('emergencyContactName', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
             setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value));
             // setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
-            setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding);
+            // setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding);
+            setRela(patientDetails.contact?.[0]?.relationship?.[0]?.coding?.[0] ?? null);
 
             // ✅ Employer Details Fix
             setValue('employerName', patientDetails?.employerDetails?.employerName || '');
@@ -345,14 +348,14 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 occupation: data?.occupation,
                 workLocation: data?.employerAddress
                     ? {
-                        address: {
-                            line: [data?.employerAddress],
-                            city: data?.employerCity,
-                            state: data?.employerStateName,
-                            postalCode: data?.employerZip,
-                            country: 'United States',
-                        },
-                    }
+                          address: {
+                              line: [data?.employerAddress],
+                              city: data?.employerCity,
+                              state: data?.employerStateName,
+                              postalCode: data?.employerZip,
+                              country: 'United States',
+                          },
+                      }
                     : {},
             },
             identifier: finalIdentifiers,
@@ -404,31 +407,31 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
     }));
 
     const [eth, setEth] = useState(null); // Store selected ethnicity
-    const handleEthnicityChange = (selectedOption) => {
-        setEth(selectedOption?.value); // Store value in state
-    };
-    const [rela, setRela] = useState(null); // Store selected relationship
-    const handleRelationChange = (selectedOption) => {
-        setRela(selectedOption ? selectedOption.value : '');
-    };
     const [tri, setTri] = useState(null); // Store selected tribal entity
-    const handleTribalChange = (selectedOption) => {
-        setTri(selectedOption ? selectedOption.value : '');
-    };
-    const selectedEthnicityOption =
-        formattedEthnicityOptions.find((option) => option?.value?.code === eth?.[0]?.code) ||
-        formattedEthnicityOptions.find((option) => option?.value?.display === eth);
-    const selectedTribleOption =
-        formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) ||
-        formattedTribleOptions.find((option) => option?.value?.code == tri);
-    const selectedRelationOption =
-        relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
-        relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
+    const [rela, setRela] = useState(null); // Store selected relationship
+
+    const handleEthnicityChange = (opt) => setEth(opt?.value ?? null);
+    const handleRelationChange = (opt) => setRela(opt?.value ?? null);
+    const handleTribalChange = (opt) => setTri(opt?.value ?? null);
+
+    const selectedEthnicityOption = useMemo(
+        () => formattedEthnicityOptions.find((o) => o.value.code === eth?.code) ?? null,
+        [eth, formattedEthnicityOptions]
+    );
+    const selectedTribleOption = useMemo(
+        () => formattedTribleOptions.find((o) => o.value.code == tri?.code) ?? null,
+        [tri, formattedTribleOptions]
+    );
+
+    const selectedRelationOption = useMemo(
+        () => relationshipOption.find((o) => o.value.code === rela?.code) ?? null,
+        [rela, relationshipOption]
+    );
 
     return (
         <Form className="" onSubmit={handleSubmit(onSubmit)}>
             <div
-                className=" scroll-container "
+                className=" scroll-container mt-1"
                 style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <IdentifierForm
                     defaultIdentifiers={[
@@ -647,13 +650,13 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                 <InputGroup>
                                     <InputGroup.Text
                                         className="ps-3 pe-1 fw-bold text-black"
-                                        style={{ height: '33px' }}>
+                                        style={{ height: '30px' }}>
                                         &nbsp;+1
                                     </InputGroup.Text>{' '}
                                     {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
-                                        style={{ height: '33px' }}
+                                        style={{ height: '30px' }}
                                         {...register('emergencyContactPhone', {
                                             pattern: {
                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -758,13 +761,13 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                 <InputGroup>
                                                     <InputGroup.Text
                                                         className="ps-3 pe-1 fw-bold text-black"
-                                                        style={{ height: '33px' }}>
+                                                        style={{ height: '30px' }}>
                                                         &nbsp;+1
                                                     </InputGroup.Text>{' '}
                                                     {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
-                                                        style={{ height: '33px' }}
+                                                        style={{ height: '30px' }}
                                                         {...register('employerPhone', {
                                                             pattern: {
                                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -816,7 +819,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={3}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className="mb-1">Employment Status</Form.Label>
+                                            <Form.Label className="mb-0">Employment Status</Form.Label>
                                             <Form.Select {...register('employmentStatus')}>
                                                 <option value="">Select Employment Status</option>
                                                 <option value="employed">Employed</option>
@@ -833,7 +836,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={3}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className="mb-1">Occupation</Form.Label>
+                                            <Form.Label className="mb-0">Occupation</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Enter Occupation"
@@ -884,10 +887,11 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
                                                             ? 'd-none'
                                                             : ''
-                                                        }`}>
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -952,13 +956,21 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">City</Form.Label>
                                             <Form.Select
-                                                disabled={store?.getCitiesReducer?.loading || store?.getCitiesReducer?.cities4?.loading}
+                                                disabled={
+                                                    store?.getCitiesReducer?.loading ||
+                                                    store?.getCitiesReducer?.cities4?.loading
+                                                }
                                                 {...register('employerCity')}>
-                                                {(store?.getCitiesReducer?.loading || store?.getCitiesReducer?.cities4?.loading) ? (
-                                                    <option value="" hidden>Loading...</option>
+                                                {store?.getCitiesReducer?.loading ||
+                                                store?.getCitiesReducer?.cities4?.loading ? (
+                                                    <option value="" hidden>
+                                                        Loading...
+                                                    </option>
                                                 ) : (
                                                     <>
-                                                        <option value="" hidden>City</option>
+                                                        <option value="" hidden>
+                                                            City
+                                                        </option>
                                                         {cities4?.map((data) => (
                                                             <option key={data?.name} value={data?.name}>
                                                                 {data?.name}

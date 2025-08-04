@@ -287,7 +287,7 @@ const AddAllergy = ({ onCancel }) => {
                     <Col sm={6}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="criticality" className="mb-0">
-                                Criticality
+                                Criticality <span className='text-danger'>*</span>
                             </Form.Label>
                             <Form.Select
                                 {...register('criticality', { required: 'Criticality is required' })}
@@ -404,7 +404,7 @@ const AddAllergy = ({ onCancel }) => {
                             <Controller
                                 name="note"
                                 control={control}
-                                defaultValue="<ul><li></li></ul>"
+                                // defaultValue="<ul><li></li></ul>"
                                 render={({ field: { onChange, value } }) => (
                                     <ReactQuill
                                         ref={quillRef}

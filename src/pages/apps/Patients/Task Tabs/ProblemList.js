@@ -54,7 +54,7 @@ const ProblemList = () => {
 
     const closeDeleteModal = () => {
         setDeleteModal(false);
-    }
+    };
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
@@ -66,9 +66,11 @@ const ProblemList = () => {
                         <Table responsive className="table-centered table-nowrap mb-0">
                             <thead className="bg-dark">
                                 <tr>
-                                    {['S.No.', 'Problem', 'ICD-CM Code', 'Diagnosed Date', 'Status', 'Action']?.map((data, index) => (
-                                        <th key={index}>{data}</th>
-                                    ))}
+                                    {['S.No.', 'Problem', 'ICD-CM Code', 'Diagnosed Date', 'Status', 'Action']?.map(
+                                        (data, index) => (
+                                            <th key={index}>{data}</th>
+                                        )
+                                    )}
                                 </tr>
                             </thead>
                             <tbody>
@@ -84,7 +86,11 @@ const ProblemList = () => {
                                             <td>{index + 1}</td>
                                             <td>{data?.code?.coding?.[0]?.display || 'N/A'}</td>
                                             <td>{data?.code?.coding?.[0]?.code || 'N/A'}</td>
-                                            <td>{new Date(data?.onsetDateTime).toLocaleDateString('en-GB')}</td>
+                                            <td>
+                                                {data?.onsetDateTime && !isNaN(new Date(data.onsetDateTime))
+                                                    ? new Date(data.onsetDateTime).toLocaleDateString('en-GB')
+                                                    : 'N/A'}
+                                            </td>{' '}
                                             <td>{data.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>
                                             <td>
                                                 <i
@@ -101,7 +107,7 @@ const ProblemList = () => {
                                                 <i
                                                     className="bi bi-trash-fill text-danger cursor-pointer"
                                                     onClick={() => {
-                                                        setDeletionId(data?._id)
+                                                        setDeletionId(data?._id);
                                                         setDeleteModal(true);
                                                     }}
                                                 />
@@ -128,7 +134,13 @@ const ProblemList = () => {
                         </div>
                     </div>
                 </Row>
-                <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={handleDelete} item={'problem'} isLoading={store?.deleteProblemListReducer?.loading} />
+                <DeletionModal
+                    show={deleteModal}
+                    onHide={closeDeleteModal}
+                    onConfirm={handleDelete}
+                    item={'problem'}
+                    isLoading={store?.deleteProblemListReducer?.loading}
+                />
             </div>
             <Modal show={problemModal} onHide={() => setProblemModal(false)} size="lg" centered>
                 <Modal.Header closeButton className="px-2 py-0">

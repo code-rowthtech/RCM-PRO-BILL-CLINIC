@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
@@ -38,7 +38,9 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
             setValue('title', patientDetails?.relatedPerson?.name?.[0]?.prefix);
             setValue('fullName', patientDetails?.relatedPerson?.name?.find((data) => data?.use === 'official')?.text);
             setValue('gender', patientDetails?.gender);
-            setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0]);
+            // setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0]);
+              setRela(patientDetails.relatedPerson?.relationship?.[0]?.coding?.[0] ?? null);
+
             setValue(
                 'dateOfBirth',
                 patientDetails?.relatedPerson?.dateOfBirth
@@ -53,16 +55,16 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                 state: data?.state,
                 type: data?.type,
                 use: data?.use,
-            }));
+            })) || [{ type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' }];
             setResponsibleAddresses(updateAddress);
             const rawTelecom = patientDetails?.relatedPerson?.telecom;
-            const updateTelecom = Array.isArray(rawTelecom)
+            const updateTelecom = Array.isArray(rawTelecom) && rawTelecom.length > 0
                 ? rawTelecom.map((data) => ({
                     system: data?.system || '',
                     value: data?.value || '',
                     use: data?.use || '',
                 }))
-                : [];
+                : [{ system: '', value: '', use: '' }];
 
             setResponsibleTelecom(updateTelecom);
         }
@@ -107,9 +109,11 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
         label: relation.display,
     }));
     const [rela, setRela] = useState(null);
-    const handleRelationChange = (selectedOption) => {
-        setRela(selectedOption ? selectedOption.value : '');
-    };
+      const handleRelationChange  = (opt) => setRela(opt?.value ?? null);
+        const selectedRelationOption = useMemo(
+              () => relationshipOption.find((o) => o.value.code == rela?.code) ?? null,
+              [rela, relationshipOption]
+          );
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <div
@@ -157,7 +161,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                         </div>
                         {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                     </div>
-                    <div className="col-md-3 col-12 pe-0">
+                    <div className="col-md-3 col-12 pe-2">
                         <Form.Label htmlFor="DOB" className="mb-0">
                             Date of Birth <span className="text-danger">*</span>
                         </Form.Label>
@@ -178,11 +182,9 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
-                                onChange={handleRelationChange}
-                                value={
-                                    relationshipOption.find((option) => option?.value?.display === rela?.display) ||
-                                    null
-                                } // Show selected value
+                                value={selectedRelationOption}
+                                                                onChange={handleRelationChange}
+
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,

@@ -24,6 +24,7 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     const store = useSelector((state) => state);
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
+    console.log(createAppointmentResponse, 'createAppointmentResponse');
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
 
     // State management

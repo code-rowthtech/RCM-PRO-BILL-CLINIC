@@ -42,7 +42,6 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
     const dailyOccurrenceDate = watch('dailyOccurrenceDate');
     const startDate = watch('scheduled');
     // const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    // console.log("User Time Zone:", timeZone);
 
     // Calculate dates whenever dependencies change
     useEffect(() => {
@@ -392,20 +391,22 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     // Set form values when selectedSlot changes
     useEffect(() => {
         if (selectedSlot) {
-            const date = new Date(calendarView === 'month' ? selectedSlot?.slots?.[0] : selectedSlot?.start);
-            const localDateString = date.toLocaleDateString('en-CA');
+            const rawDate = new Date(calendarView === 'month' ? selectedSlot?.slots?.[0] : selectedSlot?.start);
+            const localDateString = rawDate.toISOString().split('T')[0];
+            const sanitized = sanitizeScheduledDate(localDateString);
 
-            setScheduledDate(localDateString);
+            setScheduledDate(sanitized);
 
             if (calendarView !== 'month') {
                 setValue('startTime', formatTime(selectedSlot?.start));
             }
         } else {
-            setScheduledDate(new Date().toISOString().split('T')[0]);
+            const todayStr = new Date().toISOString().split('T')[0];
+            setScheduledDate(todayStr);
             setValue('startTime', getDefaultTime());
             setValue('duration', '30');
         }
-    }, [selectedSlot, calendarView, scheduledDate]);
+    }, [selectedSlot, calendarView]);
 
     // Fetch doctors when search or status changes
     useEffect(() => {
@@ -584,12 +585,10 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             slot: data?.startTime,
             ...recurrenceTemplate,
         };
-        console.log(payload, 'appointment payload');
         if (id && appointmentDetails) {
             dispatch(rescheduleAppointmentAction({ id, key: encryptMessage(payload) }));
         } else {
             dispatch(createAppointmentAction({ key: encryptMessage(payload) }));
-            // dispatch(createAppointmentAction(payload));
         }
     };
 
@@ -603,10 +602,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
 
     // Handle new patient modal
     const handlePlusIconClick = useCallback(() => setShowModal(true), []);
-    const handleCloseModal = useCallback(() => setShowModal(false), []);
-
-    // Handle delete all
-    const handleDeleteAll = useCallback(() => reset(), [reset]);
+    const handleClosePatientModal = useCallback(() => setShowModal(false), []);
 
     // Appointment reason handling
     const formattedReasonOptions = useMemo(
@@ -650,7 +646,11 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     };
     const closeConsultationModal = () => {
         setConsultationModal(false);
-        reset();
+    };
+    const sanitizeScheduledDate = (inputDate) => {
+        const today = new Date().setHours(0, 0, 0, 0);
+        const date = new Date(inputDate).setHours(0, 0, 0, 0);
+        return date < today ? new Date().toISOString().split('T')[0] : inputDate;
     };
     return (
         <div>
@@ -707,7 +707,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         onClick={handlePlusIconClick}
                                     />
                                 </div>
-
                                 {errors.patient && (
                                     <span className="text-danger" style={{ display: 'block', marginTop: '2px' }}>
                                         {errors.patient.message}
@@ -731,11 +730,16 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                             {store?.getDoctorsReducer?.loading ? 'Loading...' : 'Select Provider'}
                                         </option>
                                         {doctorDetails && doctorDetails.length > 0 ? (
-                                            doctorDetails?.map((doctor) => (
-                                                <option key={doctor?._id} value={doctor?._id}>
-                                                    {doctor?.name?.[0]?.text}
-                                                </option>
-                                            ))
+                                            doctorDetails.map((doctor) => {
+                                                const doctorName = doctor?.name?.[0]?.text || 'Unnamed';
+                                                const emailObj = doctor?.telecom?.find((t) => t.system === 'email');
+                                                const email = emailObj?.value ? ` (${emailObj.value})` : '';
+                                                return (
+                                                    <option key={doctor?._id} value={doctor?._id}>
+                                                        {doctorName + email}
+                                                    </option>
+                                                );
+                                            })
                                         ) : (
                                             <option value="" disabled>
                                                 No Doctor added yet
@@ -817,7 +821,14 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         <Form.Control
                                             type="date"
                                             className=""
-                                            {...register('scheduled', { required: 'Scheduled date is required' })}
+                                            {...register('scheduled', {
+                                                required: 'Scheduled date is required',
+                                                validate: (value) => {
+                                                    const today = new Date().setHours(0, 0, 0, 0);
+                                                    const selected = new Date(value).setHours(0, 0, 0, 0);
+                                                    return selected >= today || 'Date must be today or in the future';
+                                                },
+                                            })}
                                             value={scheduledDate}
                                             min={new Date().toISOString().split('T')[0]}
                                             onChange={(e) => setScheduledDate(e.target.value)}
@@ -872,6 +883,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 <Form.Check
                                     type="checkbox"
                                     label="Repeat"
+                                    checked={repeat}
                                     value={repeat}
                                     disabled={appointmentDetails?.repeat && id}
                                     style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
@@ -950,7 +962,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                         </Col>
                         <Col sm={6}>
                             <Form.Group className="mb-3">
-                                <Form.Label className="mb-1">
+                                <Form.Label className="mb-0">
                                     Status <span className="text-danger">*</span>
                                 </Form.Label>
                                 <Form.Control
@@ -1041,21 +1053,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                         </Row>
                     )}
                     <Row>
-                        <Col sm={12} className="d-flex justify-content-end my-2 gap-2">
-                            <Button
-                                className="cancel-button"
-                                disabled={
-                                    store?.createAppointmentReducer?.loading ||
-                                    store?.rescheduleAppointmentReducer?.loading
-                                }
-                                onClick={() => {
-                                    reset();
-                                    if (location?.pathname !== '/apps/appointments/list') {
-                                        navigate(-1);
-                                    }
-                                }}>
-                                Cancel
-                            </Button>
+                        <Col sm={12} className="d-flex justify-content-end my-2">
                             <Button
                                 className="custom-buttons"
                                 type="submit"
@@ -1064,7 +1062,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     store?.createAppointmentReducer?.loading ||
                                     store?.rescheduleAppointmentReducer?.loading
                                 }>
-                                {store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading ? (
+                                {store?.createAppointmentReducer?.loading ||
+                                store?.rescheduleAppointmentReducer?.loading ? (
                                     <Spinner color="white" className="spinner-border-sm" />
                                 ) : (
                                     'Save'
@@ -1074,7 +1073,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     </Row>
                 </Form>
             )}
-            <Modal show={showModal} onHide={handleCloseModal} size="xl" centered>
+            <Modal show={showModal} onHide={handleClosePatientModal} size="xl" centered>
                 <Modal.Header className="py-0 px-2 ">
                     <Modal.Title className="px-0 py-0">Add New Patient</Modal.Title>
                 </Modal.Header>
@@ -1088,9 +1087,9 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     className="px-0 py-0">
                     <style>{`::-webkit-scrollbar { display: none; }`}</style>
                     <div className="px-2">
-                        {activeTab === 'personalDetails' && <NewPatient patientId={patientId} />}
+                        {activeTab === 'personalDetails' && <NewPatient isModal={true} patientId={patientId} handleClosePatientModal={handleClosePatientModal} />}
                         {activeTab === 'responsible' && <Responsiblle patientId={patientId} />}
-                        {activeTab === 'insurance' && <Insurance patientId={patientId} />}
+                        {/* {activeTab === 'insurance' && <Insurance patientId={patientId} />} */}
                         {activeTab === 'demographicDetails' && <Demographicdetails patientId={patientId} />}
                         {activeTab === 'referringDoctor' && <ReferringDoctor patientId={patientId} />}
                     </div>

@@ -44,8 +44,8 @@ const AddressForm = ({ addresses, setAddresses }) => {
         }
 
         // Find the first available address type
-        const usedTypes = addresses.map((address) => address.type);
-        const availableType = addressTypes.find((type) => !usedTypes.includes(type)) || addressTypes[0];
+        const usedTypes = addresses?.map((address) => address?.type);
+        const availableType = addressTypes?.find((type) => !usedTypes?.includes(type)) || addressTypes[0];
 
         setAddresses([
             ...addresses,
@@ -453,7 +453,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             })()}
                         </Form.Select>
                     </Col>
-                    <Col sm={3} style={{ height: 'fit-content' }}>
+                    <Col sm={2} style={{ height: 'fit-content' }} className={` ${addresses?.length > 1 ? 'pe-4 d-flex align-items-center' : ''}`}>
                         <Form.Group className="mb-0">
                             <Form.Label className="mb-0">Postal Code</Form.Label>
                             <Form.Control
@@ -485,14 +485,16 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                 <span className="text-danger">{errors.address[index].postalCode.message}</span>
                             )}
                         </Form.Group>
-                    </Col>
-                    {addresses.length > 1 && index !== 0 && (
-                        <CiCircleMinus
-                            style={{ top: '80%', right: '49%' }}
-                            onClick={() => removeAddress(index)}
-                            className="text-danger px-0 cursor-pointer position-absolute w-auto fs-5 "
-                        />
+                           {addresses.length > 1 && index !== 0 && (
+                            <span
+                                onClick={() => removeAddress(index)}
+                                className="text-danger cursor-pointer fs-5 ms-2 mt-3"
+                                title="Remove Address">
+                                <CiCircleMinus />
+                            </span>
                     )}
+                    </Col>
+                 
                 </Row>
             ))}
         </Form>
