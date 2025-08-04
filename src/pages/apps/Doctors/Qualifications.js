@@ -5,7 +5,7 @@ import { createDoctorDetailAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { FiEye, FiInfo, FiUploadCloud } from 'react-icons/fi';
+import { FiEye, FiInfo, FiUploadCloud, FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import Select from 'react-select';
@@ -206,6 +206,25 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
             setShowDocPreview(true);
         }
     };
+
+    const handleDownload = async (file) => {
+        if (!file?.url) return;
+        try {
+            const response = await fetch(file.url);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = file.fileName || 'document';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            window.open(file.url, '_blank');
+        } catch (error) {
+            window.open(file.url, '_blank');
+        }
+    };
     return (
         <>
             <div className="container-fluid px-0" style={{ overflowX: 'hidden' }}>
@@ -293,7 +312,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                             }`}
                                                             style={{ minHeight: '30px' }}>
                                                             <span>
-                                                                {degreeUploading[index]
+                                                                {degreeUploading[index] === true
                                                                     ? 'Uploading...'
                                                                     : qualification.degreeFile?.fileName
                                                                       ? qualification.degreeFile.fileName.length > 30
@@ -321,9 +340,17 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                             title="Preview"
                                                                         />
                                                                     )}
-                                                                <span className="mb-0 d-inline-flex align-items-center">
-                                                                    <FiUploadCloud />
-                                                                </span>
+                                                                {qualification.degreeFile?.url && (
+                                                                    <FiDownloadCloud
+                                                                        className="text-secondary"
+                                                                        style={{ cursor: 'pointer' }}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDownload(qualification.degreeFile);
+                                                                        }}
+                                                                        title="Download"
+                                                                    />
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <Form.Control
@@ -457,7 +484,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                 : 'custom-form-fields'
                                                                         }`}>
                                                                         <span>
-                                                                            {documentUploading[index]
+                                                                            {documentUploading[index] === true
                                                                                 ? 'Uploading...'
                                                                                 : data?.document?.fileName
                                                                                   ? data.document.fileName.length > 25
@@ -466,7 +493,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                             25
                                                                                         ) + '...'
                                                                                       : data.document.fileName
-                                                                                  : 'Upload Degree'}
+                                                                                  : 'Upload Document'}
                                                                         </span>
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {data?.document?.url &&
@@ -485,9 +512,17 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                         title="Preview"
                                                                                     />
                                                                                 )}
-                                                                            <span className="mb-0 d-inline-flex align-items-center">
-                                                                                <FiUploadCloud />
-                                                                            </span>
+                                                                            {data?.document?.url && (
+                                                                                <FiDownloadCloud
+                                                                                    className="text-secondary"
+                                                                                    style={{ cursor: 'pointer' }}
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleDownload(data.document);
+                                                                                    }}
+                                                                                    title="Download"
+                                                                                />
+                                                                            )}
                                                                         </div>
                                                                     </div>
                                                                     <Form.Control

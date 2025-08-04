@@ -11,6 +11,7 @@ import DoctorIdentifierForm from './DoctorIdentifier';
 import { taxonomyOptions as taxonomy } from '../../../utils/DataSets/commonData';
 import AsyncSelect from 'react-select/async';
 const DepartmentDetails = ({ setActiveTab, docId }) => {
+    console.log('DepartmentDetails docId', docId);
     // const defaultIdentifiers = ['NPI'];
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -45,6 +46,40 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
             code: '',
         },
     ];
+
+    // Load data from API when doctorDetails is available
+    useEffect(() => {
+        if (doctorDetails?.identifier) {
+            const identifierData = [];
+            const licensureData = [];
+            
+            doctorDetails.identifier.forEach((item) => {
+                const formattedItem = {
+                    type: {
+                        label: item.type?.text || item.identifierType,
+                        value: item.system,
+                        code: item.type?.coding?.[0]?.code || item.sliceName
+                    },
+                    number: item.value,
+                    file: item.file?.[0] || item.documents?.[0],
+                    expiry: item.expiry ? new Date(item.expiry).toISOString().split('T')[0] : '',
+                    issuingAuthority: item.issuingAuthority,
+                    status: item.status,
+                    ennumerationDate: item.ennumerationDate ? new Date(item.ennumerationDate).toISOString().split('T')[0] : '',
+                    licenseState: item.licenseState
+                };
+                
+                if (item.licenseState) {
+                    licensureData.push(formattedItem);
+                } else {
+                    identifierData.push(formattedItem);
+                }
+            });
+            
+            setIdentifiers(identifierData);
+            setLicensure(licensureData);
+        }
+    }, [doctorDetails]);
 
     const onsubmit = (data) => {
         let finalIdentifiersData = [];
@@ -123,32 +158,53 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
     };
 
     useEffect(() => {
-
         if (createResponse === 200) {
-            const payload = {
-                id: updateId,
-            };
-            dispatch(getDoctorDetailsAction(payload))
+            if (updateId) {
+                const payload = { id: updateId };
+                dispatch(getDoctorDetailsAction(payload));
+            } else {
+                const payload = { id: docId };
+                dispatch(getDoctorDetailsAction(payload));
+            }
+            setActiveTab('qualifications');
         }
-    }, [createResponse])
+    }, [createResponse, setActiveTab, updateId, docId, dispatch])
 
     useEffect(() => {
-        if (doctorDetails && updateId) {
-            const updatedTaxonomyCodes = doctorDetails?.taxonomy?.map((item, index) => ({
-                type: item?.type || '',
-                displayName: item?.displayName || '',
-                code: { code: item?.code, grouping: item?.Grouping, classification: item?.Classification } || {},
-                state: item?.state || '',
-                licenseNumber: item?.licenseNumber || '',
-                status: item?.status === true ? 'active' : 'inactive' || '',
-            }));
-            setTaxonomyCodesList(updatedTaxonomyCodes);
+        if (doctorDetails) {
+            // Load taxonomy codes
+            if (doctorDetails?.taxonomy?.length > 0) {
+                const updatedTaxonomyCodes = doctorDetails.taxonomy.map((item) => ({
+                    type: item?.type || '',
+                    displayName: item?.displayName || '',
+                    code: {
+                        code: item?.code,
+                        grouping: item?.Grouping,
+                        classification: item?.Classification,
+                        specialization: item?.Specialization,
+                        definition: item?.Definition,
+                        notes: item?.Notes,
+                        displayName: item?.displayName,
+                        section: item?.section
+                    },
+                    state: item?.state || '',
+                    licenseNumber: item?.licenseNumber || '',
+                    status: item?.status === true ? 'active' : 'inactive',
+                }));
+                setTaxonomyCodesList(updatedTaxonomyCodes);
+            }
         }
-    }, [doctorDetails, setValue, updateId]);
+    }, [doctorDetails]);
 
     useEffect(() => {
         dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }));
-    }, [dispatch]);
+        
+        // Load doctor details when component mounts
+        if (updateId || docId) {
+            const payload = { id: updateId || docId };
+            dispatch(getDoctorDetailsAction(payload));
+        }
+    }, [dispatch, updateId, docId]);
 
     const [taxonomyCodesList, setTaxonomyCodesList] = useState([
         { type: 'primary', code: '', state: '', licenseNumber: '', status: '' },

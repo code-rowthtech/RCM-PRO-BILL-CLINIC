@@ -32,7 +32,7 @@ import ToastHandle from '../../../../helpers/ToastMessage';
 import { FiUploadCloud } from 'react-icons/fi';
 import ChangePasswordModal from '../../../../components/ChangePasswordModal';
 import { handleFirstSpace } from '../../../../helpers/noSpace';
-import { getDoctorsAction, getSubClinicAction } from '../../../../redux/actions';
+import { getDoctorsAction, getSubClinicAction, updateSubClinicAction } from '../../../../redux/actions';
 import { FormInput } from '../../../../components';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
 import { components } from 'react-select';
@@ -97,8 +97,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [practiceAddresses, setPracticeAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-        const [practiceTelecom, setPracticeTelecom] = useState([{ system: '', value: '', use: '' }]);
-    
+    const [practiceTelecom, setPracticeTelecom] = useState([{ system: '', value: '', use: '' }]);
+
     useEffect(() => {
         dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_id?.clinicId }) }));
         dispatch(getSubClinicAction());
@@ -208,7 +208,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         );
                     }
                 });
-            }   
+            }
             // ✅ Set POCs (Point of Contacts)
             setPocs(
                 clinicsDataGet?.poc?.map((pocs) => ({
@@ -311,6 +311,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [clinicsDataGet, setValue]);
 
     const getTableData = store.getSubClinicsReducer?.data?.clinics;
+    console.log('getTableData', getTableData);
     const [statesMenu, setStatesMenu] = useState(false);
     const menuRef = useRef(null); // Reference for the menu
     const containerRef = useRef(null); // Reference for the container
@@ -371,8 +372,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }, // Default address
     ]);
 
-    const [activeAddressIndex, setActiveAddressIndex] = useState(null);
-    const [addressFocused, setAddressFocused] = useState(false);
     useEffect(() => {
         setConstantIdentifiers(
             defaultIdentifiers.map((type) => ({
@@ -397,7 +396,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         if (index < defaultIdentifiers.length) return;
         setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
     };
- 
+
     const removeAddress = (index) => {
         if (addresses.length > 1) {
             setAddresses(addresses.filter((_, i) => i !== index));
@@ -409,7 +408,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         updatedIdentifiers[index][field] = value;
         setConstantIdentifiers(updatedIdentifiers);
     };
- 
+
     const formatDisplayValue = (value) => {
         if (!value) return '';
         const rawValue = value.replace(/\D/g, '');
@@ -503,7 +502,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         if (!selectedFile) return;
 
         try {
-            const url = await handleUpload(selectedFile,setImageLoading); // Upload file
+            const url = await handleUpload(selectedFile, setImageLoading); // Upload file
             setConstantIdentifiers((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -526,7 +525,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const date = new Date(dateString);
         return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
     };
-
+//  const handleUpdate = (patient) => {
+//         const payload = { id: patient?._id, active: !patient?.active, category: 'Department' };
+//         dispatch(updateSubClinicAction({ key: encryptMessage(payload) }));
+//     };
     return (
         <>
             {store.getClinicsReducer?.loading ? (
@@ -537,7 +539,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 <>
                     <Form onSubmit={handleSubmit(SubmitData)}>
                         <Row>
-                        
                             <Col sm={3}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">
@@ -634,7 +635,44 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             }}
                                             className="text-dark cursor-pointer"
                                         />
-                                        <p className="mb-0">
+                                        <p
+                                            className="mb-0 cursor-pointer"
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                const fileUrl = logo?.url || clinicsDataGet?.orgLogo?.url;
+                                                const fileName = logoName || 'logo';
+                                                if (fileUrl) {
+                                                    try {
+                                                        // Try fetch method first
+                                                        const response = await fetch(fileUrl);
+                                                        const blob = await response.blob();
+                                                        const url = window.URL.createObjectURL(blob);
+                                                        const link = document.createElement('a');
+                                                        link.href = url;
+                                                        link.download = fileName;
+                                                        document.body.appendChild(link);
+                                                        link.click();
+                                                        document.body.removeChild(link);
+                                                        window.URL.revokeObjectURL(url);
+                                                    } catch (error) {
+                                                        console.error(
+                                                            'Fetch download failed, trying direct download:',
+                                                            error
+                                                        );
+                                                        // Fallback to direct download
+                                                        const link = document.createElement('a');
+                                                        link.href = fileUrl;
+                                                        link.download = fileName;
+                                                        link.target = '_blank';
+                                                        document.body.appendChild(link);
+                                                        link.click();
+                                                        document.body.removeChild(link);
+                                                    }
+
+                                                    // Also open in new tab
+                                                    window.open(fileUrl, '_blank');
+                                                }
+                                            }}>
                                             <FiDownloadCloud />
                                         </p>
                                     </div>
@@ -869,7 +907,42 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 }}
                                                             />
                                                         )}
-                                                        <p className="mb-0">
+                                                        <p
+                                                            className="mb-0 cursor-pointer"
+                                                            onClick={async (e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                if (item?.file?.url) {
+                                                                    try {
+                                                                        // Try fetch method first
+                                                                        const response = await fetch(item.file.url);
+                                                                        const blob = await response.blob();
+                                                                        const url = window.URL.createObjectURL(blob);
+                                                                        const link = document.createElement('a');
+                                                                        link.href = url;
+                                                                        link.download = item.file.name || 'document';
+                                                                        document.body.appendChild(link);
+                                                                        link.click();
+                                                                        document.body.removeChild(link);
+                                                                        window.URL.revokeObjectURL(url);
+                                                                    } catch (error) {
+                                                                        console.error(
+                                                                            'Fetch download failed, trying direct download:',
+                                                                            error
+                                                                        );
+                                                                        // Fallback to direct download
+                                                                        const link = document.createElement('a');
+                                                                        link.href = item.file.url;
+                                                                        link.download = item.file.name || 'document';
+                                                                        link.target = '_blank';
+                                                                        document.body.appendChild(link);
+                                                                        link.click();
+                                                                        document.body.removeChild(link);
+                                                                    }
+                                                                    // Also open in new tab
+                                                                    window.open(item.file.url, '_blank');
+                                                                }
+                                                            }}>
                                                             <FiDownloadCloud />
                                                         </p>
                                                     </div>
@@ -929,7 +1002,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </Col>
                             </Row>
                             <hr className="mb-1" />
-                             <TelecomFrom constantContact={practiceTelecom} setConstantContact={setPracticeTelecom}/>
+                            <TelecomFrom constantContact={practiceTelecom} setConstantContact={setPracticeTelecom} />
                             <hr className="mb-1" />
                             <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses} />
                             <hr className="mb-1" />
@@ -1102,10 +1175,19 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         </td>
                                                         <td>{patient.orgType}</td>
                                                         {/* <td>{patient.practiceSpecialty || 'N/A'}</td> */}
-                                                        <td>
+                                                        {/* <td>
                                                             <Form.Switch
                                                                 className={patient.active ? 'custom-active' : ''}
                                                                 checked={patient.active === patient.status}
+                                                            />
+                                                        </td> */}
+                                                        <td
+                                                            className="py-1"
+                                                            style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                            <Form.Switch
+                                                                className={patient.active ? 'custom-active' : ''}
+                                                                checked={patient.active}
+                                                                // onChange={() => handleUpdate(patient)}
                                                             />
                                                         </td>
                                                         <td>

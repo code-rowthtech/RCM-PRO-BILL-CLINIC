@@ -42,7 +42,6 @@ const Demographicdetails = ({
         getValues,
     } = useForm();
     const [longitude, setLongitude] = useState(null);
-    console.log(gender,'gender')
     const [latitude, setLatitude] = useState(null);
     const [mailingLongitude, setMailingLongitude] = useState(null);
     const [mailingLatitude, setMailingLatitude] = useState(null);
@@ -821,10 +820,17 @@ const Demographicdetails = ({
                                                                     'employerTimeZone',
                                                                     data?.annotations?.timezone?.name
                                                                 );
-                                                                setEmployerCitySearch(data?.components?.county);
+                                                                setEmployerCitySearch(data?.components?.city || data?.components?.town || data?.components?.county);
                                                                 setEmployerLatitude(data?.bounds?.southwest?.lat);
                                                                 setEmployerLongitude(data?.bounds?.southwest?.lng);
                                                                 setValue('employerAddress', data?.formatted);
+                                                                
+                                                                // Trigger state selection to load cities
+                                                                const stateData = statesData?.states?.find(state => state.state_code === data?.components?.state_code);
+                                                                if (stateData) {
+                                                                    dispatch(getCities4Action({ state_code: stateData.id, name: '', limit: 25 }));
+                                                                }
+                                                                
                                                                 setEmployerFocused(false);
                                                             }}
                                                             style={{

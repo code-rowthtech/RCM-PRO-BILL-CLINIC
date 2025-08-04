@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { FiDownloadCloud, FiInfo } from 'react-icons/fi';
+import { Row, Col, Form, OverlayTrigger, Tooltip, Modal } from 'react-bootstrap';
+import { FiDownloadCloud, FiInfo, FiEye } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { useForm } from 'react-hook-form';
@@ -84,6 +84,34 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     };
 
     const [selectedIndex, setSelectedIndex] = useState(null);
+    const [showPreview, setShowPreview] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState('');
+
+    const handlePreview = (file) => {
+        if (file?.url) {
+            setPreviewUrl(file.url.split('?')[0]);
+            setShowPreview(true);
+        }
+    };
+
+    const handleDownload = async (file) => {
+        if (!file?.url) return;
+        try {
+            const response = await fetch(file.url);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = file.name || 'document';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            window.open(file.url, '_blank');
+        } catch (error) {
+            window.open(file.url, '_blank');
+        }
+    };
 
     const handleIdentifierFileChange = async (e, index) => {
         setSelectedIndex(index)
@@ -91,21 +119,24 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         if (!selectedFile) return;
 
         try {
-            const url = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
-            setIdentifiers((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
-                    file: {
-                        url: url?.url?.split('?')[0],
-                        name: selectedFile.name,
-                    },
-                };
-                setSelectedIndex(null)
-                return updatedDetails;
-            });
+            const uploadResult = await handleUpload(selectedFile, setIdentifierDocument);
+            if (uploadResult?.url) {
+                setIdentifiers((prevDetails) => {
+                    const updatedDetails = [...prevDetails];
+                    updatedDetails[index] = {
+                        ...updatedDetails[index],
+                        file: {
+                            url: uploadResult.url,
+                            name: selectedFile.name,
+                        },
+                    };
+                    setSelectedIndex(null)
+                    return updatedDetails;
+                });
+            }
         } catch (error) {
             console.error('Error during file upload:', error);
+            setSelectedIndex(null);
         }
     };
     useEffect(() => {
@@ -198,16 +229,39 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
                             className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
                                 }`}>
-                            {index === selectedIndex
-                                ? 'Uploading...'
-                                : item.file?.name
-                                    ? item?.file?.name?.length > 30
-                                        ? item?.file?.name?.slice(0, 25) + '...'
-                                        : item?.file?.name
-                                    : 'Upload Document'}
-                            <p className="mb-0">
-                                <FiDownloadCloud />
-                            </p>
+                            <span>
+                                {index === selectedIndex
+                                    ? 'Uploading...'
+                                    : item.file?.name
+                                        ? item?.file?.name?.length > 30
+                                            ? item?.file?.name?.slice(0, 25) + '...'
+                                            : item?.file?.name
+                                        : 'Upload Document'}
+                            </span>
+                            <div className="d-flex align-items-center gap-2">
+                                {item.file?.url && (
+                                    <FiEye
+                                        className="text-secondary"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handlePreview(item.file);
+                                        }}
+                                        title="Preview"
+                                    />
+                                )}
+                                {item.file?.url && (
+                                    <FiDownloadCloud
+                                        className="text-secondary"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDownload(item.file);
+                                        }}
+                                        title="Download"
+                                    />
+                                )}
+                            </div>
                         </div>
                         <Form.Control
                             type="file"
@@ -253,6 +307,34 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     </Col>
                 </Row>
             ))}
+            
+            <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
+                <Modal.Body>
+                    <div className="d-flex justify-content-center">
+                        <p className="fw-bold" style={{ color: '#6169D0' }}>
+                            File Preview
+                        </p>
+                    </div>
+                    <div
+                        style={{
+                            overflow: 'hidden',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                        <img
+                            src={previewUrl}
+                            alt="File Preview"
+                            style={{
+                                maxWidth: '100%',
+                                maxHeight: '100vh',
+                                objectFit: 'contain',
+                                display: 'block',
+                            }}
+                        />
+                    </div>
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };

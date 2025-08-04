@@ -96,7 +96,6 @@ const NewPractice = () => {
         }
     }, [showModalPic, modalFileUrl]);
 
-
     const {
         register,
         handleSubmit,
@@ -128,7 +127,7 @@ const NewPractice = () => {
     useEffect(() => {
         dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_MainId?.clinicId }) }));
     }, [dispatch]);
- 
+
     const [formData, setFormData] = useState({
         clinicname: '',
         clinicType: '',
@@ -255,7 +254,6 @@ const NewPractice = () => {
 
         // setIsButtonDisabled(!areAllFieldsFilled);
     };
-
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -388,7 +386,6 @@ const NewPractice = () => {
         if (index < defaultIdentifiers.length) return;
         setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
     };
-
 
     // Function to Handle Changes
     const handleChange = (index, field, value) => {
@@ -651,7 +648,36 @@ const NewPractice = () => {
                                                                 className="text-dark cursor-pointer"
                                                                 style={{ zIndex: 1 }}
                                                             />
-                                                            <p className="mb-0">
+                                                            <p 
+                                                                className="mb-0 cursor-pointer"
+                                                                onClick={async (e) => {
+                                                                    e.stopPropagation();
+                                                                    const fileUrl = logo?.url || clinicsDataGet?.orgLogo?.url;
+                                                                    const fileName = logoName || 'logo';
+                                                                    if (fileUrl) {
+                                                                        try {
+                                                                            const response = await fetch(fileUrl);
+                                                                            const blob = await response.blob();
+                                                                            const url = window.URL.createObjectURL(blob);
+                                                                            const link = document.createElement('a');
+                                                                            link.href = url;
+                                                                            link.download = fileName;
+                                                                            document.body.appendChild(link);
+                                                                            link.click();
+                                                                            document.body.removeChild(link);
+                                                                            window.URL.revokeObjectURL(url);
+                                                                            setTimeout(() => window.open(fileUrl, '_blank'), 100);
+                                                                        } catch (error) {
+                                                                            const link = document.createElement('a');
+                                                                            link.href = fileUrl;
+                                                                            link.download = fileName;
+                                                                            link.target = '_blank';
+                                                                            document.body.appendChild(link);
+                                                                            link.click();
+                                                                            document.body.removeChild(link);
+                                                                        }
+                                                                    }
+                                                                }}>
                                                                 <FiDownloadCloud />
                                                             </p>
                                                         </div>
@@ -860,7 +886,36 @@ const NewPractice = () => {
                                                                                     }}
                                                                                 />
                                                                             )}
-                                                                            <p className="mb-0">
+                                                                            <p
+                                                                                className="mb-0 cursor-pointer"
+                                                                                onClick={async (e) => {
+                                                                                    e.stopPropagation();
+                                                                                    const fileUrl = item?.file?.url;
+                                                                                    const fileName = item?.file?.name || 'document';
+                                                                                    if (fileUrl) {
+                                                                                        try {
+                                                                                            const response = await fetch(fileUrl);
+                                                                                            const blob = await response.blob();
+                                                                                            const url = window.URL.createObjectURL(blob);
+                                                                                            const link = document.createElement('a');
+                                                                                            link.href = url;
+                                                                                            link.download = fileName;
+                                                                                            document.body.appendChild(link);
+                                                                                            link.click();
+                                                                                            document.body.removeChild(link);
+                                                                                            window.URL.revokeObjectURL(url);
+                                                                                            window.open(fileUrl, '_blank');
+                                                                                        } catch (error) {
+                                                                                            const link = document.createElement('a');
+                                                                                            link.href = fileUrl;
+                                                                                            link.download = fileName;
+                                                                                            document.body.appendChild(link);
+                                                                                            link.click();
+                                                                                            document.body.removeChild(link);
+                                                                                            window.open(fileUrl, '_blank');
+                                                                                        }
+                                                                                    }
+                                                                                }}>
                                                                                 <FiDownloadCloud />
                                                                             </p>
                                                                         </div>

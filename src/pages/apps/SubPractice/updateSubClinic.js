@@ -18,10 +18,10 @@ import {
     getStatesByCountryAction,
 } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
-import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdVerified } from 'react-icons/md';
 import EmailToDoctorModal from './EmailToSubClinicModal';
 import AddressForm from '../Common Pages/AddressForm';
+import TelecomFrom from '../Common Pages/TelecomFrom';
 const SubUpdateClinic = () => {
     const [searchParams] = useSearchParams();
     const idUpdateDataSubClinics = searchParams.get('id');
@@ -36,8 +36,9 @@ const SubUpdateClinic = () => {
     const [updatePracticeAddresses, setUpdatePracticeAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
+    const [subUpdatePracticeTelecom, setSubUpdatePracticeTelecom] = useState([{ system: '', value: '', use: '' }]);
     const [modalFileUrl, setModalFileUrl] = useState(''); // State to store file URL for modal
-
+    console.log(modalFileUrl,'modalFileUrl')
     const handleShowModal = (url) => {
         setModalFileUrl(url); // Set the URL of the file to display in modal
         setShowModalPic(true); // Open the modal
@@ -63,39 +64,23 @@ const SubUpdateClinic = () => {
             console.error('Error during file upload:', error);
         }
     };
-    const [accreditationDetails, setAccreditationDetails] = useState([
-        { name: '', number: '', url: null, fileName: '' },
-    ]);
 
-    const [stateDetails, setStateDetails] = useState([{ name: '', number: '', url: null, fileName: '' }]);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [taxonomyCodes, setTaxonomyCodes] = useState(['']);
     const store = useSelector((state) => state);
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
-    const statesData = store?.getStatesReducer?.data;
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
+    console.log('subClinicsDetailsGet:', subClinicsDetailsGet);
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
-    const [selectedState, setSelectedState] = useState(null);
     useEffect(() => {
-        setLogo(subClinicsDetailsGet?.logo?.url);
+        if (subClinicsDetailsGet?.orgLogo?.url) {
+            setLogo({ url: subClinicsDetailsGet.orgLogo.url });
+        }
     }, [subClinicsDetailsGet]);
-    const cities = store?.getCitiesReducer?.cities1?.data?.cities;
-    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const updateLoading = store?.updateSubClinicReducer?.loading;
     const updateSuccess = store?.updateSubClinicReducer?.data?.status;
-    const [searchedLocations, setSearchedLocations] = useState([]);
-    const [searchedLocations2, setSearchedLocations2] = useState(null);
-    const [focused, setFocused] = useState(false);
-    const [latitude, setLatitude] = useState('');
-    const [latitude1, setLatitude1] = useState(null);
-    const [longitude, setLongitude] = useState('');
-    const [longitude1, setLongitude1] = useState(null);
     const [stateToSelect, setStateToSelect] = useState('');
-    const [selectedCity, setSelectedCity] = useState('');
-    const [newaccreditationLogo, setNewAccreditationLogo] = useState(false);
     const [imageLoading, setImageLoading] = useState(true);
-    const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
 
     useEffect(() => {
         if (showModalPic && modalFileUrl) {
@@ -105,95 +90,13 @@ const SubUpdateClinic = () => {
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
-
-    useEffect(() => {
-        if (latitude && longitude) {
-            setFocused(false);
-        }
-    }, [latitude, longitude]);
-
-    const getGeolocation = async (e) => {
-        const addressToSearch = e.target.value;
-
-        if (!addressToSearch) {
-            setSearchedLocations([]);
-            return;
-        }
-
-        const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-        const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-            addressToSearch
-        )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Error fetching data: ${response.status}`);
-            }
-            const data = await response.json();
-            setSearchedLocations(data.results || []);
-        } catch (error) {
-            console.error('Failed to fetch geocode data:', error);
-        }
-    };
-    const getGeolocation2 = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-                location
-            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-            try {
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Failed to fetch geocode data:', error);
-                return null;
-            }
-        }
-        fetchGeocodeData(addressToSearch).then((data) => {
-            if (data) {
-                setSearchedLocations2(data?.results);
-            } else {
-            }
-        });
-    };
+  
     useEffect(() => {
         if (stateToSelect) {
             dispatch(getCitiesAction({ state_code: stateToSelect, name: '', limit: 25, skip: '' }));
         }
     }, [stateToSelect]);
 
-    const handleStateSelection = (e) => {
-        const stateCode = e.target.value;
-        if (stateCode) {
-            setStateToSelect(stateCode);
-            dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
-        }
-    };
-
-    const handleCitySelection = (e) => {
-        const city = e.target.value;
-        if (city) {
-            setSelectedCity(city);
-        }
-    };
-
-    const stateGeoLocation = 'stateName';
-    useEffect(() => {
-        if (stateGeoLocation) {
-            setStateToSelect(
-                statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation)
-            );
-        }
-    }, [stateGeoLocation]);
     const {
         register,
         handleSubmit,
@@ -205,11 +108,6 @@ const SubUpdateClinic = () => {
         watch,
         clearErrors,
     } = useForm({
-        defaultValues: {
-            accreditationDetails: [{ name: '', documentNumber: '' }],
-            medicalLicenses: [{ name: '', documentNumber: '' }],
-            stateLicensing: [{ state: '', documentNumber: '' }],
-        },
     });
     // const closepassModal = () => {
     //     setPassShow(false);
@@ -221,45 +119,12 @@ const SubUpdateClinic = () => {
         dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinicId }) }));
     }, [idUpdateDataSubClinics]);
 
-    const handleAccreditationInputChange = (e, field, index) => {
-        const value = e.target.value;
-        setAccreditationDetails((prevDetails) => {
-            const updatedDetails = [...prevDetails];
-            updatedDetails[index] = {
-                ...updatedDetails[index],
-                [field]: value,
-            };
-            return updatedDetails;
-        });
-    };
-    const handleAccreditationChange = async (e, index) => {
-        const selectedFile = e.target.files[0];
-        try {
-            const url = await handleUpload(selectedFile, setNewAccreditationLogo);
-            setAccreditationDetails((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
-                    url: url?.url?.split('?')[0],
-                    fileName: selectedFile.name,
-                };
-                return updatedDetails;
-            });
-        } catch (error) {
-            console.error('Error during file upload:', error);
-        }
-    };
-
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
-
     const [formData, setFormData] = useState({
         clinicname: '',
         clinicType: '',
         email: '',
         contactPerson: '',
     });
-    const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         if (subClinicsDetailsGet) {
             if (subClinicsDetailsGet?.orgType) {
@@ -276,11 +141,10 @@ const SubUpdateClinic = () => {
                 subClinicsDetailsGet?.identifier?.map((data) => ({
                     type: data.identifierType || '',
                     number: data?.value || '',
-                    // file: data?.file|| '',
-                    file: data?.documents?.[0]
+                    file: data?.documents?.[0]?.url
                         ? {
-                              url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0]?.url?.split('/').pop(), // Extract filename from URL
+                              url: data?.documents?.[0]?.url,
+                              name: data?.documents?.[0]?.fileName || data?.documents?.[0]?.url?.split('/').pop(),
                           }
                         : '',
                     expiry: data?.expirationDate || '',
@@ -317,7 +181,7 @@ const SubUpdateClinic = () => {
                 }));
             }
 
-            setConstantContact(contacts);
+            setSubUpdatePracticeTelecom(contacts);
 
             // ✅ Set Addresses
             setUpdatePracticeAddresses(
@@ -367,47 +231,7 @@ const SubUpdateClinic = () => {
             );
         }
     }, [subClinicsDetailsGet, setValue, clinectypes]);
-
-    const handleAddAccreditation = () => {
-        const isIncomplete = accreditationDetails.some(
-            (subClinicsDetailsGet) =>
-                !subClinicsDetailsGet.name || !subClinicsDetailsGet.number || !subClinicsDetailsGet.url
-        );
-        if (isIncomplete) {
-            ToastHandle('Please fill all the fields before adding a new one', 'danger');
-            return;
-        }
-        setAccreditationDetails([...accreditationDetails, { name: '', number: '', url: null }]);
-    };
-
-    const handleRemoveAccreditation = (index) => {
-        setAccreditationDetails((prevDetails) => {
-            const updatedDetails = prevDetails.filter((_, i) => i !== index);
-            return updatedDetails;
-        });
-    };
-
-    const handleAddTaxonomy = () => {
-        const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
-
-        if (lastCode) {
-            const validCodes = taxonomyCodes.filter((code) => code.trim() !== '');
-            setTaxonomyCodes([...validCodes, '']);
-        } else {
-            ToastHandle('Please complete the current Taxonomy Code field before adding another.', 'danger');
-        }
-    };
-    const handleTaxonomyChange = (index, value) => {
-        const updatedCodes = [...taxonomyCodes];
-        updatedCodes[index] = value;
-        setTaxonomyCodes(updatedCodes);
-    };
-    const handleRemoveTaxonomy = (index) => {
-        setTaxonomyCodes((prev) => {
-            const updatedCodes = prev.filter((_, i) => i !== index);
-            return updatedCodes.length > 0 ? updatedCodes : [''];
-        });
-    };
+  
     const [posDetails, setPosDetails] = useState([{ name: '', email: '', role: '', contact: '', fileName: '' }]);
 
     const handleAddPOS = () => {
@@ -438,7 +262,7 @@ const SubUpdateClinic = () => {
             return updatedDetails;
         });
     };
-    const submitSubData = (data) => {
+    const submitUpdateSubData = (data) => {
         const payload = {
             clinicId: clinicId,
             userId: idUpdateDataSubClinics,
@@ -453,14 +277,15 @@ const SubUpdateClinic = () => {
                 identifierType: item.type,
                 use: item.use,
                 value: item.number,
-                ...(item?.file && { documents: { url: item.file.url, fileName: item.file.name || '' } }),
+                ...(item?.file &&
+                    item.file.url && { documents: { url: item.file.url, fileName: item.file.name || '' } }),
                 expirationDate: item.expiry,
                 status: 'active',
                 system: 'urn:oid:2.16.840.1.113883.4.7',
                 sliceName: item.type,
                 issuingAuthority: item.issuingAuthority,
             })),
-            telecom: constantContact,
+            telecom: subUpdatePracticeTelecom,
             address: updatePracticeAddresses,
             poc: pocs,
             flag: 'subClinic',
@@ -473,138 +298,7 @@ const SubUpdateClinic = () => {
             navigate('/apps/crm/addPractice');
         }
     }, [updateSuccess]);
-    const [selectedLocation, setSelectedLocation] = useState(null);
-    const [selectedLocation2, setSelectedLocation2] = useState(null);
 
-    useEffect(() => {
-        if (selectedLocation) {
-            setLatitude(selectedLocation?.bounds?.southwest?.lat);
-            setLongitude(selectedLocation?.bounds?.southwest?.lng);
-            setValue('address', selectedLocation?.formatted);
-            const stateId =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
-            const selectedState =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-            setValue('stateName', selectedState);
-            const countyName = selectedLocation?.components?.county;
-            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
-        }
-        if (selectedLocation2) {
-            setLatitude1(selectedLocation2?.bounds?.southwest?.lat);
-            setLongitude1(selectedLocation2?.bounds?.southwest?.lng);
-            setValue('mailingAddress', selectedLocation2?.formatted);
-            const stateId =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?.id;
-            const selectedState =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?._id;
-            setValue('mailingStateName', selectedState);
-            const countyName = selectedLocation2?.components?.county;
-            dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }));
-        }
-    }, [dispatch, selectedLocation, selectedLocation2, setValue, statesData]);
-    useEffect(() => {
-        if (cities) {
-            const selectedCounty =
-                cities &&
-                cities.find(
-                    (event) =>
-                        event?.name === selectedLocation?.components?.county ||
-                        subClinicsDetailsGet?.userId?.primaryAddress?.city?.name
-                )?._id;
-            setValue('city', selectedCounty);
-        }
-        if (cities2) {
-            const selectedCounty1 =
-                cities2 &&
-                cities2.find(
-                    (event) =>
-                        event?.name === selectedLocation2?.components?.county ||
-                        subClinicsDetailsGet?.userId?.mailingAddress?.city?.name
-                )?._id;
-            setValue('mailingCity', selectedCounty1);
-        }
-    }, [cities, cities2, setValue]);
-    const [selectedStates, setSelectedStates] = useState([]);
-    const [statesMenu, setStatesMenu] = useState(false);
-    const handleCheckboxChange = (stateName) => {
-        setSelectedStates((prev) => {
-            const updatedStates = prev.includes(stateName)
-                ? prev.filter((name) => name !== stateName)
-                : [...prev, stateName];
-
-            setStateDetails((prevDetails) => {
-                const newDetails = updatedStates.map(
-                    (state) =>
-                        prevDetails.find((detail) => detail.name === state) || {
-                            name: state,
-                            number: '',
-                            url: null,
-                            fileName: '',
-                        }
-                );
-                return newDetails;
-            });
-
-            return updatedStates;
-        });
-    };
-
-    const handleStateInputChange = (e, field, index) => {
-        const value = e.target.value;
-        setStateDetails((prevDetails) => {
-            const updatedDetails = [...prevDetails];
-            updatedDetails[index] = {
-                ...updatedDetails[index],
-                [field]: value,
-            };
-            return updatedDetails;
-        });
-    };
-    const [stateLogoUpload, setStateLogoUpload] = useState(false);
-
-    const handleStateChange = async (e, index) => {
-        const selectedFile = e.target.files[0];
-        try {
-            const url = await handleUpload(selectedFile, setStateLogoUpload);
-            setStateDetails((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
-                    url: url?.url?.split('?')[0],
-                    fileName: selectedFile.name,
-                };
-                return updatedDetails;
-            });
-        } catch (error) {
-            console.error('Error during file upload:', error);
-        }
-    };
-
-    const handleRemoveState = (index) => {
-        setStateDetails((prevDetails) => {
-            const updatedDetails = prevDetails.filter((_, i) => i !== index);
-            setSelectedStates(updatedDetails.map((detail) => detail.name));
-            return updatedDetails;
-        });
-    };
-    const menuRef = useRef(null);
-    const containerRef = useRef(null);
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (containerRef.current && !containerRef.current.contains(event.target)) {
-                setStatesMenu(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
     // new Chnages
     const defaultIdentifiers = ['NPI', 'CLIA', 'NAIC'];
     const defaultIssuingAuthority = [
@@ -618,7 +312,6 @@ const SubUpdateClinic = () => {
         'Other',
     ];
     const contactDetails = ['phone', 'email'];
-    const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
     const uses = ['usual', 'old', 'temp', 'secondary', 'official'];
     const identifierOptions = [
         'NPI',
@@ -635,10 +328,7 @@ const SubUpdateClinic = () => {
         'Facility ID',
     ];
 
-    const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
-
-    const [constantContact, setConstantContact] = useState([]);
     const [name, setName] = useState({
         use: '',
         text: '',
@@ -648,10 +338,10 @@ const SubUpdateClinic = () => {
         suffix: [],
         period: { start: new Date().toISOString() },
     });
+
     const [addresses, setAddresses] = useState([
         { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }, // Default address
     ]);
-    const [addressFocused, setAddressFocused] = useState(false);
     // Load Default Identifiers & Contacts
     useEffect(() => {
         setConstantIdentifiers(
@@ -664,13 +354,6 @@ const SubUpdateClinic = () => {
                 use: '',
             }))
         );
-        setConstantContact(
-            contactDetails.map((system) => ({
-                system,
-                value: '',
-                use: '',
-            }))
-        );
     }, []);
 
     // Function to Add New Fields
@@ -680,26 +363,11 @@ const SubUpdateClinic = () => {
             { type: '', number: '', file: '', expiry: '', issuingAuthority: '', use: '' },
         ]);
     };
-    const addContactDetails = () => {
-        setConstantContact([...constantContact, { system: '', value: '', use: '' }]);
-    };
-    const addAddress = () => {
-        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]);
-    };
 
     // Function to Remove Fields
     const removeIdentifier = (index) => {
         if (index < defaultIdentifiers.length) return;
         setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
-    };
-    const removeContact = (index) => {
-        if (index < contactDetails.length) return;
-        setConstantContact(constantContact.filter((_, i) => i !== index));
-    };
-    const removeAddress = (index) => {
-        if (addresses.length > 1) {
-            setAddresses(addresses.filter((_, i) => i !== index));
-        }
     };
 
     // Function to Handle Changes
@@ -708,21 +376,6 @@ const SubUpdateClinic = () => {
         updatedIdentifiers[index][field] = value;
         setConstantIdentifiers(updatedIdentifiers);
     };
-    const handleContactChange = (index, field, value) => {
-        const updatedContacts = [...constantContact];
-        updatedContacts[index][field] = value;
-        setConstantContact(updatedContacts);
-    };
-    const handleAddressChange = (index, field, value) => {
-        const updatedAddresses = [...addresses];
-        if (field === 'line') {
-            updatedAddresses[index].line[0] = value; // update street address
-        } else {
-            updatedAddresses[index][field] = value;
-        }
-        setAddresses(updatedAddresses);
-    };
-    // Default telecom contact options
 
     // State for POCs (at least one default POC)
     const [pocs, setPocs] = useState([
@@ -753,12 +406,6 @@ const SubUpdateClinic = () => {
             target[keys[keys.length - 1]] = value;
             return updatedPocs;
         });
-    };
-
-    const handleNameArrayChange = (index, field, value) => {
-        const updatedPocs = [...pocs];
-        updatedPocs[index].name[field] = [value];
-        setPocs(updatedPocs);
     };
 
     // Function to handle Telecom (Contact) field changes inside POCs
@@ -796,25 +443,10 @@ const SubUpdateClinic = () => {
         }
     };
 
-    // Function to add a new telecom contact inside a POC
-    const addTelecom = (pocIndex) => {
-        const updatedPocs = [...pocs];
-        updatedPocs[pocIndex].telecom.push({ system: 'phone', value: '', use: 'work' });
-        setPocs(updatedPocs);
-    };
-
-    // Function to remove a telecom contact inside a POC
-    const removeTelecom = (pocIndex, telecomIndex) => {
-        const updatedPocs = [...pocs];
-        if (updatedPocs[pocIndex].telecom.length > 1) {
-            updatedPocs[pocIndex].telecom = updatedPocs[pocIndex].telecom.filter((_, i) => i !== telecomIndex);
-            setPocs(updatedPocs);
-        }
-    };
     const [selectedIndex, setSelectedIndex] = useState(null);
 
     const handleIdentifierFileChange = async (e, index) => {
-                    setSelectedIndex(index); // Set the index of the selected identifier
+        setSelectedIndex(index); // Set the index of the selected identifier
 
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
@@ -834,8 +466,8 @@ const SubUpdateClinic = () => {
         } catch (error) {
             console.error('Error during file upload:', error);
         } finally {
-        setSelectedIndex(null); // Always reset after upload (success or error)
-    }
+            setSelectedIndex(null); // Always reset after upload (success or error)
+        }
     };
     const formatDateForInput = (dateString) => {
         if (!dateString) return ''; // Return empty if no date
@@ -886,7 +518,7 @@ const SubUpdateClinic = () => {
                                         <Spinner />
                                     </div>
                                 ) : (
-                                    <Form className="mt-1" onSubmit={handleSubmit(submitSubData)}>
+                                    <Form className="mt-1" onSubmit={handleSubmit(submitUpdateSubData)}>
                                         <Row>
                                             <Col sm={3}>
                                                 <Form.Group className="mb-1">
@@ -984,14 +616,43 @@ const SubUpdateClinic = () => {
                                                             onClick={(e) => {
                                                                 e.stopPropagation(); // Prevent file input trigger
                                                                 handleShowModal(
-                                                                    logo ? logo : subClinicsDetailsGet?.orgLogo?.url
+                                                                    logo?.url || subClinicsDetailsGet?.orgLogo?.url
                                                                 );
                                                                 // Show the logo preview
                                                             }}
                                                             className="text-dark cursor-pointer"
                                                             style={{ zIndex: 1 }}
                                                         />
-                                                        <p className="mb-0">
+                                                        <p 
+                                                            className="mb-0 cursor-pointer"
+                                                            onClick={async (e) => {
+                                                                e.stopPropagation();
+                                                                const fileUrl = logo?.url || subClinicsDetailsGet?.orgLogo?.url;
+                                                                const fileName = logoName || 'logo';
+                                                                if (fileUrl) {
+                                                                    try {
+                                                                        const response = await fetch(fileUrl);
+                                                                        const blob = await response.blob();
+                                                                        const url = window.URL.createObjectURL(blob);
+                                                                        const link = document.createElement('a');
+                                                                        link.href = url;
+                                                                        link.download = fileName;
+                                                                        document.body.appendChild(link);
+                                                                        link.click();
+                                                                        document.body.removeChild(link);
+                                                                        window.URL.revokeObjectURL(url);
+                                                                        setTimeout(() => window.open(fileUrl, '_blank'), 100);
+                                                                    } catch (error) {
+                                                                        const link = document.createElement('a');
+                                                                        link.href = fileUrl;
+                                                                        link.download = fileName;
+                                                                        link.target = '_blank';
+                                                                        document.body.appendChild(link);
+                                                                        link.click();
+                                                                        document.body.removeChild(link);
+                                                                    }
+                                                                }
+                                                            }}>
                                                             <FiDownloadCloud />
                                                         </p>
                                                     </div>
@@ -1156,13 +817,13 @@ const SubUpdateClinic = () => {
                                                                             ? 'form-control'
                                                                             : 'custom-form-fields'
                                                                     }`}>
-                                                               {index === selectedIndex
-                                                                            ? 'Uploading...'
-                                                                            : item.file?.name
-                                                                              ? item.file.name.length > 30
-                                                                                  ? item.file.name.slice(0, 25) + '...'
-                                                                                  : item.file.name
-                                                                              : 'Upload Document'}
+                                                                    {index === selectedIndex
+                                                                        ? 'Uploading...'
+                                                                        : item.file?.name
+                                                                          ? item.file.name.length > 30
+                                                                              ? item.file.name.slice(0, 25) + '...'
+                                                                              : item.file.name
+                                                                          : 'Upload Document'}
                                                                     <div className="d-flex align-items-center gap-2">
                                                                         {(item?.file?.url ||
                                                                             subClinicsDetailsGet?.orgLogo?.url) && (
@@ -1179,7 +840,36 @@ const SubUpdateClinic = () => {
                                                                                 }}
                                                                             />
                                                                         )}
-                                                                        <p className="mb-0">
+                                                                        <p 
+                                                                            className="mb-0 cursor-pointer"
+                                                                            onClick={async (e) => {
+                                                                                e.stopPropagation();
+                                                                                const fileUrl = item?.file?.url;
+                                                                                const fileName = item?.file?.name || 'document';
+                                                                                if (fileUrl) {
+                                                                                    try {
+                                                                                        const response = await fetch(fileUrl);
+                                                                                        const blob = await response.blob();
+                                                                                        const url = window.URL.createObjectURL(blob);
+                                                                                        const link = document.createElement('a');
+                                                                                        link.href = url;
+                                                                                        link.download = fileName;
+                                                                                        document.body.appendChild(link);
+                                                                                        link.click();
+                                                                                        document.body.removeChild(link);
+                                                                                        window.URL.revokeObjectURL(url);
+                                                                                        setTimeout(() => window.open(fileUrl, '_blank'), 100);
+                                                                                    } catch (error) {
+                                                                                        const link = document.createElement('a');
+                                                                                        link.href = fileUrl;
+                                                                                        link.download = fileName;
+                                                                                        link.target = '_blank';
+                                                                                        document.body.appendChild(link);
+                                                                                        link.click();
+                                                                                        document.body.removeChild(link);
+                                                                                    }
+                                                                                }
+                                                                            }}>
                                                                             <FiDownloadCloud />
                                                                         </p>
                                                                     </div>
@@ -1261,157 +951,10 @@ const SubUpdateClinic = () => {
                                                 </Col>
                                             </Row>
                                             <hr className="mb-1" />
-                                            <Row>
-                                                <Col sm={12}>
-                                                    <Row className="">
-                                                        <Col sm={12}>
-                                                            <h5>
-                                                                Contact Details
-                                                                <span
-                                                                    className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                                    onClick={addContactDetails}></span>
-                                                            </h5>
-                                                        </Col>
-                                                    </Row>
-
-                                                    <Row>
-                                                        <Col sm={4}>
-                                                            <Form.Label>Contact Type</Form.Label>
-                                                        </Col>
-                                                        <Col sm={4}>
-                                                            <Form.Label>Value </Form.Label>
-                                                        </Col>
-                                                        <Col sm={4}>
-                                                            <Form.Label>Use</Form.Label>
-                                                        </Col>
-                                                    </Row>
-
-                                                    {constantContact.map((item, index) => (
-                                                        <Row key={index} className="mb-2">
-                                                            <Col sm={4}>
-                                                                <Form.Select
-                                                                    className="text-capitalize"
-                                                                    value={item.system}
-                                                                    data-has-value={
-                                                                        !!watch(`constantContact[${index}].system`)
-                                                                    }
-                                                                    {...register(`constantContact[${index}].system`)}
-                                                                    onChange={(e) =>
-                                                                        handleContactChange(
-                                                                            index,
-                                                                            'system',
-                                                                            e.target.value
-                                                                        )
-                                                                    }
-                                                                    disabled={contactDetails.includes(item.type)}>
-                                                                    <option value="" disabled>
-                                                                        Select Contact Type
-                                                                    </option>
-                                                                    {contactOptions.map((option) => (
-                                                                        <option
-                                                                            className="text-capitalize"
-                                                                            key={option}
-                                                                            value={option}>
-                                                                            {option}
-                                                                        </option>
-                                                                    ))}
-                                                                </Form.Select>
-                                                            </Col>
-                                                            <Col sm={4}>
-                                                                {item.system === 'phone' ? (
-                                                                    <InputGroup className="position-relative">
-                                                                        {/* Country Code Prefix */}
-                                                                        <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">
-                                                                            +1
-                                                                        </InputGroup.Text>
-                                                                        {/* Phone Input */}
-                                                                        <Form.Control
-                                                                            type="tel"
-                                                                            placeholder="(123)456-7890"
-                                                                            value={formatDisplayValue(item.value)}
-                                                                            onChange={(e) =>
-                                                                                handleContactChange(
-                                                                                    index,
-                                                                                    'value',
-                                                                                    e.target.value
-                                                                                )
-                                                                            }
-                                                                            maxLength={14}
-                                                                            onKeyPress={(event) => {
-                                                                                if (!/[0-9]/.test(event.key))
-                                                                                    event.preventDefault();
-                                                                            }}
-                                                                            style={{ paddingLeft: '40px' }}
-                                                                        />
-                                                                        {/* Flag Icon */}
-                                                                        <div
-                                                                            className="position-absolute"
-                                                                            style={{
-                                                                                left: '10px',
-                                                                                top: '50%',
-                                                                                transform: 'translateY(-50%)',
-                                                                            }}>
-                                                                            <img src={us} alt="flag" width={20} />
-                                                                        </div>
-                                                                    </InputGroup>
-                                                                ) : (
-                                                                    <Form.Control
-                                                                        type={
-                                                                            item.system === 'email' ? 'email' : 'text'
-                                                                        }
-                                                                        placeholder={
-                                                                            item.system === 'email'
-                                                                                ? 'Enter email'
-                                                                                : 'Enter value'
-                                                                        }
-                                                                        value={item.value || ''}
-                                                                        onChange={(e) =>
-                                                                            handleContactChange(
-                                                                                index,
-                                                                                'value',
-                                                                                e.target.value
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                )}
-                                                            </Col>
-
-                                                            <Col sm={4} className="position-relative">
-                                                                <Form.Select
-                                                                    value={item.use}
-                                                                    data-has-value={
-                                                                        !!watch(`constantContact[${index}].use`)
-                                                                    }
-                                                                    {...register(`constantContact[${index}].use`)}
-                                                                    onChange={(e) =>
-                                                                        handleContactChange(
-                                                                            index,
-                                                                            'use',
-                                                                            e.target.value
-                                                                        )
-                                                                    }>
-                                                                    <option value="">Select Option</option>{' '}
-                                                                    {/* Placeholder option */}
-                                                                    <option value="temp">Temp</option>
-                                                                    <option value="home">Home</option>
-                                                                    <option value="work">Work</option>
-                                                                    <option value="old">Old</option>
-                                                                    <option value="mobile">Mobile</option>
-                                                                    {/* Add more options as needed */}
-                                                                </Form.Select>
-                                                                {index >= contactDetails.length && (
-                                                                    <span
-                                                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                                        style={{ right: '-1%', top: '12%' }}
-                                                                        onClick={() => removeContact(index)}>
-                                                                        <CiCircleMinus />
-                                                                    </span>
-                                                                )}
-                                                            </Col>
-                                                        </Row>
-                                                    ))}
-                                                </Col>
-                                            </Row>
+                                            <TelecomFrom
+                                                constantContact={subUpdatePracticeTelecom}
+                                                setConstantContact={setSubUpdatePracticeTelecom}
+                                            />
                                             <hr className="mb-1" />
                                             <AddressForm
                                                 addresses={updatePracticeAddresses}
@@ -1590,7 +1133,7 @@ const SubUpdateClinic = () => {
                             </div>
                         )}
                         <img
-                            src={modalFileUrl?.url || modalFileUrl}
+                            src={modalFileUrl}
                             alt="File Preview"
                             onLoad={() => setImageLoading(false)}
                             onError={() => setImageLoading(false)} // hide spinner on error too

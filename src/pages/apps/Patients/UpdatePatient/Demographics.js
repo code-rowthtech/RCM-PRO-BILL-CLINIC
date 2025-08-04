@@ -650,13 +650,13 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                 <InputGroup>
                                     <InputGroup.Text
                                         className="ps-3 pe-1 fw-bold text-black"
-                                        style={{ height: '33px' }}>
+                                        style={{ height: '30px' }}>
                                         &nbsp;+1
                                     </InputGroup.Text>{' '}
                                     {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
-                                        style={{ height: '33px' }}
+                                        style={{ height: '30px' }}
                                         {...register('emergencyContactPhone', {
                                             pattern: {
                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -761,13 +761,13 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                 <InputGroup>
                                                     <InputGroup.Text
                                                         className="ps-3 pe-1 fw-bold text-black"
-                                                        style={{ height: '33px' }}>
+                                                        style={{ height: '30px' }}>
                                                         &nbsp;+1
                                                     </InputGroup.Text>{' '}
                                                     {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
-                                                        style={{ height: '33px' }}
+                                                        style={{ height: '30px' }}
                                                         {...register('employerPhone', {
                                                             pattern: {
                                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -819,7 +819,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={3}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className="mb-1">Employment Status</Form.Label>
+                                            <Form.Label className="mb-0">Employment Status</Form.Label>
                                             <Form.Select {...register('employmentStatus')}>
                                                 <option value="">Select Employment Status</option>
                                                 <option value="employed">Employed</option>
@@ -836,7 +836,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={3}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className="mb-1">Occupation</Form.Label>
+                                            <Form.Label className="mb-0">Occupation</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Enter Occupation"

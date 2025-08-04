@@ -23,7 +23,7 @@ import { handleFirstSpace } from '../../../helpers/noSpace';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons for eye visibility toggle
 import { getDepartmentDataAction } from '../../../redux/settings/action';
 import AddressForm from '../Common Pages/AddressForm';
-import { FiUploadCloud } from 'react-icons/fi';
+import { FiUploadCloud, FiDownloadCloud } from 'react-icons/fi';
 import DoctorAddress from './DoctorAddressForm';
 import DoctorQualifications from './Qualifications';
 
@@ -146,15 +146,38 @@ const NewDoctor = () => {
     const closeModal = () => {
         setShow(false);
     };
-    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
 
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
+        if (!selectedFile) return;
+        setLogoUploading(true);
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
             setLogoName(selectedFile?.name);
         } catch (error) {
+        } finally {
+            setLogoUploading(false);
+        }
+    };
+
+    const handleDownload = async (file) => {
+        if (!file) return;
+        const fileUrl = file?.url?.split('?')[0] || file;
+        try {
+            const response = await fetch(fileUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = logoName || 'profile-image';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            window.open(fileUrl, '_blank');
+        } catch (error) {
+            window.open(fileUrl, '_blank');
         }
     };
 
@@ -824,7 +847,7 @@ const NewDoctor = () => {
                                                                             : 'custom-form-fields'
                                                                             }`}>
                                                                         <span>
-                                                                            {logoUploading
+                                                                            {logoUploading === true
                                                                                 ? 'Uploading...'
                                                                                 : logoName
                                                                                     ? logoName.length > 30
@@ -844,12 +867,22 @@ const NewDoctor = () => {
                                                                                             );
                                                                                         }}
                                                                                         className="text-dark cursor-pointer"
+                                                                                        title="Preview"
                                                                                     />
                                                                                 )}
-
-                                                                            <p className="mb-0">
-                                                                                <FiUploadCloud />
-                                                                            </p>
+                                                                            {(logo?.url?.split('?')[0] ||
+                                                                                doctorDetails?.photo?.[0]?.url) && (
+                                                                                    <FiDownloadCloud
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleDownload(
+                                                                                               logo || doctorDetails?.photo?.[0]
+                                                                                            );
+                                                                                        }}
+                                                                                        className="text-dark cursor-pointer"
+                                                                                        title="Download"
+                                                                                    />
+                                                                                )}
                                                                         </div>
                                                                     </div>
                                                                     <Form.Control

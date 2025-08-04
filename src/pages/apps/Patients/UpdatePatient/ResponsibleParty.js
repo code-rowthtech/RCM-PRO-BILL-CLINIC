@@ -55,16 +55,16 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                 state: data?.state,
                 type: data?.type,
                 use: data?.use,
-            }));
+            })) || [{ type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' }];
             setResponsibleAddresses(updateAddress);
             const rawTelecom = patientDetails?.relatedPerson?.telecom;
-            const updateTelecom = Array.isArray(rawTelecom)
+            const updateTelecom = Array.isArray(rawTelecom) && rawTelecom.length > 0
                 ? rawTelecom.map((data) => ({
                     system: data?.system || '',
                     value: data?.value || '',
                     use: data?.use || '',
                 }))
-                : [];
+                : [{ system: '', value: '', use: '' }];
 
             setResponsibleTelecom(updateTelecom);
         }
@@ -161,7 +161,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                         </div>
                         {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                     </div>
-                    <div className="col-md-3 col-12 pe-0">
+                    <div className="col-md-3 col-12 pe-2">
                         <Form.Label htmlFor="DOB" className="mb-0">
                             Date of Birth <span className="text-danger">*</span>
                         </Form.Label>

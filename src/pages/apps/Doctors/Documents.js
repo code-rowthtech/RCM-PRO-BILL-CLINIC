@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Form, useNavigate, useSearchParams } from "react-router-dom";
 import { BiEdit } from "react-icons/bi";
-import { Button, ButtonGroup } from "react-bootstrap";
-import { FiUploadCloud } from "react-icons/fi";
+import { Button, ButtonGroup, Modal } from "react-bootstrap";
+import { FiUploadCloud, FiEye, FiDownloadCloud } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createDoctorDetailAction, getStatesByCountryAction } from "../../../redux/actions";
@@ -31,6 +31,8 @@ const Documents = () => {
   const [license, setLicense] = useState(null);
   const [licenseName, setLicenseName] = useState('');
   const [licenseUploading, setLicenseUploading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
 
   useEffect(() => {
     dispatch(getStatesByCountryAction())
@@ -62,12 +64,42 @@ const Documents = () => {
   };
   const handleFileChangeDegree = async (e) => {
     const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+    setLicenseUploading(true);
     try {
       const url = await handleUpload(selectedFile, setLicenseUploading);
       setLicense(url);
       setLicenseName(selectedFile?.name)
     } catch (error) {
       // console.error('Error during file upload:', error);
+    } finally {
+      setLicenseUploading(false);
+    }
+  };
+
+  const handlePreview = (file) => {
+    if (file?.url && /\.(jpg|jpeg|png|svg)$/i.test(licenseName)) {
+      setPreviewUrl(file.url);
+      setShowPreview(true);
+    }
+  };
+
+  const handleDownload = async (file) => {
+    if (!file?.url) return;
+    try {
+      const response = await fetch(file.url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = licenseName || 'document';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      window.open(file.url, '_blank');
+    } catch (error) {
+      window.open(file.url, '_blank');
     }
   };
   return (
@@ -169,10 +201,34 @@ const Documents = () => {
                           onClick={() => licenseFileInputRef.current.click()}
                           className={`custom-file-upload justify-content-between cursor-pointer ${licenseName || licenseUploading ? '' : 'custom-form-fields'}`}
                         >
-                          {licenseName ? licenseName : licenseUploading ? 'Uploading...' : 'Upload Degree'}
-                          <p className="mb-0">
+                          <span>
+                            {licenseUploading ? 'Uploading...' : licenseName ? (licenseName.length > 30 ? licenseName.slice(0, 25) + '...' : licenseName) : 'Upload Document'}
+                          </span>
+                          <div className="d-flex align-items-center gap-2">
+                            {license?.url && (
+                              <FiEye
+                                className="text-secondary"
+                                style={{ cursor: 'pointer' }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePreview(license);
+                                }}
+                                title="Preview"
+                              />
+                            )}
+                            {license?.url && (
+                              <FiDownloadCloud
+                                className="text-secondary"
+                                style={{ cursor: 'pointer' }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownload(license);
+                                }}
+                                title="Download"
+                              />
+                            )}
                             <FiUploadCloud />
-                          </p>
+                          </div>
                         </div>
                         <input
                           type="file"
@@ -203,6 +259,33 @@ const Documents = () => {
         </div>
 
       </div>
+      <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
+        <Modal.Body>
+          <div className="d-flex justify-content-center">
+            <p className="fw-bold" style={{ color: '#6169D0' }}>
+              File Preview
+            </p>
+          </div>
+          <div
+            style={{
+              overflow: 'hidden',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <img
+              src={previewUrl}
+              alt="File Preview"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '100vh',
+                objectFit: 'contain',
+                display: 'block',
+              }}
+            />
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };
