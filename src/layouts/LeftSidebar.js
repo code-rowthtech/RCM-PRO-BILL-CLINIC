@@ -63,6 +63,7 @@ const LeftSidebar = ({
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const appointmentsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
+    console.log(appointmentsData, 'appointmentsData');
     const statusColors = {
         pending: '#f1c40f', // Yellow
         proposed: '#3498db', // Blue
@@ -271,8 +272,9 @@ const LeftSidebar = ({
                                     doctorDetails.map((data) => (
                                         <li
                                             key={data?._id}
-                                            className={`py-2  rounded ${selectedDoctor === data?._id ? 'bg-primary text-white' : 'hover-effect'
-                                                }`}
+                                            className={`py-2  rounded ${
+                                                selectedDoctor === data?._id ? 'bg-primary text-white' : 'hover-effect'
+                                            }`}
                                             style={{ cursor: 'pointer', transition: '0.3s' }}
                                             onClick={() => handleSelectDoctor(data?._id)}>
                                             {data?.userDetails?.firstName} {data?.userDetails?.lastName}
@@ -294,8 +296,9 @@ const LeftSidebar = ({
                             appointmentDetails.map((data) => (
                                 <li
                                     key={data?._id}
-                                    className={`py-2 px-3 rounded ${selectedAppointment === data?._id ? 'bg-primary text-white' : 'hover-effect'
-                                        }`}
+                                    className={`py-2 px-3 rounded ${
+                                        selectedAppointment === data?._id ? 'bg-primary text-white' : 'hover-effect'
+                                    }`}
                                     style={{ cursor: 'pointer', transition: '0.3s' }}
                                     onClick={() => handleSelectAppointment(data?._id)}>
                                     {data?.appointmentType}
@@ -345,7 +348,7 @@ const LeftSidebar = ({
                 className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`}
                 ref={menuNodeRef}>
                 {location?.pathname === '/apps/patients/update-patient' ||
-                    location?.pathname === '/apps/patients/new-patient' ? (
+                location?.pathname === '/apps/patients/new-patient' ? (
                     <>
                         {!isCondensed ? (
                             <ul style={{ listStyle: 'none' }} className="px-0">
@@ -361,6 +364,7 @@ const LeftSidebar = ({
                                 <li className="px-1 mb-1 d-flex gap-1 align-items-center">
                                     <Form.Select
                                         className="text-capitalize"
+                                        value={selectedDoctor || ""}
                                         onChange={(e) => setSelectedDoctor(e.target.value)}>
                                         <option value="" key="">
                                             All Providers
@@ -480,41 +484,35 @@ const LeftSidebar = ({
                                                             }>
                                                             <div>
                                                                 <p className="mb-0">
-                                                                    {
-                                                                        appointment?.start?.toLocaleString('en-US', {
-                                                                            year: 'numeric',
-                                                                            month: '2-digit',
-                                                                            day: '2-digit',
+                                                                    {appointment?.start
+                                                                        ? new Date(appointment?.start)
+                                                                              ?.toISOString()
+                                                                              ?.split('T')[0]
+                                                                        : ''}
+                                                                    <br />(
+                                                                    {new Date(appointment?.start).toLocaleString(
+                                                                        'en-US',
+                                                                        {
                                                                             hour: '2-digit',
                                                                             minute: '2-digit',
                                                                             hour12: true,
-                                                                        })
-                                                                    }
-                                                                    &nbsp; (
-                                                                    {appointment?.toLocaleString('en-US', {
-                                                                        year: 'numeric',
-                                                                        month: '2-digit',
-                                                                        day: '2-digit',
-                                                                        hour: '2-digit',
-                                                                        minute: '2-digit',
-                                                                        hour12: true,
-                                                                    }) +
+                                                                        }
+                                                                    ) +
                                                                         '-' +
-                                                                        appointment?.end?.toLocaleString('en-US', {
-                                                                            year: 'numeric',
-                                                                            month: '2-digit',
-                                                                            day: '2-digit',
-                                                                            hour: '2-digit',
-                                                                            minute: '2-digit',
-                                                                            hour12: true,
-                                                                        })
-                                                                    }
+                                                                        new Date(appointment?.end).toLocaleString(
+                                                                            'en-US',
+                                                                            {
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit',
+                                                                                hour12: true,
+                                                                            }
+                                                                        )}
                                                                     )
-                                                                </p>
+                                                                </p>{' '}
                                                                 <p className="mb-0">
                                                                     {appointment?.reason?.[0]?.coding?.[0]?.display}
                                                                 </p>
-                                                            </div>
+                                                            </div>{' '}
                                                             <h6
                                                                 className="text-capitalize fw-semibold"
                                                                 style={{ color: statusColors[appointment?.status] }}>
@@ -563,11 +561,18 @@ const LeftSidebar = ({
                                                 <div className="d-flex flex-column">
                                                     <p className="mb-0 text-capitalize" style={{ fontSize: '12px' }}>
                                                         (
-                                                        {new Date(data?.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
+                                                        {new Date(data?.start).toLocaleTimeString([], {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit',
+                                                        }) +
                                                             '-' +
-                                                            new Date(data?.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            new Date(data?.end).toLocaleTimeString([], {
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                            })}
                                                         )
-                                                    </p>                                                    <p
+                                                    </p>{' '}
+                                                    <p
                                                         className="mb-0 fw-semibold text-capitalize"
                                                         style={{ fontSize: '10px', color: statusColors[data?.status] }}>
                                                         {data?.status}
@@ -766,14 +771,13 @@ const LeftSidebar = ({
                     //     )}
                     //     {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
                     // </>
-                    <div className="parentLeftSidebar mb-3" >
-
+                    <div className="parentLeftSidebar mb-3">
                         <div className="media_mob ">
                             {!isCondensed && (
                                 <SimpleBar timeout={500} scrollbarMaxSize={320}>
                                     <SideBarContent
                                         data-aos="fade-down"
-                                        menuClickHandler={() => { }}
+                                        menuClickHandler={() => {}}
                                         isLight={isLight}
                                         hideUserProfile={hideUserProfile}
                                     />
@@ -793,7 +797,7 @@ const LeftSidebar = ({
                                     {!isCondensed && <div className="leftSideBarLine"></div>}
                                     <SideBarContentDown
                                         data-aos="fade-down"
-                                        menuClickHandler={() => { }}
+                                        menuClickHandler={() => {}}
                                         isLight={isLight}
                                         hideUserProfile={hideUserProfile}
                                     />

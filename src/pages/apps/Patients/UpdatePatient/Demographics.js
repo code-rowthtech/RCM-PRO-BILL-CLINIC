@@ -934,7 +934,13 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     <Col sm={6}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">State</Form.Label>
-                                            <Form.Select {...register('employerStateName')}>
+                                            <Form.Select
+                                                {...register('employerStateName')}
+                                                onChange={(e) => {
+                                                    const selectedOption = e.target.selectedOptions[0];
+                                                    const key = JSON.parse(selectedOption.getAttribute('data-key'));
+                                                    dispatch(getCities4Action({ state_code: key, name: '', limit: 25 }));
+                                                }}>
                                                 <option value="" hidden>
                                                     State
                                                 </option>

@@ -9,7 +9,7 @@ export function createNoteCategoriesApi(params: any): any {
 
 export function getNoteCategoriesApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getNoteCategories}?clinicId=${data?.clinicId}&page=${data?.skip}&limit=${data?.limit}&search=${data?.search}&active=${data?.active}&noteType=${data?.noteType}`);
+    return api.get(`${URL.getNoteCategories}?clinicId=${data?.clinicId}&page=${data?.page || 1}&limit=${data?.limit}&search=${data?.search}&active=${data?.active}&noteType=${data?.noteType}`);
 }
 
 export function updateNoteCategoriesApi(params: any): any {

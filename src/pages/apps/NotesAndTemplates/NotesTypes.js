@@ -33,13 +33,16 @@ const NotesTypes = () => {
         'System & Meta',
     ];
     const [selectedNote, setSelectedNote] = useState(null);
+    const [status, setStatus] = useState('active');
     const ClinicId = loggedInUser?.clinicId;
+    console.log(status,'uyhgfghjkjlk')
     const {
         control,
         setValue,
         getValues,
         formState: { errors },
     } = useForm();
+
     useEffect(() => {
         dispatch(
             getNoteCategoriesAction({
@@ -47,11 +50,12 @@ const NotesTypes = () => {
                 skip: skip,
                 limit: 8,
                 clinicId: ClinicId,
-                active: status === 'active' ? true : false,
+                ...(status==='active'&&({active:true})),
+                ...(status==='inactive'&&({active:false})),
                 noteType: noteType,
             })
         );
-    }, [dispatch, search, noteType, skip]);
+    }, [dispatch, search, noteType, skip,status]);
     const handleOpenTab = (note) => {
         const exists = openTabs.find((tab) => tab?._id === note?._id);
         if (!exists) {
@@ -79,7 +83,6 @@ const NotesTypes = () => {
         dispatch(getNoteCategoriesAction({ search: search, page: skip, limit: 8, clinicId: ClinicId }));
     };
 
-    const [status, setStatus] = useState('active');
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
@@ -144,16 +147,16 @@ const NotesTypes = () => {
                                                 onClick={() => {
                                                     setStatus('active');
                                                     setSkip(1); // Reset to first page
-                                                    dispatch(
-                                                        getNoteCategoriesAction({
-                                                            active: true,
-                                                            search: search,
-                                                            page: 1,
-                                                            limit: 8,
-                                                            clinicId: ClinicId,
-                                                            noteType: noteType,
-                                                        })
-                                                    );
+                                                    // dispatch(
+                                                    //     getNoteCategoriesAction({
+                                                    //         active: true,
+                                                    //         search: search,
+                                                    //         page: skip,
+                                                    //         limit: 8,
+                                                    //         clinicId: ClinicId,
+                                                    //         noteType: noteType,
+                                                    //     })
+                                                    // );
                                                 }}
                                                 className={`me-md-2 active_inactive_buttons ${status === 'active'
                                                     ? ' text-white py-'
@@ -165,16 +168,16 @@ const NotesTypes = () => {
                                                 onClick={() => {
                                                     setStatus('inactive');
                                                     setSkip(1); // Reset to first page
-                                                    dispatch(
-                                                        getNoteCategoriesAction({
-                                                            active: false,
-                                                            search: search,
-                                                            page: 1,
-                                                            limit: 8,
-                                                            clinicId: ClinicId,
-                                                            noteType: noteType,
-                                                        })
-                                                    );
+                                                    // dispatch(
+                                                    //     getNoteCategoriesAction({
+                                                    //         active: false,
+                                                    //         search: search,
+                                                    //         page: skip,
+                                                    //         limit: 8,
+                                                    //         clinicId: ClinicId,
+                                                    //         noteType: noteType,
+                                                    //     })
+                                                    // );
                                                 }}
                                                 className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${status === 'inactive'
                                                     ? ' text-white py-'

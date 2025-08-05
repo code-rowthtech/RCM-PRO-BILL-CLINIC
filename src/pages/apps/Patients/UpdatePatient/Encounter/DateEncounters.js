@@ -57,7 +57,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     useEffect(() => {
         if (createEncounterData?.data?.status === 201) {
             dispatch(getEncounterAction({ patientId: id, status: '' }));
-            reset();
+            // reset();
         }
         else if (updateEncounterData?.data?.status === 200 && updateClicked) {
             setUpdateClicked(false);

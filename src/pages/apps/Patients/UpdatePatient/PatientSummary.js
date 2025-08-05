@@ -102,9 +102,8 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
             await dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }));
             await dispatch(getAllergiesOfPatientAction({ patientId: patientId, limit: 3 }));
             await dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 1 }));
-
         };
-        if (patientDetails && patientDetails?._id === patientId && selectedMainTab === "Patient Details") {
+        if (patientDetails && patientDetails?._id === patientId && selectedMainTab === 'Patient Details') {
             fetchData();
         }
     }, [patientDetails, patientId]);
@@ -170,15 +169,9 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                             <span className="fw-bold fs-6">Vitals</span>
                         </div>
                         <div className="d-flex align-items-center">
-                            <input
-                                className="fs-6 fw-semibold bg-white px-1 me-1 border border-1 border-muted"
-                                type="date"
-                                value={effectiveDateTime}
-                                onChange={(e) => {
-                                    //  setEffectiveDateTime()
-                                    dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: e.target.value, limit: 5 }))
-                                }}
-                            />
+                            <div className="fs-6 fw-semibold px-1 me-1">
+                                {effectiveDateTime ? new Date(effectiveDateTime).toLocaleDateString('en-GB') : ''}
+                            </div>
                             <MdAddCircleOutline
                                 onClick={() => setVitalsModal(true)}
                                 className="text-primary me-2 cursor-pointer"
@@ -280,9 +273,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                         ) : allergyData && allergyData.length > 0 ? (
                             <ul className="list-unstyled pb-0 mb-0">
                                 {allergyData.slice(0, 4).map((allergy, index) => (
-                                    <li
-                                        key={index}
-                                        className="mb-2 d-flex justify-content-between align-items-start">
+                                    <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
                                         <div className="fs-6">
                                             <strong title={allergy?.code?.text}>
                                                 {allergy?.code?.text?.length > 30
@@ -348,9 +339,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                         ) : problemData && problemData.length > 0 ? (
                             <ul className="list-unstyled pb-0 mb-0">
                                 {problemData?.slice(0, 4)?.map((problem, index) => (
-                                    <li
-                                        key={index}
-                                        className="mb-2 d-flex justify-content-between align-items-start">
+                                    <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
                                         <div className="fs-6">
                                             <strong title={problem?.code?.text}>
                                                 {problem?.code?.text?.length > 30
@@ -450,16 +439,14 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                                                     className="text-muted"
                                                     title={medication?.drugId?.nonProprietaryName}>
                                                     {medication?.drugId?.nonProprietaryName?.length > 40
-                                                        ? medication?.drugId?.nonProprietaryName?.slice(0, 39) +
-                                                        '...'
+                                                        ? medication?.drugId?.nonProprietaryName?.slice(0, 39) + '...'
                                                         : medication?.drugId?.nonProprietaryName}
                                                 </div>
                                                 <div
                                                     className="text-muted "
                                                     title={medication?.dosageInstruction?.[0]?.text}>
                                                     {medication?.dosageInstruction?.[0]?.text?.length > 40
-                                                        ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) +
-                                                        '...'
+                                                        ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) + '...'
                                                         : medication?.dosageInstruction?.[0]?.text || ''}
                                                 </div>
                                             </div>
@@ -511,8 +498,8 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                                         {data?.effectiveDateTime
                                             ? new Date(data?.effectiveDateTime)?.toLocaleDateString('en-GB')
                                             : '' || data?.deceasedDate
-                                                ? new Date(data?.deceasedDate)?.toLocaleDateString('en-GB')
-                                                : '' || 'N/A'}
+                                              ? new Date(data?.deceasedDate)?.toLocaleDateString('en-GB')
+                                              : '' || 'N/A'}
                                     </div>
                                 </div>
                             ))

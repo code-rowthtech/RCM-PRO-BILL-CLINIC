@@ -57,16 +57,16 @@ function* getNoteCategoriesFunction(data) {
         });
         const response = yield call(getNoteCategoriesApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             // ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_SUCCESS,
                 payload: { ...decryptedData },
             });
-            yield put({
-                type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_RESET,
-                payload: {},
-            });
+            // yield put({
+            //     type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_RESET,
+            //     payload: {},
+            // });
         } else {
             yield put({
                 type: NotesCategoriesActionTypes.GET_NOTE_CATEGORIES_ERROR,
