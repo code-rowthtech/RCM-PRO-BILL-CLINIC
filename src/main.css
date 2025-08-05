@@ -1316,3 +1316,7 @@ option {
     vertical-align: middle;
 }
 
+.date-picker-input:focus-visible{
+    outline: none !important;
+    box-shadow: none !important;
+}
