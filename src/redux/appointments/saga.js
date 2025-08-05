@@ -16,12 +16,17 @@ function* createAppointmentFunction(data) {
             payload: {},
         });
         const response = yield call(createAppointmentApi, data);
-        console.log('response', response)
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        // const decryptedData = response.data.data;
+        
+        let decryptedData;
+        try {
+            // Try to decrypt first
+            decryptedData = JSON.parse(decryptMessage(response.data.data));
+        } catch (decryptError) {
+            // If decryption fails, use data as is
+            decryptedData = response.data.data;
+        } 
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success')
-            console.log('decryptedData', decryptedData)
             yield put({
                 type: AppointmentActionTypes.CREATE_APPOINTMENT_SUCCESS,
                 payload: { ...decryptedData },
@@ -37,10 +42,10 @@ function* createAppointmentFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger')
+        ToastHandle(error?.message || 'An error occurred', 'danger')
         yield put({
             type: AppointmentActionTypes.CREATE_APPOINTMENT_ERROR,
-            payload: error,
+            payload: error?.message || 'An error occurred',
         });
     }
 }

@@ -28,7 +28,6 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
     useEffect(() => {
         if (createResponseReferring === 201) {
             if (submissionType === 'saveAndNext') {
-                reset(); // Reset the form
                 setActiveTab('insurance');
             } else if (submissionType === 'saveAndReset') {
                 reset();

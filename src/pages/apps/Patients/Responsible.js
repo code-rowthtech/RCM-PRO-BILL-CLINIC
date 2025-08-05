@@ -92,7 +92,6 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     useEffect(() => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
-                reset(); // Reset the form
                 setActiveTab('referringDoctor');
             } else if (submissionType === 'saveAndReset') {
                 reset();

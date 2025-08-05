@@ -392,7 +392,11 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     useEffect(() => {
         if (selectedSlot) {
             const rawDate = new Date(calendarView === 'month' ? selectedSlot?.slots?.[0] : selectedSlot?.start);
-            const localDateString = rawDate.toISOString().split('T')[0];
+            // Use local date string to avoid timezone issues
+            const year = rawDate.getFullYear();
+            const month = String(rawDate.getMonth() + 1).padStart(2, '0');
+            const day = String(rawDate.getDate()).padStart(2, '0');
+            const localDateString = `${year}-${month}-${day}`;
             const sanitized = sanitizeScheduledDate(localDateString);
 
             setScheduledDate(sanitized);
@@ -401,7 +405,11 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 setValue('startTime', formatTime(selectedSlot?.start));
             }
         } else {
-            const todayStr = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
             setScheduledDate(todayStr);
             setValue('startTime', getDefaultTime());
             setValue('duration', '30');

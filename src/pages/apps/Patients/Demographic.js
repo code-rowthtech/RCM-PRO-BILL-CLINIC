@@ -244,13 +244,13 @@ const Demographicdetails = ({
     useEffect(() => {
         if (updateResponse === 200) {
             if (submissionType === 'saveAndNext') {
-                reset();
                 if (showResponsibleTab) {
                     setActiveTab('responsible'); // Go to Responsible tab if allowed
                 } else {
                     setActiveTab('insurance'); // Otherwise, go to Insurance tab
                 }
             } else if (submissionType === 'saveAndReset') {
+                reset(); // Only reset on explicit save and reset
                 setActiveTab('personalDetails');
             }
         }
@@ -964,7 +964,14 @@ const Demographicdetails = ({
                     </Col>
                 </Row>
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
-                    <Button className="cancel-button" onClick={() => reset()}>
+                    <Button className="cancel-button" onClick={() => {
+                        reset();
+                        setEth(null);
+                        setRela(null);
+                        setTri(null);
+                        setDemographicAddresses([{ type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]);
+                        setIdentifiers([]);
+                    }}>
                         Clear
                     </Button>
                     <Button

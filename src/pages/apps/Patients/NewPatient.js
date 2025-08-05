@@ -166,9 +166,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     useEffect(() => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
-                reset(); // Reset the form
                 handleTabChange('demographicDetails');
-                // setActiveTab('demographicDetails');
                 setPatientId(createPatientResponse?._id);
                 setGenderIdentity(createPatientResponse?.gender);
             } else if (submissionType === 'saveAndReset') {
