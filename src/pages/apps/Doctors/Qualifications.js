@@ -438,6 +438,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                         type="text"
                                                                         value={data?.number}
                                                                         // {...register(`documentNumber[${index}]`)}
+                                                                            maxLength={15} // Limit to 15 characters
                                                                         onChange={(e) =>
                                                                             handleDocumentsChange(
                                                                                 index,
