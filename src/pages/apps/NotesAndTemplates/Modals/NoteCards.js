@@ -26,7 +26,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
             noteType: note.noteType,
             format: note.format,
             noteType: note.noteType,
-            title: note.title,
+            // title: note.title,
             customTitle: note.title === 'Other' ? note.customTitle : '',
             active: note.active,
             private: note.private,

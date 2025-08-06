@@ -71,18 +71,18 @@ const DateEncounters = ({
     // ========================================================================
     // HOOKS AND STATE
     // ========================================================================
-    
+
     // Redux hooks
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    
+
     // Router hooks
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    
+
     // Form hooks
     const { handleSubmit, register, setValue, formState: { errors }, getValues, reset, control } = useForm();
-    
+
     // Component state
     const [leftTab, setLeftTab] = useState('Summary');
     const [selectedFromList, setSelectedFromList] = useState({});
@@ -91,11 +91,11 @@ const DateEncounters = ({
     const [selectedProvider, setSelectedProvider] = useState(null);
     const [updateClicked, setUpdateClicked] = useState(false);
     const [providerError, setProviderError] = useState(false);
-    
+
     // Modal state
     const [notesTypeModal, setNotesTypeModal] = useState(false);
     const [selectedNoteType, setSelectedNoteType] = useState(null);
-    
+
     // Stopwatch state
     const [isSessionRunning, setIsSessionRunning] = useState(false);
     const [stopwatchTime, setStopwatchTime] = useState(0);
@@ -104,22 +104,22 @@ const DateEncounters = ({
     // ========================================================================
     // DERIVED STATE FROM STORE
     // ========================================================================
-    
+
     // Patient data
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    
+
     // Doctor/Provider data
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const providerOptions = doctorDetails?.map((data) => ({
         label: `${data?.name?.[0]?.text + ' ' + data?.userId?.email}`,
         value: data?._id
     }));
-    
+
     // Encounter data
     const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
     const createEncounterData = store?.createEncounterReducer;
     const updateEncounterData = store?.updateEncounterReducer;
-    
+
     // Notes and settings data
     const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
     const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
@@ -132,11 +132,23 @@ const DateEncounters = ({
     // ========================================================================
     // EFFECTS
     // ========================================================================
-    
+
     // Handle successful encounter creation or update
     useEffect(() => {
         if (createEncounterData?.data?.status === 201) {
             dispatch(getEncounterAction({ patientId: id, status: '' }));
+            const newEncounterId = createEncounterData?.data?.encounterId;
+            const newTitle = createEncounterData?.data?.encounterStart 
+                ? new Date(createEncounterData?.data?.encounterStart).toISOString().split('T')[0] 
+                : '';
+            
+            const updatedTabs = encounterTabs.map(tab => 
+                tab.id === encounterId 
+                    ? { ...tab, id: newEncounterId, title: newTitle, type: 'updateEncounter' }
+                    : tab
+            );
+            setEncounterTabs(updatedTabs);
+            setActiveTab(newEncounterId);
         }
         else if (updateEncounterData?.data?.status === 200 && updateClicked) {
             setUpdateClicked(false);
@@ -216,21 +228,21 @@ const DateEncounters = ({
     // ========================================================================
     // UTILITY FUNCTIONS
     // ========================================================================
-    
+
     const handleNotesTypeChange = (selectedOption) => {
         dispatch(getEncounterNotesFieldsAction({ noteId: selectedOption?.value }));
         setNoteType(selectedOption ? selectedOption.value : '');
     };
-    
+
     const closeNoteTypeModal = () => {
         setNotesTypeModal(false);
     };
-    
+
     const confirmSelection = () => {
         setNoteType(selectedNoteType?.value);
         handleNotesTypeChange?.(selectedNoteType);
     };
-    
+
     const toggleSession = useCallback(() => {
         if (isSessionRunning) {
             clearInterval(intervalRef.current);
@@ -263,7 +275,7 @@ const DateEncounters = ({
     // ========================================================================
     // COMPONENTS
     // ========================================================================
-    
+
     // Note Form Fields Component
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
         // Refs for ReactQuill editors
@@ -323,7 +335,7 @@ const DateEncounters = ({
         // Render individual field based on type
         const renderField = (field) => {
             const { name, inputType = 'textarea' } = field;
-            
+
             // Utility functions
             const countWords = (text) => {
                 return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
@@ -346,7 +358,7 @@ const DateEncounters = ({
                                 <Form.Label className="mb-1 d-flex justify-content-between align-items-center gap-2">
                                     <div className='col-10 d-flex align-items-center gap-1'>
                                         <span>{section === 'CarePlan' ? 'Care Plan' : section}</span>
-                                        <Form.Select 
+                                        <Form.Select
                                             className="w-25 text-black"
                                             onChange={e => {
                                                 const value = e.target.value;
@@ -397,7 +409,7 @@ const DateEncounters = ({
                                     name={section}
                                     control={control}
                                     render={({ field: { onChange, value } }) => (
-                                        <ReactQuill 
+                                        <ReactQuill
                                             ref={quillRefs.current[section]}
                                             theme="snow"
                                             value={value || '<p><br></p>'}
@@ -527,22 +539,22 @@ const DateEncounters = ({
             </div>
         );
     });
-    
+
     // ========================================================================
     // FORM SUBMISSION
     // ========================================================================
-    
+
     const onSubmit = (data) => {
         // Validate provider selection
         if (!selectedProvider) {
             setProviderError(true);
             return;
         }
-        
+
         // Build encounter type and class objects
         const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type);
         const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class);
-        
+
         const type = {
             coding: [{
                 system: encounterTypeSelected.system,
@@ -607,7 +619,7 @@ const DateEncounters = ({
                 start: data?.startDate,
             }
         };
-        
+
         if (encounterAction === 'updateEncounter') {
             const updateData = {
                 id: encounterId,
@@ -620,7 +632,7 @@ const DateEncounters = ({
         }
 
     };
-    
+
     // ========================================================================
     // RENDER
     // ========================================================================
