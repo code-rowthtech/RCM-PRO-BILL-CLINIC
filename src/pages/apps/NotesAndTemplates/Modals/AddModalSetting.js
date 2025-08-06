@@ -105,7 +105,6 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
 
     useEffect(() => {
         if (selectedNote) {
-            console.log(selectedNote, 'selectedNote in AddModalSetting');
             const type = selectedNote?.noteType;
             const predefinedTitles = NOTE_TYPE_OPTIONS[type] || [];
             const isCustom = !predefinedTitles.includes(selectedNote?.title);
@@ -120,10 +119,9 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
     }, [selectedNote, setValue]);
 
     const onSubmit = (data) => {
-        console.log(data, 'data in AddModalSetting');
         const payload = {
-            ...(selectedNote?.title!==data?.title&&({title: data.title === 'Other' ? data.customTitle : data.title})),
-            clinicId: clinic_id?.clinicId,
+            ...(selectedNote?.title !== data?.title && ({ title: data.title === 'Other' ? data.customTitle : data.title })),
+            clinicId: clinic_id?.clinicId || store?.Auth?.user?.clinicId,
             noteType: data.noteType,
             active: 'true',
             format: data.format,
@@ -144,7 +142,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                     search: '',
                     skip: 1,
                     limit: 8,
-                    clinicId: clinic_id?.clinicId,
+                    clinicId: clinic_id?.clinicId || store?.Auth?.user?.clinicId,
                     active: true,
                     noteType: '',
                 })
