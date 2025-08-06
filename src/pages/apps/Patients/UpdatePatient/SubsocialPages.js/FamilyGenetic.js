@@ -39,7 +39,7 @@ const FamilyHistory = () => {
     const quillRef = useRef();
 
     // Form handling
-    const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm({
+    const { register, handleSubmit, reset, getValues, formState : {errors}, control, setValue, watch } = useForm({
         defaultValues: {
             name: '',
             dob: '',
@@ -245,43 +245,58 @@ const FamilyHistory = () => {
                                 <Row className="">
                                     <Col md={6}>
                                         <Form.Group controlId="relationship">
-                                            <Form.Label className="fw-medium mb-1">Relationship</Form.Label>
-                                            <Select
-                                                options={relationshipOption}
-                                                isSearchable
-                                                className="basic-single"
-                                                classNamePrefix="select"
-                                                placeholder="Select relationship"
-                                                value={
-                                                    rela
-                                                        ? relationshipOption.find((opt) => opt.value.code === rela.code)
-                                                        : null
-                                                }
-                                                onChange={handleRelationChange}
-                                                styles={{
-                                                    control: (provided) => ({
-                                                        ...provided,
-                                                        minHeight: '30px',
-                                                        border: '0px',
-                                                    }),
-                                                }}
+                                            <Form.Label className="fw-medium mb-1">Relationship <span className='text-danger'>*</span></Form.Label>
+                                            <Controller
+                                                name="relationship"
+                                                control={control}
+                                                rules={{ required: 'Relationship is required' }}
+                                                render={({ field }) => (
+                                                    <Select
+                                                        {...field}
+                                                        options={relationshipOption}
+                                                        isSearchable
+                                                        className="basic-single"
+                                                        classNamePrefix="select"
+                                                        placeholder="Select relationship"
+                                                        value={
+                                                            rela
+                                                                ? relationshipOption.find((opt) => opt.value.code === rela.code)
+                                                                : null
+                                                        }
+                                                        onChange={(selected) => {
+                                                            field.onChange(selected);
+                                                            handleRelationChange(selected);
+                                                        }}
+                                                        styles={{
+                                                            control: (provided) => ({
+                                                                ...provided,
+                                                                minHeight: '30px',
+                                                                border: '0px',
+                                                            }),
+                                                        }}
+                                                    />
+                                                )}
                                             />
+                                            {errors.relationship && (
+                                                <div className="text-danger small">{errors.relationship.message}</div>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group controlId="name">
-                                            <Form.Label className="fw-medium mb-1">Name</Form.Label>
+                                            <Form.Label className="fw-medium mb-1">Name <span className ='text-danger'>*</span></Form.Label>
                                             <Form.Control
                                                 {...register('name', { required: 'Name is required' })}
                                                 placeholder="Enter Name"
                                                 className="form-control-sm"
                                             />
                                         </Form.Group>
+                                        {errors.name && <span className="text-danger">{errors.name.message}</span>}
                                     </Col>
 
                                     <Col md={6}>
                                         <Form.Group controlId="dob">
-                                            <Form.Label className="fw-medium mb-1">Date of Birth</Form.Label>
+                                            <Form.Label className="fw-medium mb-1">Date of Birth <span className='text-danger'>*</span></Form.Label>
                                             <Form.Control
                                                 type="date"
                                                 {...register('dob', { required: 'Date of birth is required' })}
@@ -289,10 +304,11 @@ const FamilyHistory = () => {
                                                 max={new Date().toISOString().slice(0, 10)}
                                             />
                                         </Form.Group>
+                                        {errors.dob && <span className="text-danger">{errors.dob.message}</span>}
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group controlId="sex">
-                                            <Form.Label className="fw-medium mb-1">Sex</Form.Label>
+                                            <Form.Label className="fw-medium mb-1">Sex <span className='text-danger'>*</span></Form.Label>
                                             <Form.Select
                                                 {...register('sex', { required: 'Sex is required' })}
                                                 className="form-select-sm">
@@ -305,12 +321,13 @@ const FamilyHistory = () => {
                                                     </option>
                                                 ))}
                                             </Form.Select>
+                                            {errors.sex && <span className="text-danger">{errors.sex.message}</span>}
                                         </Form.Group>
                                     </Col>
 
                                     <Col md={6}>
                                         <Form.Group controlId="problem">
-                                            <Form.Label className="fw-medium mb-1">Condition</Form.Label>
+                                            <Form.Label className="fw-medium mb-1">Condition <span className='text-danger'>*</span></Form.Label>
                                             <Controller
                                                 name="problem"
                                                 control={control}
@@ -339,6 +356,9 @@ const FamilyHistory = () => {
                                                     />
                                                 )}
                                             />
+                                            {errors.problem && (
+                                                <div className="text-danger small">{errors.problem.message}</div>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                     <Col md={6}>

@@ -29,7 +29,16 @@ const Tobacco = () => {
     const tobaccoHistory = store?.getTobaccooReducer?.data?.tobaccoHistory;
     const isLoading = store?.getTobaccooReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm();
+    const {
+        register,
+        handleSubmit,
+        reset,
+        getValues,
+        formState: { errors },
+        control,
+        setValue,
+        watch,
+    } = useForm();
     const [toEdit, setToEdit] = useState(null);
     const [toDelete, setToDelete] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
@@ -91,7 +100,7 @@ const Tobacco = () => {
         ];
         data.clinicId = loggedInUser?._id;
         if (toEdit) {
-            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }))
+            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }));
         } else {
             dispatch(createTobaccooAction({ key: encryptMessage(data) }));
         }
@@ -138,8 +147,14 @@ const Tobacco = () => {
                             <Row className="">
                                 <Col md={6}>
                                     <Form.Group controlId="tobaccoUser">
-                                        <Form.Label className="fw-medium mb-1">Current Tobacco Use</Form.Label>
-                                        <Form.Select {...register('tobaccoUse')} required className="form-select-sm">
+                                        <Form.Label className="fw-medium mb-1">
+                                            Current Tobacco Use <span className="text-danger">*</span>
+                                        </Form.Label>
+                                        <Form.Select
+                                            {...register('tobaccoUse', {
+                                                required: 'Tobacco use is required',
+                                            })}
+                                            className="form-select-sm">
                                             <option value="">Select an option</option>
                                             <option value="Very heavy cigarette smoker (40+ cigs/day)">
                                                 Very heavy cigarette smoker (40+ cigs/day)
@@ -176,18 +191,25 @@ const Tobacco = () => {
                                                 Heavy cigarette smoker (20-39 cigs/day)
                                             </option>
                                         </Form.Select>
+                                        {errors.tobaccoUse && (
+                                            <div className="text-danger small">{errors.tobaccoUse.message}</div>
+                                        )}
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="effectiveDateTime">
-                                        <Form.Label className="fw-medium mb-1">Effective Date</Form.Label>
+                                        <Form.Label className="fw-medium mb-1">Effective Date <span className='text-danger'>*</span></Form.Label>
                                         <Form.Control
                                             type="date"
-                                            {...register('effectiveDateTime')}
-                                            required
+                                            {...register('effectiveDateTime', {
+                                                required: 'Effective date is required',
+                                            })}
                                             className="form-control-sm"
                                             max={new Date().toISOString().slice(0, 10)}
                                         />
+                                        {errors.effectiveDateTime && (
+                                            <div className="text-danger small">{errors.effectiveDateTime.message}</div>
+                                        )}
                                     </Form.Group>
                                 </Col>
                                 <Col xs={12} className="flex-grow-1 d-flex flex-column">
@@ -300,10 +322,10 @@ const Tobacco = () => {
                                                         (
                                                         {item?.note?.[0]?.time
                                                             ? new Date(item.note[0].time).toLocaleDateString('en-US', {
-                                                                month: 'short',
-                                                                day: 'numeric',
-                                                                year: 'numeric',
-                                                            })
+                                                                  month: 'short',
+                                                                  day: 'numeric',
+                                                                  year: 'numeric',
+                                                              })
                                                             : 'No date'}
                                                         -
                                                         {item?.note?.[0]?.time
@@ -355,7 +377,11 @@ const Tobacco = () => {
                                                 <div
                                                     className="ql-editor p-1 rounded"
                                                     dangerouslySetInnerHTML={{ __html: item.note[0].text }}
-                                                    style={{ fontSize: '0.875rem', maxHeight: '150px', overflowY: 'auto' }}
+                                                    style={{
+                                                        fontSize: '0.875rem',
+                                                        maxHeight: '150px',
+                                                        overflowY: 'auto',
+                                                    }}
                                                 />
                                             ) : (
                                                 <div className="text-muted fst-italic p-2">No notes available</div>

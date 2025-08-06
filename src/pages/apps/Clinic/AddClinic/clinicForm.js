@@ -266,8 +266,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             orgType: data?.clinicType,
             // orgSpecialty: [],
             orgLogo: {
-                url: logo?.url ? logo?.url?.split('?')[0] : '', // Check if url exists first
-                fileName: logoName || '',
+                url: logo?.url ? logo?.url?.split('?')[0] : (clinicsDataGet?.logo?.url || ''),
+                fileName: logoName || (clinicsDataGet?.logo?.fileName || ''),
             },
             identifier: constantIdentifiers.map((item) => ({
                 identifierType: item.type,
@@ -311,7 +311,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [clinicsDataGet, setValue]);
 
     const getTableData = store.getSubClinicsReducer?.data?.clinics;
-    console.log('getTableData', getTableData);
     const [statesMenu, setStatesMenu] = useState(false);
     const menuRef = useRef(null); // Reference for the menu
     const containerRef = useRef(null); // Reference for the container

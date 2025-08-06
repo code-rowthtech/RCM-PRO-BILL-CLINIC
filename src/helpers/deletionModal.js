@@ -14,7 +14,7 @@ const DeletionModal = ({ show, onHide, onConfirm, item = 'item', isLoading = fal
                 <Button disabled={isLoading} className='cancel-button' onClick={onHide}>
                     Cancel
                 </Button>
-                <Button disabled={isLoading} className='custom-buttons' onClick={onConfirm}>
+                <Button disabled={isLoading} className='custom-buttons' style={{width:"60px"}} onClick={onConfirm}>
                     {isLoading ?
                         <Spinner className='spinner-border-sm' color='white' />
                         :

@@ -44,7 +44,7 @@ const MedicalHistory = () => {
     const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
     const quillRef = useRef(null);
 
-    const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm();
+    const { register, handleSubmit, reset, formState: {errors} , getValues, control, setValue, watch } = useForm();
 
     useEffect(() => {
         dispatch(getMedicalHistoryAction({ patientId: patientId }));
@@ -190,7 +190,7 @@ const MedicalHistory = () => {
                             <Row className="">
                                 <Col xs={12}>
                                     <Form.Group controlId="problem">
-                                        <Form.Label className="fw-medium mb-1">Medical Problem</Form.Label>
+                                        <Form.Label className="fw-medium mb-1">Medical Problem <span className='text-danger'>*</span></Form.Label>
                                         <Controller
                                             name="problem"
                                             control={control}
@@ -224,29 +224,40 @@ const MedicalHistory = () => {
                                             )}
                                         />
                                     </Form.Group>
+                                     {errors.problem && (
+                                            <div className="text-danger small">{errors.problem.message}</div>
+                                        )}
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="startDate">
-                                        <Form.Label className="fw-medium mb-1">Start Date</Form.Label>
+                                        <Form.Label className="fw-medium mb-1">Start Date <span className='text-danger'>*</span></Form.Label>
                                         <Form.Control
                                             type="date"
-                                            {...register('startDate')}
-                                            required
+                                            {...register('startDate', {
+                                                required: 'Start date is required',
+                                            })}
                                             max={new Date().toISOString().slice(0, 10)}
                                             className="form-control-sm"
                                         />
+                                        {errors.startDate && (
+                                            <div className="text-danger small">{errors.startDate.message}</div>
+                                        )}
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="endDate">
-                                        <Form.Label className="fw-medium mb-1">End Date</Form.Label>
+                                        <Form.Label className="fw-medium mb-1">End Date <span className='text-danger'>*</span></Form.Label>
                                         <Form.Control
                                             type="date"
-                                            {...register('endDate')}
-                                            required
+                                            {...register('endDate', {
+                                                required: 'End date is required',
+                                            })}
                                             className="form-control-sm"
                                             min={startDate || undefined}
                                         />
+                                        {errors.endDate && (
+                                            <div className="text-danger small">{errors.endDate.message}</div>
+                                        )}
                                     </Form.Group>
                                 </Col>
                                 <Col xs={12} className="flex-grow-1 d-flex flex-column">

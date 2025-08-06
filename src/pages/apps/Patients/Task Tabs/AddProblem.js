@@ -198,7 +198,7 @@ const AddProblem = ({ onCancel }) => {
             <Row>
                 <Col sm={6}>
                     <Form.Group className="mb-1">
-                        <Form.Label className="mb-0">Problem</Form.Label>
+                        <Form.Label className="mb-0">Problem <span className='text-danger'>*</span></Form.Label>
                         <Controller
                             name="problem"
                             control={control}
@@ -254,7 +254,7 @@ const AddProblem = ({ onCancel }) => {
                 <Col sm={6}>
                     <Form.Group className="mb-1">
                         <Form.Label htmlFor="status" className="mb-0">
-                            Status
+                            Status <span className='text-danger'>*</span>
                         </Form.Label>
                         <Form.Select
                             {...register('status', { required: 'Clinical Status is required' })}
