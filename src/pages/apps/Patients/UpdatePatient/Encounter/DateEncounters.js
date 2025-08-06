@@ -1,86 +1,169 @@
+// ============================================================================
+// IMPORTS
+// ============================================================================
+
+// React and Hooks
 import React, { useCallback, useEffect, useRef, useState, createRef } from 'react';
+
+// UI Components
 import { Col, Button, Row, Form } from 'react-bootstrap';
-import EncounterSummary from './EncounterSummary';
-import { useSelector } from 'react-redux';
 import Select from 'react-select';
-import { useDispatch } from 'react-redux';
-import { createEncounterAction, getDoctorsAction, getEncounterAction, getEncounterByIdAction, getEncounterNotesFieldsAction, updateEncounterAction } from '../../../../../redux/actions';
-import EncounterTemplates from './EncounterTemplates';
-import { useForm } from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { encounterClassCodes, encounterTypes } from '../../../../../utils/DataSets/commonData';
+
+// Redux
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    createEncounterAction,
+    getDoctorsAction,
+    getEncounterAction,
+    getEncounterByIdAction,
+    getEncounterNotesFieldsAction,
+    updateEncounterAction
+} from '../../../../../redux/actions';
+
+// Form Handling
+import { useForm, Controller } from 'react-hook-form';
+
+// Router
 import { useSearchParams } from 'react-router-dom';
+
+// Utils and Constants
+import { encounterClassCodes, encounterTypes } from '../../../../../utils/DataSets/commonData';
 import { encryptMessage } from '../../../../../cryptoUtils';
-import Spinner from '../../../../../constants/Spinner';
-import PastEncounters from './PastEncounters';
-import { string } from 'prop-types';
-import { Controller } from 'react-hook-form';
 import ToastHandle from '../../../../../helpers/ToastMessage';
+import Spinner from '../../../../../constants/Spinner';
+
+// Local Components
+import EncounterSummary from './EncounterSummary';
+import EncounterTemplates from './EncounterTemplates';
+import PastEncounters from './PastEncounters';
 import ChangeNoteTypeModal from './ChangeNoteTypeModal';
 
-const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType,
-    isAccordionOpen, encounterAction, encounterId,
-    encounterTabs, setEncounterTabs, setActiveTab, setExpanded }) => {
+// ============================================================================
+// CONSTANTS
+// ============================================================================
 
-    const [leftTab, setLeftTab] = useState('Summary');
-    const [selectedFromList, setSelectedFromList] = useState({})
+const MAX_WORDS = 700;
+const MAX_WORD_LENGTH = 45;
+const SOAP_SECTIONS = ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'];
+const PATIENT_INFO_FIELDS = ['Address', 'Age', 'Date of Birth', 'Email', 'Patient Name', 'Phone'];
+const ENCOUNTER_STATUSES = ['planned', 'arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'cancelled'];
+const DEFAULT_TABS = ['Summary', 'Templates', 'Past Encounters'];
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+const DateEncounters = ({
+    isCollapsed,
+    searchNoteType,
+    expanded,
+    setSearchNoteType,
+    isAccordionOpen,
+    encounterAction,
+    encounterId,
+    encounterTabs,
+    setEncounterTabs,
+    setActiveTab,
+    setExpanded
+}) => {
+    // ========================================================================
+    // HOOKS AND STATE
+    // ========================================================================
+    
+    // Redux hooks
     const store = useSelector((state) => state);
-    const { handleSubmit, register, setValue, formState: { errors }, getValues, reset, control } = useForm();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
+    
+    // Router hooks
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
+    
+    // Form hooks
+    const { handleSubmit, register, setValue, formState: { errors }, getValues, reset, control } = useForm();
+    
+    // Component state
+    const [leftTab, setLeftTab] = useState('Summary');
+    const [selectedFromList, setSelectedFromList] = useState({});
     const [initialLoading, setInitialLoading] = useState(true);
-
-    // Get data from store
-    const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log(doctorDetails, 'doctorDetails in DateEncounters');
-    const providerOptions = doctorDetails?.map((data) => ({
-        label:`${data?.name?.[0]?.text + ' ' +data?.userId?.email}` , value: data?._id
-    }))
-    const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
-    const createEncounterData = store?.createEncounterReducer;
-    // const encounterData=
-    const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
-    const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
-        label: data?.title, value: data?._id, isDefault: data?.default
-    }));
-    const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
     const [noteType, setNoteType] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
-    const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
-    // Get update encounter data from store
-    const updateEncounterData = store?.updateEncounterReducer;
-
     const [updateClicked, setUpdateClicked] = useState(false);
+    const [providerError, setProviderError] = useState(false);
+    
+    // Modal state
+    const [notesTypeModal, setNotesTypeModal] = useState(false);
+    const [selectedNoteType, setSelectedNoteType] = useState(null);
+    
+    // Stopwatch state
+    const [isSessionRunning, setIsSessionRunning] = useState(false);
+    const [stopwatchTime, setStopwatchTime] = useState(0);
+    const intervalRef = useRef(null);
+
+    // ========================================================================
+    // DERIVED STATE FROM STORE
+    // ========================================================================
+    
+    // Patient data
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
+    
+    // Doctor/Provider data
+    const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    const providerOptions = doctorDetails?.map((data) => ({
+        label: `${data?.name?.[0]?.text + ' ' + data?.userId?.email}`,
+        value: data?._id
+    }));
+    
+    // Encounter data
+    const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
+    const createEncounterData = store?.createEncounterReducer;
+    const updateEncounterData = store?.updateEncounterReducer;
+    
+    // Notes and settings data
+    const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
+    const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
+        label: data?.title,
+        value: data?._id,
+        isDefault: data?.default
+    }));
+    const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
+    const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
+    // ========================================================================
+    // EFFECTS
+    // ========================================================================
+    
     // Handle successful encounter creation or update
     useEffect(() => {
         if (createEncounterData?.data?.status === 201) {
             dispatch(getEncounterAction({ patientId: id, status: '' }));
-            // reset();
         }
         else if (updateEncounterData?.data?.status === 200 && updateClicked) {
             setUpdateClicked(false);
             setInitialLoading(false);
-            dispatch(getEncounterByIdAction({ encounterId: encounterId }))
+            dispatch(getEncounterByIdAction({ encounterId: encounterId }));
             dispatch(getEncounterAction({ patientId: id, status: '' }));
-            // removeEncounterTab(encounterId)
             reset();
         }
     }, [
         createEncounterData?.data?.status,
         updateEncounterData?.data?.status,
-        updateClicked
+        updateClicked,
+        dispatch,
+        id,
+        encounterId,
+        reset
     ]);
 
+    // Load encounter data for update
     useEffect(() => {
         if (encounterAction === 'updateEncounter') {
-            dispatch(getEncounterByIdAction({ encounterId: encounterId }))
+            dispatch(getEncounterByIdAction({ encounterId: encounterId }));
         }
-    }, [encounterAction])
+    }, [encounterAction, dispatch, encounterId]);
     // Set default note type and populate form for update
     useEffect(() => {
+        // Set default note type
         if (!noteType && defaultNoteTypeOption) {
             setNoteType(defaultNoteTypeOption.value);
             dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption.value }));
@@ -88,7 +171,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
         // Populate form for update operation
         if (encounterAction === 'updateEncounter' && encounterData && notesFields) {
-            // Set provider
+            // Set provider and note type
             if (encounterData?.providerId) {
                 setSelectedProvider(encounterData?.providerId?._id);
             }
@@ -96,19 +179,16 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 setNoteType(encounterData?.noteType);
             }
 
-            // Set form values
+            // Set basic form values
             if (encounterData?.type?.[0]?.coding?.[0]) {
                 setValue('type', encounterData?.type?.[0]?.coding?.[0]?.code);
             }
-
             if (encounterData?.class?.coding?.[0]) {
                 setValue('class', encounterData?.class?.coding?.[0]?.code);
             }
-
             if (encounterData?.status) {
                 setValue('status', encounterData?.status);
             }
-
             if (encounterData?.period?.start) {
                 setValue('startDate', encounterData?.period?.start?.split('T')[0]);
             }
@@ -122,44 +202,56 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 });
             }
         }
-    }, [encounterAction, encounterData, setValue, notesFields]);
+    }, [encounterAction, encounterData, setValue, notesFields, noteType, defaultNoteTypeOption, dispatch]);
 
 
-    const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
-    const visibleTabs =
-        settingsDataMainItems?.length > 0
-            ? settingsDataMainItems?.filter((item) => item?.show === true)
-            : defaultTabs.map((name, index) => ({
-                _id: index.toString(),
-                name,
-            }));
+    // Visible tabs configuration
+    const visibleTabs = settingsDataMainItems?.length > 0
+        ? settingsDataMainItems?.filter((item) => item?.show === true)
+        : DEFAULT_TABS.map((name, index) => ({
+            _id: index.toString(),
+            name,
+        }));
 
+    // ========================================================================
+    // UTILITY FUNCTIONS
+    // ========================================================================
+    
     const handleNotesTypeChange = (selectedOption) => {
-        dispatch(getEncounterNotesFieldsAction({ noteId: selectedOption?.value }))
+        dispatch(getEncounterNotesFieldsAction({ noteId: selectedOption?.value }));
         setNoteType(selectedOption ? selectedOption.value : '');
     };
+    
+    const closeNoteTypeModal = () => {
+        setNotesTypeModal(false);
+    };
+    
+    const confirmSelection = () => {
+        setNoteType(selectedNoteType?.value);
+        handleNotesTypeChange?.(selectedNoteType);
+    };
+    
+    const toggleSession = useCallback(() => {
+        if (isSessionRunning) {
+            clearInterval(intervalRef.current);
+        } else {
+            const startTime = Date.now() - stopwatchTime * 1000;
+            intervalRef.current = setInterval(() => {
+                setStopwatchTime(Math.floor((Date.now() - startTime) / 1000));
+            }, 1000);
+        }
+        setIsSessionRunning(!isSessionRunning);
+    }, [isSessionRunning, stopwatchTime]);
 
     // Apply template values to form
-    // useEffect(() => {
-    //     if (!selectedFromList) return;
-    //     console.log(selectedFromList, 'selectedFromList')
-    //     setTimeout(() => {
-    //         ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach((section) => {
-    //             if (selectedFromList?.[section]) {
-    //                 setValue(section, selectedFromList[section]);
-    //             }
-    //         });
-    //     }, 0);
-    // }, [selectedFromList, setValue]);
     useEffect(() => {
         if (!selectedFromList) return;
 
         setTimeout(() => {
             ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach((section) => {
-
                 const fieldName = section === 'Care Plan' ? 'CarePlan' : section;
                 if (selectedFromList?.[section]) {
-                    document.getElementById(section === 'Care Plan' ? 'CarePlan' : section)?.scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById(fieldName)?.scrollIntoView({ behavior: 'smooth' });
                     setValue(fieldName, selectedFromList[section]);
                 }
             });
@@ -168,8 +260,13 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
 
 
+    // ========================================================================
+    // COMPONENTS
+    // ========================================================================
+    
+    // Note Form Fields Component
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
-        // For SOAP sections, keep refs for each ReactQuill
+        // Refs for ReactQuill editors
         const quillRefs = useRef({
             Subjective: createRef(),
             Objective: createRef(),
@@ -178,16 +275,11 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             CarePlan: createRef(),
             Notes: createRef(),
         });
-        const MAX_LENGTH = 700;
-
-        const MAX_WORDS = 700;
-        const MAX_WORD_LENGTH = 45;
 
 
+        // Word limit validation for ReactQuill editors
         useEffect(() => {
-            const sections = ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'];
-
-            sections.forEach(section => {
+            SOAP_SECTIONS.forEach(section => {
                 const editor = quillRefs.current[section]?.current?.getEditor?.();
                 if (!editor) return;
 
@@ -200,11 +292,10 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                         const contents = editor.getContents();
                         const text = editor.getText().trim();
                         const words = text.split(/\s+/).filter(Boolean);
-
                         const longWord = words.find(word => word.length > MAX_WORD_LENGTH);
 
                         if (longWord || words.length > MAX_WORDS) {
-                            editor.setContents(lastValidDelta); // Restore last valid state
+                            editor.setContents(lastValidDelta);
                             ToastHandle(
                                 longWord
                                     ? `Word "${longWord}" exceeds max ${MAX_WORD_LENGTH} characters`
@@ -212,7 +303,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                 'danger'
                             );
                         } else {
-                            lastValidDelta = contents; // Update last valid state
+                            lastValidDelta = contents;
                         }
                     }, 0);
                 });
@@ -222,37 +313,41 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
 
 
+        // Get fields to render based on visibility and exclusions
         const getFieldsToRender = () => {
             return (data || [])
                 .filter(field => field.isShown && !excludedFields.includes(field.name))
                 .sort((a, b) => a.order - b.order);
         };
 
+        // Render individual field based on type
         const renderField = (field) => {
             const { name, inputType = 'textarea' } = field;
+            
+            // Utility functions
             const countWords = (text) => {
                 return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
             };
 
-            // Handler for text change with word limit
             const handleTextChange = (onChange, value, maxWords) => (content) => {
-                const wordCount = countWords(content.replace(/<[^>]*>/g, ' ')); // Strip HTML tags for counting
+                const wordCount = countWords(content.replace(/<[^>]*>/g, ' '));
                 if (wordCount <= maxWords) {
                     onChange(content);
                 }
             };
 
+            // Render SOAP Notes section
             if (name === 'Notes (SOAP)') {
                 return (
                     <div className="" key={name}>
-
                         <h5>{name}</h5>
-                        {['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].map(section => (
+                        {SOAP_SECTIONS.map(section => (
                             <Form.Group className="mb-2" key={section} id={section}>
                                 <Form.Label className="mb-1 d-flex justify-content-between align-items-center gap-2">
                                     <div className='col-10 d-flex align-items-center gap-1'>
                                         <span>{section === 'CarePlan' ? 'Care Plan' : section}</span>
-                                        <Form.Select className="w-25 text-black"
+                                        <Form.Select 
+                                            className="w-25 text-black"
                                             onChange={e => {
                                                 const value = e.target.value;
                                                 if (value && quillRefs.current[section]?.current) {
@@ -264,7 +359,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                             }}
                                         >
                                             <option value="">Add Patient Info</option>
-                                            {['Address', 'Age', 'Date of Birth', 'Email', 'Patient Name', 'Phone'].map((label, index) => {
+                                            {PATIENT_INFO_FIELDS.map((label, index) => {
                                                 const getValue = () => {
                                                     switch (label) {
                                                         case 'Address':
@@ -302,7 +397,8 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                     name={section}
                                     control={control}
                                     render={({ field: { onChange, value } }) => (
-                                        <ReactQuill ref={quillRefs.current[section]}
+                                        <ReactQuill 
+                                            ref={quillRefs.current[section]}
                                             theme="snow"
                                             value={value || '<p><br></p>'}
                                             onChange={handleTextChange(onChange, value, MAX_WORDS)}
@@ -323,16 +419,12 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 );
             }
 
-            // Handle regular fields
+            // Render regular fields
             return (
                 <Form.Group key={name}>
                     <Form.Label className="mb-0 d-flex align-items-center justify-content-between">
-                        <p className='mb-0'>
-                            {name}
-                        </p>
-                        <p className='mb-0'>
-                            {MAX_WORDS + ' words'}
-                        </p>
+                        <p className='mb-0'>{name}</p>
+                        <p className='mb-0'>{MAX_WORDS + ' words'}</p>
                     </Form.Label>
                     {inputType === 'text-editor' ? (
                         <Controller
@@ -341,8 +433,8 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                             render={({ field: { onChange, value } }) => (
                                 <ReactQuill
                                     theme="snow"
-                                    value={value || ''} // Use form state value
-                                    onChange={onChange} // Update form state on change
+                                    value={value || ''}
+                                    onChange={onChange}
                                     modules={{
                                         toolbar: [
                                             ['bold', 'italic', 'underline'],
@@ -366,31 +458,25 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                     value={value}
                                     onChange={(e) => {
                                         const input = e.target.value;
-
-                                        const words = input.match(/\S+/g) || []; // words are non-space sequences
+                                        const words = input.match(/\S+/g) || [];
                                         const wordCount = words.length;
-
-                                        const lastWordMatch = input.match(/(\S+)$/); // match last word
+                                        const lastWordMatch = input.match(/(\S+)$/);
                                         const lastWord = lastWordMatch ? lastWordMatch[0] : '';
 
-                                        if (wordCount < MAX_LENGTH) {
+                                        if (wordCount < MAX_WORDS) {
                                             onChange(input);
                                             return;
                                         }
 
-                                        // Word count == MAX_LENGTH
-                                        if (wordCount === MAX_LENGTH) {
-                                            // Allow updating only if user is typing inside the last word and it's <= 45 characters
-                                            if (lastWord.length <= 45 && /\S$/.test(input)) {
+                                        if (wordCount === MAX_WORDS) {
+                                            if (lastWord.length <= MAX_WORD_LENGTH && /\S$/.test(input)) {
                                                 onChange(input);
                                             }
-                                            // Else block (including if trying to type space after last word)
                                         }
                                     }}
                                 />
                             )}
                         />
-
                     )}
                 </Form.Group>
             );
@@ -408,107 +494,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             </Row>
         );
     };
-    const [providerError, setProviderError] = useState(false);
-    const onSubmit = (data) => {
-        const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type)
-        const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class)
-        const type = {
-            coding: [{
-                system: encounterTypeSelected.system,
-                code: encounterTypeSelected.code,
-                display: encounterTypeSelected.display,
-            }],
-            text: encounterTypeSelected.display,
-        };
-
-        const encounterClass = {
-            coding: [{
-                system: '',
-                code: encounterClassSelected.code,
-                display: encounterClassSelected.display,
-            }],
-            text: encounterClassSelected.display,
-        };
-
-        const fieldsData = [];
-
-        // Process regular fields and SOAP notes
-        const fieldsToRender = (notesFields || [])
-            .filter(field => field.isShown)
-            .sort((a, b) => a.order - b.order);
-
-        fieldsToRender.forEach(field => {
-            const { name, inputType = 'textarea' } = field;
-
-            // Handle SOAP notes specially
-            if (name === 'Notes (SOAP)') {
-                ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach(section => {
-                    const value = getValues(section) || '';
-                    fieldsData.push({
-                        type: section,
-                        content: {
-                            type: inputType === 'text-editor' ? 'html' : 'text',
-                            value: value
-                        }
-                    });
-                });
-            } else {
-                // Handle regular fields
-                const value = getValues(name) || '';
-                fieldsData.push({
-                    type: name,
-                    content: {
-                        type: inputType === 'text-editor' ? 'html' : 'text',
-                        value: value
-                    }
-                });
-            }
-        });
-        if (!selectedProvider) {
-            setProviderError(true)
-            return;
-        } else {
-            const payload = {
-                type,
-                class: encounterClass,
-                subject: id,
-                status: data?.status,
-                providerId: selectedProvider,
-                noteType,
-                data: fieldsData,
-                period: {
-                    start: data?.startDate,
-                }
-            }
-            if (encounterAction === 'updateEncounter') {
-                const updateData = {
-                    id: encounterId,
-                    data: fieldsData
-                }
-                setUpdateClicked(true);
-                dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
-            } else {
-                dispatch(createEncounterAction({ key: encryptMessage(payload) }));
-                // dispatch(createEncounterAction(payload));
-            }
-        }
-
-    }
-
-    const [isSessionRunning, setIsSessionRunning] = useState(false);
-    const [stopwatchTime, setStopwatchTime] = useState(0);
-    const [notesTypeModal, setNotesTypeModal] = useState(false);
-    const [selectedNoteType, setSelectedNoteType] = useState(null);
-
-    const closeNoteTypeModal = () => {
-        setNotesTypeModal(false);
-    }
-    const confirmSelection = () => {
-        setNoteType(selectedNoteType?.value);
-        handleNotesTypeChange?.(selectedNoteType);
-    }
-    const intervalRef = useRef(null);
-
+    // Stopwatch Component
     const Stopwatch = React.memo(({ isRunning, time, onToggle }) => {
         const formatTime = (timeInSeconds) => {
             const hours = Math.floor(timeInSeconds / 3600);
@@ -538,22 +524,106 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 >
                     {isRunning ? "Stop Session" : "Start Session"}
                 </Button>
-            </div >
+            </div>
         );
     });
-
-
-    const toggleSession = useCallback(() => {
-        if (isSessionRunning) {
-            clearInterval(intervalRef.current);
-        } else {
-            const startTime = Date.now() - stopwatchTime * 1000;
-            intervalRef.current = setInterval(() => {
-                setStopwatchTime(Math.floor((Date.now() - startTime) / 1000));
-            }, 1000);
+    
+    // ========================================================================
+    // FORM SUBMISSION
+    // ========================================================================
+    
+    const onSubmit = (data) => {
+        // Validate provider selection
+        if (!selectedProvider) {
+            setProviderError(true);
+            return;
         }
-        setIsSessionRunning(!isSessionRunning);
-    }, [isSessionRunning, stopwatchTime]);
+        
+        // Build encounter type and class objects
+        const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type);
+        const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class);
+        
+        const type = {
+            coding: [{
+                system: encounterTypeSelected.system,
+                code: encounterTypeSelected.code,
+                display: encounterTypeSelected.display,
+            }],
+            text: encounterTypeSelected.display,
+        };
+
+        const encounterClass = {
+            coding: [{
+                system: '',
+                code: encounterClassSelected.code,
+                display: encounterClassSelected.display,
+            }],
+            text: encounterClassSelected.display,
+        };
+
+        // Process form fields data
+        const fieldsData = [];
+        const fieldsToRender = (notesFields || [])
+            .filter(field => field.isShown)
+            .sort((a, b) => a.order - b.order);
+
+        fieldsToRender.forEach(field => {
+            const { name, inputType = 'textarea' } = field;
+
+            if (name === 'Notes (SOAP)') {
+                // Handle SOAP notes specially
+                ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach(section => {
+                    const value = getValues(section) || '';
+                    fieldsData.push({
+                        type: section,
+                        content: {
+                            type: inputType === 'text-editor' ? 'html' : 'text',
+                            value: value
+                        }
+                    });
+                });
+            } else {
+                // Handle regular fields
+                const value = getValues(name) || '';
+                fieldsData.push({
+                    type: name,
+                    content: {
+                        type: inputType === 'text-editor' ? 'html' : 'text',
+                        value: value
+                    }
+                });
+            }
+        });
+        // Create or update encounter
+        const payload = {
+            type,
+            class: encounterClass,
+            subject: id,
+            status: data?.status,
+            providerId: selectedProvider,
+            noteType,
+            data: fieldsData,
+            period: {
+                start: data?.startDate,
+            }
+        };
+        
+        if (encounterAction === 'updateEncounter') {
+            const updateData = {
+                id: encounterId,
+                data: fieldsData
+            };
+            setUpdateClicked(true);
+            dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
+        } else {
+            dispatch(createEncounterAction({ key: encryptMessage(payload) }));
+        }
+
+    };
+    
+    // ========================================================================
+    // RENDER
+    // ========================================================================
     return (
         <div className='px-0 mt-1  row border h-100  mx-1'>
             <Col className={` px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
@@ -622,7 +692,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                 className='border-primary'>
                                                 <option key='' value='' hidden>Select...</option>
                                                 {encounterTypes?.map((data, index) => (
-                                                    <option key={index} value={data?.code}>{data?.code + '-' + data?.display}</option>
+                                                    <option key={index} value={data?.code}>
+                                                        {data?.code + '-' + data?.display}
+                                                    </option>
                                                 ))}
                                             </Form.Select>
                                         </div>
@@ -640,7 +712,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                 className='border-primary'
                                                 onChange={(e) => {
                                                     if (encounterAction === 'updateEncounter') {
-                                                        const encounterClassSelected = encounterClassCodes?.find((data) => data?.code === e.target.value)
+                                                        const encounterClassSelected = encounterClassCodes?.find((data) => data?.code === e.target.value);
                                                         const encounterClass = {
                                                             coding: [{
                                                                 system: '',
@@ -652,13 +724,15 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                         const payload = {
                                                             id: encounterId,
                                                             class: encounterClass,
-                                                        }
+                                                        };
                                                         dispatch(updateEncounterAction({ key: encryptMessage(payload), fieldUpdating: 'class' }));
                                                     }
                                                 }}>
                                                 <option key='' value='' hidden>Select...</option>
                                                 {encounterClassCodes?.map((data, index) => (
-                                                    <option key={index} value={data?.code}>{data?.code + ' (' + data?.display + ')'}</option>
+                                                    <option key={index} value={data?.code}>
+                                                        {data?.code + ' (' + data?.display + ')'}
+                                                    </option>
                                                 ))}
                                             </Form.Select>
                                         </div>
@@ -759,8 +833,10 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                 }}
                                                 className='text-capitalize'>
                                                 <option key='' value=''>Select Status</option>
-                                                {['planned', 'arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'cancelled']?.map((data, index) => (
-                                                    <option value={data} className='text-capitalize' key={index}>{data}</option>
+                                                {ENCOUNTER_STATUSES?.map((data, index) => (
+                                                    <option value={data} className='text-capitalize' key={index}>
+                                                        {data}
+                                                    </option>
                                                 ))}
                                             </Form.Select>
                                         </div>
@@ -783,12 +859,12 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                             value={providerOptions?.find(option => option?.value === selectedProvider) || null}
                                             onChange={(selectedValue) => {
                                                 setSelectedProvider(selectedValue?.value);
-                                                setProviderError(false)
+                                                setProviderError(false);
                                                 if (encounterAction === 'updateEncounter') {
                                                     const payload = {
                                                         id: encounterId,
                                                         providerId: selectedValue?.value
-                                                    }
+                                                    };
                                                     dispatch(updateEncounterAction({ key: encryptMessage(payload), fieldUpdating: 'provider' }));
                                                 }
                                             }}
@@ -834,13 +910,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                     control={control}
                                 />
                             }
+                            {/* Form Actions */}
                             <div className="row">
                                 <div className="col-12 d-flex justify-content-end gap-2 py-2">
-                                    {/* <Stopwatch
-                                        isRunning={isSessionRunning}
-                                        time={stopwatchTime}
-                                        onToggle={toggleSession}
-                                    /> */}
                                     <Button
                                         type='Submit'
                                         className='custom-buttons'

@@ -22,7 +22,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
 
     const sendUpdate = (id, note) => {
         const payload = {
-            clinicId: clinic_id,
+            clinicId: clinic_id || store?.Auth?.user?.clinicId,
             noteType: note.noteType,
             format: note.format,
             noteType: note.noteType,
