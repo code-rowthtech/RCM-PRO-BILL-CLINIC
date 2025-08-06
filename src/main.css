@@ -1286,6 +1286,9 @@ option {
 .text-danger {
     color: red !important;
 }
+.minusIcons{
+    color: red !important;
+}
 .paddingNone td,
 .paddingNone tr {
     padding-top: 0px !important;
