@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Form } from 'react-bootstrap';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { FiDownloadCloud } from 'react-icons/fi';
-import { CiCircleMinus } from 'react-icons/ci';
+import { FiMinusCircle } from "react-icons/fi";
 import { getCities2Action, getCities3Action, getCitiesAction, getStatesByCountryAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
@@ -97,16 +97,35 @@ const AddressForm = ({ addresses, setAddresses }) => {
             return; // Prevent selection
         }
 
-        // if(addresses?.some((address) => address?.use === field)) {}
         const updatedAddresses = [...addresses];
         if (field === 'line') {
-            // updatedAddresses[index].line[0] = value; // update street address
-            // Create a new array with the updated line
             const updatedLines = [...updatedAddresses[index].line];
             updatedLines[lineIndex] = value;
             updatedAddresses[index].line = updatedLines;
         } else {
             updatedAddresses[index][field] = value;
+            
+            // If type is changed and state is already selected, reload cities
+            if (field === 'type' && updatedAddresses[index].state) {
+                updatedAddresses[index].city = ''; // Clear city selection
+                const stateObj = statesData?.states?.find((s) => s.name === updatedAddresses[index].state);
+                if (stateObj) {
+                    const cityPayload = {
+                        state_code: stateObj.id,
+                        name: '',
+                        limit: 25,
+                        skip: '',
+                    };
+                    
+                    if (value === 'physical') {
+                        dispatch(getCitiesAction(cityPayload));
+                    } else if (value === 'postal') {
+                        dispatch(getCities2Action(cityPayload));
+                    } else {
+                        dispatch(getCities3Action(cityPayload));
+                    }
+                }
+            }
         }
         setAddresses(updatedAddresses);
     };
@@ -218,7 +237,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         <Form.Select
                             value={item.type}
                             className="text-capitalize"
-                            data-has-value={!!watch(`address[${index}].type`)}
                             {...register(`address[${index}].type`)}
                             onChange={(e) => handleAddressChange(index, 'type', e.target.value)}>
                             <option value="" hidden>
@@ -236,7 +254,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         <Form.Select
                             value={item.use}
                             className="text-capitalize"
-                            data-has-value={!!watch(`address[${index}].use`)}
                             {...register(`address[${index}].use`)}
                             onChange={(e) => handleAddressChange(index, 'use', e.target.value)}>
                             <option value="" hidden>
@@ -405,7 +422,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         <Form.Label className="mb-0">City</Form.Label>
                         <Form.Select
                             value={item?.city}
-                            data-has-value={!!getValues(`address[${index}].city`)}
                             {...register(`address[${index}].city`)}
                             // disabled={!selectedState || store?.getCitiesReducer?.loading}
                             onChange={(e) => {
@@ -490,7 +506,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                 onClick={() => removeAddress(index)}
                                 className="text-danger cursor-pointer fs-5 ms-2 mt-3"
                                 title="Remove Address">
-                                <CiCircleMinus />
+                                <FiMinusCircle  />
                             </span>
                     )}
                     </Col>

@@ -22,15 +22,15 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
 
     const sendUpdate = (id, note) => {
         const payload = {
-            clinicId: clinic_id,
+            clinicId: clinic_id || store?.Auth?.user?.clinicId,
             noteType: note.noteType,
             format: note.format,
             noteType: note.noteType,
-            title: note.title,
+            // title: note.title,
             customTitle: note.title === 'Other' ? note.customTitle : '',
             active: note.active,
             private: note.private,
-            default: note.isDefault,
+            default: note.isDefault || note.default,
         };
         dispatch(updateNoteCategoriesAction({ id, key: encryptMessage(payload) }));
     };
@@ -42,9 +42,12 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     };
 
     const handleDefaultChange = (id) => {
+        const currentNote = noteTypes.find((n) => n._id === id);
+        const isCurrentlyDefault = currentNote.default || currentNote.isDefault;
         const updated = noteTypes.map((note) => ({
             ...note,
-            isDefault: note._id === id,
+            default: note._id === id ? !isCurrentlyDefault : false,
+            isDefault: note._id === id ? !isCurrentlyDefault : false,
         }));
         setNoteTypes(updated);
         const note = updated.find((n) => n._id === id);
@@ -127,10 +130,9 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                             >
                                 <div className="d-flex align-items-center">
                                     <Form.Check
-                                        type="radio"
-                                        name="defaultNote"
+                                        type="checkbox"
                                         className="me-1"
-                                        checked={note?.default}
+                                        checked={note?.default || note?.isDefault}
                                         onChange={() => handleDefaultChange(note?._id)}
                                     />
                                     <strong>Set as default</strong>

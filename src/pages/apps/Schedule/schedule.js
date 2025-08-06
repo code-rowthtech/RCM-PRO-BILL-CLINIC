@@ -8,6 +8,7 @@ import ScheduleTab from './scheduleTab';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch } from 'react-icons/fi';
 import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
 import { getScheduleAction } from '../../../redux/schedule/action';
@@ -28,12 +29,13 @@ const Schedule = () => {
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    console.log('doctorDetails', doctorDetails);
     const scheduleResponse = store?.getScheduleReducer?.data?.holidays;
 
     const navigate = useNavigate('');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.name[0]?.text + ' ',
+        label: data?.name[0]?.text + ' ' + data?.userId?.email,
     }));
 
     useEffect(() => {
@@ -139,8 +141,8 @@ const Schedule = () => {
                                 <Col sm={8} xs={12} className="text-md-end ">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-between">
                                         {activeTab !== 'schedules' && (
-                                            <div className="d-flex align-items-center gap-md-2 gap-1 justify-content-start justify-content-md-end flex-wrap">
-                                                <div className="responnsible-party-select text-start">
+                                            <div className="d-flex align-items-center justify-content-start justify-content-md-end flex-wrap">
+                                                <div className="responnsible-party-select text-start me-2">
                                                     <Select
                                                         className="basic-single"
                                                         classNamePrefix="select"
@@ -185,6 +187,12 @@ const Schedule = () => {
                                                                 fontWeight: 600,
                                                                 color: '#0908084f',
                                                             }),
+                                                            option: (provided, state) => ({
+                                                                ...provided,
+                                                                // color: state.isSelected ? '#fff' : '#000',
+                                                                // backgroundColor: state.isSelected ? '#007bff' : '#fff',
+                                                                fontSize: '12px !important',
+                                                            })
                                                         }}
                                                     />
                                                 </div>
@@ -196,7 +204,7 @@ const Schedule = () => {
                                                     selectsRange
                                                     isClearable
                                                     placeholderText="Select a date range"
-                                                    className="date-picker-input  border-0"
+                                                    className="date-picker-input  border-0 me-2"
                                                 />
                                                 <Button
                                                     className="custom-buttons d-none d-md-block"

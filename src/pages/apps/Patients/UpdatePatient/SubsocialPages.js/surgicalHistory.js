@@ -211,29 +211,47 @@ const SurgicalHistory = () => {
                             <Row className="">
                                 <Col sm={12}>
                                     <Form.Group>
-                                        <Form.Label className="fw-medium mb-1">Diagnosis</Form.Label>
-                                        <Select
-                                            options={procedureOptions}
-                                            isSearchable
-                                            className="basic-single"
-                                            classNamePrefix="select"
-                                            placeholder="Select procedure"
-                                            value={selectedIcdProcedure || null}
-                                            onChange={handleIcdProcedure}
-                                            onInputChange={(value) => setSearch(value)}
-                                            styles={{
-                                                control: (provided) => ({
-                                                    ...provided,
-                                                    minHeight: '30px',
-                                                    border: '0px',
-                                                }),
-                                            }}
+                                        <Form.Label className="fw-medium mb-1">
+                                            Diagnosis <span className="text-danger">*</span>
+                                        </Form.Label>
+                                        <Controller
+                                            name="icdProcedure"
+                                            control={control}
+                                            rules={{ required: 'Diagnosis is required' }}
+                                            render={({ field }) => (
+                                                <Select
+                                                    {...field}
+                                                    options={procedureOptions}
+                                                    isSearchable
+                                                    className="basic-single"
+                                                    classNamePrefix="select"
+                                                    placeholder="Select procedure"
+                                                    value={selectedIcdProcedure || null}
+                                                    onChange={(selected) => {
+                                                        field.onChange(selected);
+                                                        handleIcdProcedure(selected);
+                                                    }}
+                                                    onInputChange={(value) => setSearch(value)}
+                                                    styles={{
+                                                        control: (provided) => ({
+                                                            ...provided,
+                                                            minHeight: '30px',
+                                                            border: '0px',
+                                                        }),
+                                                    }}
+                                                />
+                                            )}
                                         />
+                                        {errors.icdProcedure && (
+                                            <div className="text-danger small">{errors.icdProcedure.message}</div>
+                                        )}
                                     </Form.Group>
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="effectiveDateTime">
-                                        <Form.Label className="fw-medium mb-1">Date & Time</Form.Label>
+                                        <Form.Label className="fw-medium mb-1">
+                                            Date & Time <span className="text-danger">*</span>
+                                        </Form.Label>
                                         <Form.Control
                                             type="date"
                                             {...register('effectiveDateTime', { required: true })}
@@ -247,7 +265,9 @@ const SurgicalHistory = () => {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group>
-                                        <Form.Label className="fw-medium mb-1">Body Site</Form.Label>
+                                        <Form.Label className="fw-medium mb-1">
+                                            Body Site <span className="text-danger">*</span>
+                                        </Form.Label>
                                         <Form.Select
                                             {...register('bodySite', { required: true })}
                                             onChange={(e) => {

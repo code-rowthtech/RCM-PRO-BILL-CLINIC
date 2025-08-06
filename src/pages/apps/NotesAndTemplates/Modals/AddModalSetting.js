@@ -120,9 +120,9 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
 
     const onSubmit = (data) => {
         const payload = {
-            clinicId: clinic_id?.clinicId,
+            ...(selectedNote?.title !== data?.title && ({ title: data.title === 'Other' ? data.customTitle : data.title })),
+            clinicId: clinic_id?.clinicId || store?.Auth?.user?.clinicId,
             noteType: data.noteType,
-            title: data.title === 'Other' ? data.customTitle : data.title,
             active: 'true',
             format: data.format,
             private: data.private === 'true',
@@ -142,7 +142,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                     search: '',
                     skip: 1,
                     limit: 8,
-                    clinicId: clinic_id?.clinicId,
+                    clinicId: clinic_id?.clinicId || store?.Auth?.user?.clinicId,
                     active: true,
                     noteType: '',
                 })
@@ -171,7 +171,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                     <Row className="mb-1">
                         <Col md={6}>
                             <Form.Group className="mb-1">
-                                <Form.Label>Type</Form.Label>
+                                <Form.Label>Type <span className="text-danger">*</span></Form.Label>
                                 <Controller
                                     name="noteType"
                                     control={control}
@@ -208,7 +208,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                         {noteType && (
                             <Col md={6}>
                                 <Form.Group className="mb-1">
-                                    <Form.Label>Note Title</Form.Label>
+                                    <Form.Label>Note Title <span className="text-danger">*</span></Form.Label>
                                     <Controller
                                         name="title"
                                         control={control}
@@ -232,7 +232,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                         {showCustomTitle && (
                             <Col md={6}>
                                 <Form.Group className="mb-1">
-                                    <Form.Label>Custom Title</Form.Label>
+                                    <Form.Label>Custom Title <span className="text-danger">*</span></Form.Label>
                                     <Controller
                                         name="customTitle"
                                         control={control}
@@ -258,7 +258,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                         </Col> */}
                         <Col md={6}>
                             <Form.Group controlId="format">
-                                <Form.Label>Format</Form.Label>
+                                <Form.Label>Format <span className="text-danger">*</span></Form.Label>
                                 <Form.Select {...register('format', { required: 'Format is required' })}>
                                     <option value="SOAP">SOAP</option>
                                     <option value="Simple">Simple</option>
@@ -269,7 +269,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                         </Col>
                         <Col md={6}>
                             <Form.Group controlId="private">
-                                <Form.Label>Keep This Clinical Note Private?.</Form.Label>
+                                <Form.Label>Keep This Clinical Note Private? <span className="text-danger">*</span></Form.Label>
                                 <Form.Select {...register('private', { required: 'private is required' })}>
                                     <option value="false">False</option>
                                     <option value="true">True</option>

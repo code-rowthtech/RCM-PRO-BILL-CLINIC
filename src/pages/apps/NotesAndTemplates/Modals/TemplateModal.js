@@ -45,7 +45,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
 
     useEffect(() => {
         if (createResponse === true || updateResponse === true) {
-            dispatch(getTemplateAction({ search: '', page: 1, limit: 10, status: 'active' }))
+            dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
         }
     }, [createResponse, updateResponse])
 

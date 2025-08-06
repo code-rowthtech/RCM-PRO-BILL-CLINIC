@@ -231,7 +231,9 @@ select.form-control:not([size]):not([multiple]) {
     color: black !important;
 } */
 
-.custom-form-fields,.select__placeholder,.css-5pmyje-placeholder,
+.custom-form-fields,
+.select__placeholder,
+.css-5pmyje-placeholder,
 .form-control::placeholder {
     color: #0908084f !important;
     font-size: 12px;
@@ -1286,6 +1288,9 @@ option {
 .text-danger {
     color: red !important;
 }
+.minusIcons {
+    color: red !important;
+}
 .paddingNone td,
 .paddingNone tr {
     padding-top: 0px !important;
@@ -1306,7 +1311,7 @@ option {
 }
 .password-eye:before {
     font-feature-settings: normal;
-    content: "󰛐";
+    content: '󰛐';
     font-family: Material Design Icons;
     font-size: 16px;
     font-style: normal;
@@ -1314,5 +1319,18 @@ option {
     font-weight: 400;
     line-height: 1.2;
     vertical-align: middle;
+}
+
+.date-picker-input:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+.react-datepicker__close-icon::after {
+    position: absolute !important;
+    right: 17px !important;
+    top: 6px !important;
+    background-color: transparent !important;
+    color: #727cf5 !important;
+    font-size: 16px !important;
 }
 

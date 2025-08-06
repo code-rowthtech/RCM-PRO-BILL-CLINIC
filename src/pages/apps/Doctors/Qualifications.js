@@ -117,25 +117,30 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     useEffect(() => {
         if (doctorDetails && updateId) {
             // Set qualifications data
-            const updatedQualifications = doctorDetails?.qualification?.map((item, index) => ({
-                degreeName: {
-                    code: item?.code?.code,
-                    display: item?.code?.display,
-                    definition: item?.code?.display,
-                    system: item?.code?.system,
-                },
-                specialties: item?.specialties?.[0] || 'N/A',
-                degreeFile: item?.documents?.[0] || null, // Use the first document if available
-                issuerOrganisation: item?.issuer || '', // Use the issuer reference if available
-            }));
+            const updatedQualifications = doctorDetails?.qualification?.length > 0 
+                ? doctorDetails.qualification.map((item, index) => ({
+                    degreeName: {
+                        code: item?.code?.code,
+                        display: item?.code?.display,
+                        definition: item?.code?.display,
+                        system: item?.code?.system,
+                    },
+                    specialties: item?.specialties?.[0] || 'N/A',
+                    degreeFile: item?.documents?.[0] || null,
+                    issuerOrganisation: item?.issuer || '',
+                }))
+                : [{ degreeName: '', degreeFile: null, issuerOrganisation: '' }];
 
-            const updateDocuments = doctorDetails?.otherDocuments?.map((item, index) => ({
-                name: item?.name || '',
-                number: item?.number || '',
-                issuingAuthority: item?.issuingAuthority || '',
-                document: item?.document || null,
-                note: item?.note || '',
-            }));
+            const updateDocuments = doctorDetails?.otherDocuments?.length > 0
+                ? doctorDetails.otherDocuments.map((item, index) => ({
+                    name: item?.name || '',
+                    number: item?.number || '',
+                    issuingAuthority: item?.issuingAuthority || '',
+                    document: item?.document || null,
+                    note: item?.note || '',
+                }))
+                : [{ name: '', number: '', issuingAuthority: '', document: null, note: '' }];
+                
             setQualifications(updatedQualifications);
             setDocuments(updateDocuments);
         }
@@ -433,6 +438,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                         type="text"
                                                                         value={data?.number}
                                                                         // {...register(`documentNumber[${index}]`)}
+                                                                            maxLength={15} // Limit to 15 characters
                                                                         onChange={(e) =>
                                                                             handleDocumentsChange(
                                                                                 index,

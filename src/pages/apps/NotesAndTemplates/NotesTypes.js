@@ -34,8 +34,7 @@ const NotesTypes = () => {
     ];
     const [selectedNote, setSelectedNote] = useState(null);
     const [status, setStatus] = useState('active');
-    const ClinicId = loggedInUser?.clinicId;
-    console.log(status,'uyhgfghjkjlk')
+    const ClinicId = loggedInUser?.clinicId || store?.Auth?.user?.clinicId;
     const {
         control,
         setValue,
@@ -50,12 +49,12 @@ const NotesTypes = () => {
                 skip: skip,
                 limit: 8,
                 clinicId: ClinicId,
-                ...(status==='active'&&({active:true})),
-                ...(status==='inactive'&&({active:false})),
+                ...(status === 'active' && ({ active: true })),
+                ...(status === 'inactive' && ({ active: false })),
                 noteType: noteType,
             })
         );
-    }, [dispatch, search, noteType, skip,status]);
+    }, [dispatch, search, noteType, skip, status]);
     const handleOpenTab = (note) => {
         const exists = openTabs.find((tab) => tab?._id === note?._id);
         if (!exists) {

@@ -42,7 +42,7 @@ const Alcohol = () => {
     const alcoholData = store?.getAlcoholHistoryReducer?.data?.data;
 
     // Form handling
-    const { register, handleSubmit, reset, control, watch, getValues, setValue } = useForm();
+    const { register, handleSubmit, reset, formState:{errors}, control, watch, getValues, setValue } = useForm();
     const watchUseStatus = watch('useStatus');
     const heavyFrequency = watch('frequency');
 
@@ -205,9 +205,11 @@ const Alcohol = () => {
                                             <Col sm={6}>
                                                 <Form.Group>
                                                     <Form.Label className="fw-medium mb-1">
-                                                        Alcohol use frequency
+                                                        Alcohol use frequency <span className="text-danger">*</span>
                                                     </Form.Label>
-                                                    <Form.Select {...register('frequency')} required>
+                                                    <Form.Select {...register('frequency', {
+                                                        required: 'Alcohol use frequency is required'
+                                                    })}>
                                                         <option key="" value="">
                                                             Select
                                                         </option>
@@ -219,15 +221,20 @@ const Alcohol = () => {
                                                             )
                                                         )}
                                                     </Form.Select>
+                                                    {errors.frequency && (
+                                                        <div className="text-danger small">{errors.frequency.message}</div>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
 
                                             <Col sm={6}>
                                                 <Form.Group>
                                                     <Form.Label className="fw-medium mb-1">
-                                                        Standard drinks per occasion
+                                                        Standard drinks per occasion <span className="text-danger">*</span>
                                                     </Form.Label>
-                                                    <Form.Select {...register('quantityPerOccasion')} required>
+                                                    <Form.Select {...register('quantityPerOccasion', {
+                                                        required: 'Standard drinks per occasion is required'
+                                                    })}>
                                                         <option key="" value="">
                                                             Select
                                                         </option>
@@ -239,6 +246,9 @@ const Alcohol = () => {
                                                             )
                                                         )}
                                                     </Form.Select>
+                                                    {errors.quantityPerOccasion && (
+                                                        <div className="text-danger small">{errors.quantityPerOccasion.message}</div>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
 
@@ -270,9 +280,11 @@ const Alcohol = () => {
                                             <Col sm={6}>
                                                 <Form.Group>
                                                     <Form.Label className="fw-medium mb-1">
-                                                        What types of alcohol do you usually consume?
+                                                        What types of alcohol do you usually consume? <span className='text-danger'>*</span>
                                                     </Form.Label>
-                                                    <Form.Select {...register('alcoholType')} required>
+                                                    <Form.Select {...register('alcoholType',
+                                                        { required: 'Alcohol type is required' }
+                                                    )} >
                                                         <option key="" value="">
                                                             Select
                                                         </option>
@@ -282,6 +294,9 @@ const Alcohol = () => {
                                                             </option>
                                                         ))}
                                                     </Form.Select>
+                                                    {errors.alcoholType && (
+                                                        <span className="text-danger small">{errors.alcoholType.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
 
