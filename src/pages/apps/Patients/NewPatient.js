@@ -1155,7 +1155,6 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         <Form.Group>
                                             <Form.Label className="mb-0">Responsible Party</Form.Label>
                                             <Form.Select onChange={handleResponsibleChange} value={responsibleParty}>
-                                                <option value="">Select</option>
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>
@@ -1166,7 +1165,6 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         <Form.Group>
                                             <Form.Label className="mb-0">Referring Doctor</Form.Label>
                                             <Form.Select onChange={handleReferringChange} value={referringPhysician}>
-                                                <option value="">Select</option>
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>

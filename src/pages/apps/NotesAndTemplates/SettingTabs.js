@@ -96,6 +96,7 @@ const SettingTabs = ({ noteType }) => {
     const [offcanvasSections, setOffcanvasSections] = useState([]);
     const [showCanvas, setShowCanvas] = useState(false);
     const [showCustomFields, setShowCustomFields] = useState(false);
+    const [sectionToRemove, setSectionToRemove] = useState(null);
     const [customFieldData, setCustomFieldData] = useState({ fieldName: '', inputType: '' });
     const hasSettings = !!store?.getSettingsTabsReducer?.data?.data?._id;
 
@@ -201,8 +202,13 @@ const SettingTabs = ({ noteType }) => {
     useEffect(() => {
         if ((createResponse === 201 || updateSettingsStatus === 200) && noteType?._id) {
             dispatch(getSettingsTabAction({ noteId: noteType._id }));
+            // Remove the card from offcanvas after successful API call
+            if (sectionToRemove) {
+                setOffcanvasSections((prev) => prev.filter((s) => s.id !== sectionToRemove));
+                setSectionToRemove(null);
+            }
         }
-    }, [createResponse, updateSettingsStatus, dispatch, noteType?._id]);
+    }, [createResponse, updateSettingsStatus, dispatch, noteType?._id, sectionToRemove]);
 
     // Custom field input
     const handleInputChange = (e) => {
@@ -244,10 +250,11 @@ const SettingTabs = ({ noteType }) => {
                 visible: true,
                 minimized: false,
             };
+            // Store the section ID to remove after API success
+            setSectionToRemove(section.id);
             // Do NOT updateCurrentSections here!
             // Just call the API, then wait for GET API to update state
             saveSectionsAPI([...currentSections, newSection]);
-            setOffcanvasSections((prev) => prev.filter((s) => s.id !== section.id));
         }
     };
 
@@ -257,8 +264,8 @@ const SettingTabs = ({ noteType }) => {
             <div className="p-2 w-100">
                 <DragDropContext onDragEnd={handleDragEnd}>
                     <Row>
-                        <Col md={12} className="d-flex align-items-center">
-                            <h5>Clinical Form Sections</h5>
+                        <Col md={12} className="d-flex align-items-center mb-1">
+                            <h5 className='mb-0'>Clinical Form Sections</h5>
                             <span
                                 className="text-secondary cursor-pointer ms-2"
                                 title="Info of Drag Section"
