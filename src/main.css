@@ -1286,6 +1286,9 @@ option {
 .text-danger {
     color: red !important;
 }
+.minusIcons{
+    color: red !important;
+}
 .paddingNone td,
 .paddingNone tr {
     padding-top: 0px !important;
@@ -1316,3 +1319,7 @@ option {
     vertical-align: middle;
 }
 
+.date-picker-input:focus-visible{
+    outline: none !important;
+    box-shadow: none !important;
+}

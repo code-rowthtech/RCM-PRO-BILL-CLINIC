@@ -35,7 +35,6 @@ const NotesTypes = () => {
     const [selectedNote, setSelectedNote] = useState(null);
     const [status, setStatus] = useState('active');
     const ClinicId = loggedInUser?.clinicId;
-    console.log(status,'uyhgfghjkjlk')
     const {
         control,
         setValue,

@@ -35,8 +35,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     // Get data from store
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    console.log(doctorDetails, 'doctorDetails in DateEncounters');
     const providerOptions = doctorDetails?.map((data) => ({
-        label: data?.name?.[0]?.text, value: data?._id
+        label:`${data?.name?.[0]?.text + ' ' +data?.userId?.email}` , value: data?._id
     }))
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
     const createEncounterData = store?.createEncounterReducer;

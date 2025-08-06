@@ -990,10 +990,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 />
                                                 {index >= defaultIdentifiers?.length && (
                                                     <span
-                                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                                                        className="minusIcons cursor-pointer position-absolute fs-5 fw-bold"
                                                         style={{ right: '-2%', top: '12%' }}
                                                         onClick={() => removeIdentifier(index)}>
-                                                        <CiCircleMinus />
+                                                    <CiCircleMinus />
                                                     </span>
                                                 )}
                                             </Col>
@@ -1007,21 +1007,21 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses} />
                             <hr className="mb-1" />
                             <Row>
-                                <Col sm={12}>
+                                <Col sm={12} className='mt-2'>
                                     <h5>
                                         Points of Contact (POC)
                                         <span
-                                            className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                            className="fs-5 uil-plus-circle plusicon fw-bold cursor-pointer"
                                             onClick={addPoc}></span>
                                     </h5>
                                 </Col>
                             </Row>
                             {pocs.map((poc, pocIndex) => (
-                                <div key={pocIndex} className="p-1">
+                                <div key={pocIndex} className="mb-2">
                                     <Row>
                                         <Col sm={6}>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label>Full Name</Form.Label>
+                                            <Form.Group>
+                                                <Form.Label  className="mb-0">Full Name</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     value={poc.name.text}
@@ -1034,7 +1034,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         </Col>
                                         <Col sm={6} className="position-relative">
                                             <Form.Group>
-                                                <Form.Label>Role</Form.Label>
+                                                <Form.Label className='mb-0'>Role</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     placeholder="Enter Role"
@@ -1044,7 +1044,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             </Form.Group>
                                             {pocs.length > 1 && (
                                                 <span
-                                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bolder"
+                                                    className="minusIcons cursor-pointer position-absolute fs-5 fw-bold fw-bolder"
                                                     style={{ right: '-1%', top: '45%' }}
                                                     onClick={() => removePoc(pocIndex)}>
                                                     <CiCircleMinus />
@@ -1054,7 +1054,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                                         <Col sm={6}>
                                             <Form.Group>
-                                                <Form.Label>Email</Form.Label>
+                                                <Form.Label className='mb-0'>Email</Form.Label>
                                                 <Form.Control
                                                     type="email"
                                                     placeholder="Enter Email"
@@ -1066,7 +1066,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         {poc?.telecom?.map((telecom, telecomIndex) => (
                                             <Col sm={6} key={telecomIndex}>
                                                 <Form.Group className="mb-2 position-relative">
-                                                    <Form.Label className="mb-1">Phone Number</Form.Label>
+                                                    <Form.Label className="mb-0">Phone Number</Form.Label>
                                                     <InputGroup>
                                                         {/* Country Code Prefix */}
                                                         <InputGroup.Text className="ps-3 pe-1 p-0 fw-bold text-black">
