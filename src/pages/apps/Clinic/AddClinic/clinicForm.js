@@ -23,7 +23,7 @@ import {
 import { VscLoading } from 'react-icons/vsc';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
-import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
+import { FiMinusCircle } from "react-icons/fi";
 import { FiDownloadCloud, FiEdit, FiEye, FiInfo, FiMinus, FiTrash } from 'react-icons/fi';
 import UploadToS3 from '../../../../helpers/uploads3';
 import { handleUpload } from '../../../../helpers/HandleUpload';
@@ -993,7 +993,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         className="minusIcons cursor-pointer position-absolute fs-5 fw-bold"
                                                         style={{ right: '-2%', top: '12%' }}
                                                         onClick={() => removeIdentifier(index)}>
-                                                    <CiCircleMinus />
+                                                    <FiMinusCircle  />
                                                     </span>
                                                 )}
                                             </Col>
@@ -1047,7 +1047,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     className="minusIcons cursor-pointer position-absolute fs-5 fw-bold fw-bolder"
                                                     style={{ right: '-1%', top: '45%' }}
                                                     onClick={() => removePoc(pocIndex)}>
-                                                    <CiCircleMinus />
+                                                    <FiMinusCircle  />
                                                 </span>
                                             )}
                                         </Col>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { CiCircleMinus } from 'react-icons/ci';
+import { FiMinusCircle } from "react-icons/fi";
+
 import us from '../../../assets/images/flags/us.jpg';
 
 const TelecomFrom = ({ constantContact, setConstantContact }) => {
@@ -184,7 +185,7 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                         className="text-danger cursor-pointer fs-5 ms-2"
                                         onClick={() => removeContact(index)}
                                         title="Remove">
-                                        <CiCircleMinus />
+                                        <FiMinusCircle  />
                                     </span>
                                 )}
                             </Col>

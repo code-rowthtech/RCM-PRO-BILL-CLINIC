@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Form } from 'react-bootstrap';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { FiDownloadCloud } from 'react-icons/fi';
-import { CiCircleMinus } from 'react-icons/ci';
+import { FiMinusCircle } from "react-icons/fi";
 import { getCities2Action, getCities3Action, getCitiesAction, getStatesByCountryAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
@@ -506,7 +506,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                 onClick={() => removeAddress(index)}
                                 className="text-danger cursor-pointer fs-5 ms-2 mt-3"
                                 title="Remove Address">
-                                <CiCircleMinus />
+                                <FiMinusCircle  />
                             </span>
                     )}
                     </Col>
