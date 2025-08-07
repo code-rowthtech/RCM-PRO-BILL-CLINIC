@@ -131,6 +131,69 @@ const DateEncounters = ({
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
 
     // ========================================================================
+    // FIELD POPULATION SYSTEM
+    // ========================================================================
+
+    // Store populated field data with remove functionality
+    const [populatedFields, setPopulatedFields] = useState({});
+
+    // Clear populated fields when form is reset or encounter changes
+    useEffect(() => {
+        if (encounterAction === 'updateEncounter' && encounterData) {
+            setPopulatedFields({});
+        }
+    }, [encounterAction, encounterData]);
+
+    // Global function to populate encounter fields from EncounterSummary
+    useEffect(() => {
+        window.populateEncounterField = (fieldName, data) => {
+            const currentValue = getValues(fieldName) || '';
+
+            // For ReactQuill fields (SOAP sections), handle HTML content
+            if (['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].includes(fieldName)) {
+                const newValue = currentValue && currentValue !== '<p><br></p>'
+                    ? `${currentValue}<p>${data}</p>`
+                    : `<p>${data}</p>`;
+                setValue(fieldName, newValue);
+            } else {
+                // For regular text fields
+                const newValue = currentValue ? `${currentValue}\n${data}` : data;
+                setValue(fieldName, newValue);
+            }
+
+            // Track populated data for removal functionality
+            setPopulatedFields(prev => ({
+                ...prev,
+                [fieldName]: [...(prev[fieldName] || []), data]
+            }));
+        };
+
+        return () => {
+            delete window.populateEncounterField;
+        };
+    }, [setValue, getValues]);
+
+    // Function to remove populated data from field
+    const removePopulatedData = (fieldName, dataToRemove) => {
+        const currentValue = getValues(fieldName) || '';
+
+        // For ReactQuill fields (SOAP sections), handle HTML content
+        if (['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].includes(fieldName)) {
+            const newValue = currentValue.replace(`<p>${dataToRemove}</p>`, '').replace(/<p><\/p>/g, '');
+            setValue(fieldName, newValue || '<p><br></p>');
+        } else {
+            // For regular text fields
+            const newValue = currentValue.replace(dataToRemove, '').replace(/\n\n+/g, '\n').trim();
+            setValue(fieldName, newValue);
+        }
+
+        setPopulatedFields(prev => ({
+            ...prev,
+            [fieldName]: (prev[fieldName] || []).filter(item => item !== dataToRemove)
+        }));
+    };
+
+    // ========================================================================
     // EFFECTS
     // ========================================================================
 
@@ -271,8 +334,6 @@ const DateEncounters = ({
         }, 0);
     }, [selectedFromList, setValue]);
 
-
-
     // ========================================================================
     // COMPONENTS
     // ========================================================================
@@ -403,6 +464,27 @@ const DateEncounters = ({
                                         {MAX_WORDS + ' words'}
                                     </div>
                                 </Form.Label>
+                                {/* Show populated data with remove options for SOAP sections */}
+                                {populatedFields[section] && populatedFields[section].length > 0 && (
+                                    <div className="mb-2">
+                                        <small className="text-muted">Auto-populated data:</small>
+                                        {populatedFields[section].map((data, index) => (
+                                            <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
+                                                <small className="text-truncate" title={data}>{data}</small>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    className="p-0 ms-2"
+                                                    style={{ width: '20px', height: '20px', fontSize: '10px' }}
+                                                    onClick={() => removePopulatedData(section, data)}
+                                                    title="Remove this data"
+                                                >
+                                                    ×
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                                 <Controller
                                     name={section}
                                     control={control}
@@ -436,6 +518,27 @@ const DateEncounters = ({
                         <p className='mb-0'>{name}</p>
                         <p className='mb-0'>{MAX_WORDS + ' words'}</p>
                     </Form.Label>
+                    {/* Show populated data with remove options */}
+                    {populatedFields[name] && populatedFields[name].length > 0 && (
+                        <div className="mb-2">
+                            <small className="text-muted">Auto-populated data:</small>
+                            {populatedFields[name].map((data, index) => (
+                                <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
+                                    <small className="text-truncate" title={data}>{data}</small>
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
+                                        className="p-0 ms-2"
+                                        style={{ width: '20px', height: '20px', fontSize: '10px' }}
+                                        onClick={() => removePopulatedData(name, data)}
+                                        title="Remove this data"
+                                    >
+                                        ×
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     {inputType === 'text-editor' ? (
                         <Controller
                             name={name}

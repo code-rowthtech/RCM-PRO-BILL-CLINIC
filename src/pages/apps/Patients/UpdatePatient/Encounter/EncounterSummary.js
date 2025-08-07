@@ -144,6 +144,9 @@ const EncounterSummary = () => {
         if (patientVitals?.length === 0) {
             dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 3 }));
         }
+        // if(tobaccoHistory?.length===0){
+        //     dispatch(getTobaccooActio({ patientId: patientId }));
+        // }
     }, [allergyData, problemData, medicationList])
 
     // FUNCTIONS
@@ -266,7 +269,7 @@ const EncounterSummary = () => {
                                         <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >                                            <thead>
                                             <tr className='border'>
                                                 <th className='text-white'>
-                                                    Vital Name
+                                                    {'Vital Name'}
                                                 </th>
                                                 {sortedDates?.slice(0, 3)?.map(date => (
                                                     <th className='text-white' key={date}>
@@ -277,7 +280,14 @@ const EncounterSummary = () => {
                                         </thead>
                                             <tbody>
                                                 {vitals.map((vital, index) => (
-                                                    <tr className='' key={vital.name}>
+                                                    <tr className='cursor-pointer' key={vital.name} onClick={() => {
+                                                        const latestDate = sortedDates[0];
+                                                        const value = findVitalValue(vital.name, latestDate);
+                                                        if (value) {
+                                                            const formattedValue = vital.type === 'bp' ? `${value.systolic}/${value.diastolic}` : value;
+                                                            window.populateEncounterField?.('Monitoring Chart (Vitals)', `${vital.name}: ${formattedValue} ${getDisplayUnit(vital)}`);
+                                                        }
+                                                    }}>
                                                         <td className='p-0 vitalsTableBorder'>
                                                             {vital.name} {getDisplayUnit(vital) && (
                                                                 <small className="text-muted">({getDisplayUnit(vital)})</small>
@@ -328,8 +338,7 @@ const EncounterSummary = () => {
 
                                                     <ul className="list-unstyled pb-0 mb-0">
                                                         {allergyData.slice(0, 4).map((allergy, index) => (
-                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
-                                                                <div className="fs-6">
+                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`)}>                                                                <div className="fs-6">
                                                                     <strong title={allergy.code?.text}>
                                                                         {allergy.code?.text?.length > 30
                                                                             ? allergy.code?.text.slice(0, 29) + '...'
@@ -383,7 +392,8 @@ const EncounterSummary = () => {
                                                         {problemData?.slice(0, 4)?.map((problem, index) => (
                                                             <li
                                                                 key={index}
-                                                                className="mb-2 d-flex justify-content-between align-items-start">
+                                                                className="mb-2 d-flex justify-content-between align-items-start cursor-pointer"
+                                                                onClick={() => window.populateEncounterField?.('Reason for Visit', problem?.code?.text || '')}>
                                                                 <div className="fs-6">
                                                                     <strong title={problem?.code?.text}>
                                                                         {problem?.code?.text?.length > 30
@@ -452,7 +462,10 @@ const EncounterSummary = () => {
                                                                 </div>
                                                             </li>
                                                         ) : medicationList?.slice(0, 4)?.map((medication, index) => (
-                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => {
+                                                                const medicationInfo = `${medication?.drugId?.proprietaryName || ''} ${medication?.drugId?.nonProprietaryName ? '(' + medication?.drugId?.nonProprietaryName + ')' : ''} - ${medication?.dosageInstruction?.[0]?.text || ''} [Status: ${medication?.status || 'Unknown'}]`;
+                                                                window.populateEncounterField?.('Prescriptions (Medications)', medicationInfo);
+                                                            }}>
                                                                 <div className="fs-6">
                                                                     <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>{medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}</strong>
                                                                     <div className="text-muted" title={medication?.drugId?.nonProprietaryName}>
@@ -519,7 +532,7 @@ const EncounterSummary = () => {
                                                     <>
                                                         {socialHistoryData?.tobaccoHistory?.length > 0 && (
                                                             socialHistoryData?.tobaccoHistory?.map((data, index) => (
-                                                                <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                                <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Tobacco: ${data?.tobaccoUse || ''}`)}>
                                                                     <div className="fs-6">
                                                                         <strong className="text-capitalize" title={data?.tobaccoUse}>{data?.tobaccoUse?.length > 40 ? data?.tobaccoUse?.slice(0, 39) + '...' : data?.tobaccoUse}</strong>
                                                                         <div className="text-muted fs-6" >
@@ -531,7 +544,7 @@ const EncounterSummary = () => {
                                                         )}
                                                         {socialHistoryData?.familyGeneticHistory?.length > 0 && (
                                                             socialHistoryData?.familyGeneticHistory?.map((data, index) => (
-                                                                <li title='Family Genetics' key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                                <li title='Family Genetics' key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Family History: ${data?.name || ''} (${data?.relationship?.coding?.[0]?.display || ''})`)}>
                                                                     <div className="fs-6">
                                                                         <strong className="text-capitalize" title={data?.name}>{data?.name?.length > 40 ? data?.name?.slice(0, 39) + '...' : data?.name}
                                                                             <span className='ms-1'>
