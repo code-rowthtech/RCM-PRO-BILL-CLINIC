@@ -174,7 +174,7 @@ const DateEncounters = ({
             dispatch(getEncounterByIdAction({ encounterId: encounterId }));
         }
     }, [encounterAction, dispatch, encounterId]);
-    // Set default note type and populate form for update
+    // Set default note type and populate form for update 
     useEffect(() => {
         // Set default note type
         if (!noteType && defaultNoteTypeOption) {
@@ -322,9 +322,6 @@ const DateEncounters = ({
                 });
             });
         }, []);
-
-
-
 
         // Get fields to render based on visibility and exclusions
         const getFieldsToRender = () => {
