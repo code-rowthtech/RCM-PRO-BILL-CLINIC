@@ -129,6 +129,7 @@ const DateEncounters = ({
     }));
     const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
+
     // ========================================================================
     // EFFECTS
     // ========================================================================
@@ -138,12 +139,12 @@ const DateEncounters = ({
         if (createEncounterData?.data?.status === 201) {
             dispatch(getEncounterAction({ patientId: id, status: '' }));
             const newEncounterId = createEncounterData?.data?.encounterId;
-            const newTitle = createEncounterData?.data?.encounterStart 
-                ? new Date(createEncounterData?.data?.encounterStart).toISOString().split('T')[0] 
+            const newTitle = createEncounterData?.data?.encounterStart
+                ? new Date(createEncounterData?.data?.encounterStart).toISOString().split('T')[0]
                 : '';
-            
-            const updatedTabs = encounterTabs.map(tab => 
-                tab.id === encounterId 
+
+            const updatedTabs = encounterTabs.map(tab =>
+                tab.id === encounterId
                     ? { ...tab, id: newEncounterId, title: newTitle, type: 'updateEncounter' }
                     : tab
             );
@@ -173,7 +174,7 @@ const DateEncounters = ({
             dispatch(getEncounterByIdAction({ encounterId: encounterId }));
         }
     }, [encounterAction, dispatch, encounterId]);
-    // Set default note type and populate form for update
+    // Set default note type and populate form for update 
     useEffect(() => {
         // Set default note type
         if (!noteType && defaultNoteTypeOption) {
@@ -321,9 +322,6 @@ const DateEncounters = ({
                 });
             });
         }, []);
-
-
-
 
         // Get fields to render based on visibility and exclusions
         const getFieldsToRender = () => {

@@ -14,7 +14,7 @@ export function updateUserTasksApi(params: any): any {
 
 export function getUserTasksApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.tasks}?status=${data?.status}&priority=${data?.priority || ''}&assignedToId=${data?.assignedToId || ''}&page=${data?.skip}&search=${data?.search}`);
+    return api.get(`${URL.tasks}?status=${data?.status}&priority=${data?.priority || ''}&assignedToId=${data?.assignedToId || ''}&page=${data?.skip}&search=${data?.search}&associatedPatientId=${data?.associatedPatientId || ''}`);
 }
 
 export function getUserTaskByIdApi(params: any): any {
