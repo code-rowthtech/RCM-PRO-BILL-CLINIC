@@ -9,10 +9,13 @@ import { getUserTasksAction } from '../../../../../redux/actions';
 import Paginations from '../../../../../helpers/Paginations';
 import { FormInput } from '../../../../../components';
 import ModalTask from '../../../Tasks/ModalTask';
+import { useSearchParams } from 'react-router-dom';
 
 const TaskListing = () => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('id');
     const [search, setSearch] = useState('');
     const [show, setShow] = useState(false);
     const [priority, setPriority] = useState('');
@@ -27,7 +30,18 @@ const TaskListing = () => {
     useEffect(() => {
         if (createTaskResponse === 201 || updateTaskResponse === 200) {
             handleClose();
-            dispatch(getUserTasksAction({ status: '', skip: skip }));
+            if (
+                store?.createUserTasksReducer?.data?.task?.associatedPatientId === patientId &&
+                store?.createUserTasksReducer?.data?.task?.associatedPatientId
+            ) {
+                dispatch(
+                    getUserTasksAction({
+                        status: '',
+                        skip: skip,
+                        associatedPatientId: store?.createUserTasksReducer?.data?.task?.associatedPatientId,
+                    })
+                );
+            }
         }
     }, [createTaskResponse, updateTaskResponse]);
 
@@ -39,7 +53,14 @@ const TaskListing = () => {
 
     useEffect(() => {
         dispatch(
-            getUserTasksAction({ status: status, skip: skip, priority: priority, dueDate: dueDate, search: search })
+            getUserTasksAction({
+                status: status,
+                skip: skip,
+                priority: priority,
+                dueDate: dueDate,
+                search: search,
+                associatedPatientId: patientId,
+            })
         );
     }, [dispatch, skip, priority, status, search]);
 
@@ -64,7 +85,6 @@ const TaskListing = () => {
 
     return (
         <>
-           
             <div className="scroll-container" style={{ height: '69vh', overflowY: 'auto' }}>
                 <Table responsive className="table-centered table-nowrap mb-0 rounded mt-2">
                     <thead className="text-white">
@@ -98,7 +118,7 @@ const TaskListing = () => {
                                 <td colSpan={9} className="text-center py-5">
                                     <div className="d-flex flex-column align-items-center">
                                         <FiFileText size={44} className="text-muted mb-0 mt-2" />
-                                        <h5>No tasks found</h5>
+                                        <h5>No tasks linked to this patient yet.</h5>
                                     </div>
                                 </td>
                             </tr>

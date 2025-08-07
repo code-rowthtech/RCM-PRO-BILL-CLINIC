@@ -36,7 +36,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
     const encounters = store?.getEncounterReducer?.data?.encounters;
     const taskData = store?.getTaskByIdReducer?.data?.task;
     const quillRef = useRef(null);
-    console.log(doctorDetails, roleData, '13443234234')
+
     useEffect(() => {
         if (taskData && taskId) {
             setValue('description', taskData?.description);
@@ -60,6 +60,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
     useEffect(() => {
         if (createTaskResponse === 201) {
             reset();
+            handleClose();
         }
     }, [createTaskResponse])
 
@@ -114,7 +115,6 @@ const ModalTask = ({ show, handleClose, taskId }) => {
         // Add assignedById
         cleanedData.clinicId = loggedInUser?.clinicId;
         cleanedData.assignedById = loggedInUser?._id;
-        console.log(cleanedData, 'cleanedData')
         if (taskId) {
             dispatch(updateUserTasksAction({ data: `${encryptMessage(cleanedData)}`, taskId: taskId }));
         } else {

@@ -358,7 +358,7 @@ const UpdatePatientIndex = () => {
                                                             <Form
                                                                 onSubmit={handleSubmit(onSubmit)}
                                                                 className="d-flex flex-column align-items-center">
-                                                                <div className="position-relative w-75 d-flex align-items-center flex-column justify-content-center">
+                                                                <div className="position-relative w-100 d-flex align-items-center flex-column justify-content-center ms-3">
                                                                     {isCameraOpen ? (
                                                                         <video
                                                                             ref={videoRef}
