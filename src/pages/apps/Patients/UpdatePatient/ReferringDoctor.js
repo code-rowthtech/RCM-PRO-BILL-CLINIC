@@ -29,11 +29,11 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
         watch,
     } = useForm();
     const [referringDoctorAddress, setReferringDoctorAddress] = useState([
-        {type:'', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
+        { type: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
     const [submissionType, setSubmissionType] = useState(null);
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log(patientDetails,'patents')
+    console.log(patientDetails, 'patents');
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
 
     const primaryState = watch('primaryStateName');
@@ -51,10 +51,10 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                 'phone',
                 patientDetails?.referringDocId?.telecom?.[0]?.value
                     ? patientDetails?.referringDocId?.telecom?.[0]?.value
-                        .replace(/\D/g, '')
-                        .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                        )
+                          .replace(/\D/g, '')
+                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                          )
                     : ''
             );
             // setValue('phone', patientDetails?.referringDocId?.telecom?.[0]?.value);
@@ -67,7 +67,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                     state: address?.state,
                     postalCode: address?.postalCode,
                     country: address?.country,
-                })) || [{type:'', line: [''], city: '', state: '', postalCode: '', country: 'USA' }]
+                })) || [{ type: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' }]
             );
         }
     }, []);
@@ -110,14 +110,16 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
         };
         dispatch(addReferringDoctorAction({ key: encryptMessage(payload) }));
     };
-  useEffect(() => {
-        if(createResponseReferring === 201) {
+    useEffect(() => {
+        if (createResponseReferring === 201) {
             dispatch(getPatientByIdAction({ patientId }));
         }
     }, [createResponseReferring]);
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
-            <div className='scroll-container mt-1' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
+            <div
+                className="scroll-container mt-1"
+                style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <Row className="pb-2">
                     <Col sm={12}>
                         <span className="text-black fw-semibold form-label">Personal Details</span>
@@ -152,7 +154,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                             <Form.Control {...register('suffix')} placeholder="Suffix" type="text" />
                         </Form.Group>
                     </Col>
-                    <Col sm={3}>
+                    <Col sm={3} className='mb-0 position-relative' style={{ minHeight: '70px' }}>
                         <Form.Group>
                             <Form.Label className="mb-0">
                                 NPI Number <span className="text-danger">*</span>
@@ -168,7 +170,13 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                                 placeholder="NPI Number"
                                 type="text"
                             />
-                            {errors.npiNumber && <span className="text-danger">{errors.npiNumber.message}</span>}
+                              {errors.npiNumber && (
+                                <span
+                                    className="text-danger position-absolute"
+                                    style={{ top: '74%', left: '15px', fontSize: '0.8rem' }}>
+                                    {errors.npiNumber.message}
+                                </span>
+                            )}
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
@@ -178,7 +186,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
-                        <Form.Group className="mb-0 position-relative">
+                        <Form.Group className="mb-0 position-relative" style={{ minHeight: '70px' }}>
                             <Form.Label className="mb-0">
                                 Phone <span className="text-danger">*</span>
                             </Form.Label>
@@ -204,7 +212,13 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                                     placeholder="(XXX)XXX-XXXX"
                                 />
                             </InputGroup>
-                            {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
+                            {errors.phone && (
+                                <span
+                                    className="text-danger position-absolute"
+                                    style={{ top: '74%', left: '15px', fontSize: '0.8rem' }}>
+                                    {errors.phone.message}
+                                </span>
+                            )}
                         </Form.Group>
                     </Col>
                 </Row>

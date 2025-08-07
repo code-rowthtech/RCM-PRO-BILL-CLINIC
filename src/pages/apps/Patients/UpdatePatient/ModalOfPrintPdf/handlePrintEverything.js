@@ -685,9 +685,9 @@ width: 100%;
             ''
         }
 
-         ${printData?.toBePrinted?.some((data) => data === "Tobacco History") ?
+         ${printData?.toBePrinted?.some((data) => data === "Substance Use") ?
             ` <div class="patient-info">
-                   <h2>Tobacco History</h2>
+                   <h2>Substance Use</h2>
 
         ${printData?.tobaccoHistory?.map((tobacco, index) => (
                 `<div class="summary-headers">

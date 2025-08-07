@@ -125,7 +125,7 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
                         <Form.Control {...register('suffix')} placeholder="Suffix" type="text" />
                     </Form.Group>
                 </Col>
-                <Col sm={3}>
+                <Col sm={3} className="mb-0 position-relative" style={{ minHeight: '70px' }}>
                     <Form.Group>
                         <Form.Label className="mb-0">
                             NPI Number <span className="text-danger">*</span>
@@ -141,7 +141,13 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
                             placeholder="NPI Number"
                             type="text"
                         />
-                        {errors.npiNumber && <span className="text-danger">{errors.npiNumber.message}</span>}
+                        {errors.npiNumber && (
+                            <span
+                                className="text-danger position-absolute"
+                                style={{ top: '74%', left: '15px', fontSize: '0.8rem' }}>
+                                {errors.npiNumber.message}
+                            </span>
+                        )}{' '}
                     </Form.Group>
                 </Col>
                 <Col sm={3}>
@@ -151,7 +157,7 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
                     </Form.Group>
                 </Col>
                 <Col sm={3}>
-                    <Form.Group className="mb-0 position-relative">
+                    <Form.Group className="mb-0 position-relative" style={{ minHeight: '70px' }}>
                         <Form.Label className="mb-0">
                             Phone <span className="text-danger">*</span>
                         </Form.Label>
@@ -180,11 +186,17 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
                                 left: '10px',
                                 top: '35px',
                                 transform: 'translateY(-50%)',
-                                zIndex: 1
+                                zIndex: 1,
                             }}>
                             <img src={us} alt="flag" width={20} />
                         </div>
-                        {errors.phone && <span className="text-danger d-block">{errors.phone.message}</span>}
+                        {errors.phone && (
+                            <span
+                                className="text-danger position-absolute"
+                                style={{ top: '74%', left: '15px', fontSize: '0.8rem' }}>
+                                {errors.phone.message}
+                            </span>
+                        )}
                     </Form.Group>
                 </Col>
             </Row>

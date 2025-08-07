@@ -120,7 +120,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                 className="scroll-container "
                 style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <div className="row  pb-2 pt-1 pe-0">
-                    <div className="col-md-3 col-12 pe-1">
+                    <div className="col-md-3 col-12 pe-1 position-relative" style={{ minHeight: '70px' }}>
                         <Form.Label className="mb-0">
                             Title <span className="text-danger">*</span>
                         </Form.Label>
@@ -132,9 +132,14 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                             <option value="Dr.">Dr.</option>
                             <option value="Other">Other</option>
                         </Form.Select>
-                        {errors.title && <span className="text-danger">{errors.title.message}</span>}
-                    </div>
-                    <div className="col-md-3 col-12">
+  {errors.title && (
+                                <span
+                                    className="text-danger position-absolute"
+                                    style={{ top: '74%', left: '15px', fontSize: '0.8rem' }}>
+                                    {errors.title.message}
+                                </span>
+                            )}                    </div>
+                    <div className="col-md-3 col-12 position-relative" style={{ minHeight: '70px' }}>
                         <Form.Label htmlFor="fileName" className="mb-0">
                             Full Name <span className="text-danger">*</span>
                         </Form.Label>
@@ -143,10 +148,15 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                             placeholder="Full Name"
                             {...register('fullName', { required: 'Full name is required' })}
                         />
-                        {errors.fullName && <span className="text-danger">{errors.fullName.message}</span>}
-                    </div>
+                        {errors.fullName && (
+                                <span
+                                    className="text-danger position-absolute"
+                                    style={{ top: '74%', left: '15px', fontSize: '0.8rem' }}>
+                                    {errors.fullName.message}
+                                </span>
+                            )}                    </div>
 
-                    <div className="col-md-3 col-12">
+                    <div className="col-md-3 col-12 position-relative" style={{ minHeight: '70px' }}>
                         <Form.Label htmlFor="gender" className="mb-0">
                             Gender <span className="text-danger">*</span>
                         </Form.Label>
@@ -159,9 +169,14 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                                 <option value="female">Female</option>
                             </Form.Select>
                         </div>
-                        {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
-                    </div>
-                    <div className="col-md-3 col-12 pe-2">
+  {errors.gender && (
+                                <span
+                                    className="text-danger position-absolute"
+                                    style={{ top: '74%', left: '15px', fontSize: '0.8rem' }}>
+                                    {errors.gender.message}
+                                </span>
+                            )}                    </div>
+                    <div className="col-md-3 col-12 pe-2 position-relative" style={{ minHeight: '70px' }}>
                         <Form.Label htmlFor="DOB" className="mb-0">
                             Date of Birth <span className="text-danger">*</span>
                         </Form.Label>
@@ -171,8 +186,13 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                             max={new Date().toISOString().split('T')[0]} // today's date in YYYY-MM-DD format
                             {...register('dateOfBirth', { required: 'This field is required' })}
                         />
-                        {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
-                    </div>
+  {errors.dateOfBirth && (
+                                <span
+                                    className="text-danger position-absolute"
+                                    style={{ top: '74%', left: '15px', fontSize: '0.8rem' }}>
+                                    {errors.dateOfBirth.message}
+                                </span>
+                            )}                    </div>
                     <Col sm={3} className="mb-2">
                         <Form.Group>
                             <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>

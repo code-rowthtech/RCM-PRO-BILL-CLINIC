@@ -14,6 +14,7 @@ import { IoSearchSharp } from 'react-icons/io5';
 const Task = () => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
+    
     const [search, setSearch] = useState('');
     const [show, setShow] = useState(false);
     const [priority, setPriority] = useState('');
