@@ -124,14 +124,14 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                         {store?.getTemplateReducer?.loading ? (
                             <div className="text-center py-5">
                                 <Spinner animation="border" variant="primary" />
-                                <p className="mt-2">Loading templates...</p>
+                                <p className="mt-2">{`Loading templates...`}</p>
                             </div>
                         ) : (
                             <div className="template-cards-container">
                                 {templatesData?.length === 0 ? (
                                     <div className="no-templates-placeholder text-center py-4">
                                         <FiFileText size={48} className="text-muted mb-2" />
-                                        <h5>No templates found</h5>
+                                        <h5>{`No templates found`}</h5>
                                     </div>
                                 ) : (
                                     <div className='template-grid d-flex flex-column py-1 gap-1 px-0'>
@@ -152,15 +152,15 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                         )}
                     </div>
                     <div className='d-flex justify-content-between p-2 align-items-center'>
-                        <span onClick={() => setShowModal(true)} className='fs-6 fw-semibold cursor-pointer'><i className="bi bi-plus-circle"></i>&nbsp;Add template</span>
+                        <span onClick={() => setShowModal(true)} className='fs-6 fw-semibold cursor-pointer'><i className="bi bi-plus-circle"></i>&nbsp;{`Add template`}</span>
                         {editIcon ?
                             <span onClick={() => {
                                 setEditIcon(false)
-                            }} className='fs-6 fw-semibold  cursor-pointer'><i className="bi bi-check2 cursor-pointer"></i>&nbsp;Done editing</span>
+                            }} className='fs-6 fw-semibold  cursor-pointer'><i className="bi bi-check2 cursor-pointer"></i>&nbsp;{`Done editing`}</span>
                             :
                             <span onClick={() => {
                                 setEditIcon(true)
-                            }} className='fs-6 fw-semibold  cursor-pointer'><i className="mdi mdi-square-edit-outline cursor-pointer"></i>&nbsp;Edit template</span>
+                            }} className='fs-6 fw-semibold  cursor-pointer'><i className="mdi mdi-square-edit-outline cursor-pointer"></i>&nbsp;{`Edit template`}</span>
                         }
 
                         <TemplateModal

@@ -310,12 +310,12 @@ const EncounterSummary = () => {
                                         </Table>
                                         <div className="row">
                                             <div className="col-12 text-end">
-                                                <small onClick={() => setVitalsModal(true)} className='text-info cursor-pointer'>Add vitals</small>
+                                                <small onClick={() => setVitalsModal(true)} className='text-info cursor-pointer'>{`Add vitals`}</small>
                                             </div>
                                         </div>
                                         <Modal show={vitalsModal} onHide={closeVitalsModal} size="lg" centered>
                                             <Modal.Header closeButton className="px-2 py-0">
-                                                <Modal.Title className="">Add Vitals</Modal.Title>
+                                                <Modal.Title className="">{`Add Vitals`}</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
                                                 <VitalStatus />
@@ -339,15 +339,15 @@ const EncounterSummary = () => {
                                                     <ul className="list-unstyled pb-0 mb-0">
                                                         {allergyData.slice(0, 4).map((allergy, index) => (
                                                             <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`)}>                                                                <div className="fs-6">
-                                                                    <strong title={allergy.code?.text}>
-                                                                        {allergy.code?.text?.length > 30
-                                                                            ? allergy.code?.text.slice(0, 29) + '...'
-                                                                            : allergy.code?.text || 'Unknown Allergy'}
-                                                                    </strong>
-                                                                    <div className="text-muted small">
-                                                                        {allergy.clinicalStatus?.text || 'Status not available'}
-                                                                    </div>
+                                                                <strong title={allergy.code?.text}>
+                                                                    {allergy.code?.text?.length > 30
+                                                                        ? allergy.code?.text.slice(0, 29) + '...'
+                                                                        : allergy.code?.text || 'Unknown Allergy'}
+                                                                </strong>
+                                                                <div className="text-muted small">
+                                                                    {allergy.clinicalStatus?.text || 'Status not available'}
                                                                 </div>
+                                                            </div>
                                                                 <span className="fs-6 fw-semibold text-nowrap">
                                                                     {getSeverityBadge(allergy.criticality)}
                                                                 </span>
@@ -357,16 +357,16 @@ const EncounterSummary = () => {
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className="text-muted">No allergies recorded</div>
+                                            <div className="text-muted">{`No allergies recorded`}</div>
                                         )}
                                         <div className="row">
                                             <div className="col-12 text-end">
-                                                <small onClick={() => setShowAddAllergyModal(true)} className='text-info cursor-pointer'>Add new allergy</small>
+                                                <small onClick={() => setShowAddAllergyModal(true)} className='text-info cursor-pointer'>{`Add new allergy`}</small>
                                             </div>
                                         </div>
                                         <Modal show={showAddAllergyModal} onHide={handleAddAllergyClose} size="lg" centered>
                                             <Modal.Header closeButton className="px-2 py-0">
-                                                <Modal.Title className="">Add Allergy</Modal.Title>
+                                                <Modal.Title className="">{`Add Allergy`}</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
                                                 <AddAllergy onCancel={handleAddAllergyClose} />
@@ -418,23 +418,23 @@ const EncounterSummary = () => {
                                                     <ul className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
                                                         <li className="mb-2">
                                                             <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                                <strong>No Problems Found</strong>
+                                                                <strong>{`No Problems Found`}</strong>
                                                             </div>
                                                         </li>
                                                     </ul>
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className='text-muted'>No problems recorded</div>
+                                            <div className='text-muted'>{`No problems recorded`}</div>
                                         )}
                                         <div className="row">
                                             <div className="col-12 text-end">
-                                                <small onClick={() => setShowAddProblemModal(true)} className='text-info cursor-pointer'>Add new problem</small>
+                                                <small onClick={() => setShowAddProblemModal(true)} className='text-info cursor-pointer'>{`Add new problem`}</small>
                                             </div>
                                         </div>
                                         <Modal show={showAddProblemModal} onHide={handleAddProblemClose} size="lg" centered>
                                             <Modal.Header closeButton className="px-2 py-0">
-                                                <Modal.Title className="">Add Problem</Modal.Title>
+                                                <Modal.Title className="">{`Add Problem`}</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
                                                 <AddProblem onCancel={handleAddProblemClose} />
@@ -458,7 +458,7 @@ const EncounterSummary = () => {
                                                         {medicationList?.length === 0 || !medicationList ? (
                                                             <li className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
                                                                 <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                                    <strong>No Medications Found</strong>
+                                                                    <strong>{`No Medications Found`}</strong>
                                                                 </div>
                                                             </li>
                                                         ) : medicationList?.slice(0, 4)?.map((medication, index) => (
@@ -505,11 +505,11 @@ const EncounterSummary = () => {
                                                 }
                                             </div>
                                         ) : (
-                                            <div className='text-muted'>No medications recorded</div>
+                                            <div className='text-muted'>{`No medications recorded`}</div>
                                         )}
                                         <div className="row">
                                             <div className="col-12 text-end">
-                                                <small onClick={() => setMedicationModal(true)} className='text-info cursor-pointer'>Add new medication</small>
+                                                <small onClick={() => setMedicationModal(true)} className='text-info cursor-pointer'>{`Add new medication`}</small>
                                             </div>
                                         </div>
                                         <AddMedication show={medicationModal} onCancel={closeMedicationModal} />
@@ -525,7 +525,7 @@ const EncounterSummary = () => {
                                                 {socialHistoryData?.tobaccoHistory?.length === 0 && socialHistoryData?.familyGeneticHistory?.length === 0 ? (
                                                     <li className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
                                                         <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                            <strong>No Social History Found</strong>
+                                                            <strong>{`No Social History Found`}</strong>
                                                         </div>
                                                     </li>
                                                 ) : (

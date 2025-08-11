@@ -429,7 +429,7 @@ const DateEncounters = ({
                                                 }
                                             }}
                                         >
-                                            <option value="">Add Patient Info</option>
+                                            <option value="">{`Add Patient Info`}</option>
                                             {PATIENT_INFO_FIELDS.map((label, index) => {
                                                 const getValue = () => {
                                                     switch (label) {
@@ -467,7 +467,7 @@ const DateEncounters = ({
                                 {/* Show populated data with remove options for SOAP sections */}
                                 {populatedFields[section] && populatedFields[section].length > 0 && (
                                     <div className="mb-2">
-                                        <small className="text-muted">Auto-populated data:</small>
+                                        <small className="text-muted">{`Auto-populated data:`}</small>
                                         {populatedFields[section].map((data, index) => (
                                             <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
                                                 <small className="text-truncate" title={data}>{data}</small>
@@ -521,7 +521,7 @@ const DateEncounters = ({
                     {/* Show populated data with remove options */}
                     {populatedFields[name] && populatedFields[name].length > 0 && (
                         <div className="mb-2">
-                            <small className="text-muted">Auto-populated data:</small>
+                            <small className="text-muted">{`Auto-populated data:`}</small>
                             {populatedFields[name].map((data, index) => (
                                 <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
                                     <small className="text-truncate" title={data}>{data}</small>
@@ -780,7 +780,7 @@ const DateEncounters = ({
                                 className="g-2 mt-0 bg-light rounded-top p-1">
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>Encounter Type <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Encounter Type`} <span className='text-danger'>*</span></Form.Label>
                                         <div className="position-relative">
                                             <Form.Select
                                                 {...register('type', { required: 'This field is required' })}
@@ -803,7 +803,7 @@ const DateEncounters = ({
                                                     }
                                                 }}
                                                 className='border-primary'>
-                                                <option key='' value='' hidden>Select...</option>
+                                                <option key='' value='' hidden>{`Select...`}</option>
                                                 {encounterTypes?.map((data, index) => (
                                                     <option key={index} value={data?.code}>
                                                         {data?.code + '-' + data?.display}
@@ -818,7 +818,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>Encounter Class <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Encounter Class`} <span className='text-danger'>*</span></Form.Label>
                                         <div className="position-relative">
                                             <Form.Select
                                                 {...register('class', { required: 'This field is required.' })}
@@ -841,7 +841,7 @@ const DateEncounters = ({
                                                         dispatch(updateEncounterAction({ key: encryptMessage(payload), fieldUpdating: 'class' }));
                                                     }
                                                 }}>
-                                                <option key='' value='' hidden>Select...</option>
+                                                <option key='' value='' hidden>{`Select...`}</option>
                                                 {encounterClassCodes?.map((data, index) => (
                                                     <option key={index} value={data?.code}>
                                                         {data?.code + ' (' + data?.display + ')'}
@@ -856,7 +856,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>Note Type <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Note Type`} <span className='text-danger'>*</span></Form.Label>
                                         <Select
                                             options={notesTypeOptions}
                                             isSearchable
@@ -897,7 +897,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>Start Date <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Start Date`} <span className='text-danger'>*</span></Form.Label>
                                         <div className="position-relative">
                                             <Form.Control
                                                 type="date"
@@ -925,7 +925,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>Status <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Status`} <span className='text-danger'>*</span></Form.Label>
                                         <div className="position-relative">
                                             <Form.Select
                                                 {...register('status', { required: 'This field is required' })}
@@ -945,7 +945,7 @@ const DateEncounters = ({
                                                     }
                                                 }}
                                                 className='text-capitalize'>
-                                                <option key='' value=''>Select Status</option>
+                                                <option key='' value=''>{`Select Status`}</option>
                                                 {ENCOUNTER_STATUSES?.map((data, index) => (
                                                     <option value={data} className='text-capitalize' key={index}>
                                                         {data}
@@ -960,7 +960,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>Provider <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Provider`} <span className='text-danger'>*</span></Form.Label>
                                         <Select
                                             options={providerOptions}
                                             isSearchable
@@ -1005,7 +1005,7 @@ const DateEncounters = ({
                                             }}
                                         />
                                         {providerError && (
-                                            <div className="text-danger small mt-0">This field is required</div>
+                                            <div className="text-danger small mt-0">{`This field is required`}</div>
                                         )}
                                     </Form.Group>
                                 </Col>

@@ -28,7 +28,6 @@ const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, se
     }, [template]);
 
     const sectionLabels = ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'];
-
     useEffect(() => {
         if ((updateResponse == true && sectionsId) || (updateResponse == true && template?._id)) {
             onHide();
@@ -94,7 +93,7 @@ const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, se
                 <div className="row mb-2">
                     {/* <h5 className="mb-1 fs-5">Add Section</h5> */}
                     <div className="col-8 d-flex flex-wrap ">
-                        {sectionLabels?.map((label) => (
+                        {sectionLabels && sectionLabels?.map((label) => (
                             <button
                                 key={label}
                                 variant="outlined"
@@ -120,7 +119,7 @@ const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, se
                 {!items?.length ? (
                     <div className="alert alert-info mb-4">
                         <i className="dripicons-information me-2"></i>
-                        No sections added to this template yet. Click the buttons above to add sections.
+                        {`No sections added to this template yet. Click the buttons above to add sections.`}
                     </div>
                 ) : (
                     <Row>
@@ -153,7 +152,7 @@ const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, se
                                         <Accordion.Body>
                                             {!section.list?.length ? (
                                                 <div className="alert alert-warning m-1 p-1">
-                                                    No items in this section
+                                                    {`No items in this section`}
                                                 </div>
                                             ) : (
                                                 <ListGroup className="mb-0">
@@ -204,7 +203,7 @@ const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, se
                                         className=""
                                         style={{ background: '#ecedee', padding: '0.456rem 0.6rem' }}>
                                         <h6 className="my-0 fw-semibold">
-                                            Add New Item to {items[activeAccordionKey]?.label}
+                                            {`Add New Item to`} {items[activeAccordionKey]?.label}
                                         </h6>
                                     </Card.Header>
                                     <Card.Body>
@@ -212,7 +211,7 @@ const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, se
                                             <div className="col-12">
                                                 <Form.Group>
                                                     <Form.Label className="mb-0">
-                                                        Item Text <span className="text-danger">*</span>
+                                                        {`Item Text`} <span className="text-danger">*</span>
                                                     </Form.Label>
                                                     <Form.Control
                                                         as="textarea"
@@ -233,7 +232,7 @@ const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, se
                                             </div>
                                             <div className="col-12">
                                                 <Form.Group>
-                                                    <Form.Label className="mb-0">Shortcut</Form.Label>
+                                                    <Form.Label className="mb-0">{`Shortcut`}</Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         name="shortcut"
@@ -268,7 +267,7 @@ const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, se
                                                 disabled={!/\p{L}|\p{N}/u.test(newItem.text)}
                                                 className="d-flex align-items-center gap-1 custom-buttons">
                                                 <Plus size={16} />
-                                                Add Item
+                                                {`Add Item`}
                                             </Button>
                                         </div>
                                     </Card.Body>
@@ -287,7 +286,7 @@ const TemplateSection = ({ sectionsId, setActiveTab, template, onHide, reset, se
                         setActiveTab('details');
                     }}
                     className="custom-buttons">
-                    Cancel
+                    {`Cancel`}
                 </Button>
                 <Button
                     disabled={items?.length < 1 || store?.updateTemplateReducer?.loading}

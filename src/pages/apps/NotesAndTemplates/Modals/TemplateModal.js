@@ -133,7 +133,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
         }} size="xl" centered backdrop="static">
             <Modal.Header className="p-0 pb-0 d-flex justify-content-center">
                 <Modal.Title className="fw-semibold py-1 ">
-                    {template?._id ? 'Update' : "Create"} Template
+                    {template?._id ? 'Update' : "Create"} {`Template`}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body className="pt-0 scroll-container">
@@ -148,7 +148,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                 }
                             )}
                             onClick={() => setActiveTab('details')}>
-                            Details
+                            {`Details`}
                         </span>
                     </li>
                     <li className="nav-item">
@@ -161,7 +161,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                 }
                             )}
                             onClick={() => setActiveTab('sections')}>
-                            Section
+                            {`Section`}
                         </span>
                     </li>
                 </ul>
@@ -188,17 +188,17 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                         {...register('templateType')}
                                         className="form-select-lg text-black"
                                     >
-                                        <option value="SOAP">SOAP</option>
-                                        <option value="PlanOnly">Plan Only</option>
-                                        <option value="AssessmentPlan">Assessment & Plan</option>
-                                        <option value="HPI">HPI</option>
-                                        <option value="Custom">Custom</option>
+                                        <option value="SOAP">{`SOAP`}</option>
+                                        <option value="PlanOnly">{`Plan Only`}</option>
+                                        <option value="AssessmentPlan">{`Assessment & Plan`}</option>
+                                        <option value="HPI">{`HPI`}</option>
+                                        <option value="Custom">{`Custom`}</option>
                                     </Form.Select>
                                 </Form.Group>
                             </div>
                             <div className="col-md-4">
                                 <Form.Group>
-                                    <Form.Label className='mb-0'>Category</Form.Label>
+                                    <Form.Label className='mb-0'>{`Category`}</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="category"
@@ -209,20 +209,20 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                             </div>
                             <div className="col-md-4">
                                 <Form.Group>
-                                    <Form.Label className='mb-0'>Status</Form.Label>
+                                    <Form.Label className='mb-0'>{`Status`}</Form.Label>
                                     <Form.Select
                                         name="status"
                                         {...register('status')}
                                     >
-                                        <option value="active" selected>Active</option>
-                                        <option value="inactive">Inactive</option>
-                                        <option value="archive">Archived</option>
+                                        <option value="active" selected>{`Active`}</option>
+                                        <option value="inactive">{`Inactive`}</option>
+                                        <option value="archive">{`Archived`}</option>
                                     </Form.Select>
                                 </Form.Group>
                             </div>
                             <div className="col-md-4">
                                 <Form.Group>
-                                    <Form.Label className='mb-0'>Template Shortcut</Form.Label>
+                                    <Form.Label className='mb-0'>{`Template Shortcut`}</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="shortcut"
@@ -234,7 +234,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                             <div className="row my-2">
                                 <div className="col-md-4 pe-0">
                                     <Form.Group>
-                                        <Form.Label className='mb-0'>Practice Type <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0'>{`Practice Type`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <Controller
                                             name="practiceType"
                                             control={control}
@@ -284,7 +284,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                             <div className="row mb-2 d-flex align-items-center">
                                 <div className="col-md-4 pe-0">
                                     <Form.Group>
-                                        <Form.Label className='mb-0'>Tags</Form.Label>
+                                        <Form.Label className='mb-0'>{`Tags`}</Form.Label>
                                         <Form.Control
                                             rows={4}
                                             type="text"
@@ -314,7 +314,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                     <Form.Group controlId="description" className="flex-grow-1 d-flex flex-column mb-0">
                                         <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
                                             <div>
-                                                Description{' '}
+                                                {`Description`}
 
                                             </div>
                                             <small className="text-muted">
