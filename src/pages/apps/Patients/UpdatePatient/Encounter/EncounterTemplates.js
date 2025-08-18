@@ -46,11 +46,9 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                     <Row>
                         {selectedTemplate?.items?.map((item, index) => (
                             <Col sm={12} key={index} className='p-2 '>
-                                <Row className=''>
+                                <Row>
                                     <Col sm={12} className='d-flex  align-items-center justify-content-between'>
                                         <h5 className="my-0 fw-semibold fs-6">{item?.label}</h5>
-                                        {/* <span><i className="bi me-1 bi-plus-circle"></i>
-                                            <i className="mdi mdi-square-edit-outline cursor-pointer"></i></span> */}
                                     </Col>
                                     <Col sm={12}>
                                         <ul className='list-unstyled fs-6 px-2'>
