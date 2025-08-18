@@ -6,7 +6,6 @@ import {
     FiX as CloseIcon,
     FiFile as FileIcon,
     FiPlus as PlusIcon,
-    FiFileText
 } from 'react-icons/fi';
 import AsyncSelect from 'react-select/async';
 import Select from 'react-select';
@@ -39,22 +38,37 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
     const [notes, setNotes] = useState(null);
     const [error, setError] = useState(null);
     const [loadingUpload, setLoadingUpload] = useState(false);
+    const [wordCount, setWordCount] = useState(0);
     const quillRef = useRef(null);
-    const MAX_LENGTH = 1000;
-    useEffect(() => {
-        if (quillRef) {
-            const editor = quillRef?.current?.getEditor();
+    const MAX_WORDS = 700;
 
-            editor?.on('text-change', (delta, oldDelta, source) => {
-                if (source === 'user') {
-                    const text = editor?.getText(); // includes trailing '\n'
-                    if (text.length > MAX_LENGTH + 1) {
-                        editor?.deleteText(MAX_LENGTH, text.length);
-                    }
+    useEffect(() => {
+        if (quillRef?.current) {
+            const editor = quillRef.current.getEditor();
+
+            const handleTextChange = () => {
+                const text = editor.getText().trim();
+                const words = text ? text.split(/\s+/).filter(word => word.length > 0) : [];
+                const currentWordCount = words.length;
+
+                setWordCount(currentWordCount);
+
+                if (currentWordCount > MAX_WORDS) {
+                    const allowedWords = words.slice(0, MAX_WORDS);
+                    const allowedText = allowedWords.join(' ');
+                    editor.setText(allowedText);
+                    setWordCount(MAX_WORDS);
                 }
-            });
+            };
+
+            editor.on('text-change', handleTextChange);
+            handleTextChange(); // Initial count
+
+            return () => {
+                editor.off('text-change', handleTextChange);
+            };
         }
-    }, []);
+    }, [notes]);
     const uploadDocumentsResponse = store?.uploadDocumentsReducer;
     const encounterOptions = store?.getEncounterReducer?.data?.encounters?.map((data) => ({
         label: data?.period?.start ? new Date(data?.period?.start)?.toISOString().split('T')?.[0] : '', value: data?._id
@@ -514,7 +528,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                         </Row>
                     </Col>
                     <Col xs={12} className="mt-1">
-                        <Form.Label className='mb-0'>Notes & Comments <small className='text-muted'>(Max length: {MAX_LENGTH})</small></Form.Label>
+                        <Form.Label className='mb-0'>Notes & Comments <small className='text-muted'>({wordCount}/{MAX_WORDS} words)</small></Form.Label>
                         <ReactQuill
                             ref={quillRef}
                             theme="snow"

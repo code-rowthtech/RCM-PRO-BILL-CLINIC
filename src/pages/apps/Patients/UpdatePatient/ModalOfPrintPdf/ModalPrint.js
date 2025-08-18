@@ -29,7 +29,7 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
     ], []);
 
     const socialHistoryOptions = useMemo(() => [
-        'Tobacco History', 'Medical History', 'Family History', 'Alcohol History', 'Surgical History'
+        'Substance Use', 'Medical History', 'Family History', 'Alcohol History', 'Surgical History'
     ], []);
 
     useEffect(() => {
@@ -58,7 +58,7 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
             dispatch(getFamilyGeneticAction({ patientId }));
         } else if (option === 'Medical History') {
             dispatch(getMedicalHistoryAction({ patientId }));
-        } else if (option === 'Tobacco History') {
+        } else if (option === 'Substance Use') {
             dispatch(getTobaccooAction({ patientId }));
         } else if (option === 'Surgical History') {
             dispatch(getSurgicalHistoryAction({ patientId }));

@@ -76,7 +76,7 @@ const useQuillWordLimit = ({
             const text = editor.getText().trim();
             const words = text.split(/\s+/).filter(Boolean);
             const wordCount = words.length;
-            const hasLongWord = words.some(word => word.length > maxWordLength);
+            const hasLongWord = maxWordLength ? words.some(word => word.length > maxWordLength) : false;
 
             if (skipFirstRun.current) {
                 skipFirstRun.current = false;

@@ -46,11 +46,9 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                     <Row>
                         {selectedTemplate?.items?.map((item, index) => (
                             <Col sm={12} key={index} className='p-2 '>
-                                <Row className=''>
+                                <Row>
                                     <Col sm={12} className='d-flex  align-items-center justify-content-between'>
                                         <h5 className="my-0 fw-semibold fs-6">{item?.label}</h5>
-                                        {/* <span><i className="bi me-1 bi-plus-circle"></i>
-                                            <i className="mdi mdi-square-edit-outline cursor-pointer"></i></span> */}
                                     </Col>
                                     <Col sm={12}>
                                         <ul className='list-unstyled fs-6 px-2'>
@@ -124,14 +122,14 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                         {store?.getTemplateReducer?.loading ? (
                             <div className="text-center py-5">
                                 <Spinner animation="border" variant="primary" />
-                                <p className="mt-2">Loading templates...</p>
+                                <p className="mt-2">{`Loading templates...`}</p>
                             </div>
                         ) : (
                             <div className="template-cards-container">
                                 {templatesData?.length === 0 ? (
                                     <div className="no-templates-placeholder text-center py-4">
                                         <FiFileText size={48} className="text-muted mb-2" />
-                                        <h5>No templates found</h5>
+                                        <h5>{`No templates found`}</h5>
                                     </div>
                                 ) : (
                                     <div className='template-grid d-flex flex-column py-1 gap-1 px-0'>
@@ -152,15 +150,15 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                         )}
                     </div>
                     <div className='d-flex justify-content-between p-2 align-items-center'>
-                        <span onClick={() => setShowModal(true)} className='fs-6 fw-semibold cursor-pointer'><i className="bi bi-plus-circle"></i>&nbsp;Add template</span>
+                        <span onClick={() => setShowModal(true)} className='fs-6 fw-semibold cursor-pointer'><i className="bi bi-plus-circle"></i>&nbsp;{`Add template`}</span>
                         {editIcon ?
                             <span onClick={() => {
                                 setEditIcon(false)
-                            }} className='fs-6 fw-semibold  cursor-pointer'><i className="bi bi-check2 cursor-pointer"></i>&nbsp;Done editing</span>
+                            }} className='fs-6 fw-semibold  cursor-pointer'><i className="bi bi-check2 cursor-pointer"></i>&nbsp;{`Done editing`}</span>
                             :
                             <span onClick={() => {
                                 setEditIcon(true)
-                            }} className='fs-6 fw-semibold  cursor-pointer'><i className="mdi mdi-square-edit-outline cursor-pointer"></i>&nbsp;Edit template</span>
+                            }} className='fs-6 fw-semibold  cursor-pointer'><i className="mdi mdi-square-edit-outline cursor-pointer"></i>&nbsp;{`Edit template`}</span>
                         }
 
                         <TemplateModal

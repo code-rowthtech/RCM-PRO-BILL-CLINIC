@@ -36,6 +36,7 @@ import PatientDocs from './Patientdocs';
 import PatientAccess from './PatientAccess';
 import DrugInteraction from './DrugInteractions/DrugInteraction';
 import ModalPrint from './ModalOfPrintPdf/ModalPrint';
+import TaskListing from './TaskList/TaskListing';
 
 const UpdatePatientIndex = () => {
     // Imports initialization
@@ -357,7 +358,7 @@ const UpdatePatientIndex = () => {
                                                             <Form
                                                                 onSubmit={handleSubmit(onSubmit)}
                                                                 className="d-flex flex-column align-items-center">
-                                                                <div className="position-relative w-75 d-flex align-items-center flex-column justify-content-center">
+                                                                <div className="position-relative w-100 d-flex align-items-center flex-column justify-content-center ms-3">
                                                                     {isCameraOpen ? (
                                                                         <video
                                                                             ref={videoRef}
@@ -834,7 +835,7 @@ const UpdatePatientIndex = () => {
                                                 />
                                             )}
                                             {selectedMainTab === 'Communication' && <p>In progress...</p>}
-                                            {selectedMainTab === 'Task' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Task' && <TaskListing/>}
                                             {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
                                             {selectedMainTab === 'Patient Access' && <PatientAccess />}
                                             {selectedMainTab === 'Lab Request' && <p>In progress...</p>}

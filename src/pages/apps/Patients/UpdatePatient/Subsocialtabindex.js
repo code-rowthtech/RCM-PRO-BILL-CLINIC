@@ -7,7 +7,7 @@ import SurgicalHistory from './SubsocialPages.js/surgicalHistory';
 
 const Subsocialtabindex = ({ patientId, isAccordionOpen, defaultTab }) => {
   const tabMapping = {
-    'Tobacco': 'Tobacco History',
+    'Tobacco': 'Substance Use',
     'Medical': 'Medical History',
     'Surgical': 'Surgical History',
     'Family / Genetic': 'Family/Genetic History',
@@ -16,7 +16,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen, defaultTab }) => {
   };
 
   const tabs = [
-    'Tobacco History',
+    'Substance Use',
     'Medical History',
     'Surgical History',
     'Family/Genetic History',
@@ -53,7 +53,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen, defaultTab }) => {
       </ul>
 
       <div className="">
-        {activeSocialTabs === 'Tobacco History' && <Tobacco patientId={patientId} isAccordionOpen={isAccordionOpen} />}
+        {activeSocialTabs === 'Substance Use' && <Tobacco patientId={patientId} isAccordionOpen={isAccordionOpen} />}
         {activeSocialTabs === 'Medical History' && <MedicalHistory patientId={patientId} isAccordionOpen={isAccordionOpen} />}
         {activeSocialTabs === 'Surgical History' && <SurgicalHistory />}
         {activeSocialTabs === 'Family/Genetic History' && <FamilyHistory patientId={patientId} isAccordionOpen={isAccordionOpen} />}

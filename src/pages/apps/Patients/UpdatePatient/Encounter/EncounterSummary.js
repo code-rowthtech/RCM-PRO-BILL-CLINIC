@@ -144,6 +144,9 @@ const EncounterSummary = () => {
         if (patientVitals?.length === 0) {
             dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 3 }));
         }
+        // if(tobaccoHistory?.length===0){
+        //     dispatch(getTobaccooActio({ patientId: patientId }));
+        // }
     }, [allergyData, problemData, medicationList])
 
     // FUNCTIONS
@@ -266,7 +269,7 @@ const EncounterSummary = () => {
                                         <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >                                            <thead>
                                             <tr className='border'>
                                                 <th className='text-white'>
-                                                    Vital Name
+                                                    {'Vital Name'}
                                                 </th>
                                                 {sortedDates?.slice(0, 3)?.map(date => (
                                                     <th className='text-white' key={date}>
@@ -277,7 +280,14 @@ const EncounterSummary = () => {
                                         </thead>
                                             <tbody>
                                                 {vitals.map((vital, index) => (
-                                                    <tr className='' key={vital.name}>
+                                                    <tr className='cursor-pointer' key={vital.name} onClick={() => {
+                                                        const latestDate = sortedDates[0];
+                                                        const value = findVitalValue(vital.name, latestDate);
+                                                        if (value) {
+                                                            const formattedValue = vital.type === 'bp' ? `${value.systolic}/${value.diastolic}` : value;
+                                                            window.populateEncounterField?.('Monitoring Chart (Vitals)', `${vital.name}: ${formattedValue} ${getDisplayUnit(vital)}`);
+                                                        }
+                                                    }}>
                                                         <td className='p-0 vitalsTableBorder'>
                                                             {vital.name} {getDisplayUnit(vital) && (
                                                                 <small className="text-muted">({getDisplayUnit(vital)})</small>
@@ -300,12 +310,12 @@ const EncounterSummary = () => {
                                         </Table>
                                         <div className="row">
                                             <div className="col-12 text-end">
-                                                <small onClick={() => setVitalsModal(true)} className='text-info cursor-pointer'>Add vitals</small>
+                                                <small onClick={() => setVitalsModal(true)} className='text-info cursor-pointer'>{`Add vitals`}</small>
                                             </div>
                                         </div>
                                         <Modal show={vitalsModal} onHide={closeVitalsModal} size="lg" centered>
                                             <Modal.Header closeButton className="px-2 py-0">
-                                                <Modal.Title className="">Add Vitals</Modal.Title>
+                                                <Modal.Title className="">{`Add Vitals`}</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
                                                 <VitalStatus />
@@ -328,17 +338,16 @@ const EncounterSummary = () => {
 
                                                     <ul className="list-unstyled pb-0 mb-0">
                                                         {allergyData.slice(0, 4).map((allergy, index) => (
-                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
-                                                                <div className="fs-6">
-                                                                    <strong title={allergy.code?.text}>
-                                                                        {allergy.code?.text?.length > 30
-                                                                            ? allergy.code?.text.slice(0, 29) + '...'
-                                                                            : allergy.code?.text || 'Unknown Allergy'}
-                                                                    </strong>
-                                                                    <div className="text-muted small">
-                                                                        {allergy.clinicalStatus?.text || 'Status not available'}
-                                                                    </div>
+                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`)}>                                                                <div className="fs-6">
+                                                                <strong title={allergy.code?.text}>
+                                                                    {allergy.code?.text?.length > 30
+                                                                        ? allergy.code?.text.slice(0, 29) + '...'
+                                                                        : allergy.code?.text || 'Unknown Allergy'}
+                                                                </strong>
+                                                                <div className="text-muted small">
+                                                                    {allergy.clinicalStatus?.text || 'Status not available'}
                                                                 </div>
+                                                            </div>
                                                                 <span className="fs-6 fw-semibold text-nowrap">
                                                                     {getSeverityBadge(allergy.criticality)}
                                                                 </span>
@@ -348,16 +357,16 @@ const EncounterSummary = () => {
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className="text-muted">No allergies recorded</div>
+                                            <div className="text-muted">{`No allergies recorded`}</div>
                                         )}
                                         <div className="row">
                                             <div className="col-12 text-end">
-                                                <small onClick={() => setShowAddAllergyModal(true)} className='text-info cursor-pointer'>Add new allergy</small>
+                                                <small onClick={() => setShowAddAllergyModal(true)} className='text-info cursor-pointer'>{`Add new allergy`}</small>
                                             </div>
                                         </div>
                                         <Modal show={showAddAllergyModal} onHide={handleAddAllergyClose} size="lg" centered>
                                             <Modal.Header closeButton className="px-2 py-0">
-                                                <Modal.Title className="">Add Allergy</Modal.Title>
+                                                <Modal.Title className="">{`Add Allergy`}</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
                                                 <AddAllergy onCancel={handleAddAllergyClose} />
@@ -383,7 +392,8 @@ const EncounterSummary = () => {
                                                         {problemData?.slice(0, 4)?.map((problem, index) => (
                                                             <li
                                                                 key={index}
-                                                                className="mb-2 d-flex justify-content-between align-items-start">
+                                                                className="mb-2 d-flex justify-content-between align-items-start cursor-pointer"
+                                                                onClick={() => window.populateEncounterField?.('Reason for Visit', problem?.code?.text || '')}>
                                                                 <div className="fs-6">
                                                                     <strong title={problem?.code?.text}>
                                                                         {problem?.code?.text?.length > 30
@@ -408,23 +418,23 @@ const EncounterSummary = () => {
                                                     <ul className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
                                                         <li className="mb-2">
                                                             <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                                <strong>No Problems Found</strong>
+                                                                <strong>{`No Problems Found`}</strong>
                                                             </div>
                                                         </li>
                                                     </ul>
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className='text-muted'>No problems recorded</div>
+                                            <div className='text-muted'>{`No problems recorded`}</div>
                                         )}
                                         <div className="row">
                                             <div className="col-12 text-end">
-                                                <small onClick={() => setShowAddProblemModal(true)} className='text-info cursor-pointer'>Add new problem</small>
+                                                <small onClick={() => setShowAddProblemModal(true)} className='text-info cursor-pointer'>{`Add new problem`}</small>
                                             </div>
                                         </div>
                                         <Modal show={showAddProblemModal} onHide={handleAddProblemClose} size="lg" centered>
                                             <Modal.Header closeButton className="px-2 py-0">
-                                                <Modal.Title className="">Add Problem</Modal.Title>
+                                                <Modal.Title className="">{`Add Problem`}</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
                                                 <AddProblem onCancel={handleAddProblemClose} />
@@ -448,11 +458,14 @@ const EncounterSummary = () => {
                                                         {medicationList?.length === 0 || !medicationList ? (
                                                             <li className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
                                                                 <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                                    <strong>No Medications Found</strong>
+                                                                    <strong>{`No Medications Found`}</strong>
                                                                 </div>
                                                             </li>
                                                         ) : medicationList?.slice(0, 4)?.map((medication, index) => (
-                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => {
+                                                                const medicationInfo = `${medication?.drugId?.proprietaryName || ''} ${medication?.drugId?.nonProprietaryName ? '(' + medication?.drugId?.nonProprietaryName + ')' : ''} - ${medication?.dosageInstruction?.[0]?.text || ''} [Status: ${medication?.status || 'Unknown'}]`;
+                                                                window.populateEncounterField?.('Prescriptions (Medications)', medicationInfo);
+                                                            }}>
                                                                 <div className="fs-6">
                                                                     <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>{medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}</strong>
                                                                     <div className="text-muted" title={medication?.drugId?.nonProprietaryName}>
@@ -492,11 +505,11 @@ const EncounterSummary = () => {
                                                 }
                                             </div>
                                         ) : (
-                                            <div className='text-muted'>No medications recorded</div>
+                                            <div className='text-muted'>{`No medications recorded`}</div>
                                         )}
                                         <div className="row">
                                             <div className="col-12 text-end">
-                                                <small onClick={() => setMedicationModal(true)} className='text-info cursor-pointer'>Add new medication</small>
+                                                <small onClick={() => setMedicationModal(true)} className='text-info cursor-pointer'>{`Add new medication`}</small>
                                             </div>
                                         </div>
                                         <AddMedication show={medicationModal} onCancel={closeMedicationModal} />
@@ -512,14 +525,14 @@ const EncounterSummary = () => {
                                                 {socialHistoryData?.tobaccoHistory?.length === 0 && socialHistoryData?.familyGeneticHistory?.length === 0 ? (
                                                     <li className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
                                                         <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                            <strong>No Social History Found</strong>
+                                                            <strong>{`No Social History Found`}</strong>
                                                         </div>
                                                     </li>
                                                 ) : (
                                                     <>
                                                         {socialHistoryData?.tobaccoHistory?.length > 0 && (
                                                             socialHistoryData?.tobaccoHistory?.map((data, index) => (
-                                                                <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                                <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Tobacco: ${data?.tobaccoUse || ''}`)}>
                                                                     <div className="fs-6">
                                                                         <strong className="text-capitalize" title={data?.tobaccoUse}>{data?.tobaccoUse?.length > 40 ? data?.tobaccoUse?.slice(0, 39) + '...' : data?.tobaccoUse}</strong>
                                                                         <div className="text-muted fs-6" >
@@ -531,7 +544,7 @@ const EncounterSummary = () => {
                                                         )}
                                                         {socialHistoryData?.familyGeneticHistory?.length > 0 && (
                                                             socialHistoryData?.familyGeneticHistory?.map((data, index) => (
-                                                                <li title='Family Genetics' key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                                <li title='Family Genetics' key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Family History: ${data?.name || ''} (${data?.relationship?.coding?.[0]?.display || ''})`)}>
                                                                     <div className="fs-6">
                                                                         <strong className="text-capitalize" title={data?.name}>{data?.name?.length > 40 ? data?.name?.slice(0, 39) + '...' : data?.name}
                                                                             <span className='ms-1'>

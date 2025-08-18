@@ -70,6 +70,7 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
 
     const todayString = DateUtils.formatDate(new Date());
     const oneMonthLaterString = DateUtils.formatDate(new Date(new Date().setMonth(new Date().getMonth() + 1)));
+    const minEndDate = scheduledDate ? DateUtils.formatDate(new Date(scheduledDate)) : todayString;
 
     // const oneYearLaterString = DateUtils.formatDate(new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
     const isReadOnly = appointmentDetails?.repeat && id;
@@ -96,7 +97,7 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
                         <Form.Control
                             {...register('dailyOccurrenceDate')}
                             type="date"
-                            min={todayString}
+                            min={minEndDate}
                             max={oneMonthLaterString}
                             readOnly={isReadOnly}
                             style={{ cursor: isReadOnly ? 'not-allowed' : '' }}
@@ -126,7 +127,7 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
     );
 });
 
-const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, id }) => {
+const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, id, scheduledDate }) => {
     const appointmentDays = watch('appointmentDay');
     const weekInterval = watch('weekInterval');
     const weeklyOccurrenceDate = watch('weeklyOccurrenceDate');
@@ -191,6 +192,7 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
     const oneYearLaterString = new Date(new Date().setFullYear(new Date().getFullYear() + 1))
         .toISOString()
         .split('T')[0];
+    const minEndDate = scheduledDate ? new Date(scheduledDate).toISOString().split('T')[0] : todayString;
 
     return (
         <>
@@ -237,7 +239,7 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                         <Form.Control
                             {...register('weeklyOccurrenceDate')}
                             type="date"
-                            min={todayString}
+                            min={minEndDate}
                             max={oneYearLaterString}
                             readOnly={appointmentDetails?.repeat && id}
                             style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}

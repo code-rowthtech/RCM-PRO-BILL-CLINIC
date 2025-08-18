@@ -29,7 +29,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
     } = useForm();
     const CategoryData = store?.getMastersDataReducer?.data1?.data?.result;
     const roleData = store?.getRolesDataReducer?.data;
-    const clinicId = loggedInUser?.clinicId;
+    const clinicId = loggedInUser?.clinicId || store?.Auth?.user?.clinicId;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const patientsData = store?.getPatientsReducer?.data?.data;
     const createTaskResponse = store?.createUserTasksReducer?.data?.status;
@@ -60,6 +60,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
     useEffect(() => {
         if (createTaskResponse === 201) {
             reset();
+            handleClose();
         }
     }, [createTaskResponse])
 
@@ -263,6 +264,17 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                                         ].find((option) => option.value === field.value) || null
                                                     }
                                                     onChange={(option) => field.onChange(option ? option.value : '')}
+                                                    onInputChange={(data) => {
+                                                        dispatch(getDoctorsAction({ status: '', search: data, page: 1, limit: 10 }));
+                                                        dispatch(getRolesAction({
+                                                            clinicId: clinicId,
+                                                            limit: 10,
+                                                            search: data,
+                                                            page: 1,
+                                                            status: true,
+                                                        })
+                                                        );
+                                                    }}
                                                     styles={{
                                                         control: (provided) => ({
                                                             ...provided,
@@ -376,6 +388,15 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                                     onChange={(val) => {
                                                         field.onChange(val ? val.value : '');
                                                         dispatch(getEncounterAction({ patientId: val?.value }))
+                                                    }}
+                                                    onInputChange={(searchValue) => {
+                                                        const data = {
+                                                            clinicId: clinicId,
+                                                            page: 1,
+                                                            limit: 10,
+                                                            search: searchValue,
+                                                        };
+                                                        dispatch(getPatientsAction(data));
                                                     }}
                                                     styles={{
                                                         control: (provided) => ({

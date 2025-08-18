@@ -31,7 +31,7 @@ export const patientMenuItems = [
         label: 'Social History',
         icon: <MdOutlinePreview />,
         subItems: [
-            { label: 'Tobacco History', tab: "Tobacco", icon: <FiPlus /> },
+            { label: 'Substance Use', tab: "Tobacco", icon: <FiPlus /> },
             { label: 'Medical History', tab: "Medical", icon: <FiPlus /> },
             { label: 'Surgical History', tab: "Surgical", icon: <FiPlus /> },
             { label: 'Family History', tab: "Family / Genetic", icon: <FiPlus /> },
