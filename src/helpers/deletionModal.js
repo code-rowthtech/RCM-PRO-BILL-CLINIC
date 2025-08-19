@@ -9,12 +9,12 @@ const DeletionModal = ({ show, onHide, onConfirm, item = 'item', isLoading = fal
             <Modal.Header className='text-center'>
                 <Modal.Title className='text-center'>Confirm Deletion</Modal.Title>
             </Modal.Header>
-            <Modal.Body className='text-center py-4 fs-5'>Are you sure you want to delete the selected <strong>{item}</strong>?</Modal.Body>
+            <Modal.Body className='text-center py-4 fs-5'>{`Are you sure you want to delete the selected`} <strong>{item}</strong>{`?`}</Modal.Body>
             <Modal.Footer>
                 <Button disabled={isLoading} className='cancel-button' onClick={onHide}>
-                    Cancel
+                    {`Cancel`}
                 </Button>
-                <Button disabled={isLoading} className='custom-buttons' style={{width:"60px"}} onClick={onConfirm}>
+                <Button disabled={isLoading} className='custom-buttons' style={{ width: "60px" }} onClick={onConfirm}>
                     {isLoading ?
                         <Spinner className='spinner-border-sm' color='white' />
                         :

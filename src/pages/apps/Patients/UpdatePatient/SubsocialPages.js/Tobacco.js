@@ -148,47 +148,47 @@ const Tobacco = () => {
                                 <Col md={6}>
                                     <Form.Group controlId="tobaccoUser">
                                         <Form.Label className="fw-medium mb-1">
-                                            Current Tobacco Use <span className="text-danger">*</span>
+                                            {`Current Tobacco Use`} <span className="text-danger">{`*`}</span>
                                         </Form.Label>
                                         <Form.Select
                                             {...register('tobaccoUse', {
                                                 required: 'Tobacco use is required',
                                             })}
                                             className="form-select-sm">
-                                            <option value="">Select an option</option>
+                                            <option value="">{`Select an option`}</option>
                                             <option value="Very heavy cigarette smoker (40+ cigs/day)">
-                                                Very heavy cigarette smoker (40+ cigs/day)
+                                                {`Very heavy cigarette smoker (40+ cigs/day)`}
                                             </option>
-                                            <option value="Cigar smoker">Cigar smoker</option>
-                                            <option value="Pipe smoker">Pipe smoker</option>
-                                            <option value="Chews tobacco">Chews tobacco</option>
+                                            <option value="Cigar smoker">{`Cigar smoker`}</option>
+                                            <option value="Pipe smoker">{`Pipe smoker`}</option>
+                                            <option value="Chews tobacco">{`Chews tobacco`}</option>
                                             <option value="Chews products containing tobacco">
-                                                Chews products containing tobacco
+                                                {`Chews products containing tobacco`}
                                             </option>
-                                            <option value="Snuff user">Snuff user</option>
-                                            <option value="Electronic cigarette user">Electronic cigarette user</option>
-                                            <option value="Heavy tobacco smoker">Heavy tobacco smoker</option>
-                                            <option value="Light tobacco smoker">Light tobacco smoker</option>
-                                            <option value="Current some day smoker">Current some day smoker</option>
-                                            <option value="Non-Smoker">Non-Smoker</option>
-                                            <option value="Ex-Smoker">Ex-Smoker</option>
+                                            <option value="Snuff user">{`Snuff user`}</option>
+                                            <option value="Electronic cigarette user">{`Electronic cigarette user`}</option>
+                                            <option value="Heavy tobacco smoker">{`Heavy tobacco smoker`}</option>
+                                            <option value="Light tobacco smoker">{`Light tobacco smoker`}</option>
+                                            <option value="Current some day smoker">{`Current some day smoker`}</option>
+                                            <option value="Non-Smoker">{`Non-Smoker`}</option>
+                                            <option value="Ex-Smoker">{`Ex-Smoker`}</option>
                                             <option value="Ex-user of moist powdered tobacco">
-                                                Ex-user of moist powdered tobacco
+                                                {`Ex-user of moist powdered tobacco`}
                                             </option>
-                                            <option value="Smoker">Smoker</option>
-                                            <option value="Unknown if ever smoked">Unknown if ever smoked</option>
+                                            <option value="Smoker">{`Smoker`}</option>
+                                            <option value="Unknown if ever smoked">{`Unknown if ever smoked`}</option>
                                             <option value="Current non smoker but past smoking history unknown">
-                                                Current non smoker but past smoking history unknown
+                                                {`Current non smoker but past smoking history unknown`}
                                             </option>
-                                            <option value="Current every day smoker">Current every day smoker</option>
+                                            <option value="Current every day smoker">{`Current every day smoker`}</option>
                                             <option value="Light cigarette smoker (1-9 cigs/day)">
-                                                Light cigarette smoker (1-9 cigs/day)
+                                                {`Light cigarette smoker (1-9 cigs/day)`}
                                             </option>
                                             <option value="Moderate cigarette smoker (10-19 cigs/day)">
-                                                Moderate cigarette smoker (10-19 cigs/day)
+                                                {`Moderate cigarette smoker (10-19 cigs/day)`}
                                             </option>
                                             <option value="Heavy cigarette smoker (20-39 cigs/day)">
-                                                Heavy cigarette smoker (20-39 cigs/day)
+                                                {`Heavy cigarette smoker (20-39 cigs/day)`}
                                             </option>
                                         </Form.Select>
                                         {errors.tobaccoUse && (
@@ -198,7 +198,7 @@ const Tobacco = () => {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="effectiveDateTime">
-                                        <Form.Label className="fw-medium mb-1">Effective Date <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className="fw-medium mb-1">{`Effective Date`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <Form.Control
                                             type="date"
                                             {...register('effectiveDateTime', {
@@ -216,7 +216,7 @@ const Tobacco = () => {
                                     <Form.Group controlId="notes" className="flex-grow-1 d-flex flex-column">
                                         <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
                                             <div>
-                                                Notes{' '}
+                                                {`Notes`}{' '}
                                                 <span
                                                     style={{ cursor: 'pointer' }}
                                                     title="Notes Suggestions"
@@ -301,7 +301,7 @@ const Tobacco = () => {
                         ) : tobaccoHistory?.length === 0 ? (
                             <div className="text-center py-4 text-muted">
                                 <i className="bi bi-journal-x fs-1"></i>
-                                <p className="mt-2 mb-0">No tobacco use records found</p>
+                                <p className="mt-2 mb-0">{`No tobacco use records found`}</p>
                             </div>
                         ) : (
                             <Accordion alwaysOpen flush className="h-100">
@@ -322,10 +322,10 @@ const Tobacco = () => {
                                                         (
                                                         {item?.note?.[0]?.time
                                                             ? new Date(item.note[0].time).toLocaleDateString('en-US', {
-                                                                  month: 'short',
-                                                                  day: 'numeric',
-                                                                  year: 'numeric',
-                                                              })
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                                year: 'numeric',
+                                                            })
                                                             : 'No date'}
                                                         -
                                                         {item?.note?.[0]?.time
@@ -384,7 +384,7 @@ const Tobacco = () => {
                                                     }}
                                                 />
                                             ) : (
-                                                <div className="text-muted fst-italic p-2">No notes available</div>
+                                                <div className="text-muted fst-italic p-2">{`No notes available`}</div>
                                             )}
                                         </Accordion.Body>
                                     </Accordion.Item>

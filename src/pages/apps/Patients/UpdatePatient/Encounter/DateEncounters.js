@@ -33,6 +33,7 @@ import { encounterClassCodes, encounterTypes } from '../../../../../utils/DataSe
 import { encryptMessage } from '../../../../../cryptoUtils';
 import ToastHandle from '../../../../../helpers/ToastMessage';
 import Spinner from '../../../../../constants/Spinner';
+import { handleUpload } from '../../../../../helpers/HandleUpload';
 
 // Local Components
 import EncounterSummary from './EncounterSummary';
@@ -100,6 +101,11 @@ const DateEncounters = ({
     const [isSessionRunning, setIsSessionRunning] = useState(false);
     const [stopwatchTime, setStopwatchTime] = useState(0);
     const intervalRef = useRef(null);
+
+    // File upload state
+    const [attachedRecords, setAttachedRecords] = useState([]);
+    console.log(attachedRecords, 'attachedRecordsattachedRecords')
+    const [uploadLoading, setUploadLoading] = useState(false);
 
     // ========================================================================
     // DERIVED STATE FROM STORE
@@ -277,6 +283,12 @@ const DateEncounters = ({
                     }
                 });
             }
+
+            console.log(encounterData, 'encounterDataencounterData')
+            // Set attached records
+            if (encounterData?.attachedRecords) {
+                setAttachedRecords(encounterData.attachedRecords);
+            }
         }
     }, [encounterAction, encounterData, setValue, notesFields, noteType, defaultNoteTypeOption, dispatch]);
 
@@ -292,6 +304,23 @@ const DateEncounters = ({
     // ========================================================================
     // UTILITY FUNCTIONS
     // ========================================================================
+
+    const handleFileUpload = async (files) => {
+        const fileArray = Array.from(files);
+        const uploadedFiles = [];
+
+        for (const file of fileArray) {
+            const uploadResult = await handleUpload(file, setUploadLoading);
+            if (uploadResult) {
+                uploadedFiles.push({
+                    url: uploadResult?.url ? uploadResult.url.split('?')[0] : '',
+                    fileName: uploadResult?.fileName || file.name
+                });
+            }
+        }
+
+        setAttachedRecords(prev => [...prev, ...uploadedFiles]);
+    };
 
     const handleNotesTypeChange = (selectedOption) => {
         dispatch(getEncounterNotesFieldsAction({ noteId: selectedOption?.value }));
@@ -511,6 +540,43 @@ const DateEncounters = ({
                 );
             }
 
+            // Render Attached Records field with file upload
+            if (name === 'Attached Records') {
+                return (
+                    <Form.Group key={name}>
+                        <Form.Label className="mb-0">{name}</Form.Label>
+                        <Form.Control
+                            type="file"
+                            multiple
+                            onChange={(e) => handleFileUpload(e.target.files)}
+                            className="mb-2"
+                            disabled={uploadLoading}
+                        />
+                        {uploadLoading && <small className="text-muted">Uploading files...</small>}
+                        {attachedRecords?.length > 0 && (
+                            <div className="mb-2">
+                                <small className="text-muted">Attached Files:</small>
+                                {attachedRecords?.map((file, index) => (
+                                    <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
+                                        <small className="text-truncate" title={file.fileName}>{file.fileName}</small>
+                                        <Button
+                                            variant="outline-danger"
+                                            size="sm"
+                                            className="p-0 ms-2"
+                                            style={{ width: '20px', height: '20px', fontSize: '10px' }}
+                                            onClick={() => setAttachedRecords(prev => prev.filter((_, i) => i !== index))}
+                                            title="Remove file"
+                                        >
+                                            ×
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </Form.Group>
+                );
+            }
+
             // Render regular fields
             return (
                 <Form.Group key={name}>
@@ -695,8 +761,8 @@ const DateEncounters = ({
                         }
                     });
                 });
-            } else {
-                // Handle regular fields
+            } else if (name !== 'Attached Records') {
+                // Handle regular fields, exclude Attached Records
                 const value = getValues(name) || '';
                 fieldsData.push({
                     type: name,
@@ -716,6 +782,7 @@ const DateEncounters = ({
             providerId: selectedProvider,
             noteType,
             data: fieldsData,
+            attachedRecords,
             period: {
                 start: data?.startDate,
             }
@@ -729,6 +796,7 @@ const DateEncounters = ({
             setUpdateClicked(true);
             dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
         } else {
+            console.log(payload, 'payloadpayload')
             dispatch(createEncounterAction({ key: encryptMessage(payload) }));
         }
 

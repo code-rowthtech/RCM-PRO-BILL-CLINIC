@@ -98,12 +98,12 @@ const MENU_ITEMS = [
         icon: 'uil-lock-open-alt',
         url: '/apps/settings/list',
         children: [
-            // {
-            //     key: 'department',
-            //     label: 'Department',
-            //     url: '/apps/settings/department',
-            //     parentKey: 'setting',
-            // },
+            {
+                key: 'department',
+                label: 'Department',
+                url: '/apps/settings/department',
+                parentKey: 'setting',
+            },
             {
                 key: 'designation',
                 label: 'Designation',
@@ -165,11 +165,11 @@ const MENU_ITEMS = [
         icon: 'uil uil-money-bill',
         redirectTo: '#',
     },
-   {
-    label: 'Help & Support',
-    icon: 'uil uil-question-circle', // Unicons equivalent of help/support
-    redirectTo: '#',
-}
+    {
+        label: 'Help & Support',
+        icon: 'uil uil-question-circle', // Unicons equivalent of help/support
+        redirectTo: '#',
+    }
     // {
     //     key: 'logout',
     //     label: 'Logout',

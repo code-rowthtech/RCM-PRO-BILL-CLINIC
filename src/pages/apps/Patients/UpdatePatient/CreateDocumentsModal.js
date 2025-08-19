@@ -348,7 +348,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
         <Modal className={`upload-documents`} show={showUploadModal} onHide={closeModal} size="lg" centered>
             <Modal.Header className="p-0 border-0 pb-0 d-flex justify-content-center">
                 <Modal.Title className="fw-semibold ">
-                    Upload Documents
+                    {`Upload Documents`}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body className='pt-0'>
@@ -361,7 +361,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                             style={{ borderStyle: 'dashed', backgroundColor: '#f8f9fa' }}
                         >
                             <UploadIcon size={24} className="mb-1" />
-                            <p>Drag and drop files or</p>
+                            <p>{`Drag and drop files or`}</p>
                             <input
                                 type="file"
                                 multiple
@@ -375,10 +375,10 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                                 size="sm"
                                 onClick={() => document.getElementById('file-upload').click()}
                             >
-                                Browse Files
+                                {`Browse Files`}
                             </Button>
                             <p className="small text-muted mt-2">
-                                Allowed: PDF, DOC, DOCX, JPG, PNG, GIF. Max size: {MAX_FILE_SIZE_MB}MB
+                                {`Allowed: PDF, DOC, DOCX, JPG, PNG, GIF. Max size:`} {MAX_FILE_SIZE_MB}{`MB`}
                             </p>
                         </div>
                     </Col>
@@ -392,20 +392,20 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                                     className="table-centered table-nowrap mb-0  rounded table-scroll small-first-col ">
                                     <thead className="text-white">
                                         <tr>
-                                            <th style={{ width: '10%' }} className='text-white' >
+                                            <th style={{ width: '10%' }} className='text-white'>
                                                 <Form.Check
                                                     type="checkbox"
-                                                    checked={selectedFiles.length === files.length && files.length > 0}
+                                                    checked={selectedFiles?.length === files?.length && files?.length > 0}
                                                     onChange={handleSelectAll}
                                                     aria-label="Select all files"
                                                 />
                                             </th>
-                                            <th style={{ width: '26.6%' }} className='text-white'>File</th>
-                                            <th style={{ width: '26.6%' }} className='text-white'>Type</th>
-                                            <th style={{ width: '26.6%' }} className='text-white'>Size</th>
-                                            <OverlayTrigger overlay={<Tooltip>Delete Selected</Tooltip>}>
+                                            <th style={{ width: '26.6%' }} className='text-white'>{`File`}</th>
+                                            <th style={{ width: '26.6%' }} className='text-white'>{`Type`}</th>
+                                            <th style={{ width: '26.6%' }} className='text-white'>{`Size`}</th>
+                                            <OverlayTrigger overlay={<Tooltip>{`Delete Selected`}</Tooltip>}>
                                                 <th style={{ width: '10%' }} className='text-white'>
-                                                    <DeleteIcon className={`${selectedFiles.length > 0 ? "" : "d-none"}`} onClick={handleDeleteSelected} />
+                                                    <DeleteIcon className={`${selectedFiles?.length > 0 ? "" : "d-none"}`} onClick={handleDeleteSelected} />
                                                 </th>
                                             </OverlayTrigger>
                                         </tr>
@@ -422,34 +422,33 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                                                                 e.stopPropagation();
                                                                 handleCheckboxChange(index);
                                                             }}
-                                                            aria-label={`Select file ${file.name}`}
+                                                            aria-label={`Select file ${file?.name}`}
                                                         />
                                                     </td>
-                                                    <td style={{ width: '26.6%' }} title={file.name}>{file.name?.length > 8 ? file.name?.slice(0, 7) + '...' : file.name}</td>
-                                                    <td style={{ width: '26.6%' }} title={file.type.split('/').pop().toUpperCase()}>{file.type.split('/').pop().toUpperCase()?.length > 5
+                                                    <td style={{ width: '26.6%' }} title={file?.name}>{file?.name?.length > 8 ? file?.name?.slice(0, 7) + '...' : file?.name}</td>
+                                                    <td style={{ width: '26.6%' }} title={file?.type.split('/').pop().toUpperCase()}>{file.type.split('/').pop().toUpperCase()?.length > 5
                                                         ? file.type.split('/').pop().toUpperCase()?.slice(0, 4) + '...' :
                                                         file.type.split('/').pop().toUpperCase()}
                                                     </td>
-                                                    <td style={{ width: '26.6%' }}>{formatFileSize(file.size)}</td>
+                                                    <td style={{ width: '26.6%' }}>{formatFileSize(file?.size)}</td>
                                                     <td style={{ width: '10%' }}></td>
                                                 </tr>
                                             )) :
                                             <tr>
                                                 <td colSpan={5} className='text-center py-2'>
-                                                    <h6>No files selected</h6>
+                                                    <h6>{`No files selected`}</h6>
                                                 </td>
                                             </tr>}
                                     </tbody>
                                 </Table>
                             </Col>
                         </Row>
-
                     </Col>
                     <Col xs={12} className='mt-1'>
                         <Row>
                             <Col xs={4}>
                                 <Form.Group>
-                                    <Form.Label className='mb-0 mt-1'>Document Type</Form.Label>
+                                    <Form.Label className='mb-0 mt-1'>{`Document Type`}</Form.Label>
                                     <AsyncSelect
                                         loadOptions={loadDocumentTypeOptions}
                                         defaultOptions={formattedDocumentTypes.slice(0, 10)}
@@ -478,12 +477,12 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                             </Col>
                             <Col xs={4}>
                                 <Form.Group>
-                                    <Form.Label className='mb-0 mt-1'>Document Category</Form.Label>
+                                    <Form.Label className='mb-0 mt-1'>{`Document Category`}</Form.Label>
                                     <Form.Select onChange={(e) => {
-                                        setDocumentCategory(documentCategories.find(category => category.code === e.target.value) || null);
+                                        setDocumentCategory(documentCategories?.find(category => category?.code === e.target.value) || null);
                                     }}>
                                         <option value="" hidden>Select</option>
-                                        {documentCategories.map((category, index) => (
+                                        {documentCategories?.map((category, index) => (
                                             <option key={index} value={category.code}>{category.display}</option>
                                         ))}
                                     </Form.Select>
@@ -491,7 +490,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                             </Col>
                             <Col xs={4}>
                                 <Form.Group>
-                                    <Form.Label className='mb-0 mt-1'>Encounter</Form.Label>
+                                    <Form.Label className='mb-0 mt-1'>{`Encounter`}</Form.Label>
                                     <Select
                                         options={encounterOptions}
                                         isSearchable
@@ -528,7 +527,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                         </Row>
                     </Col>
                     <Col xs={12} className="mt-1">
-                        <Form.Label className='mb-0'>Notes & Comments <small className='text-muted'>({wordCount}/{MAX_WORDS} words)</small></Form.Label>
+                        <Form.Label className='mb-0'>{`Notes & Comments`} <small className='text-muted'>({wordCount}/{MAX_WORDS} words)</small></Form.Label>
                         <ReactQuill
                             ref={quillRef}
                             theme="snow"
@@ -559,7 +558,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                             setDocumentCategory(null);
                             setNotes('');
                             setEncounter('');
-                        }} disabled={isLoading}>Cancel</Button>
+                        }} disabled={isLoading}>{`Cancel`}</Button>
                         <Button className='custom-buttons' onClick={handleUpload} disabled={isLoading}>
                             {isLoading ? <Spinner className='spinner-border-sm' color='white' /> : 'Upload'}
                         </Button>
