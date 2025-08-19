@@ -963,6 +963,8 @@ const NewDoctor = () => {
                                                                         onChange={(data) => {
                                                                             setSelectedDepartment(data);
                                                                         }}
+                                                                        menuPlacement="auto"
+                                                                        menuPosition="fixed"
                                                                     />
                                                                 </Form.Group>
                                                             </div>
