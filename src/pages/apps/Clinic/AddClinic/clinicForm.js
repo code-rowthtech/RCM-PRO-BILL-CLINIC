@@ -247,8 +247,8 @@ const ClinicForm = ({ clinicId }) => {
             orgType: data?.clinicType,
             // orgSpecialty: [],
             orgLogo: {
-                url: logo?.url ? logo?.url?.split('?')[0] : (clinicsDataGet?.logo?.url || ''),
-                fileName: logoName || (clinicsDataGet?.logo?.fileName || ''),
+                url: logo?.url ? logo?.url?.split('?')[0] : clinicsDataGet?.logo?.url || '',
+                fileName: logoName || clinicsDataGet?.logo?.fileName || '',
             },
             identifier: constantIdentifiers.map((item) => ({
                 identifierType: item.type,
@@ -276,6 +276,7 @@ const ClinicForm = ({ clinicId }) => {
     const [logoUploading, setLogoUploading] = useState(false);
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
+        if (!selectedFile) return; // Exit if no file selected (cancelled)
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo({ url: url?.url?.split('?')[0] });
@@ -984,7 +985,7 @@ const ClinicForm = ({ clinicId }) => {
                             <AddressForm addresses={practiceAddresses} setAddresses={setPracticeAddresses} />
                             <hr className="mb-1" />
                             <Row>
-                                <Col sm={12} className='mt-2'>
+                                <Col sm={12} className="mt-2">
                                     <h5>
                                         Points of Contact (POC)
                                         <span
@@ -1011,7 +1012,7 @@ const ClinicForm = ({ clinicId }) => {
                                         </Col>
                                         <Col sm={6} className="position-relative">
                                             <Form.Group>
-                                                <Form.Label className='mb-0'>Role</Form.Label>
+                                                <Form.Label className="mb-0">Role</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     placeholder="Enter Role"
@@ -1031,7 +1032,7 @@ const ClinicForm = ({ clinicId }) => {
 
                                         <Col sm={6}>
                                             <Form.Group>
-                                                <Form.Label className='mb-0'>Email</Form.Label>
+                                                <Form.Label className="mb-0">Email</Form.Label>
                                                 <Form.Control
                                                     type="email"
                                                     placeholder="Enter Email"

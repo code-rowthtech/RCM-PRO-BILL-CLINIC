@@ -60,9 +60,13 @@ const setAuthorization = (token) => {
     if (userData?._id) {
         axios.defaults.headers.common['x-user-id'] = `${encryptMessage(userData._id)}`; // Set new value for 'XUIXX'
     }
+    
     if (token) {
-        axios.defaults.headers.common['Authorization'] = `${encryptMessage(token)}`;
-    } else {
+        const tokenValue = token.startsWith('token=') ? token.substring(6) : token;
+        axios.defaults.headers.common['Authorization'] = `${encryptMessage(tokenValue)}`;
+    }
+    
+    else {
         delete axios.defaults.headers.common['Authorization']; // Remove the header if token is null/undefined
     }
 };
@@ -70,7 +74,6 @@ const setAuthorization = (token) => {
 
 const getUserFromSession = () => {
     const user = sessionStorage.getItem(AUTH_SESSION_KEY);
-
     return user ? (typeof user == 'object' ? user : JSON.parse(user)) : null;
 
 };

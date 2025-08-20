@@ -177,6 +177,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
         return acc;
     }, {});
 
+
     // Get sorted dates (newest first)
     const sortedDates = Object.keys(groupedVitals).sort((a, b) =>
         new Date(b) - new Date(a)
@@ -611,6 +612,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                         {sortedDates?.map(date => (
                             <th className='text-white' key={date}>
                                 {formatDate(date)}
+
                                 {editingDate === date ? (
                                     <i
                                         className="bi bi-check-square ms-2 cursor-pointer fs-4 text-success"

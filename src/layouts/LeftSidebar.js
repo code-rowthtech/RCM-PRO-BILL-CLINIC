@@ -661,9 +661,13 @@ const LeftSidebar = ({
                                 ) : (
                                     <ul className="ps-0 scroll-container" style={{ height: '90vh' }}>
                                         {appointmentsData &&
-                                            appointmentsData?.map((data, index) => (
+                                            appointmentsData
+                                                ?.filter((data, index, self) => 
+                                                    index === self.findIndex(item => item?.subject?._id === data?.subject?._id)
+                                                )
+                                                ?.map((data, index) => (
                                                 <li
-                                                    key={index}
+                                                    key={data?.subject?._id || index}
                                                     className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
                                                     style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
                                                     onClick={() =>
