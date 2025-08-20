@@ -41,7 +41,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [vitals, setVitals] = useState(defaultVitals);
-
+    console.log(vitals, 'vitals');
     // const [newVital, setNewVital] = useState('');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
@@ -175,6 +175,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
         acc[date].push(...vitalGroup.vitals);
         return acc;
     }, {});
+
 
     // Get sorted dates (newest first)
     const sortedDates = Object.keys(groupedVitals).sort((a, b) =>
@@ -591,6 +592,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                         {sortedDates?.map(date => (
                             <th className='text-white' key={date}>
                                 {formatDate(date)}
+
                                 {editingDate === date ? (
                                     <i
                                         className="bi bi-check-square ms-2 cursor-pointer fs-4 text-success"

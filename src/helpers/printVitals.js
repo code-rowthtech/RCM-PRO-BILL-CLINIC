@@ -1,4 +1,4 @@
-import { loggedInUser } from "./api/loggedInUser";
+import { loggedInUser } from './api/loggedInUser';
 
 export const handlePrintVitals = ({ vitals, patientDetails }) => {
     // Define all possible vital types with their display names and units
@@ -18,7 +18,7 @@ export const handlePrintVitals = ({ vitals, patientDetails }) => {
         { key: 'Weight-for-Length Percentile', display: 'Weight-for-Length %', unit: '%' },
         { key: 'Head Occipital-frontal Circumference Percentile', display: 'Head Circumference %', unit: '%' },
         { key: 'Oxygen Concentration', display: 'O₂ Concentration', unit: '%' },
-        { key: 'Inhaled Oxygen Flow Rate', display: 'O₂ Flow Rate', unit: 'l/min' }
+        { key: 'Inhaled Oxygen Flow Rate', display: 'O₂ Flow Rate', unit: 'l/min' },
     ];
 
     // Group by date and sort chronologically
@@ -26,7 +26,7 @@ export const handlePrintVitals = ({ vitals, patientDetails }) => {
         const date = new Date(vitalGroup.effectiveDateTime).toLocaleDateString('en-GB');
         const time = new Date(vitalGroup.effectiveDateTime).toLocaleTimeString('en-GB', {
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
         });
         const key = `${date} (${time})`;
 
@@ -39,29 +39,26 @@ export const handlePrintVitals = ({ vitals, patientDetails }) => {
 
     // Sort dates chronologically
     const sortedDates = Object.keys(groupedByDate).sort((a, b) => {
-        return new Date(a.split(' ')[0].split('/').reverse().join('-')) -
-            new Date(b.split(' ')[0].split('/').reverse().join('-'));
+        return (
+            new Date(a.split(' ')[0].split('/').reverse().join('-')) -
+            new Date(b.split(' ')[0].split('/').reverse().join('-'))
+        );
     });
 
     // Function to get vital value with proper formatting
     const getVitalValue = (entries, type) => {
-        const vital = entries.find(v =>
-            v.code?.text === type.key ||
-            v.code?.coding?.[0]?.display === type.key
-        );
+        const vital = entries.find((v) => v.code?.text === type.key || v.code?.coding?.[0]?.display === type.key);
 
         if (!vital) return '';
 
         // Handle blood pressure specially
         if (vital.component?.length > 0) {
-            const systolic = vital.component.find(c =>
-                c.code?.coding?.[0]?.code === '8480-6' ||
-                c.code?.coding?.[0]?.display?.includes('Systolic')
+            const systolic = vital.component.find(
+                (c) => c.code?.coding?.[0]?.code === '8480-6' || c.code?.coding?.[0]?.display?.includes('Systolic')
             )?.valueQuantity?.value;
 
-            const diastolic = vital.component.find(c =>
-                c.code?.coding?.[0]?.code === '8462-4' ||
-                c.code?.coding?.[0]?.display?.includes('Diastolic')
+            const diastolic = vital.component.find(
+                (c) => c.code?.coding?.[0]?.code === '8462-4' || c.code?.coding?.[0]?.display?.includes('Diastolic')
             )?.valueQuantity?.value;
 
             return systolic && diastolic ? `${systolic}/${diastolic} mmHg` : '';
@@ -81,14 +78,17 @@ export const handlePrintVitals = ({ vitals, patientDetails }) => {
     };
 
     // Generate table rows
-    const rows = vitalTypes.map(type => {
-        const rowData = sortedDates.map(date => {
+    const rows = vitalTypes.map((type) => {
+        const rowData = sortedDates.map((date) => {
             return getVitalValue(groupedByDate[date], type);
         });
 
-        const tds = rowData.map(val => `<td>${val || '-'}</td>`).join('');
+        const tds = rowData.map((val) => `<td>${val || '-'}</td>`).join('');
         return `<tr><td>${type.display} (${type.unit})</td>${tds}</tr>`;
     });
+
+    // Helper function to capitalize first letter
+    const capitalize = (str) => str && typeof str === 'string' ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
 
     const originalContent = document.body.innerHTML;
 
@@ -161,7 +161,7 @@ export const handlePrintVitals = ({ vitals, patientDetails }) => {
   <div class="header">
     <div class="patient-info">
       <h4>PATIENT INFORMATION</h4>
-      <strong>Name:</strong> ${patientDetails?.name?.[0]?.prefix + ' ' || ''}${patientDetails?.name?.[0]?.given?.join(' ') + ' ' || ''}${patientDetails?.name?.[0]?.family || 'N/A'}<br>
+      <strong>Name:</strong> ${capitalize(patientDetails?.name?.[0]?.prefix) ? capitalize(patientDetails?.name?.[0]?.prefix) + ' ' : ''}${patientDetails?.name?.[0]?.given?.map(name => capitalize(name)).join(' ') || ''}${patientDetails?.name?.[0]?.given?.length ? ' ' : ''}${capitalize(patientDetails?.name?.[0]?.family) || 'N/A'}<br>
       <strong>DOB:</strong> ${patientDetails?.birthDate ? new Date(patientDetails.birthDate).toLocaleDateString('en-GB') : 'N/A'}<br>
       <strong>Age:</strong> ${patientDetails?.approxAge ? Math.floor(patientDetails.approxAge) + ' years' : 'N/A'}<br>
       <strong>Gender:</strong> ${patientDetails?.gender ? patientDetails.gender.charAt(0).toUpperCase() + patientDetails.gender.slice(1) : 'N/A'}<br>
@@ -182,7 +182,7 @@ export const handlePrintVitals = ({ vitals, patientDetails }) => {
     <thead>
       <tr>
         <th>Vital Sign</th>
-        ${sortedDates.map(date => `<th>${date}</th>`).join('')}
+        ${sortedDates.map((date) => `<th>${date}</th>`).join('')}
       </tr>
     </thead>
     <tbody>
@@ -202,8 +202,24 @@ export const handlePrintVitals = ({ vitals, patientDetails }) => {
 </html>
 `;
 
-    document.body.innerHTML = printContent;
-    window.print();
-    document.body.innerHTML = originalContent;
-    window.location.reload();
+    // document.body.innerHTML = printContent;
+    // window.print();
+    // document.body.innerHTML = originalContent;
+    // window.location.reload();
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert('Popup blocked. Please allow popups for this site.');
+        return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for window to finish loading styles and layout
+    printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+        // printWindow.close(); // optional
+    };
 };

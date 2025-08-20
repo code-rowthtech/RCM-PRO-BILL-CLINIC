@@ -648,17 +648,19 @@ const NewPractice = () => {
                                                                 className="text-dark cursor-pointer"
                                                                 style={{ zIndex: 1 }}
                                                             />
-                                                            <p 
+                                                            <p
                                                                 className="mb-0 cursor-pointer"
                                                                 onClick={async (e) => {
                                                                     e.stopPropagation();
-                                                                    const fileUrl = logo?.url || clinicsDataGet?.orgLogo?.url;
+                                                                    const fileUrl =
+                                                                        logo?.url || clinicsDataGet?.orgLogo?.url;
                                                                     const fileName = logoName || 'logo';
                                                                     if (fileUrl) {
                                                                         try {
                                                                             const response = await fetch(fileUrl);
                                                                             const blob = await response.blob();
-                                                                            const url = window.URL.createObjectURL(blob);
+                                                                            const url =
+                                                                                window.URL.createObjectURL(blob);
                                                                             const link = document.createElement('a');
                                                                             link.href = url;
                                                                             link.download = fileName;
@@ -666,7 +668,10 @@ const NewPractice = () => {
                                                                             link.click();
                                                                             document.body.removeChild(link);
                                                                             window.URL.revokeObjectURL(url);
-                                                                            setTimeout(() => window.open(fileUrl, '_blank'), 100);
+                                                                            setTimeout(
+                                                                                () => window.open(fileUrl, '_blank'),
+                                                                                100
+                                                                            );
                                                                         } catch (error) {
                                                                             const link = document.createElement('a');
                                                                             link.href = fileUrl;
@@ -891,28 +896,56 @@ const NewPractice = () => {
                                                                                 onClick={async (e) => {
                                                                                     e.stopPropagation();
                                                                                     const fileUrl = item?.file?.url;
-                                                                                    const fileName = item?.file?.name || 'document';
+                                                                                    const fileName =
+                                                                                        item?.file?.name || 'document';
                                                                                     if (fileUrl) {
                                                                                         try {
-                                                                                            const response = await fetch(fileUrl);
-                                                                                            const blob = await response.blob();
-                                                                                            const url = window.URL.createObjectURL(blob);
-                                                                                            const link = document.createElement('a');
+                                                                                            const response =
+                                                                                                await fetch(fileUrl);
+                                                                                            const blob =
+                                                                                                await response.blob();
+                                                                                            const url =
+                                                                                                window.URL.createObjectURL(
+                                                                                                    blob
+                                                                                                );
+                                                                                            const link =
+                                                                                                document.createElement(
+                                                                                                    'a'
+                                                                                                );
                                                                                             link.href = url;
                                                                                             link.download = fileName;
-                                                                                            document.body.appendChild(link);
+                                                                                            document.body.appendChild(
+                                                                                                link
+                                                                                            );
                                                                                             link.click();
-                                                                                            document.body.removeChild(link);
-                                                                                            window.URL.revokeObjectURL(url);
-                                                                                            window.open(fileUrl, '_blank');
+                                                                                            document.body.removeChild(
+                                                                                                link
+                                                                                            );
+                                                                                            window.URL.revokeObjectURL(
+                                                                                                url
+                                                                                            );
+                                                                                            window.open(
+                                                                                                fileUrl,
+                                                                                                '_blank'
+                                                                                            );
                                                                                         } catch (error) {
-                                                                                            const link = document.createElement('a');
+                                                                                            const link =
+                                                                                                document.createElement(
+                                                                                                    'a'
+                                                                                                );
                                                                                             link.href = fileUrl;
                                                                                             link.download = fileName;
-                                                                                            document.body.appendChild(link);
+                                                                                            document.body.appendChild(
+                                                                                                link
+                                                                                            );
                                                                                             link.click();
-                                                                                            document.body.removeChild(link);
-                                                                                            window.open(fileUrl, '_blank');
+                                                                                            document.body.removeChild(
+                                                                                                link
+                                                                                            );
+                                                                                            window.open(
+                                                                                                fileUrl,
+                                                                                                '_blank'
+                                                                                            );
                                                                                         }
                                                                                     }
                                                                                 }}>
@@ -1014,7 +1047,7 @@ const NewPractice = () => {
                                                 <hr className="mb-1" />
                                                 <Row>
                                                     <Col sm={12}>
-                                                        <h5>
+                                                        <h5 className='mb-0'>
                                                             Points of Contact (POC)
                                                             <span
                                                                 className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
@@ -1043,7 +1076,7 @@ const NewPractice = () => {
                                                                 </Form.Group>
                                                             </Col>
                                                             <Col sm={6} className="position-relative">
-                                                                <Form.Group>
+                                                                <Form.Group className={pocs.length === 1 ? '' : 'pe-4'}>
                                                                     <Form.Label>Role</Form.Label>
                                                                     <Form.Control
                                                                         type="text"
@@ -1061,7 +1094,7 @@ const NewPractice = () => {
                                                                 {pocs.length > 1 && (
                                                                     <span
                                                                         className="text-danger cursor-pointer position-absolute fs-5 fw-bolder"
-                                                                        style={{ right: '-1%', top: '45%' }}
+                                                                        style={{ right: '1%', top: '45%' }}
                                                                         onClick={() => removePoc(pocIndex)}>
                                                                         <CiCircleMinus />
                                                                     </span>

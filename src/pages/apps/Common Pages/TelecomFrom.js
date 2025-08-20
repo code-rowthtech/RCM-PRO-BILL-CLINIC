@@ -166,7 +166,7 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                 )}
                             </Col>
 
-                            <Col sm={4} className={`position-relative  ${contactDetails?.length > 1 ? 'pe-4 d-flex align-items-center' : ''}`}>
+                            <Col sm={4} className={`position-relative  ${contactDetails?.length > 1 ? 'd-flex align-items-center' : ''}`}>
                                 <Form.Select
                                     value={item.use}
                                     data-has-value={!!watch(`constantContact[${index}].use`)}
