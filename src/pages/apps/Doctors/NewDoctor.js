@@ -440,7 +440,7 @@ const NewDoctor = () => {
                                                                             : {}
                                                                     }
                                                                     className="custom-buttons text-nowrap">
-                                                                    Email to Provider
+                                                                    {`Email to Provider`}
                                                                 </Button>
                                                             </span>
                                                         </OverlayTrigger>
@@ -449,7 +449,7 @@ const NewDoctor = () => {
                                             )}
                                             <div className="d-none d-md-block me-2">
                                                 <Button className="cancel-button" onClick={handleNewDoctor}>
-                                                    Back
+                                                    {`Back`}
                                                 </Button>
                                             </div>
                                         </div>

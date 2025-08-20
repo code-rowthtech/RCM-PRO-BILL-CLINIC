@@ -107,33 +107,6 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         }
     }, [updateSuccess]);
 
-    // useEffect(() => {
-    //     if (appointmentsList?.length > 0) {
-    //         const transformedEvents = appointmentsList
-    //             .map((data) => {
-    //                 const start = new Date(data.start);
-    //                 const end = new Date(data.end);
-    //                 console.log(start, end, 'datadatasdjif')
-
-    //                 if (isNaN(start) || isNaN(end)) return null;
-
-    //                 return {
-    //                     event_id: data?._id,
-    //                     title: data?.reason?.[0]?.coding?.[0]?.display,
-    //                     status: data?.status,
-    //                     start: start,
-    //                     end: end,
-    //                     slotStart: data?.start,
-    //                     slotEnd: data?.end,
-    //                     patientName: data?.subject?.name?.find((data) => data?.use === 'official')?.text,
-    //                 };
-    //             })
-    //             .filter(Boolean);
-
-    //         setEvents(transformedEvents);
-    //     }
-    // }, [appointmentsList]);
-
     useEffect(() => {
         if (appointmentsList?.length > 0) {
             const transformedEvents = appointmentsList

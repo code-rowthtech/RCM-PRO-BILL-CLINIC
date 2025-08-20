@@ -314,19 +314,19 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                             'homePhone',
                                             !id
                                                 ? {
-                                                      pattern: {
-                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                          message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                      },
-                                                      maxLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not exceed 13 digits',
-                                                      },
-                                                      minLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not be less than 13 digits',
-                                                      },
-                                                  }
+                                                    pattern: {
+                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                    },
+                                                    maxLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not exceed 13 digits',
+                                                    },
+                                                    minLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not be less than 13 digits',
+                                                    },
+                                                }
                                                 : {}
                                         )}
                                         onChange={(e) => {
@@ -377,19 +377,19 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                             'cellPhone',
                                             !id
                                                 ? {
-                                                      pattern: {
-                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                          message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                      },
-                                                      maxLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not exceed 13 digits',
-                                                      },
-                                                      minLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not be less than 13 digits',
-                                                      },
-                                                  }
+                                                    pattern: {
+                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                    },
+                                                    maxLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not exceed 13 digits',
+                                                    },
+                                                    minLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not be less than 13 digits',
+                                                    },
+                                                }
                                                 : {}
                                         )}
                                         onChange={(e) => {
@@ -440,19 +440,19 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                             'officePhone',
                                             !id
                                                 ? {
-                                                      pattern: {
-                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                          message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                      },
-                                                      maxLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not exceed 13 digits',
-                                                      },
-                                                      minLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not be less than 13 digits',
-                                                      },
-                                                  }
+                                                    pattern: {
+                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                    },
+                                                    maxLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not exceed 13 digits',
+                                                    },
+                                                    minLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not be less than 13 digits',
+                                                    },
+                                                }
                                                 : {}
                                         )}
                                         onChange={(e) => {
@@ -562,12 +562,11 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                 <div className="row">
                     <div className="col-md-3 col-12">
                         <div className="mb-1 d-flex flex-column position-relative">
-                            <Form.Label className="mb-0">Patient Photo</Form.Label>
+                            <Form.Label className="mb-0">{`Patient Photo`}</Form.Label>
                             <div
                                 onClick={() => !profileUploading && logoFileInputRef.current.click()}
-                                className={`custom-file-upload justify-content-between cursor-pointer ${
-                                    logoName || profileUploading ? '' : 'custom-form-fields'
-                                }`}
+                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? 'form-control' : 'custom-form-fields'
+                                    }`}
                                 style={{
                                     backgroundColor: '#d9ddd6',
                                     opacity: profileUploading ? 0.7 : 1,
@@ -576,10 +575,10 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                 {profileUploading
                                     ? 'Uploading...'
                                     : logoName
-                                      ? logoName.length > 25
-                                          ? `${logoName.substring(0, 22)}...`
-                                          : logoName.split('/').pop().slice(0, 30) + '...'
-                                      : 'Upload Patient Chart Photo'}
+                                        ? logoName.length > 25
+                                            ? `${logoName.substring(0, 22)}...`
+                                            : logoName.split('/').pop().slice(0, 30) + '...'
+                                        : 'Upload Patient Chart Photo'}
                                 <p className="mb-0">
                                     <FiUploadCloud />
                                 </p>

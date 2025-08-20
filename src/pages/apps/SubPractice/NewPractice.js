@@ -152,9 +152,9 @@ const NewPractice = () => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                              url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                          }
+                            url: data?.documents?.[0], // Store URL
+                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -512,9 +512,8 @@ const NewPractice = () => {
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
                                             <button
-                                                className={`text-black nav-link font_active_tabs ${
-                                                    activeTab === 'personalDetails' ? 'active' : ''
-                                                }`}
+                                                className={`text-black nav-link font_active_tabs ${activeTab === 'personalDetails' ? 'active' : ''
+                                                    }`}
                                                 onClick={() => handleTabChange('personalDetails')}>
                                                 Practice Sub Information
                                             </button>
@@ -626,16 +625,15 @@ const NewPractice = () => {
                                                     <Form.Label className="mb-0">Upload Logo</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
-                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                            logoName || logoUploading
-                                                                ? 'form-control'
-                                                                : 'custom-form-fields'
-                                                        }`}>
+                                                        className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading
+                                                            ? 'form-control'
+                                                            : 'custom-form-fields'
+                                                            }`}>
                                                         {logoName
                                                             ? logoName.split('/').pop().slice(0, 30) + '...'
                                                             : logoUploading
-                                                              ? 'Uploading...'
-                                                              : 'Upload Logo'}
+                                                                ? 'Uploading...'
+                                                                : 'Upload Logo'}
                                                         <div className="d-flex align-items-center gap-2">
                                                             <FiEye
                                                                 onClick={(e) => {
@@ -648,7 +646,7 @@ const NewPractice = () => {
                                                                 className="text-dark cursor-pointer"
                                                                 style={{ zIndex: 1 }}
                                                             />
-                                                            <p 
+                                                            <p
                                                                 className="mb-0 cursor-pointer"
                                                                 onClick={async (e) => {
                                                                     e.stopPropagation();
@@ -791,8 +789,8 @@ const NewPractice = () => {
                                                                             item.type === 'NPI' || item.type === 'CLIA'
                                                                                 ? 10
                                                                                 : item.type === 'NAIC'
-                                                                                  ? 5
-                                                                                  : 10
+                                                                                    ? 5
+                                                                                    : 10
                                                                         }
                                                                         {...register(`identifiers[${index}].number`, {
                                                                             // required: defaultIdentifiers.includes(item.type)
@@ -857,35 +855,34 @@ const NewPractice = () => {
                                                                                 )
                                                                                 .click()
                                                                         }
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                                            item.file
-                                                                                ? 'form-control'
-                                                                                : 'custom-form-fields'
-                                                                        }`}>
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${item.file
+                                                                            ? 'form-control'
+                                                                            : 'custom-form-fields'
+                                                                            }`}>
                                                                         {index === selectedIndex
                                                                             ? 'Uploading...'
                                                                             : item.file?.name
-                                                                              ? item.file.name.length > 30
-                                                                                  ? item.file.name.slice(0, 25) + '...'
-                                                                                  : item.file.name
-                                                                              : 'Upload Document'}
+                                                                                ? item.file.name.length > 30
+                                                                                    ? item.file.name.slice(0, 25) + '...'
+                                                                                    : item.file.name
+                                                                                : 'Upload Document'}
 
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {(item?.file?.url ||
                                                                                 clinicsDataGet?.orgLogo?.url) && (
-                                                                                <FiEye
-                                                                                    className="cursor-pointer"
-                                                                                    onClick={(e) => {
-                                                                                        e.preventDefault();
-                                                                                        e.stopPropagation();
-                                                                                        handleShowModal(
-                                                                                            item?.file?.url ||
+                                                                                    <FiEye
+                                                                                        className="cursor-pointer"
+                                                                                        onClick={(e) => {
+                                                                                            e.preventDefault();
+                                                                                            e.stopPropagation();
+                                                                                            handleShowModal(
+                                                                                                item?.file?.url ||
                                                                                                 clinicsDataGet?.orgLogo
                                                                                                     ?.url
-                                                                                        );
-                                                                                    }}
-                                                                                />
-                                                                            )}
+                                                                                            );
+                                                                                        }}
+                                                                                    />
+                                                                                )}
                                                                             <p
                                                                                 className="mb-0 cursor-pointer"
                                                                                 onClick={async (e) => {
@@ -1014,7 +1011,7 @@ const NewPractice = () => {
                                                 <hr className="mb-1" />
                                                 <Row>
                                                     <Col sm={12}>
-                                                        <h5>
+                                                        <h5 className='mb-0'>
                                                             Points of Contact (POC)
                                                             <span
                                                                 className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
@@ -1023,11 +1020,11 @@ const NewPractice = () => {
                                                     </Col>
                                                 </Row>
                                                 {pocs.map((poc, pocIndex) => (
-                                                    <div key={pocIndex} className="p-2">
+                                                    <div key={pocIndex} className={`p-2 ${pocs.length > 1 ? 'pe-3' : ''}`}>
                                                         <Row>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-2">
-                                                                    <Form.Label>Full Name</Form.Label>
+                                                                    <Form.Label>{`Full Name`}</Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         value={poc.name.text}
@@ -1044,7 +1041,7 @@ const NewPractice = () => {
                                                             </Col>
                                                             <Col sm={6} className="position-relative">
                                                                 <Form.Group>
-                                                                    <Form.Label>Role</Form.Label>
+                                                                    <Form.Label>{`Role`}</Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         placeholder="Enter Role"
@@ -1061,7 +1058,7 @@ const NewPractice = () => {
                                                                 {pocs.length > 1 && (
                                                                     <span
                                                                         className="text-danger cursor-pointer position-absolute fs-5 fw-bolder"
-                                                                        style={{ right: '-1%', top: '45%' }}
+                                                                        style={{ right: '-0.5%', top: '45%' }}
                                                                         onClick={() => removePoc(pocIndex)}>
                                                                         <CiCircleMinus />
                                                                     </span>
@@ -1161,8 +1158,6 @@ const NewPractice = () => {
                         </div>
                     </Card>
                 </div>
-                {/* <EmailToSubClinicModal setIsModalRequest={setIsModalRequest} closeModal={closeModal} show={show} formData={formData} /> */}
-                {/* <ResetPassword closeModal={closepassModal} show={passShow} /> */}
             </div>
             <Modal show={showModalPic} onHide={handleCloseModal} centered>
                 <Modal.Body>

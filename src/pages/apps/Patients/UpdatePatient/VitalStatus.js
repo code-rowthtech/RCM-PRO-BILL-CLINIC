@@ -41,7 +41,6 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [vitals, setVitals] = useState(defaultVitals);
-
     // const [newVital, setNewVital] = useState('');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
@@ -67,6 +66,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     };
 
     const [validationErrors, setValidationErrors] = useState({});
+    const [editValidationErrors, setEditValidationErrors] = useState({});
     const validateVital = (vital, unitSystem) => {
         const rules = validationSchema[vital.name];
         if (!rules) return '';
@@ -161,6 +161,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                         code: "kg/m2"
                     }
                 };
+                console.log(effectiveDateTime, 'effectiveDateTimeeffectiveDateTime')
                 dispatch(createVitalsAction({ key: encryptMessage(observation) }));
             }
         }
@@ -338,60 +339,77 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     };
     const renderVitalCell = (vital, date) => {
         const { value, _id } = findVitalValue(vital.name, date);
+        const editErrorKey = `${vital.name}-${date}`;
+
         if (date === editingDate) {
             if (vital.type === 'bp') {
                 const bpValue = value || { systolic: '', diastolic: '' };
                 return (
-                    <div className="d-flex">
-                        <Form.Control
-                            type="number"
-                            defaultValue={bpValue.systolic}
-                            onBlur={(e) => handleUpdateVital(
-                                vital.name,
-                                { systolic: e.target.value, diastolic: bpValue.diastolic },
-                                date,
-                                _id // Pass the vital's _id
-                            )}
-                            size="sm"
-                            className="me-1"
-                        />
-                        /
-                        <Form.Control
-                            type="number"
-                            defaultValue={bpValue.diastolic}
-                            onBlur={(e) => handleUpdateVital(
-                                vital.name,
-                                { systolic: bpValue.systolic, diastolic: e.target.value },
-                                date,
-                                _id // Pass the vital's _id
-                            )}
-                            size="sm"
-                            className="ms-1"
-                        />
+                    <div>
+                        <div className="d-flex">
+                            <Form.Control
+                                type="number"
+                                defaultValue={bpValue.systolic}
+                                onBlur={(e) => handleUpdateVital(
+                                    vital.name,
+                                    { systolic: e.target.value, diastolic: bpValue.diastolic },
+                                    date,
+                                    _id // Pass the vital's _id
+                                )}
+                                size="sm"
+                                className="me-1"
+                            />
+                            /
+                            <Form.Control
+                                type="number"
+                                defaultValue={bpValue.diastolic}
+                                onBlur={(e) => handleUpdateVital(
+                                    vital.name,
+                                    { systolic: bpValue.systolic, diastolic: e.target.value },
+                                    date,
+                                    _id // Pass the vital's _id
+                                )}
+                                size="sm"
+                                className="ms-1"
+                            />
+                        </div>
+                        {editValidationErrors[editErrorKey] && (
+                            <div className="text-danger small">{editValidationErrors[editErrorKey]}</div>
+                        )}
                     </div>
                 );
             }
 
             if (vital.type === 'dropdown') {
                 return (
-                    <Form.Select
-                        defaultValue={value || ''}
-                        onBlur={(e) => handleUpdateVital(vital.name, e.target.value, date, _id)}
-                        size="sm"
-                    >
-                        <option value="">Select</option>
-                        {vital.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </Form.Select>
+                    <div>
+                        <Form.Select
+                            defaultValue={value || ''}
+                            onBlur={(e) => handleUpdateVital(vital.name, e.target.value, date, _id)}
+                            size="sm"
+                        >
+                            <option value="">Select</option>
+                            {vital.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                        </Form.Select>
+                        {editValidationErrors[editErrorKey] && (
+                            <div className="text-danger small">{editValidationErrors[editErrorKey]}</div>
+                        )}
+                    </div>
                 );
             }
 
             return (
-                <Form.Control
-                    type="number"
-                    defaultValue={value || ''}
-                    onBlur={(e) => handleUpdateVital(vital.name, e.target.value, date, _id)}
-                    size="sm"
-                />
+                <div>
+                    <Form.Control
+                        type="number"
+                        defaultValue={value || ''}
+                        onBlur={(e) => handleUpdateVital(vital.name, e.target.value, date, _id)}
+                        size="sm"
+                    />
+                    {editValidationErrors[editErrorKey] && (
+                        <div className="text-danger small">{editValidationErrors[editErrorKey]}</div>
+                    )}
+                </div>
             );
         }
 
@@ -453,7 +471,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
         const vital = vitals.find(v => v.name === vitalName);
         if (!vital) return;
 
-        const effectiveDateTime = date.includes('T') ? date : `${date}T${visitDateTime.time}:00`;
+        const effectiveDateTime = `${date.split('T')[0]}T${visitDateTime.time}:00`;
 
         let observation;
         if (vital.type === 'bp') {
@@ -557,8 +575,10 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
         // Validate before dispatching
         const error = validateVital({ ...vital, value: newValue });
         if (error) {
-            setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
+            setEditValidationErrors(prev => ({ ...prev, [`${vital.name}-${date}`]: error }));
             return;
+        } else {
+            setEditValidationErrors(prev => ({ ...prev, [`${vital.name}-${date}`]: '' }));
         }
 
         // Dispatch update or create action
@@ -595,7 +615,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                                     <i
                                         className="bi bi-check-square ms-2 cursor-pointer fs-4 text-success"
                                         onClick={() => {
-                                                    dispatch(getVitalsByPatientIdAction({ patientId, limit: 5 }))
+                                            dispatch(getVitalsByPatientIdAction({ patientId, limit: 5 }))
                                             // Save all changes for this date
                                             setEditingDate(null);
                                         }}

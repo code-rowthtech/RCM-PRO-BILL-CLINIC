@@ -197,7 +197,7 @@ const Designation = () => {
                                                 setEdit(null);
                                             }}
                                             className="custom-buttons py-1">
-                                            New Desigination
+                                            {`New Desigination`}
                                         </Button>
                                     </Col>
                                 </Row>
@@ -209,21 +209,11 @@ const Designation = () => {
                             style={{ height: tableGetData?.length === 0 ? '' : 'auto' }}>
                             <thead className="text-white">
                                 <tr className="">
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        S.No.
-                                    </th>
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        Department Name
-                                    </th>
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        Created Date
-                                    </th>
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        Status
-                                    </th>
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        Action
-                                    </th>
+                                    {['S.No.', 'Designation Name', 'Created Date', 'Status', 'Action']?.map((header, index) => (
+                                        <th key={index} className="text-white py-2" style={{ fontSize: '13px' }}>
+                                            {header}
+                                        </th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>

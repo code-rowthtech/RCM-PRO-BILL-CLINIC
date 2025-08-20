@@ -3,43 +3,27 @@ import { Col, Form, Row, Button, Table, Modal, InputGroup, Card, OverlayTrigger,
 import { useForm } from 'react-hook-form';
 import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
-import profileDummy from '../../../../assets/images/profileDummy.png';
 import us from '../../../../assets/images/flags/us.jpg';
 import {
     createClinicAction,
     getCities2Action,
     getCities3Action,
-    getCities4Action,
-    getCities5Action,
-    getCities6Action,
     getCitiesAction,
     getClinicAction,
-    getClinicById,
-    getClinicByParentAction,
-    getClinicTypeAction,
-    getStatesByCountryAction,
-    updateClinicAction,
 } from '../../../../redux/clinics/actions';
-import { VscLoading } from 'react-icons/vsc';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { FaDownload, FaPlus } from 'react-icons/fa';
+import { Link, useSearchParams } from 'react-router-dom';
 import { FiMinusCircle } from "react-icons/fi";
 import { FiDownloadCloud, FiEdit, FiEye, FiInfo, FiMinus, FiTrash } from 'react-icons/fi';
-import UploadToS3 from '../../../../helpers/uploads3';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../../cryptoUtils';
-import ToastHandle from '../../../../helpers/ToastMessage';
-import { FiUploadCloud } from 'react-icons/fi';
 import ChangePasswordModal from '../../../../components/ChangePasswordModal';
 import { handleFirstSpace } from '../../../../helpers/noSpace';
-import { getDoctorsAction, getSubClinicAction, updateSubClinicAction } from '../../../../redux/actions';
-import { FormInput } from '../../../../components';
-import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
-import { components } from 'react-select';
+import { getSubClinicAction } from '../../../../redux/actions';
+import { MdVerified } from 'react-icons/md';
 import AddressForm from '../../Common Pages/AddressForm';
 import TelecomFrom from '../../Common Pages/TelecomFrom';
 
-const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
+const ClinicForm = ({ clinicId }) => {
     const {
         register,
         handleSubmit,
@@ -49,7 +33,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     } = useForm();
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    // const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
     const updateId = searchParams.get('updateid');
@@ -84,8 +67,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     // const [stateToSelect, setStateToSelect] = useState(null);
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
-    const createResponse = store?.createClinicsReducer?.data?.status;
-    const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
@@ -123,9 +104,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                              url: data?.documents?.[0]?.url, // Store URL
-                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                          }
+                            url: data?.documents?.[0]?.url, // Store URL
+                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -524,10 +505,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const date = new Date(dateString);
         return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
     };
-//  const handleUpdate = (patient) => {
-//         const payload = { id: patient?._id, active: !patient?.active, category: 'Department' };
-//         dispatch(updateSubClinicAction({ key: encryptMessage(payload) }));
-//     };
+    //  const handleUpdate = (patient) => {
+    //         const payload = { id: patient?._id, active: !patient?.active, category: 'Department' };
+    //         dispatch(updateSubClinicAction({ key: encryptMessage(payload) }));
+    //     };
     return (
         <>
             {store.getClinicsReducer?.loading ? (
@@ -602,11 +583,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     />
                                     <span
                                         style={{ right: '2%', top: '43%' }}
-                                        className={`${
-                                            clinicsDataGet?.userId?.verified_email
-                                                ? 'text-success position-absolute fs-4'
-                                                : 'd-none'
-                                        }`}>
+                                        className={`${clinicsDataGet?.userId?.verified_email
+                                            ? 'text-success position-absolute fs-4'
+                                            : 'd-none'
+                                            }`}>
                                         <MdVerified />
                                     </span>
 
@@ -618,14 +598,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                 <div
                                     onClick={handleLogoClick}
-                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                        logoName || logoUploading ? 'form-control' : 'custom-form-fields'
-                                    }`}>
+                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading ? 'form-control' : 'custom-form-fields'
+                                        }`}>
                                     {logoName
                                         ? logoName.split('/').pop().slice(0, 30) + '...'
                                         : logoUploading
-                                          ? 'Uploading...'
-                                          : 'Upload Logo'}
+                                            ? 'Uploading...'
+                                            : 'Upload Logo'}
                                     <div className="d-flex align-items-center gap-2">
                                         <FiEye
                                             onClick={(e) => {
@@ -772,24 +751,24 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         item.type === 'NPI' || item.type === 'CLIA'
                                                             ? 10
                                                             : item.type === 'NAIC'
-                                                              ? 10
-                                                              : item.type === 'Medicare'
-                                                                ? 11
-                                                                : item.type === 'Medicaid'
-                                                                  ? 12
-                                                                  : item.type === 'State License'
-                                                                    ? 15
-                                                                    : item.type === 'Accreditation'
-                                                                      ? 10
-                                                                      : item.type === 'CCN'
-                                                                        ? 6
-                                                                        : item.type === 'Taxonomy Code'
-                                                                          ? 10
-                                                                          : item.type === 'DUNS'
-                                                                            ? 9
-                                                                            : item.type === 'Facility ID'
-                                                                              ? 12
-                                                                              : 20
+                                                                ? 10
+                                                                : item.type === 'Medicare'
+                                                                    ? 11
+                                                                    : item.type === 'Medicaid'
+                                                                        ? 12
+                                                                        : item.type === 'State License'
+                                                                            ? 15
+                                                                            : item.type === 'Accreditation'
+                                                                                ? 10
+                                                                                : item.type === 'CCN'
+                                                                                    ? 6
+                                                                                    : item.type === 'Taxonomy Code'
+                                                                                        ? 10
+                                                                                        : item.type === 'DUNS'
+                                                                                            ? 9
+                                                                                            : item.type === 'Facility ID'
+                                                                                                ? 12
+                                                                                                : 20
                                                     }
                                                     {...register(`identifiers[${index}].number`, {
                                                         // required: defaultIdentifiers.includes(item.type)
@@ -885,16 +864,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     onClick={() =>
                                                         document.getElementById(`fileInput-identifier-${index}`).click()
                                                     }
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                        item.file ? 'form-control' : 'custom-form-fields'
-                                                    }`}>
+                                                    className={`custom-file-upload justify-content-between cursor-pointer ${item.file ? 'form-control' : 'custom-form-fields'
+                                                        }`}>
                                                     {index === selectedIndex
                                                         ? 'Uploading...'
                                                         : item.file?.name
-                                                          ? item.file.name.length > 30
-                                                              ? item.file.name.slice(0, 25) + '...'
-                                                              : item.file.name
-                                                          : 'Upload Document'}
+                                                            ? item.file.name.length > 30
+                                                                ? item.file.name.slice(0, 25) + '...'
+                                                                : item.file.name
+                                                            : 'Upload Document'}
                                                     <div className="d-flex align-items-center gap-2">
                                                         {item?.file?.url && (
                                                             <FiEye
@@ -992,7 +970,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         className="minusIcons cursor-pointer position-absolute fs-5 fw-bold"
                                                         style={{ right: '-2%', top: '12%' }}
                                                         onClick={() => removeIdentifier(index)}>
-                                                    <FiMinusCircle  />
+                                                        <FiMinusCircle />
                                                     </span>
                                                 )}
                                             </Col>
@@ -1020,7 +998,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Row>
                                         <Col sm={6}>
                                             <Form.Group>
-                                                <Form.Label  className="mb-0">Full Name</Form.Label>
+                                                <Form.Label className="mb-0">Full Name</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     value={poc.name.text}
@@ -1046,7 +1024,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     className="minusIcons cursor-pointer position-absolute fs-5 fw-bold fw-bolder"
                                                     style={{ right: '-1%', top: '45%' }}
                                                     onClick={() => removePoc(pocIndex)}>
-                                                    <FiMinusCircle  />
+                                                    <FiMinusCircle />
                                                 </span>
                                             )}
                                         </Col>
@@ -1113,10 +1091,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     to={'/apps/Practice/new-practice'}
                                     variant="primary"
                                     className="custom-buttons">
-                                    Add Multiple
+                                    {`Add Multiple`}
                                 </Button>
                                 <Button variant="primary" className="custom-buttons" onClick={() => setShowModal(true)}>
-                                    Change Password
+                                    {`Change Password`}
                                 </Button>
 
                                 <Button
@@ -1149,13 +1127,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Table responsive className="table-centered table-nowrap mb-0">
                                             <thead className="text-white">
                                                 <tr>
-                                                    <th className="text-white">S.No.</th>
-                                                    <th className="text-white">PRACTICE NAME</th>
-                                                    <th className="text-white">LOCATION</th>
-                                                    <th className="text-white">PRACTICE TYPE</th>
-                                                    {/* <th className="text-white">SPECIALITY</th> */}
-                                                    <th className="text-white">STATUS</th>
-                                                    <th className="text-white">ACTION</th>
+                                                    {["S.No.", "PRACTICE NAME", "LOCATION", "PRACTICE TYPE", "STATUS", "ACTION"]?.map((data, index) => (
+                                                        <th className="text-white" key={index}>{data}</th>
+                                                    ))}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1186,7 +1160,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             <Form.Switch
                                                                 className={patient.active ? 'custom-active' : ''}
                                                                 checked={patient.active}
-                                                                // onChange={() => handleUpdate(patient)}
+                                                            // onChange={() => handleUpdate(patient)}
                                                             />
                                                         </td>
                                                         <td>

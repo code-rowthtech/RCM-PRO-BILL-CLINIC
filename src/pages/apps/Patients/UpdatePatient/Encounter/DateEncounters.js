@@ -433,7 +433,20 @@ const DateEncounters = ({
                 const wordCount = countWords(content.replace(/<[^>]*>/g, ' '));
                 if (wordCount <= maxWords) {
                     onChange(content);
+                } else {
+                    ToastHandle(`Maximum word limit of ${maxWords} exceeded`, 'warning');
                 }
+            };
+
+            const getWordCount = (text) => {
+                return countWords(text?.replace(/<[^>]*>/g, ' ') || '');
+            };
+
+            const getWordCountColor = (count, max) => {
+                const percentage = (count / max) * 100;
+                if (percentage >= 90) return 'text-danger';
+                if (percentage >= 75) return 'text-warning';
+                return 'text-muted';
             };
 
             // Render SOAP Notes section
@@ -489,9 +502,18 @@ const DateEncounters = ({
                                             })}
                                         </Form.Select>
                                     </div>
-                                    <div className="col-2 text-end pe-2">
-                                        {MAX_WORDS + ' words'}
-                                    </div>
+                                    <Controller
+                                        name={section}
+                                        control={control}
+                                        render={({ field: { value } }) => {
+                                            const wordCount = getWordCount(value);
+                                            return (
+                                                <div className={`col-2 text-end pe-2 ${getWordCountColor(wordCount, MAX_WORDS)}`}>
+                                                    {wordCount}/{MAX_WORDS} words
+                                                </div>
+                                            );
+                                        }}
+                                    />
                                 </Form.Label>
                                 {/* Show populated data with remove options for SOAP sections */}
                                 {populatedFields[section] && populatedFields[section].length > 0 && (
@@ -550,25 +572,38 @@ const DateEncounters = ({
                             multiple
                             onChange={(e) => handleFileUpload(e.target.files)}
                             className="mb-2"
+                            accept='.pdf, .doc, .docx, .jpg, .jpeg, .png, .xls, .xlsx, .csv'
                             disabled={uploadLoading}
-                        />
-                        {uploadLoading && <small className="text-muted">Uploading files...</small>}
+                            title="Allowed file types: PDF, DOC, DOCX, JPG, JPEG, PNG, XLS, XLSX, CSV"
+                        />                        {uploadLoading && <small className="text-muted">Uploading files...</small>}
                         {attachedRecords?.length > 0 && (
                             <div className="mb-2">
                                 <small className="text-muted">Attached Files:</small>
                                 {attachedRecords?.map((file, index) => (
                                     <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
                                         <small className="text-truncate" title={file.fileName}>{file.fileName}</small>
-                                        <Button
-                                            variant="outline-danger"
-                                            size="sm"
-                                            className="p-0 ms-2"
-                                            style={{ width: '20px', height: '20px', fontSize: '10px' }}
-                                            onClick={() => setAttachedRecords(prev => prev.filter((_, i) => i !== index))}
-                                            title="Remove file"
-                                        >
-                                            ×
-                                        </Button>
+                                        <div className="d-flex align-items-center gap-1">
+                                            <Button
+                                                variant="outline-primary"
+                                                size="sm"
+                                                className="p-0"
+                                                style={{ width: '20px', height: '20px', fontSize: '10px' }}
+                                                onClick={() => window.open(file.url, '_blank')}
+                                                title="Preview file"
+                                            >
+                                                👁
+                                            </Button>
+                                            <Button
+                                                variant="outline-danger"
+                                                size="sm"
+                                                className="p-0"
+                                                style={{ width: '20px', height: '20px', fontSize: '10px' }}
+                                                onClick={() => setAttachedRecords(prev => prev.filter((_, i) => i !== index))}
+                                                title="Remove file"
+                                            >
+                                                ×
+                                            </Button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -582,7 +617,18 @@ const DateEncounters = ({
                 <Form.Group key={name}>
                     <Form.Label className="mb-0 d-flex align-items-center justify-content-between">
                         <p className='mb-0'>{name}</p>
-                        <p className='mb-0'>{MAX_WORDS + ' words'}</p>
+                        <Controller
+                            name={name}
+                            control={control}
+                            render={({ field: { value } }) => {
+                                const wordCount = inputType === 'text-editor' ? getWordCount(value) : countWords(value || '');
+                                return (
+                                    <p className={`mb-0 ${getWordCountColor(wordCount, MAX_WORDS)}`}>
+                                        {wordCount}/{MAX_WORDS} words
+                                    </p>
+                                );
+                            }}
+                        />
                     </Form.Label>
                     {/* Show populated data with remove options */}
                     {populatedFields[name] && populatedFields[name].length > 0 && (
@@ -650,7 +696,11 @@ const DateEncounters = ({
                                         if (wordCount === MAX_WORDS) {
                                             if (lastWord.length <= MAX_WORD_LENGTH && /\S$/.test(input)) {
                                                 onChange(input);
+                                            } else if (lastWord.length > MAX_WORD_LENGTH) {
+                                                ToastHandle(`Word "${lastWord}" exceeds max ${MAX_WORD_LENGTH} characters`, 'warning');
                                             }
+                                        } else {
+                                            ToastHandle(`Maximum word limit of ${MAX_WORDS} exceeded`, 'warning');
                                         }
                                     }}
                                 />

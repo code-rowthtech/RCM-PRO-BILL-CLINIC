@@ -879,6 +879,10 @@ table {
     height: 90vh !important;
 }
 
+.page-modal-height {
+    height: 60vh !important;
+}
+
 .textLeftSidebar {
     color: #8391a2 !important;
     font-size: 0.9375rem !important;

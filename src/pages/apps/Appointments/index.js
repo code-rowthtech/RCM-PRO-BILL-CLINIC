@@ -57,7 +57,6 @@ const AppointmentsList = ({
     const [selectedStatus, setSelectedStatus] = useState('');
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
     const {
-        register,
         handleSubmit,
         formState: { errors },
     } = useForm();
@@ -307,7 +306,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
-        label: data?.name[0]?.text + ' ',
+        label: data?.name[0]?.text + ' ' + data?.telecom?.find((tel) => tel?.system === 'email')?.value || '',
     }));
     useEffect(() => {
         const doctorPayload = { status: true, search: doctorSearch };
@@ -367,7 +366,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     }
                                                 )}
                                                 onClick={() => setActiveTab('appointmentCalendar')}>
-                                                <CiCalendar /> Appointment Calendar
+                                                <CiCalendar /> {`Appointment Calendar`}
                                             </span>
                                         </li>
                                         <li className="nav-item">
@@ -380,7 +379,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     }
                                                 )}
                                                 onClick={() => setActiveTab('appointments')}>
-                                                <FaRegListAlt /> Appointment List
+                                                <FaRegListAlt /> {`Appointment List`}
                                             </span>
                                         </li>
                                     </ul>
@@ -533,6 +532,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                         zIndex: 9999, // 🔥 z-index if using portal
                                                     }),
                                                 }}
+                                                menuPlacement="auto"
+                                                menuPosition="fixed"
                                             />
 
                                             {/* Additional controls shown only in the "Appointments" tab */}

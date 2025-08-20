@@ -140,7 +140,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                     {encounterTabs?.map((tab) => (
                         <div
                             key={tab?.id}
-                            className={`cursor-pointer p-1 fs-6 rounded-0 list-group-item  
+                            className={`${encounterTabs?.length > 1 ? 'cursor-pointer' : ''}  p-1 fs-6 rounded-0 list-group-item  
                                     d-flex align-items-center flex-fill justify-content-center fw-bold 
                                      ${activeTab === tab?.id ? 'active-patient-chart-tab fw-medium border border-muted' : 'border border-muted'}`}
                             onClick={() => {

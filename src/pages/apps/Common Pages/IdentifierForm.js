@@ -307,7 +307,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     </Col>
                 </Row>
             ))}
-            
+
             <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
                 <Modal.Body>
                     <div className="d-flex justify-content-center">
@@ -322,20 +322,29 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             justifyContent: 'center',
                             alignItems: 'center',
                         }}>
-                        <img
-                            src={previewUrl}
-                            alt="File Preview"
-                            style={{
-                                maxWidth: '100%',
-                                maxHeight: '100vh',
-                                objectFit: 'contain',
-                                display: 'block',
-                            }}
-                        />
+                        {previewUrl?.toLowerCase().endsWith('.pdf') ? (
+                            <iframe
+                                src={previewUrl}
+                                title="PDF Preview"
+                                width="100%"
+                                height="500px"
+                                style={{ border: 'none' }}
+                            />
+                        ) : (
+                            <img
+                                src={previewUrl}
+                                alt="File Preview"
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '100vh',
+                                    objectFit: 'contain',
+                                    display: 'block',
+                                }}
+                            />
+                        )}
                     </div>
                 </Modal.Body>
-            </Modal>
-        </div>
+            </Modal>        </div>
     );
 };
 

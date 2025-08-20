@@ -348,14 +348,14 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 occupation: data?.occupation,
                 workLocation: data?.employerAddress
                     ? {
-                          address: {
-                              line: [data?.employerAddress],
-                              city: data?.employerCity,
-                              state: data?.employerStateName,
-                              postalCode: data?.employerZip,
-                              country: 'United States',
-                          },
-                      }
+                        address: {
+                            line: [data?.employerAddress],
+                            city: data?.employerCity,
+                            state: data?.employerStateName,
+                            postalCode: data?.employerZip,
+                            country: 'United States',
+                        },
+                    }
                     : {},
             },
             identifier: finalIdentifiers,
@@ -819,7 +819,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={3}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className="mb-0">Employment Status</Form.Label>
+                                            <Form.Label className="mb-0">{`Employment Status`}</Form.Label>
                                             <Form.Select {...register('employmentStatus')}>
                                                 <option value="">Select Employment Status</option>
                                                 <option value="employed">Employed</option>
@@ -836,7 +836,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={3}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className="mb-0">Occupation</Form.Label>
+                                            <Form.Label className="mb-0">{`Occupation`}</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Enter Occupation"
@@ -858,7 +858,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                 <Row className="position-relative">
                                     <Col sm={12}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">Address</Form.Label>
+                                            <Form.Label className="mb-0">{`Address`}</Form.Label>
                                             <div style={{ position: 'relative' }}>
                                                 <Form.Control
                                                     type="text"
@@ -887,11 +887,10 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -933,7 +932,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">State</Form.Label>
+                                            <Form.Label className="mb-0">{`State`}</Form.Label>
                                             <Form.Select
                                                 {...register('employerStateName')}
                                                 onChange={(e) => {
@@ -960,7 +959,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">City</Form.Label>
+                                            <Form.Label className="mb-0">{`City`}</Form.Label>
                                             <Form.Select
                                                 disabled={
                                                     store?.getCitiesReducer?.loading ||
@@ -968,7 +967,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                 }
                                                 {...register('employerCity')}>
                                                 {store?.getCitiesReducer?.loading ||
-                                                store?.getCitiesReducer?.cities4?.loading ? (
+                                                    store?.getCitiesReducer?.cities4?.loading ? (
                                                     <option value="" hidden>
                                                         Loading...
                                                     </option>

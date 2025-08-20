@@ -463,8 +463,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     'dailyOccurrenceDate',
                     appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate
                         ? new Date(appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate)
-                              ?.toISOString()
-                              .split('T')[0]
+                            ?.toISOString()
+                            .split('T')[0]
                         : ''
                 );
                 setValue('daysNumberDaily', appointmentDetails?.recurrenceTemplate?.every);
@@ -477,8 +477,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     'weeklyOccurrenceDate',
                     appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate
                         ? new Date(appointmentDetails?.recurrenceTemplate?.lastOccurrenceDate)
-                              ?.toISOString()
-                              .split('T')[0]
+                            ?.toISOString()
+                            .split('T')[0]
                         : ''
                 );
                 setValue('weekInterval', appointmentDetails?.recurrenceTemplate?.every);
@@ -581,16 +581,16 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             minutesDuration: data.duration,
             examRoom: data?.consultationRoom,
             ...(appointmentReason?.text ||
-            appointmentReason?.display === appointmentDetails?.reason?.[0]?.coding?.[0]?.display
+                appointmentReason?.display === appointmentDetails?.reason?.[0]?.coding?.[0]?.display
                 ? {}
                 : {
-                      reason: [
-                          {
-                              coding: appointmentReason,
-                              text: appointmentReason?.display,
-                          },
-                      ],
-                  }),
+                    reason: [
+                        {
+                            coding: appointmentReason,
+                            text: appointmentReason?.display,
+                        },
+                    ],
+                }),
             status: data?.status,
             slot: data?.startTime,
             ...recurrenceTemplate,
@@ -987,8 +987,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     {(id
                                         ? appointmentStatus
                                         : appointmentStatus.filter((data) =>
-                                              ['proposed', 'booked', 'arrived', 'checked-in'].includes(data.code)
-                                          )
+                                            ['proposed', 'booked', 'arrived', 'checked-in'].includes(data.code)
+                                        )
                                     ).map((data, index) => (
                                         <option value={data.code} key={index}>
                                             {data.display}
@@ -1073,7 +1073,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     store?.rescheduleAppointmentReducer?.loading
                                 }>
                                 {store?.createAppointmentReducer?.loading ||
-                                store?.rescheduleAppointmentReducer?.loading ? (
+                                    store?.rescheduleAppointmentReducer?.loading ? (
                                     <Spinner color="white" className="spinner-border-sm" />
                                 ) : (
                                     'Save'
@@ -1083,23 +1083,21 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     </Row>
                 </Form>
             )}
-            <Modal show={showModal} onHide={handleClosePatientModal} size="xl" centered>
-                <Modal.Header className="py-0 px-2 ">
-                    <Modal.Title className="px-0 py-0">Add New Patient</Modal.Title>
+            <Modal show={showModal} size="xl" centered>
+                <Modal.Header className="py-0 px-2">
+                    <Modal.Title className="px-1 py-2">{`Add New Patient`}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body
-                    style={{
-                        overflowY: 'scroll',
-                        height: '70vh',
-                        scrollbarWidth: 'none',
-                        msOverflowStyle: 'none',
-                    }}
+                    // style={{
+                    //     overflowY: 'scroll',
+                    //     height: '70vh',
+                    //     scrollbarWidth: 'none',
+                    //     msOverflowStyle: 'none',
+                    // }}
                     className="px-0 py-0">
-                    <style>{`::-webkit-scrollbar { display: none; }`}</style>
-                    <div className="px-2">
+                    <div className="p-0">
                         {activeTab === 'personalDetails' && <NewPatient isModal={true} patientId={patientId} handleClosePatientModal={handleClosePatientModal} />}
                         {activeTab === 'responsible' && <Responsiblle patientId={patientId} />}
-                        {/* {activeTab === 'insurance' && <Insurance patientId={patientId} />} */}
                         {activeTab === 'demographicDetails' && <Demographicdetails patientId={patientId} />}
                         {activeTab === 'referringDoctor' && <ReferringDoctor patientId={patientId} />}
                     </div>
@@ -1114,8 +1112,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             <ConsultationModal
                 show={consultationModal}
                 onClose={closeConsultationModal}
-                // defaultValues={edit}
-                // isEdit={!!edit}
+            // defaultValues={edit}
+            // isEdit={!!edit}
             />
         </div>
     );

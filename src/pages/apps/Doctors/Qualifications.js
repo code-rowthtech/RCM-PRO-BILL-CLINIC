@@ -5,7 +5,7 @@ import { createDoctorDetailAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { FiEye, FiInfo, FiUploadCloud, FiDownloadCloud } from 'react-icons/fi';
+import { FiEye, FiInfo, FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import Select from 'react-select';
@@ -79,7 +79,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
             if (url?.url) {
                 handleQualificationChange(index, 'degreeFile', { url: url.url, fileName, localPreviewUrl });
             }
-        } catch (error) {}
+        } catch (error) { }
         setDegreeUploading((prev) => ({ ...prev, [index]: false }));
     };
     const QualificationOptions = qualificationsData.map((qualification) => ({
@@ -89,35 +89,36 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     }));
 
     const onsubmit = (data) => {
-    const qualificationData = qualifications?.map((item) => {
-        const qualification = {};
-        if (item?.degreeName?.data || item?.degreeName) qualification.code = item?.degreeName?.data || item?.degreeName;
-        if (item?.degreeFile) qualification.documents = item?.degreeFile;
-        if (item?.issuerOrganisation) qualification.issuer = item?.issuerOrganisation;
-        return qualification;
-    });
+        const qualificationData = qualifications?.map((item) => {
+            const qualification = {};
+            if (item?.degreeName?.data || item?.degreeName) qualification.code = item?.degreeName?.data || item?.degreeName;
+            if (item?.degreeFile) qualification.documents = item?.degreeFile;
+            if (item?.issuerOrganisation) qualification.issuer = item?.issuerOrganisation;
+            return qualification;
+        });
 
-    const filteredDocuments = documents.map(doc => {
-        const filtered = {};
-        if (doc.name) filtered.name = doc.name;
-        if (doc.number) filtered.number = doc.number; 
-        if (doc.issuingAuthority) filtered.issuingAuthority = doc.issuingAuthority;
-        if (doc.document) filtered.document = doc.document;
-        if (doc.note) filtered.note = doc.note;
-        return filtered;
-    });
+        const filteredDocuments = documents.map(doc => {
+            const filtered = {};
+            if (doc.name) filtered.name = doc.name;
+            if (doc.number) filtered.number = doc.number;
+            if (doc.issuingAuthority) filtered.issuingAuthority = doc.issuingAuthority;
+            if (doc.document) filtered.document = doc.document;
+            if (doc.note) filtered.note = doc.note;
+            return filtered;
+        });
 
-    const payload = {
-        ...(updateId ? { doctorId: id } : { doctorId: docId }),
-        qualification: qualificationData,
-        otherDocuments: filteredDocuments
+        const payload = {
+            ...(updateId ? { doctorId: id } : { doctorId: docId }),
+            qualification: qualificationData,
+            otherDocuments: filteredDocuments
+        };
+        dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
     };
-    dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
-};
+
     useEffect(() => {
         if (doctorDetails && updateId) {
             // Set qualifications data
-            const updatedQualifications = doctorDetails?.qualification?.length > 0 
+            const updatedQualifications = doctorDetails?.qualification?.length > 0
                 ? doctorDetails.qualification.map((item, index) => ({
                     degreeName: {
                         code: item?.code?.code,
@@ -140,7 +141,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                     note: item?.note || '',
                 }))
                 : [{ name: '', number: '', issuingAuthority: '', document: null, note: '' }];
-                
+
             setQualifications(updatedQualifications);
             setDocuments(updateDocuments);
         }
@@ -178,7 +179,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                 // Save both backend and local preview URL
                 handleDocumentsChange(index, 'document', { url: url.url, fileName, localPreviewUrl });
             }
-        } catch (error) {}
+        } catch (error) { }
         setDocumentUploading((prev) => ({ ...prev, [index]: false }));
     };
     const removeDocument = (index) => {
@@ -310,23 +311,22 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                     .getElementById(`degree-file-input-${index}`)
                                                                     .click()
                                                             }
-                                                            className={`custom-file-upload d-flex justify-content-between align-items-center cursor-pointer form-control ${
-                                                                qualification.degreeName || qualification.degreeFile
-                                                                    ? ''
-                                                                    : 'custom-form-fields'
-                                                            }`}
+                                                            className={`custom-file-upload d-flex justify-content-between align-items-center cursor-pointer form-control ${qualification.degreeName || qualification.degreeFile
+                                                                ? ''
+                                                                : 'custom-form-fields'
+                                                                }`}
                                                             style={{ minHeight: '30px' }}>
                                                             <span>
                                                                 {degreeUploading[index] === true
                                                                     ? 'Uploading...'
                                                                     : qualification.degreeFile?.fileName
-                                                                      ? qualification.degreeFile.fileName.length > 30
-                                                                          ? qualification.degreeFile.fileName.slice(
+                                                                        ? qualification.degreeFile.fileName.length > 30
+                                                                            ? qualification.degreeFile.fileName.slice(
                                                                                 0,
                                                                                 30
                                                                             ) + '...'
-                                                                          : qualification.degreeFile.fileName
-                                                                      : 'Upload Degree'}
+                                                                            : qualification.degreeFile.fileName
+                                                                        : 'Upload Degree'}
                                                             </span>
                                                             <div className="d-flex align-items-center gap-2">
                                                                 {qualification.degreeFile?.url &&
@@ -438,7 +438,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                         type="text"
                                                                         value={data?.number}
                                                                         // {...register(`documentNumber[${index}]`)}
-                                                                            maxLength={15} // Limit to 15 characters
+                                                                        maxLength={15} // Limit to 15 characters
                                                                         onChange={(e) =>
                                                                             handleDocumentsChange(
                                                                                 index,
@@ -484,22 +484,21 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                 )
                                                                                 .click()
                                                                         }
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                                            data?.document?.fileName || data.degreeFile
-                                                                                ? ''
-                                                                                : 'custom-form-fields'
-                                                                        }`}>
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${data?.document?.fileName || data.degreeFile
+                                                                            ? ''
+                                                                            : 'custom-form-fields'
+                                                                            }`}>
                                                                         <span>
                                                                             {documentUploading[index] === true
                                                                                 ? 'Uploading...'
                                                                                 : data?.document?.fileName
-                                                                                  ? data.document.fileName.length > 25
-                                                                                      ? data.document.fileName.slice(
+                                                                                    ? data.document.fileName.length > 25
+                                                                                        ? data.document.fileName.slice(
                                                                                             0,
                                                                                             25
                                                                                         ) + '...'
-                                                                                      : data.document.fileName
-                                                                                  : 'Upload Document'}
+                                                                                        : data.document.fileName
+                                                                                    : 'Upload Document'}
                                                                         </span>
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {data?.document?.url &&
