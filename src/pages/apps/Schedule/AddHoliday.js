@@ -19,9 +19,9 @@ const AddHoliday = () => {
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const addResponse = store?.createScheduleReducer?.data?.response?.status;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    const doctorOptions = doctorDetails?.map((data) => ({
+   const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.name[0]?.text + ' ',
+        label: data?.name[0]?.text + ' ' +"(" +data?.userId?.email + ")",
     }));
     useEffect(() => {
         if (addResponse === 200) {

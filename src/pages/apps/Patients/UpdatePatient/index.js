@@ -561,16 +561,16 @@ const UpdatePatientIndex = () => {
                                                                             <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
                                                                                 Last Appointment:
                                                                             </th>
-                                                                            <td className="fs-6 pe-2 text-nowrap text-black">
-                                                                                16/04/2025
+                                                                            <td className="fs-6 pe-2 text-nowrap text-danger">
+                                                                                Missing
                                                                             </td>
                                                                         </tr>
                                                                         <tr className="">
                                                                             <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
                                                                                 Next Appointment:
                                                                             </th>
-                                                                            <td className="fs-6 pe-2 text-nowrap text-black">
-                                                                                26/05/2025
+                                                                            <td className="fs-6 pe-2 text-nowrap text-danger">
+                                                                                Missing
                                                                             </td>
                                                                         </tr>
                                                                         <tr className="">
@@ -835,7 +835,7 @@ const UpdatePatientIndex = () => {
                                                 />
                                             )}
                                             {selectedMainTab === 'Communication' && <p>In progress...</p>}
-                                            {selectedMainTab === 'Task' && <TaskListing/>}
+                                            {selectedMainTab === 'Task' && <TaskListing />}
                                             {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
                                             {selectedMainTab === 'Patient Access' && <PatientAccess />}
                                             {selectedMainTab === 'Lab Request' && <p>In progress...</p>}

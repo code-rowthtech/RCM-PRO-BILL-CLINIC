@@ -68,7 +68,7 @@ const ScheduleTab = () => {
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.name[0]?.text + ' ',
+        label: data?.name[0]?.text + ' ' + "(" +data?.userId?.email +")", // Added email to label
     }));
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const practitionerTimings = store?.getPractitionerTimingsReducer?.data?.schedule;

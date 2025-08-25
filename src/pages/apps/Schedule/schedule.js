@@ -35,7 +35,7 @@ const Schedule = () => {
     const navigate = useNavigate('');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.name[0]?.text + ' ' + data?.userId?.email,
+        label: data?.name[0]?.text + ' ' + "(" +data?.userId?.email + ")",
     }));
 
     useEffect(() => {

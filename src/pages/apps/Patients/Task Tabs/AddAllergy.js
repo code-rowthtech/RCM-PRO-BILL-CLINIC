@@ -349,7 +349,7 @@ const AddAllergy = ({ onCancel }) => {
 
                             {selectMode === 'appointment' ? (
                                 <>
-                                    <Form.Label className="mb-0">Appointment</Form.Label>
+                                    <Form.Label className="mb-0">Appointment <span className='text-danger'>*</span></Form.Label>
                                     <Form.Select
                                         {...register('appointment', {
                                             required: selectMode === 'appointment' ? 'Appointment is required' : false,
