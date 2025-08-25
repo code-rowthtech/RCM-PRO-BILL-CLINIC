@@ -3,7 +3,7 @@ import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 
 import { useForm } from 'react-hook-form';
 import { FiDownloadCloud, FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getStatesByCountryAction, updatePatientsAction, getCities4Action } from '../../../redux/actions';
 import Select from 'react-select';
 import us from '../../../assets/images/flags/us.jpg';
@@ -21,7 +21,6 @@ import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
 
 const Demographicdetails = ({
-    patientId,
     activeTab,
     setActiveTab,
     showResponsibleTab,
@@ -41,6 +40,8 @@ const Demographicdetails = ({
         watch,
         getValues,
     } = useForm();
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('updateid');
     const [longitude, setLongitude] = useState(null);
     const [latitude, setLatitude] = useState(null);
     const [mailingLongitude, setMailingLongitude] = useState(null);
@@ -824,13 +825,13 @@ const Demographicdetails = ({
                                                                 setEmployerLatitude(data?.bounds?.southwest?.lat);
                                                                 setEmployerLongitude(data?.bounds?.southwest?.lng);
                                                                 setValue('employerAddress', data?.formatted);
-                                                                
+
                                                                 // Trigger state selection to load cities
                                                                 const stateData = statesData?.states?.find(state => state.state_code === data?.components?.state_code);
                                                                 if (stateData) {
                                                                     dispatch(getCities4Action({ state_code: stateData.id, name: '', limit: 25 }));
                                                                 }
-                                                                
+
                                                                 setEmployerFocused(false);
                                                             }}
                                                             style={{

@@ -104,7 +104,6 @@ const DateEncounters = ({
 
     // File upload state
     const [attachedRecords, setAttachedRecords] = useState([]);
-    console.log(attachedRecords, 'attachedRecordsattachedRecords')
     const [uploadLoading, setUploadLoading] = useState(false);
 
     // ========================================================================
@@ -243,6 +242,7 @@ const DateEncounters = ({
             dispatch(getEncounterByIdAction({ encounterId: encounterId }));
         }
     }, [encounterAction, dispatch, encounterId]);
+
     // Set default note type and populate form for update 
     useEffect(() => {
         // Set default note type
@@ -284,7 +284,6 @@ const DateEncounters = ({
                 });
             }
 
-            console.log(encounterData, 'encounterDataencounterData')
             // Set attached records
             if (encounterData?.attachedRecords) {
                 setAttachedRecords(encounterData.attachedRecords);
@@ -575,7 +574,8 @@ const DateEncounters = ({
                             accept='.pdf, .doc, .docx, .jpg, .jpeg, .png, .xls, .xlsx, .csv'
                             disabled={uploadLoading}
                             title="Allowed file types: PDF, DOC, DOCX, JPG, JPEG, PNG, XLS, XLSX, CSV"
-                        />                        {uploadLoading && <small className="text-muted">Uploading files...</small>}
+                        />
+                        {uploadLoading && <small className="text-muted">{`Uploading files...`}</small>}
                         {attachedRecords?.length > 0 && (
                             <div className="mb-2">
                                 <small className="text-muted">Attached Files:</small>
@@ -898,7 +898,7 @@ const DateEncounters = ({
                                 className="g-2 mt-0 bg-light rounded-top p-1">
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>{`Encounter Type`} <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Encounter Type`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <div className="position-relative">
                                             <Form.Select
                                                 {...register('type', { required: 'This field is required' })}
@@ -936,7 +936,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>{`Encounter Class`} <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Encounter Class`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <div className="position-relative">
                                             <Form.Select
                                                 {...register('class', { required: 'This field is required.' })}
@@ -974,7 +974,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>{`Note Type`} <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Note Type`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <Select
                                             options={notesTypeOptions}
                                             isSearchable
@@ -1015,7 +1015,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>{`Start Date`} <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Start Date`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <div className="position-relative">
                                             <Form.Control
                                                 type="date"
@@ -1043,7 +1043,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>{`Status`} <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Status`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <div className="position-relative">
                                             <Form.Select
                                                 {...register('status', { required: 'This field is required' })}
@@ -1078,7 +1078,7 @@ const DateEncounters = ({
                                 </Col>
                                 <Col sm={4} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
-                                        <Form.Label className='mb-0 fw-bold small'>{`Provider`} <span className='text-danger'>*</span></Form.Label>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Provider`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <Select
                                             options={providerOptions}
                                             isSearchable

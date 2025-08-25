@@ -116,14 +116,14 @@ const Designation = () => {
                                     onClick={() => handleStatusChange(true)}
                                     className={` active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
                                         } me-2 py-1`}>
-                                    Active
+                                    {`Active`}
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
                                     className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
                                         } me-2 py-1`}>
-                                    Inactive
+                                    {`Inactive`}
                                 </Button>
                             </Col>
                             <Col sm={6} className="text-end mt-md-0 mt-2 mt-sm-0">
@@ -252,7 +252,7 @@ const Designation = () => {
                                 ) : (
                                     <tr key={''}>
                                         <td colSpan={6} className="text-center">
-                                            <h3 className="my-5">No Data Found</h3>
+                                            <h3 className="my-5">{`No Data Found`}</h3>
                                         </td>
                                     </tr>
                                 )}
@@ -287,7 +287,7 @@ const Designation = () => {
                         <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label>Desigination Name *</Form.Label>
+                                    <Form.Label>{`Desigination Name`} <span className='text-danger'>{`*`}</span></Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('name', {

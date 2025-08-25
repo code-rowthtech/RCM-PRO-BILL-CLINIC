@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 import { getDoctorsAction, getEncounterByIdAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
 import { decryptMessage } from '../../../../../cryptoUtils';
+import { formatDate } from '../../../../../helpers/dateFormat';
 
 let decryptedUser = null;
 
@@ -153,7 +154,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 setActiveTab(tab?.id)
                             }}
                         >
-                            <span className="text-nowrap">{tab?.title}</span>
+                            <span className="text-nowrap">{tab?.title === 'Encounter list' ? tab?.title : formatDate(tab?.title)}</span>
                             {tab.type !== 'default' && (
                                 <span
                                     className="p-0 ms-2 m-0"

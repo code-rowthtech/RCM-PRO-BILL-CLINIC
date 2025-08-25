@@ -251,14 +251,14 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
             className={`${showAddProblemModal ? 'd-none' : ''}`}
             centered>
             <Modal.Header closeButton className="px-2 py-0">
-                <Modal.Title className="mb-0">{selectedMedication ? 'Update' : 'Add'} Medication</Modal.Title>
+                <Modal.Title className="mb-0">{selectedMedication ? 'Update' : 'Add'} {`Medication`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <Row>
                         <Col sm={12}>
                             <Form.Group className="position-relative" ref={dropdownRef}>
-                                <Form.Label className="mb-0">Drug <span className='text-danger'>*</span></Form.Label>
+                                <Form.Label className="mb-0">{`Drug`} <span className='text-danger'>{`*`}</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     {...register('drugInfo', { required: 'This field is required.' })}
@@ -285,11 +285,11 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                                 onClick={() => handleSelectDrug(item)}
                                                 className="list-group-item list-group-item-action py-1 px-2"
                                                 style={{ cursor: 'pointer' }}>
-                                                <strong>{item.proprietaryName}</strong> ({item.nonProprietaryName})
+                                                <strong>{item?.proprietaryName}</strong> ({item?.nonProprietaryName})
                                                 <br />
                                                 <small className="text-muted">
-                                                    {item.activeNumeratorStrength} {item.activeIngredientUnit} —{' '}
-                                                    {item.dosageFormName}
+                                                    {item?.activeNumeratorStrength} {item?.activeIngredientUnit} —{' '}
+                                                    {item?.dosageFormName}
                                                 </small>
                                             </div>
                                         ))}
@@ -325,7 +325,11 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                         <Col sm={4}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Frequency <span className='text-danger'>*</span></Form.Label>
-                                <Form.Control type="number" placeholder="e.g. 2" {...register('frequency', { required: 'This field is required.' })} />
+                                <Form.Control
+                                    type="number"
+                                    placeholder="e.g. 2"
+                                    {...register('frequency', { required: 'This field is required.' })}
+                                />
                                 {errors.frequency && (
                                     <span className="text-danger fs-6">{errors.frequency.message}</span>
                                 )}
@@ -481,12 +485,12 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                     </Row>
 
                     <div className="d-flex justify-content-end mt-3">
-                     
+
                         <Button
                             disabled={
                                 store?.createMedicationReducer?.loading || store?.updateMedicationReducer?.loading
                             }
-                            style={{width: '100px'}}
+                            style={{ width: '100px' }}
                             type="submit"
                             className="custom-buttons">
                             {store?.createMedicationReducer?.loading || store?.updateMedicationReducer?.loading ?

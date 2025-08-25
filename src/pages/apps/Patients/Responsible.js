@@ -9,9 +9,12 @@ import { createResponsiblePartyAction } from '../../../redux/actions';
 import { dataList } from '../../../utils/DataSets/relations.data';
 import Select from 'react-select';
 import Spinner from '../../../constants/Spinner';
+import { useSearchParams } from 'react-router-dom';
 
-const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
+const Responsiblle = ({ activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('updateid');
     const [submissionType, setSubmissionType] = useState(null);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const dispatch = useDispatch();
