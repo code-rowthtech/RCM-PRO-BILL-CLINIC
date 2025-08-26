@@ -27,6 +27,7 @@ import { FiUploadCloud, FiDownloadCloud } from 'react-icons/fi';
 import DoctorAddress from './DoctorAddressForm';
 import DoctorQualifications from './Qualifications';
 import Select from 'react-select';
+import DepartmentModal from '../Settings/Department/DepartmentModal';
 
 const NewDoctor = () => {
     const {
@@ -57,6 +58,8 @@ const NewDoctor = () => {
     const [modalFileUrl, setModalFileUrl] = useState('');
     const [imageLoading, setImageLoading] = useState(true);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
+    const [addDepartmentModal, setAddDepartmentModal] = useState(false);
+
     const handleShowModal = (url) => {
         setModalFileUrl(url);
         setShowModalPic(true);
@@ -109,7 +112,6 @@ const NewDoctor = () => {
         };
         dispatch(getDoctorDetailsAction(payload));
         dispatch(getStatesByCountryAction());
-
     }, [dispatch]);
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
@@ -118,11 +120,11 @@ const NewDoctor = () => {
     const newDoctorId = store?.createtDoctorsReducer?.data?.doctor?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const createDepartmentResponse = store?.createMastersDataReducer?.data?.status;
     const departmentOptions = store?.getDepartmentDataReducer?.data?.result?.map((department) => ({
         value: department?.name,
-        label: department?.name
+        label: department?.name,
     }));
-
     useEffect(() => {
         dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 50, skip: 1, search: '' }));
     }, [dispatch]);
@@ -230,7 +232,7 @@ const NewDoctor = () => {
     const handleNewDoctor = () => {
         navigate('/apps/providers/list');
         reset();
-        setSelectedDepartment(null)
+        setSelectedDepartment(null);
     };
 
     const submitData = (data) => {
@@ -273,7 +275,7 @@ const NewDoctor = () => {
             ],
             address: demographicAddresses,
             specialties: [data?.specialist],
-            department: selectedDepartment?.value
+            department: selectedDepartment?.value,
         };
 
         if (updateId) {
@@ -379,7 +381,13 @@ const NewDoctor = () => {
     }, [formData, id]);
 
     const requiredFieldTooltip = <Tooltip id="button-tooltip">Please fill all required fields.</Tooltip>;
-
+    useEffect(() => {
+        if (createDepartmentResponse === 201) {
+            setAddDepartmentModal(false);
+            // Refresh department list after creating new department
+            dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 50, skip: 1, search: '' }));
+        }
+    }, [createDepartmentResponse, dispatch]);
     return (
         <>
             <div className="pt-1 pb-2 px-0">
@@ -394,24 +402,27 @@ const NewDoctor = () => {
                                             <ul className="nav nav-underline">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'personalDetails' ? 'active' : ''
-                                                            }`}
+                                                        className={` font_active_tabs text-black nav-link ${
+                                                            activeTab === 'personalDetails' ? 'active' : ''
+                                                        }`}
                                                         onClick={() => handleTabChange('personalDetails')}>
                                                         {`Personal Details`}
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'departmentDetails' ? 'active' : ''
-                                                            }`}
+                                                        className={` font_active_tabs text-black nav-link ${
+                                                            activeTab === 'departmentDetails' ? 'active' : ''
+                                                        }`}
                                                         onClick={() => handleTabChange('departmentDetails')}>
                                                         {`Professional Information`}
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'qualifications' ? 'active' : ''
-                                                            }`}
+                                                        className={` font_active_tabs text-black nav-link ${
+                                                            activeTab === 'qualifications' ? 'active' : ''
+                                                        }`}
                                                         onClick={() => handleTabChange('qualifications')}>
                                                         {`Qualifications`}
                                                     </button>
@@ -433,10 +444,10 @@ const NewDoctor = () => {
                                                                     style={
                                                                         isButtonDisabled
                                                                             ? {
-                                                                                pointerEvents: 'none',
-                                                                                opacity: 0.6, // Visual indication that the button is disabled
-                                                                                cursor: 'not-allowed', // Shows the "not allowed" cursor
-                                                                            }
+                                                                                  pointerEvents: 'none',
+                                                                                  opacity: 0.6, // Visual indication that the button is disabled
+                                                                                  cursor: 'not-allowed', // Shows the "not allowed" cursor
+                                                                              }
                                                                             : {}
                                                                     }
                                                                     className="custom-buttons text-nowrap">
@@ -468,7 +479,11 @@ const NewDoctor = () => {
                                                 <>
                                                     <div
                                                         className="col-12 mt-1 scroll-container"
-                                                        style={{ height: '75vh', overflow: 'scroll', overflowX: 'hidden' }}>
+                                                        style={{
+                                                            height: '75vh',
+                                                            overflow: 'scroll',
+                                                            overflowX: 'hidden',
+                                                        }}>
                                                         <div className="row  px-0" style={{ overflowX: 'hidden' }}>
                                                             <div className="col-md-6 col-lg-3 col-sm-6  col-12">
                                                                 <Form.Group className="mb-1">
@@ -511,7 +526,8 @@ const NewDoctor = () => {
                                                             <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Last Name`} <span className="text-danger">*</span>
+                                                                        {`Last Name`}{' '}
+                                                                        <span className="text-danger">*</span>
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
@@ -549,7 +565,8 @@ const NewDoctor = () => {
                                                                 <div className="mb-1">
                                                                     <Form.Group className="mb-0 position-relative">
                                                                         <Form.Label className="mb-0">
-                                                                            {`Phone`} <span className="text-danger">*</span>
+                                                                            {`Phone`}{' '}
+                                                                            <span className="text-danger">*</span>
                                                                         </Form.Label>
                                                                         <Form.Group>
                                                                             <InputGroup>
@@ -681,7 +698,8 @@ const NewDoctor = () => {
                                                             <div className="col-md-6 col-lg-3 col-sm-6 col-12 ">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Email`} <span className="text-danger">{`*`}</span>
+                                                                        {`Email`}{' '}
+                                                                        <span className="text-danger">{`*`}</span>
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="email"
@@ -744,7 +762,8 @@ const NewDoctor = () => {
                                                             <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Password`} <span className="text-danger">{`*`}</span>
+                                                                        {`Password`}{' '}
+                                                                        <span className="text-danger">{`*`}</span>
                                                                     </Form.Label>
                                                                     <div className="position-relative">
                                                                         <Form.Control
@@ -773,12 +792,12 @@ const NewDoctor = () => {
                                                                                 ...(updateId
                                                                                     ? {} // Don't apply pattern if updating
                                                                                     : {
-                                                                                        pattern: {
-                                                                                            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                            message:
-                                                                                                'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
-                                                                                        },
-                                                                                    }),
+                                                                                          pattern: {
+                                                                                              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                              message:
+                                                                                                  'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
+                                                                                          },
+                                                                                      }),
                                                                             })}
                                                                         />
 
@@ -857,47 +876,52 @@ const NewDoctor = () => {
                                                                     </Form.Label>
                                                                     <div
                                                                         onClick={() => logoFileInputRef.current.click()}
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading
-                                                                            ? ''
-                                                                            : 'custom-form-fields'
-                                                                            }`}>
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${
+                                                                            logoName || logoUploading
+                                                                                ? ''
+                                                                                : 'custom-form-fields'
+                                                                        }`}>
                                                                         <span>
                                                                             {logoUploading === true
                                                                                 ? 'Uploading...'
                                                                                 : logoName
-                                                                                    ? logoName.length > 30
-                                                                                        ? logoName.slice(0, 25) + '...'
-                                                                                        : logoName
-                                                                                    : 'Upload Profile Image'}
+                                                                                  ? logoName.length > 30
+                                                                                      ? logoName.slice(0, 25) + '...'
+                                                                                      : logoName
+                                                                                  : 'Upload Profile Image'}
                                                                         </span>
 
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {(logo?.url?.split('?')[0] ||
                                                                                 doctorDetails?.photo?.[0]?.url) && (
-                                                                                    <FaEye
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            handleShowModal(
-                                                                                                logo?.url?.split('?')[0] || doctorDetails?.photo?.[0]?.url
-                                                                                            );
-                                                                                        }}
-                                                                                        className="text-dark cursor-pointer"
-                                                                                        title="Preview"
-                                                                                    />
-                                                                                )}
+                                                                                <FaEye
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleShowModal(
+                                                                                            logo?.url?.split('?')[0] ||
+                                                                                                doctorDetails
+                                                                                                    ?.photo?.[0]?.url
+                                                                                        );
+                                                                                    }}
+                                                                                    className="text-dark cursor-pointer"
+                                                                                    title="Preview"
+                                                                                />
+                                                                            )}
                                                                             {(logo?.url?.split('?')[0] ||
                                                                                 doctorDetails?.photo?.[0]?.url) && (
-                                                                                    <FiDownloadCloud
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            handleDownload(
-                                                                                                logo || doctorDetails?.photo?.[0]
-                                                                                            );
-                                                                                        }}
-                                                                                        className="text-dark cursor-pointer"
-                                                                                        title="Download"
-                                                                                    />
-                                                                                )}
+                                                                                <FiDownloadCloud
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleDownload(
+                                                                                            logo ||
+                                                                                                doctorDetails
+                                                                                                    ?.photo?.[0]
+                                                                                        );
+                                                                                    }}
+                                                                                    className="text-dark cursor-pointer"
+                                                                                    title="Download"
+                                                                                />
+                                                                            )}
                                                                         </div>
                                                                     </div>
                                                                     <Form.Control
@@ -933,7 +957,17 @@ const NewDoctor = () => {
                                                             <div className="col-md-3 col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Department`}<span className='text-danger'>{' *'}</span>
+                                                                        {`Department`}{' '}
+                                                                        <span>
+                                                                            <i
+                                                                                className="bi bi-plus-circle text-primary ms-1 cursor-pointer"
+                                                                                style={{ fontSize: '0.7rem' }}
+                                                                                title="Add Department"
+                                                                                onClick={() => {
+                                                                                    setAddDepartmentModal(true);
+                                                                                }}></i>
+                                                                        </span>
+                                                                        <span className="text-danger">{' *'}</span>
                                                                     </Form.Label>
                                                                     <Select
                                                                         options={departmentOptions}
@@ -942,7 +976,14 @@ const NewDoctor = () => {
                                                                         classNamePrefix="select"
                                                                         placeholder="Select"
                                                                         required
-                                                                        value={selectedDepartment || departmentOptions?.find((data) => data?.value === selectedDepartment?.value)}
+                                                                        value={
+                                                                            selectedDepartment ||
+                                                                            departmentOptions?.find(
+                                                                                (data) =>
+                                                                                    data?.value ===
+                                                                                    selectedDepartment?.value
+                                                                            )
+                                                                        }
                                                                         styles={{
                                                                             control: (provided) => ({
                                                                                 ...provided,
@@ -958,7 +999,15 @@ const NewDoctor = () => {
                                                                             }),
                                                                         }}
                                                                         onInputChange={(data) => {
-                                                                            dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 50, skip: 1, search: data }))
+                                                                            dispatch(
+                                                                                getDepartmentDataAction({
+                                                                                    status: true,
+                                                                                    category: 'Department',
+                                                                                    limit: 50,
+                                                                                    skip: 1,
+                                                                                    search: data,
+                                                                                })
+                                                                            );
                                                                         }}
                                                                         onChange={(data) => {
                                                                             setSelectedDepartment(data);
@@ -986,7 +1035,7 @@ const NewDoctor = () => {
                                                             disabled={store?.createtDoctorsReducer?.loading}
                                                             style={{ width: '120px' }}>
                                                             {store?.createtDoctorsReducer?.loading ||
-                                                                store?.createtDoctorsDetailReducer?.loading ? (
+                                                            store?.createtDoctorsDetailReducer?.loading ? (
                                                                 <Spinner color="white" className="spinner-border-sm" />
                                                             ) : id ? (
                                                                 'Update & Next'
@@ -1012,7 +1061,11 @@ const NewDoctor = () => {
                     </Card>
                 </div>
                 <EmailToDoctorModal closeModal={closeModal} show={show} formData={formData} setFormData={setFormData} />
-
+                <DepartmentModal
+                    addDepartmentModal={addDepartmentModal}
+                    closeAddModal={() => setAddDepartmentModal(false)}
+                    // edit={edit}
+                />
                 <Modal show={showModalPic} onHide={handleCloseModal} centered>
                     <Modal.Body>
                         <div className="d-flex justify-content-center">

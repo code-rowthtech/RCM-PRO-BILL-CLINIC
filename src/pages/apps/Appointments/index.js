@@ -235,7 +235,7 @@ const AppointmentsList = ({
                                         <span>
                                             {data?.subject?.telecom?.find(
                                                 (item) => item.system === 'phone' && item.value
-                                            )?.value || 'No phone number'}
+                                            )?.value || 'Phone number not available'}
                                         </span>
                                     </div>
                                 </td>
@@ -249,18 +249,22 @@ const AppointmentsList = ({
                                     data-toggle="tooltip"
                                     data-placement="top"
                                     title={data?.appointmentType?.coding?.[0]?.display}>
-                                    {data?.appointmentType?.coding?.[0]?.display?.length > 20
-                                        ? data?.appointmentType?.coding?.[0]?.display?.slice(0, 19) + '...'
-                                        : data?.appointmentType?.coding?.[0]?.display}
+                                    {data?.appointmentType?.coding?.[0]?.display
+                                        ? data?.appointmentType?.coding?.[0]?.display?.length > 20
+                                            ? data?.appointmentType?.coding?.[0]?.display?.slice(0, 19) + '...'
+                                            : data?.appointmentType?.coding?.[0]?.display
+                                        : 'N/A'}
                                 </td>
                                 <td
                                     className="text-capitalize cursor-pointer"
                                     data-toggle="tooltip"
                                     data-placement="top"
-                                    title={data?.reason?.[0]?.coding?.[0]?.display}>
-                                    {data?.reason?.[0]?.coding?.[0]?.display?.length > 20
-                                        ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...'
-                                        : data?.reason?.[0]?.coding?.[0]?.display}
+                                    title={data?.reason?.[0]?.coding?.[0]?.display || 'N/A'}>
+                                    {data?.reason?.[0]?.coding?.[0]?.display
+                                        ? data?.reason?.[0]?.coding?.[0]?.display?.length > 20
+                                            ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...'
+                                            : data?.reason?.[0]?.coding?.[0]?.display
+                                        : 'N/A'}
                                 </td>
                                 <td>
                                     <Link
@@ -345,7 +349,6 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
         waitlist: '#8e44ad', // Dark Purple
     };
     const [showTooltip, setShowTooltip] = useState(false);
-
 
     return (
         <>
@@ -560,8 +563,9 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                             <ul className="nav nav-pills">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'today' ? 'active' : 'text-black'
-                                                            }`}
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'today' ? 'active' : 'text-black'
+                                                        }`}
                                                         onClick={() => setAppointmentPeriod('today')}>
                                                         <FiSun className="me-1" />
                                                         Today
@@ -569,8 +573,9 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
-                                                            }`}
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
+                                                        }`}
                                                         onClick={() => setAppointmentPeriod('upcoming')}>
                                                         <FiClock className="me-1" />
                                                         Upcoming
@@ -578,8 +583,9 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'history' ? 'active' : 'text-black'
-                                                            }`}
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'history' ? 'active' : 'text-black'
+                                                        }`}
                                                         onClick={() => setAppointmentPeriod('history')}>
                                                         <FiArchive className="me-1" />
                                                         History

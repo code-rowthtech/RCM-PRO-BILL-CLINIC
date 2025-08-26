@@ -132,18 +132,26 @@ const AddProblem = ({ onCancel }) => {
             ...(data.appointment && { appointment: data.appointment }),
             ...(data.diagnosisDate && { onsetDateTime: data.diagnosisDate }),
             // onsetDate: data.onsetDate,
-            note: [
-                {
-                    authorReference: {
-                        reference: '',
-                        type: '',
-                        display: '',
-                    },
-                    authorString: ' ',
-                    time: '',
-                    text: data?.note,
-                },
-            ],
+             ...(data?.note
+                ? {
+                      note: [
+                          {
+                              text: data.note,
+                              time: '',
+                              authorReference: {
+                                  reference: '',
+                                  type: '',
+                                  identifier: {
+                                      use: '',
+                                      system: '',
+                                      value: '',
+                                  },
+                                  display: '',
+                              },
+                          },
+                      ],
+                  }
+                : {}),
         };
         dispatch(createProblemListAction(payload));
     };
@@ -282,11 +290,15 @@ const AddProblem = ({ onCancel }) => {
                             className="bi bi-plus-circle text-black cursor-pointer"></i></Form.Label>
                         <Form.Select {...register('appointment')}>
                             <option value="">Select Appointment</option>
-                            {appointments?.map((item) => (
-                                <option key={item._id} value={item._id}>
-                                    {item?.date ? new Date(item?.date).toISOString().split('T')[0] : 'N/A'}
-                                </option>
-                            ))}
+                            {appointments?.length > 0 ? (
+                                appointments.map((item) => (
+                                    <option key={item._id} value={item._id}>
+                                        {item?.date ? new Date(item?.date).toISOString().split('T')[0] : 'N/A'}
+                                    </option>
+                                ))
+                            ) : (
+                                <option disabled>No appointment scheduled yet</option>
+                            )}
                         </Form.Select>
                     </Form.Group>
                     <Modal centered show={showAppointmentModal} size="xl" onHide={closeAppointmentModal}>

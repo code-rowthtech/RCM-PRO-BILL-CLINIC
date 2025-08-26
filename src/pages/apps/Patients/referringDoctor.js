@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Col, Form, Row, InputGroup, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,11 +7,13 @@ import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddressForm from '../Common Pages/AddressForm';
 import { loggedInUser } from '../../../helpers/api/loggedInUser';
+import { useSearchParams } from 'react-router-dom';
 
-const ReferringDoctor = ({ patientId, setActiveTab }) => {
+const ReferringDoctor = ({ setActiveTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const clinicId = JSON.parse(localStorage.getItem('hyper_user'))?.data?._id;
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('updateid');
     const {
         register,
         handleSubmit,
@@ -25,6 +27,7 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
     ]);
     const [submissionType, setSubmissionType] = useState(null);
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
+
     useEffect(() => {
         if (createResponseReferring === 201) {
             if (submissionType === 'saveAndNext') {
@@ -35,6 +38,7 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
             }
         }
     }, [createResponseReferring]);
+
     const primaryState = watch('primaryStateName');
     const primaryCitySearch = watch('primaryCity');
 
@@ -93,42 +97,42 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
         <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
             <Row className="pb-2">
                 <Col sm={12}>
-                    <h5 className="text-black">Personal Details</h5>
+                    <h5 className="text-black">{`Personal Details`}</h5>
                 </Col>
                 <Col sm={3}>
                     <Form.Group>
-                        <Form.Label className="mb-0">Prefix</Form.Label>
+                        <Form.Label className="mb-0">{`Prefix`}</Form.Label>
                         <Form.Control {...register('prefix')} placeholder="Prefix (Dr., Mr., Ms.)" type="text" />
                     </Form.Group>
                 </Col>
                 <Col sm={3}>
                     <Form.Group>
-                        <Form.Label className="mb-0">First Name</Form.Label>
+                        <Form.Label className="mb-0">{`First Name`}</Form.Label>
                         <Form.Control {...register('firstName')} placeholder="First Name" type="text" />
                     </Form.Group>
                 </Col>
                 <Col sm={3}>
                     <Form.Group>
-                        <Form.Label className="mb-0">Middle Name</Form.Label>
+                        <Form.Label className="mb-0">{`Middle Name`}</Form.Label>
                         <Form.Control {...register('middleName')} placeholder="Middle Name" type="text" />
                     </Form.Group>
                 </Col>
                 <Col sm={3}>
                     <Form.Group>
-                        <Form.Label className="mb-0">Last Name</Form.Label>
+                        <Form.Label className="mb-0">{`Last Name`}</Form.Label>
                         <Form.Control {...register('lastName')} placeholder="Last Name" type="text" />
                     </Form.Group>
                 </Col>
                 <Col sm={3}>
                     <Form.Group>
-                        <Form.Label className="mb-0">Suffix</Form.Label>
+                        <Form.Label className="mb-0">{`Suffix`}</Form.Label>
                         <Form.Control {...register('suffix')} placeholder="Suffix" type="text" />
                     </Form.Group>
                 </Col>
                 <Col sm={3} className="mb-0 position-relative" style={{ minHeight: '70px' }}>
                     <Form.Group>
                         <Form.Label className="mb-0">
-                            NPI Number <span className="text-danger">*</span>
+                            {`NPI Number`} <span className="text-danger">*</span>
                         </Form.Label>
                         <Form.Control
                             {...register('npiNumber', {
@@ -152,17 +156,17 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
                 </Col>
                 <Col sm={3}>
                     <Form.Group>
-                        <Form.Label className="mb-0">Email</Form.Label>
+                        <Form.Label className="mb-0">{`Email`}</Form.Label>
                         <Form.Control {...register('email')} placeholder="Email" type="email" />
                     </Form.Group>
                 </Col>
                 <Col sm={3}>
                     <Form.Group className="mb-0 position-relative" style={{ minHeight: '70px' }}>
                         <Form.Label className="mb-0">
-                            Phone <span className="text-danger">*</span>
+                            {`Phone`} <span className="text-danger">{`*`}</span>
                         </Form.Label>
                         <InputGroup>
-                            <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">+1</InputGroup.Text>
+                            <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">{`+1`}</InputGroup.Text>
                             <Form.Control
                                 type="tel"
                                 {...register('phone', {
@@ -205,7 +209,7 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
             <Row className="mt-2">
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
                     <Button className="cancel-button" onClick={() => reset()}>
-                        Clear
+                        {`Clear`}
                     </Button>
                     <Button
                         className="custom-buttons"
@@ -213,7 +217,7 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
                         onClick={() => {
                             setSubmissionType('saveAndReset');
                         }}>
-                        Save & Add Another
+                        {`Save & Add Another`}
                     </Button>
                     <Button
                         onClick={() => {

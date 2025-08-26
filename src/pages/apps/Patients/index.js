@@ -26,34 +26,6 @@ const Patients = () => {
         const payload = { search: search, page: skip, limit: 10, clinicId: clinicId };
         dispatch(getPatientsAction(payload));
     }, [dispatch, skip, search]);
-    // useEffect(() => {
-    //     const data = {
-    //         clinicId: clinicId,
-    //         page: skip,
-    //         limit: 10,
-    //         search: search,
-    //     };
-    //     dispatch(getPatientsAction(data));
-    // }, [dispatch, skip, search]);
-
-    // const handlePasswordSubmit = (e) => {
-    //     e.preventDefault();
-    //     if (password === '1234') {
-    //         setIsPasswordCorrect(true);
-    //         setSmShow(false);
-    //         setIsVisible(true);
-    //         ToastHandle("password success", "success");
-
-    //         const id = setTimeout(() => {
-    //             setIsPasswordCorrect(false);
-    //             setIsVisible(false);
-    //         }, 300000);
-
-    //         setTimeoutId(id);
-    //     } else {
-    //         ToastHandle("password incorrect", "danger");
-    //     }
-    // };
 
     const handleNewPatients = () => {
         navigate('/apps/patients/new-patient');

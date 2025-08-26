@@ -1,14 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Card, Col, Form, Modal, Row, InputGroup, Spinner } from 'react-bootstrap';
-import { FiDownloadCloud, FiEye, FiUploadCloud } from 'react-icons/fi';
-import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
+import { FiDownloadCloud, FiEye } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     createPatientsAction,
     getPatientByIdAction,
     getPatientsAction,
-    getResponsiblePartyAction,
+    updatePatientsAction,
 } from '../../../redux/patients/actions';
 import { useForm, Controller } from 'react-hook-form';
 import us from '../../../assets/images/flags/us.jpg';
@@ -25,38 +24,23 @@ import Select from 'react-select';
 import Insurance from './Insurance/Insurance';
 import Demographicdetails from './Demographic';
 import ReferringDoctor from './referringDoctor';
-
-const calculateAge = (dob) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    if (isNaN(birthDate.getTime())) {
-        return '0.0';
-    }
-
-    let years = today.getFullYear() - birthDate.getFullYear();
-    let months = today.getMonth() - birthDate.getMonth();
-
-    // Adjust if the current month/day is before the birth month/day
-    if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
-        years--;
-        months += 12; // Add 12 months to the negative month difference
-    }
-
-    // Adjust the month difference for the day of the month
-    if (today.getDate() < birthDate.getDate()) {
-        months--;
-    }
-
-    // Ensure months is non-negative after adjustment
-    if (months < 0) {
-        months += 12;
-    }
-
-    return `${String(years).padStart(2, '0')}.${String(months).padStart(2, '0')}`;
-};
+import PreviewModal from './NewPatient/Modals/PreviewModal';
+import { calculateAge } from '../../../helpers/helperFunctions';
 
 const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {
+        register,
+        control,
+        getValues,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        reset,
+        clearErrors,
+        watch,
+    } = useForm();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('updateid');
     const store = useSelector((state) => state);
@@ -69,11 +53,6 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const [submissionType, setSubmissionType] = useState(null);
-    const [smShow, setSmShow] = useState(false);
-    const [password, setPassword] = useState('');
-    const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
-    const [timeoutId, setTimeoutId] = useState(null);
     const [patientId, setPatientId] = useState(null);
     const [genderIdentity, setGenderIdentity] = useState(null);
     const [age, setAge] = useState(null);
@@ -97,21 +76,27 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const [showModalPic, setShowModalPic] = useState(false);
     const [modalFileUrl, setModalFileUrl] = useState('');
     const [imageLoading, setImageLoading] = useState(true);
-    const [skip, setSkip] = useState(1);
+    const [showCellPhone, setShowCellPhone] = useState(false);
+    const [showOfficePhone, setShowOfficePhone] = useState(false);
+    const [showAltEmail, setShowAltEmail] = useState(false);
+    const [profileUploading, setProfileUploading] = useState(false);
 
     const handleShowModal = (url) => {
         setModalFileUrl(url);
         setShowModalPic(true);
     };
+
     const handleCloseModal = () => {
         setShowModalPic(false); // Close the modal
         setModalFileUrl(''); // Reset file URL
     };
+
     useEffect(() => {
         if (showModalPic && modalFileUrl) {
             setImageLoading(true);
         }
     }, [showModalPic, modalFileUrl]);
+
     const options = responsibleParties?.map((party) => ({
         value: party._id,
         label: party.fullName,
@@ -121,6 +106,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
         value: data?._id,
         label: data?.name?.[0]?.text,
     }));
+
     const handleTabChange = (tab) => {
         setActiveTab(tab);
         if (tab === 'personalDetails') {
@@ -128,7 +114,9 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
         } else {
             setBtnShow(false);
         }
+        // Don't reset form data when switching tabs
     };
+
     const handleResponsibleChange = (e) => {
         const value = e.target.value;
         setResponsibleParty(value);
@@ -141,20 +129,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
         setShowReferringTab(value === 'true');
     };
 
-    const navigate = useNavigate();
-    const {
-        register,
-        control,
-        getValues,
-        handleSubmit,
-        formState: { errors },
-        setValue,
-        reset,
-        clearErrors,
-        watch,
-    } = useForm();
     const patientStatus = watch('patientStatus'); // Watch selected option
-
     const gender = watch('gender');
     const title = watch('title');
 
@@ -163,12 +138,17 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
             setValue('approxAge', age);
         }
     }, [age]);
+
     useEffect(() => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
                 handleTabChange('demographicDetails');
                 setPatientId(createPatientResponse?._id);
                 setGenderIdentity(createPatientResponse?.gender);
+                // Update URL with patient ID
+                if (!isModal) {
+                    navigate(`/apps/patients/new-patient?updateid=${createPatientResponse?._id}`, { replace: true });
+                }
             } else if (submissionType === 'saveAndReset') {
                 reset(); // Ensure the form resets
                 setSelectedDoctor(null);
@@ -176,47 +156,42 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                 setLogoName(null);
                 setPatientId(null);
                 setGenderIdentity(null);
+                // Navigate to clean new patient form
+                if (!isModal) {
+                    navigate('/apps/patients/new-patient', { replace: true });
+                }
             } else if (submissionType === 'save') {
                 setPatientId(createPatientResponse?._id);
             }
         }
-    }, [createResponse, submissionType]);
+    }, [createResponse, submissionType, navigate, isModal]);
+
     useEffect(() => {
-        // const payload = {
-        //     clinicId: clinicId,
-        //     search: doctorSearch,
-        //     limit: 20,
-        // };
-        // if (activeTab === 'personalDetails') {
-        //     dispatch(getResponsiblePartyAction({ key: encryptMessage(payload) }));
-        // }
         const doctorPayload = { status: status, search: search };
         dispatch(getDoctorsAction(doctorPayload));
-    }, [
-        dispatch,
-        // , doctorSearch
-        activeTab,
-    ]);
+    }, [dispatch, activeTab]);
+
     useEffect(() => {
         if (createResponse === 201) {
             setPatientId(createPatientResponse?._id);
-            const data = { clinicId, page: skip, limit: 10, search };
+            const data = { clinicId, page: 1, limit: 10, search: '' };
             dispatch(getPatientsAction(data));
         }
-    }, [createResponse, dispatch, skip, search, clinicId]);
+    }, [createResponse, clinicId]);
+
     useEffect(() => {
         if (id) {
             const payload = {
                 id: id,
             };
             dispatch(getPatientByIdAction(payload));
+            setPatientId(id);
         }
     }, [id]);
+
     useEffect(() => {
         if (id) {
-            setSelectedParty(
-                options && options?.find((option) => option.value === patientDetails?.responsibleParty?._id)
-            );
+            setSelectedParty(options && options?.find((option) => option.value === patientDetails?.responsibleParty?._id));
         }
     }, [id, patientDetails, responsibleParties]);
 
@@ -231,9 +206,10 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                 statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
             setValue('stateName', selectedState);
             const countyName = selectedLocation?.components?.county;
-            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
+            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: 1 }));
         }
     }, [selectedLocation, setValue, statesData, dispatch]);
+
     useEffect(() => {
         if (cities) {
             const selectedCounty =
@@ -247,7 +223,6 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
 
     useEffect(() => {
         const currentTitle = getValues('title');
-
         if (!currentTitle || ['Mr.', 'Mrs.', 'Miss'].includes(currentTitle)) {
             if (gender === 'male') setValue('title', 'Mr.');
             else if (gender === 'female') setValue('title', 'Miss');
@@ -256,21 +231,6 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
         }
     }, [gender, title, setValue, getValues]);
 
-    const handlePasswordSubmit = (e) => {
-        e.preventDefault();
-        if (password === '1234') {
-            setIsPasswordCorrect(true);
-            setSmShow(false);
-            setIsVisible(true);
-
-            const id = setTimeout(() => {
-                setIsPasswordCorrect(false);
-                setIsVisible(false);
-            }, 300000);
-            setTimeoutId(id);
-        }
-    };
-    const [profileUploading, setProfileUploading] = useState(false);
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
@@ -280,21 +240,16 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
             clearErrors('profileImage');
         } catch (error) {}
     };
+
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
 
-    const [stateCode, setStateCode] = useState();
-
     useEffect(() => {
         if (stateToSelect) {
-            dispatch(getSubClinicCitiesAction({ state_code: stateToSelect, name: '', limit: 25, skip: '' }));
+            dispatch(getSubClinicCitiesAction({ state_code: stateToSelect, name: '', limit: 25, skip: 1 }));
         }
     }, [stateToSelect]);
-
-    const [showCellPhone, setShowCellPhone] = useState(false);
-    const [showOfficePhone, setShowOfficePhone] = useState(false);
-    const [showAltEmail, setShowAltEmail] = useState(false);
 
     const formatPhone = (value) => {
         let rawValue = value.replace(/\D/g, '');
@@ -372,10 +327,8 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
             medicationHistoryConsent: true,
             patientCopayAmount: data?.patientCopayAmount || '0',
             ...(selectedDoctor?.value && { doctorId: selectedDoctor.value }),
-            // Responsible Party & Referring Doctor
             responsibleParty: showResponsibleTab, // Convert string to boolean
             refferingDoctor: showReferringTab, // Convert string to boolean
-
             photo: logo?.url
                 ? [
                       {
@@ -391,16 +344,9 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
             patientStatus: data?.patientStatus || '',
             paymentProfile: data?.paymentProfile || '',
             preferredCommunication: data?.preferredCommunication || '',
-            // previousBirthName: data?.previousBirthName || '',
-            //     profileImage: data?.profileImage || '',
             reminderLanguage: data?.reminderLanguage || '',
-
-            //     selectedDoctor: data?.selectedDoctor || '',
-            //     suffix: data?.suffix || '',
-            //     title: data?.title || '',
         };
 
-        // Structuring name inside an object
         payload.name = [
             {
                 given: [data?.firstName || '', data?.middleName || ''].filter(Boolean),
@@ -429,39 +375,13 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                 },
             });
         }
-
-        // Structuring telecom inside an array
-        payload.telecom = [];
-
-        payload.telecom.push({
-            system: 'phone',
-            use: 'home',
-            value: data?.homePhone || '',
-        });
-
-        payload.telecom.push({
-            system: 'phone',
-            use: 'mobile',
-            value: data?.cellPhone || '',
-        });
-
-        payload.telecom.push({
-            system: 'phone',
-            use: 'work',
-            value: data?.officePhone || '',
-        });
-
-        payload.telecom.push({
-            system: 'email',
-            use: 'mobile',
-            value: data?.email || '',
-        });
-
-        payload.telecom.push({
-            system: 'email',
-            use: 'work',
-            value: data?.alternateEmail || '',
-        });
+        payload.telecom = [
+            { system: 'phone', use: 'home', value: data?.homePhone || '' },
+            { system: 'phone', use: 'mobile', value: data?.cellPhone || '' },
+            { system: 'phone', use: 'work', value: data?.officePhone || '' },
+            { system: 'email', use: 'mobile', value: data?.email || '' },
+            { system: 'email', use: 'work', value: data?.alternateEmail || '' }
+        ];
 
         if (data?.patientStatus === 'Inactive-Deceased') {
             payload.deceasedBoolean = true;
@@ -469,16 +389,14 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                 payload.deceasedDateTime = new Date(data.deceasedDateTime).toISOString();
             }
         }
-        dispatch(createPatientsAction({ key: encryptMessage(payload) }));
-        if (submissionType === 'saveAndReset') {
-            reset(); // Reset before dispatch
+
+        if (id) {
+            payload.id = id;
+            dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        } else {
+            dispatch(createPatientsAction({ key: encryptMessage(payload) }));
         }
     };
-
-    const tableData = [
-        { type: 'Patient', values: Array(6).fill('0.00') },
-        { type: 'Insurance', values: Array(6).fill('0.00') }, // Add more rows as needed
-    ];
 
     const handleInputChange = (data) => {
         setDoctorSearch(data);
@@ -486,6 +404,13 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const handleChange = (selectedOption) => {
         setSelectedDoctor(selectedOption);
     };
+
+    const tabs = [
+        { key: 'personalDetails', label: 'Personal Details', show: true },
+        { key: 'demographicDetails', label: 'Demographic', show: true },
+        { key: 'responsible', label: 'Responsible Party', show: showResponsibleTab },
+        { key: 'referringDoctor', label: 'Referring Doctor', show: showReferringTab }
+    ];
     return (
         <div className="background_Color">
             <div className={`container-fluid ${isModal ? 'mt-0 ' : 'mt-2'} px-0`}>
@@ -493,46 +418,15 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                     <div className="d-flex justify-content-between">
                         <div>
                             <ul className="nav nav-underline">
-                                <li className="nav-item">
-                                    <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'personalDetails' ? 'active fw-bold' : ''
-                                        }`}
-                                        onClick={() => handleTabChange('personalDetails')}>
-                                        {`Personal Details`}
-                                    </button>
-                                </li>
-                                <li className="nav-item">
-                                    <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'demographicDetails' ? 'active fw-bold' : ''
-                                        }`}
-                                        onClick={() => handleTabChange('demographicDetails')}>
-                                        Demographic
-                                    </button>
-                                </li>
-                                {showResponsibleTab && (
-                                    <li className="nav-item">
+                                {tabs.filter(tab => tab.show).map(tab => (
+                                    <li key={tab.key} className="nav-item">
                                         <button
-                                            className={`text-black nav-link fw-medium ${
-                                                activeTab === 'responsible' ? 'active fw-bold' : ''
-                                            }`}
-                                            onClick={() => handleTabChange('responsible')}>
-                                            Responsible Party
+                                            className={`text-black nav-link fw-medium ${activeTab === tab.key ? 'active fw-bold' : ''}`}
+                                            onClick={() => handleTabChange(tab.key)}>
+                                            {tab.label}
                                         </button>
                                     </li>
-                                )}
-                                {showReferringTab && (
-                                    <li className="nav-item">
-                                        <button
-                                            className={`text-black nav-link fw-medium ${
-                                                activeTab === 'referringDoctor' ? 'active fw-bold' : ''
-                                            }`}
-                                            onClick={() => handleTabChange('referringDoctor')}>
-                                            Referring Doctor
-                                        </button>
-                                    </li>
-                                )}
+                                ))}
                             </ul>
                         </div>
                         <div className="d-flex">
@@ -579,7 +473,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label htmlFor="middleName" className="mb-0">
-                                                Middle Name
+                                                {`Middle Name`}
                                             </Form.Label>
                                             <Form.Control
                                                 id="middleName"
@@ -600,7 +494,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label htmlFor="lastName" className="mb-0">
-                                                Last Name <span className="text-danger">*</span>
+                                                {`Last Name`} <span className="text-danger">{`*`}</span>
                                             </Form.Label>
                                             <Form.Control
                                                 id="lastName"
@@ -619,74 +513,6 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         </Form.Group>
                                     </div>
 
-                                    {/* <div className="col-md-3 col-12">
-                                        <Form.Group className="mb-1 position-relative">
-                                            <Form.Label className="mb-0">
-                                                Cell Phone <span className="text-danger">*</span>
-                                            </Form.Label>
-                                            <Form.Group>
-                                                <InputGroup>
-                                                    <InputGroup.Text
-                                                        className="ps-3 pe-1 fw-bold text-black"
-                                                        style={{ height: '33px' }}>
-                                                        &nbsp;&nbsp;+1
-                                                    </InputGroup.Text>
-                                                    <Form.Control
-                                                        type="tel"
-                                                        style={{ height: '30px!important' }}
-                                                        {...register(
-                                                            'cellPhone',
-                                                            !id
-                                                                ? {
-                                                                    pattern: {
-                                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                                        message:
-                                                                            'Contact must be in the format (XXX)XXX-XXXX',
-                                                                    },
-                                                                    maxLength: {
-                                                                        value: 13,
-                                                                        message: 'Contact must not exceed 13 digits',
-                                                                    },
-                                                                    minLength: {
-                                                                        value: 13,
-                                                                        message:
-                                                                            'Contact must not be less than 13 digits',
-                                                                    },
-                                                                }
-                                                                : {}
-                                                        )}
-                                                        onChange={(e) => {
-                                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                                            const formattedValue = rawValue.replace(
-                                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                                (match, p1, p2, p3) => {
-                                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                                    if (p2) return `(${p1})${p2}`;
-                                                                    return `(${p1}`;
-                                                                }
-                                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                                            e.target.value = formattedValue; // Update input value
-                                                            clearErrors('cellPhone'); // Clear validation errors
-                                                        }}
-                                                        placeholder="(XXX)XXX-XXXX"
-                                                        maxLength={14}
-                                                        onKeyPress={(event) => {
-                                                            // Only allow numeric characters (0-9)
-                                                            if (!/[0-9]/.test(event.key)) {
-                                                                event.preventDefault();
-                                                            }
-                                                        }}
-                                                    />
-                                                </InputGroup>
-                                            </Form.Group>
-
-                                            <div className="position-absolute" style={{ top: '48%', left: '1%' }}>
-                                                <img src={us} alt="country code flag" width={20} />
-                                            </div>
-                                        </Form.Group>
-                                       
-                                    </div> */}
                                     {renderPhoneField(
                                         'Home Phone',
                                         'homePhone',
@@ -724,7 +550,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     <div className="col-md-3 col-12 mb-2 mt-1">
                                         <Form.Group>
                                             <Form.Label className="mb-0 d-flex justify-content-start gap-1 align-items-center">
-                                                Email ID
+                                                {`Email ID`}
                                                 {!showAltEmail && (
                                                     <span
                                                         className=" uil-plus-circle plusicon cursor-pointer"
@@ -754,7 +580,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         <div className="col-md-3 col-12 mb-2">
                                             <Form.Group>
                                                 <Form.Label className="mb-0 d-flex gap-1  align-items-center">
-                                                    Alternate Email
+                                                    {`Alternate Email`}
                                                     <span
                                                         onClick={() => setShowAltEmail(false)}
                                                         className=" uil-minus-circle minusicon text-danger cursor-pointer"></span>
@@ -780,7 +606,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
 
                                     <Col md={3} className="mb-2">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Date of Birth</Form.Label>
+                                            <Form.Label className="mb-0">{`Date of Birth`}</Form.Label>
                                             <Form.Control
                                                 type="date"
                                                 {...register('dateOfBirth')}
@@ -794,7 +620,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     </Col>
                                     <Col md={3}>
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Approx age (if DOB is unknown)</Form.Label>
+                                            <Form.Label className="mb-0">{`Approx age (if DOB is unknown)`}</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Approx. age"
@@ -815,18 +641,18 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label htmlFor="gender" className="mb-0">
-                                                Gender
+                                                {`Gender`}
                                             </Form.Label>
                                             <Form.Select
                                                 id="gender"
+                                                className='text-capitalize'
                                                 {...register(
                                                     'gender'
                                                     //  { required: 'Gender is required' }
                                                 )}>
-                                                <option value="unknown">Unknown</option>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                                <option value="other">Other</option>
+                                                {["unknown", "male", "female", "other"]?.map((gender, index) => (
+                                                    <option className='text-capitalize' value={gender} key={index}>{gender}</option>
+                                                ))}
                                             </Form.Select>
                                             {errors.gender && (
                                                 <span className="text-danger">{errors.gender.message}</span>
@@ -839,15 +665,15 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label htmlFor="patientstatus" className="mb-0">
-                                                Patient Status
+                                                {`Patient Status`}
                                             </Form.Label>
                                             <Form.Select
                                                 as="select" // Use 'select' to make it a dropdown
                                                 id="patientstatus"
                                                 {...register('patientStatus')}>
-                                                <option value="Active">Active</option>
-                                                <option value="Inactive">Inactive</option>
-                                                <option value="Inactive-Deceased">Inactive-Deceased</option>
+                                                {["Active", "Inactive", "Inactive-Deceased"]?.map((pStatus, index) => (
+                                                    <option value={pStatus} key={index}>{pStatus}</option>
+                                                ))}
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
@@ -856,7 +682,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         <div className="col-md-3 col-12">
                                             <Form.Group>
                                                 <Form.Label htmlFor="deceasedDateTime" className="mb-0">
-                                                    Deceased Date
+                                                    {`Deceased Date`}
                                                 </Form.Label>
                                                 <Form.Control
                                                     type="date"
@@ -870,7 +696,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     )}
                                     <div className="col-md-3 col-12 mb-2">
                                         <div className="d-flex flex-column position-relative">
-                                            <Form.Label className="mb-0">Patient Photo</Form.Label>
+                                            <Form.Label className="mb-0">{`Patient Photo`}</Form.Label>
                                             <div
                                                 onClick={() => logoFileInputRef.current.click()}
                                                 style={{ height: '30px', marginTop: '3px' }}
@@ -915,21 +741,18 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label htmlFor="title" className="mb-0">
-                                                Title
+                                                {`Title`}
                                             </Form.Label>
                                             <Form.Select {...register('title')} aria-label="Select Title">
                                                 <option value="" hidden>
-                                                    Select
+                                                    {`Select`}
                                                 </option>
-                                                <option value="Mr.">Mr.</option>
-                                                <option value="Mrs.">Mrs.</option>
-                                                <option value="Miss">Miss</option>
-                                                <option value="Dr.">Dr.</option>
-                                                <option value="Other">Other</option>
+                                                {["Mr.", "Mrs.", "Miss", "Dr.", "Other"]?.map((title, index) => (
+                                                    <option value={title} key={index}>{title}</option>
+                                                ))}
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
-
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Suffix </Form.Label>
@@ -941,7 +764,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     </div>
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Previous Birth Name </Form.Label>
+                                            <Form.Label className="mb-0">{`Previous Birth Name`} </Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Previous Birth Name"
@@ -952,167 +775,19 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                             )}
                                         </Form.Group>
                                     </div>
-                                    {/* <div className="col-md-3 col-12 mb-2">
-                                        <Form.Group className="mb-1 position-relative">
-                                            <Form.Label className="mb-0">Home Phone</Form.Label>
-                                            <Form.Group>
-                                                <InputGroup>
-                                                    <InputGroup.Text
-                                                        className="ps-3 pe-1 fw-bold text-black"
-                                                        style={{ height: '33px' }}>
-                                                        &nbsp;&nbsp;+1
-                                                    </InputGroup.Text>
-                                                    <Form.Control
-                                                        type="tel"
-                                                        style={{ height: '30px!important' }}
-                                                        {...register(
-                                                            'homePhone',
-                                                            !id
-                                                                ? {
-                                                                    pattern: {
-                                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                                        message:
-                                                                            'Contact must be in the format (XXX)XXX-XXXX',
-                                                                    },
-                                                                    maxLength: {
-                                                                        value: 13,
-                                                                        message: 'Contact must not exceed 13 digits',
-                                                                    },
-                                                                    minLength: {
-                                                                        value: 13,
-                                                                        message:
-                                                                            'Contact must not be less than 13 digits',
-                                                                    },
-                                                                }
-                                                                : {}
-                                                        )}
-                                                        onChange={(e) => {
-                                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                                            const formattedValue = rawValue.replace(
-                                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                                (match, p1, p2, p3) => {
-                                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                                    if (p2) return `(${p1})${p2}`;
-                                                                    return `(${p1}`;
-                                                                }
-                                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                                            e.target.value = formattedValue; // Update input value
-                                                            clearErrors('homePhone'); // Clear validation errors
-                                                        }}
-                                                        placeholder="(XXX)XXX-XXXX"
-                                                        maxLength={14}
-                                                        onKeyPress={(event) => {
-                                                            // Only allow numeric characters (0-9)
-                                                            if (!/[0-9]/.test(event.key)) {
-                                                                event.preventDefault();
-                                                            }
-                                                        }}
-                                                    />
-                                                </InputGroup>
-                                            </Form.Group>
-                                            <div className="position-absolute" style={{ top: '48%', left: '1%' }}>
-                                                <img src={us} alt="country code flag" width={20} />
-                                            </div>
-                                        </Form.Group>
-                                    </div> */}
-                                    {/* <div className="col-md-3 col-12">
-                                        <Form.Group>
-                                            <Form.Label className="mb-0">Alternate Email</Form.Label>
-                                            <Form.Control
-                                                type="email"
-                                                placeholder="Alternate Email ID"
-                                                {...register('alternateEmail', {
-                                                    pattern: {
-                                                        value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                                                        message: 'Invalid email address',
-                                                    },
-                                                })}
-                                            />
-                                        </Form.Group>
-                                    </div> */}
-                                    {/* <div className="col-md-3 col-12">
-                                        <Form.Group className="mb-1 position-relative">
-                                            <Form.Label className="mb-0">Office Phone</Form.Label>
-                                            <Form.Group>
-                                                <InputGroup>
-                                                    <InputGroup.Text
-                                                        className="ps-3 pe-1 fw-bold text-black"
-                                                        style={{ height: '33px' }}>
-                                                        &nbsp;&nbsp;+1
-                                                    </InputGroup.Text>
-                                                    <Form.Control
-                                                        type="tel"
-                                                        style={{ height: '30px!important' }}
-                                                        {...register(
-                                                            'officePhone',
-                                                            !id
-                                                                ? {
-                                                                    pattern: {
-                                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                                        message:
-                                                                            'Contact must be in the format (XXX)XXX-XXXX',
-                                                                    },
-                                                                    maxLength: {
-                                                                        value: 13,
-                                                                        message: 'Contact must not exceed 13 digits',
-                                                                    },
-                                                                    minLength: {
-                                                                        value: 13,
-                                                                        message:
-                                                                            'Contact must not be less than 13 digits',
-                                                                    },
-                                                                }
-                                                                : {}
-                                                        )}
-                                                        onChange={(e) => {
-                                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                                            const formattedValue = rawValue.replace(
-                                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                                (match, p1, p2, p3) => {
-                                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                                    if (p2) return `(${p1})${p2}`;
-                                                                    return `(${p1}`;
-                                                                }
-                                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                                            e.target.value = formattedValue; // Update input value
-                                                            clearErrors('officePhone'); // Clear validation errors
-                                                        }}
-                                                        placeholder="(XXX)XXX-XXXX"
-                                                        maxLength={14}
-                                                        onKeyPress={(event) => {
-                                                            // Only allow numeric characters (0-9)
-                                                            if (!/[0-9]/.test(event.key)) {
-                                                                event.preventDefault();
-                                                            }
-                                                        }}
-                                                    />
-                                                </InputGroup>
-                                            </Form.Group>
-
-                                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
-                                                <img src={us} alt="country code flag" width={20} />
-                                            </div>
-                                        </Form.Group>
-                                    </div> */}
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Preferred Communication</Form.Label>
+                                            <Form.Label className="mb-0">{`Preferred Communication`}</Form.Label>
                                             <Form.Select
                                                 {...register('preferredCommunication')}
                                                 aria-label="Select Title">
                                                 <option value="" hidden>
-                                                    Select
+                                                    {`Select`}
                                                 </option>
-                                                <option value="Home Phone">Home Phone</option>
-                                                <option value="Work Phone">Work Phone</option>
-                                                <option value="Cell Phone">Cell Phone</option>
-                                                <option value="Email">Email</option>
-                                                <option value="Text Message">Text Message</option>
-                                                <option value="Declined">Declined</option>
-                                                <option value="Snail Mail">Snail Mail</option>
-                                                <option value="Other">Other</option>
+                                                {["Home Phone", "Work Phone", "Cell Phone", "Email",
+                                                    "Text Message", "Declined", "Snail Mail", "Other"]?.map((prefCom, index) => (
+                                                        <option key={index} value={prefCom}>{prefCom}</option>
+                                                    ))}
                                             </Form.Select>
                                             {errors.preferredCommunication && (
                                                 <span className="text-danger">
@@ -1124,30 +799,30 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
 
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Reminder Language</Form.Label>
+                                            <Form.Label className="mb-0">{`Reminder Language`}</Form.Label>
                                             <Form.Select {...register('reminderLanguage')} defaultValue="English">
-                                                <option value="English">English</option>
-                                                <option value="Spanish">Spanish</option>
-                                                <option value="French">French</option>
+                                                {["English", "Spanish", "French"]?.map((lang, index) => (
+                                                    <option value={lang} key={index}>{lang}</option>
+                                                ))}
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Responsible Party</Form.Label>
+                                            <Form.Label className="mb-0">{`Responsible Party`}</Form.Label>
                                             <Form.Select onChange={handleResponsibleChange} value={responsibleParty}>
-                                                <option value="true">Yes</option>
-                                                <option value="false">No</option>
+                                                <option value="true">{`Yes`}</option>
+                                                <option value="false">{`No`}</option>
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
 
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Referring Doctor</Form.Label>
+                                            <Form.Label className="mb-0">{`Referring Doctor`}</Form.Label>
                                             <Form.Select onChange={handleReferringChange} value={referringPhysician}>
-                                                <option value="true">Yes</option>
-                                                <option value="false">No</option>
+                                                <option value="true">{`Yes`}</option>
+                                                <option value="false">{`No`}</option>
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
@@ -1157,7 +832,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                 <div className="row">
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group className="responnsible-party-select">
-                                            <Form.Label className="mb-0">Primary Provider (Doctor Name)</Form.Label>
+                                            <Form.Label className="mb-0">{`Primary Provider (Doctor Name)`}</Form.Label>
                                             <Select
                                                 className="basic-single"
                                                 classNamePrefix="select"
@@ -1198,33 +873,28 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
 
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Medical History Concent</Form.Label>
+                                            <Form.Label className="mb-0">{`Medical History Concent`}</Form.Label>
                                             <Form.Select
                                                 {...register('medicationHistoryConsent')}
                                                 // defaultValue={'true'}
                                             >
-                                                <option value={''}>Select</option>
-                                                <option value={'true'}>Yes</option>
-                                                <option value={'false'}>No</option>
+                                                <option value={''}>{`Select`}</option>
+                                                <option value={'true'}>{`Yes`}</option>
+                                                <option value={'false'}>{`No`}</option>
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
 
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Payment Profile</Form.Label>
+                                            <Form.Label className="mb-0">{`Payment Profile`}</Form.Label>
                                             <Form.Select
                                                 {...register('paymentProfile')}
                                                 aria-label="Payment Profile"
                                                 defaultValue={'Cash'}>
-                                                <option value="Cash">Cash</option>
-                                                <option value="Insurance">Insurance</option>
-                                                <option value="Insurance Out of Network">
-                                                    Insurance Out of Network
-                                                </option>
-                                                <option value="Auto Accident">Auto Accident</option>
-                                                <option value="Worker's Comp">Worker's Comp</option>
-                                                <option value="Other">Other</option>
+                                                {["Cash", "Insurance", "Insurance Out of Network", "Auto Accident", "Worker's Comp", "Other"]?.map((paymentProf, index) => (
+                                                    <option value={paymentProf} key={index}>{paymentProf}</option>
+                                                ))}
                                             </Form.Select>
                                             {errors.paymentProfile && (
                                                 <span className="text-danger">{errors.paymentProfile.message}</span>
@@ -1233,7 +903,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     </div>
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Patient's Copay (in $)</Form.Label>
+                                            <Form.Label className="mb-0">{`Patient's Copay (in $)`}</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Patient's Copay"
@@ -1251,7 +921,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label htmlFor="DOB" className="mb-0">
-                                                Follow Up Date
+                                                {`Follow Up Date`}
                                             </Form.Label>
                                             <Form.Control
                                                 type="date" // Change type to "date" for date input
@@ -1265,7 +935,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                     </div>
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Follow Up Reason</Form.Label>
+                                            <Form.Label className="mb-0">{`Follow Up Reason`}</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Follow Up Reason"
@@ -1285,7 +955,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                             setLogo(null);
                                             setLogoName(null);
                                         }}>
-                                        Clear
+                                        {`Clear`}
                                     </Button>
                                     <Button
                                         onClick={() => setSubmissionType('saveAndReset')}
@@ -1295,7 +965,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         }
                                         className="custom-buttons "
                                         type="submit">
-                                        Save & Add Another
+                                        {`Save & Add Another`}
                                     </Button>
                                     <Button
                                         onClick={() => {
@@ -1307,28 +977,17 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         }
                                         className="custom-buttons "
                                         type="submit">
-                                        Save & Continue Editing
+                                        {`Save & Continue Editing`}
                                     </Button>
-                                    {/* <Button
-                                        onClick={() => setSubmissionType('saveOnly')}
-                                        disabled={
-                                            store?.createPatientsReducer?.loading ||
-                                            store?.updatePatientsReducer?.loading
-                                        }
-                                        className="custom-buttons "
-                                        type="submit">
-                                        Save
-                                    </Button> */}
                                 </div>
                             </Form>
                         )}
                         {activeTab === 'responsible' && (
-                            <Responsiblle patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab} />
+                            <Responsiblle activeTab={activeTab} setActiveTab={setActiveTab} />
                         )}
-                        {activeTab === 'insurance' && <Insurance patientId={patientId} />}
+                        {activeTab === 'insurance' && <Insurance />}
                         {activeTab === 'demographicDetails' && (
                             <Demographicdetails
-                                patientId={patientId}
                                 activeTab={activeTab}
                                 gender={genderIdentity}
                                 setActiveTab={setActiveTab}
@@ -1339,72 +998,12 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                             />
                         )}
                         {activeTab === 'referringDoctor' && (
-                            <ReferringDoctor patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab} />
+                            <ReferringDoctor activeTab={activeTab} setActiveTab={setActiveTab} />
                         )}
                     </div>
                 </Card>
             </div>
-
-            {/* Password Modal */}
-            <Modal size="sm" show={smShow} centered onHide={() => setSmShow(false)} aria-labelledby="password-modal">
-                <Modal.Body className="rounded-4 p-4">
-                    <Form onSubmit={handlePasswordSubmit}>
-                        <Form.Group controlId="password" className="text-center my-2">
-                            <Form.Label className="mb-2">View Details</Form.Label>
-                            <Form.Control
-                                type="password"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
-                        <Row className="mt-2">
-                            <Col sm={12} className="text-center">
-                                <Button variant="primary" type="submit">
-                                    Submit
-                                </Button>
-                                <p className="fw-bold mt-2">Show the number for 5 min only</p>
-                            </Col>
-                        </Row>
-                    </Form>
-                </Modal.Body>
-            </Modal>
-            <Modal show={showModalPic} onHide={handleCloseModal} centered>
-                <Modal.Body>
-                    <div className="d-flex justify-content-center">
-                        <p className="fw-bold" style={{ color: '#6169D0' }}>
-                            File Preview
-                        </p>
-                    </div>
-                    <div
-                        style={{
-                            overflow: 'hidden',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            minHeight: '300px', // minimum height to keep space for loader
-                        }}>
-                        {imageLoading && (
-                            <div className="d-flex justify-content-center align-items-center">
-                                <Spinner />
-                            </div>
-                        )}
-                        <img
-                            src={modalFileUrl}
-                            alt="File Preview"
-                            onLoad={() => setImageLoading(false)}
-                            onError={() => setImageLoading(false)} // hide spinner on error too
-                            style={{
-                                maxWidth: '100%',
-                                maxHeight: '100vh',
-                                objectFit: 'contain',
-                                display: imageLoading ? 'none' : 'block', // hide while loading
-                            }}
-                        />
-                    </div>
-                </Modal.Body>
-            </Modal>
+            <PreviewModal showModalPic={showModalPic} handleCloseModal={handleCloseModal} modalFileUrl={modalFileUrl} />
         </div>
     );
 };

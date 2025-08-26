@@ -86,6 +86,8 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
                                                 value.trim() !== '' || 'Name cannot be empty or only spaces',
                                             noSpacesBeforeText: (value) =>
                                                 !/^\s/.test(value) || 'First character cannot be a space',
+                                            noEmojis: (value) =>
+                                                !/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(value) || 'Emojis are not allowed',
                                         },
                                     })}
                                     placeholder="Enter Consultation Room Name"
@@ -94,6 +96,7 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
                                         if (value.trim() === '') {
                                             e.target.value = value.replace(/\s/g, '');
                                         }
+                                        e.target.value = value.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
                                     }}
                                 />
                                 {errors.name && <p className="text-danger">{errors.name.message}</p>}
@@ -114,6 +117,8 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
                                             noSpacesBeforeText: (value) =>
                                                 !/^\s/.test(value) || 'First character cannot be a space',
                                             matchName: (value) => value === watch('name') || 'Name do not match',
+                                            noEmojis: (value) =>
+                                                !/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(value) || 'Emojis are not allowed',
                                         },
                                     })}
                                     placeholder="Re-enter Consultation Room Name"
@@ -122,6 +127,7 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
                                         if (value.trim() === '') {
                                             e.target.value = value.replace(/\s/g, '');
                                         }
+                                        e.target.value = value.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
                                     }}
                                 />
                                 {errors.reEnterName && <p className="text-danger">{errors.reEnterName.message}</p>}
@@ -133,15 +139,22 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
-                                    {...register('description')}
+                                    {...register('description', {
+                                        validate: {
+                                            noEmojis: (value) =>
+                                                !value || !/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(value) || 'Emojis are not allowed',
+                                        },
+                                    })}
                                     placeholder="Enter description"
                                     onInput={(e) => {
                                         const value = e.target.value;
                                         if (value.trim() === '') {
                                             e.target.value = value.replace(/\s/g, '');
                                         }
+                                        e.target.value = value.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
                                     }}
                                 />
+                                {errors.description && <p className="text-danger">{errors.description.message}</p>}
                             </Form.Group>
                         </Col>
                     </Row>

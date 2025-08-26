@@ -212,11 +212,13 @@ const FamilyHistory = () => {
             bornDate: data?.dob,
             deceasedBoolean: data.deceased === 'yes',
             deceasedDate: data?.dateOfDeath,
-            note: [
-                {
-                    text: data?.note,
-                },
-            ],
+            ...(data?.note && data.note.trim() !== '' && data.note !== '<ul><li></li></ul>' && data.note !== '<p><br></p>' && {
+                note: [
+                    {
+                        text: data?.note,
+                    },
+                ],
+            }),
         };
 
         if (toEdit) {

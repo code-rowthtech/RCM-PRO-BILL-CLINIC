@@ -91,18 +91,23 @@ const Tobacco = () => {
     }, [createSuccess, updateSuccess]);
 
     const onSubmit = (data) => {
-        data.subject = patientId;
-        data.note = [
-            {
-                text: data.note,
-                time: new Date().toISOString(),
-            },
-        ];
-        data.clinicId = loggedInUser?._id;
+        const payload = {
+            ...data,
+            subject: patientId,
+            clinicId: loggedInUser?._id,
+            ...(data.note && data.note.trim() !== '' && data.note !== '<ul><li></li></ul>' && data.note !== '<p><br></p>' && {
+                note: [
+                    {
+                        text: data.note,
+                        time: new Date().toISOString(),
+                    },
+                ],
+            }),
+        };
         if (toEdit) {
-            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }));
+            dispatch(updateTobaccooAction({ key: encryptMessage(payload), id: toEdit?._id }));
         } else {
-            dispatch(createTobaccooAction({ key: encryptMessage(data) }));
+            dispatch(createTobaccooAction({ key: encryptMessage(payload) }));
         }
     };
 

@@ -220,7 +220,7 @@ const ScheduleTab = () => {
                             Provider Name <span className="text-danger ">*</span>
                         </Form.Label>
                         <Select
-                            options={doctorOptions} // Use the formatted array
+                            options={doctorOptions || []} // Use the formatted array
                             isLoading={store?.getDoctorsReducer?.loading}
                             isSearchable={true}
                             isClearable={true}
@@ -230,7 +230,10 @@ const ScheduleTab = () => {
                             classNamePrefix="select"
                             placeholder="&nbsp; Select "
                             name="doctorName"
+                            value={selectedDoctor}
                             getOptionLabel={(e) => e.label.replace(/\b\w/g, (char) => char.toUpperCase())}
+                            filterOption={() => true}
+                            noOptionsMessage={() => 'No providers found'}
                             styles={{
                                 control: (provided) => ({
                                     ...provided,

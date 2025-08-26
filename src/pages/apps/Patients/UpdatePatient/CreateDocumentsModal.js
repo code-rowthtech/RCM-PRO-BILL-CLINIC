@@ -206,26 +206,22 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
         addFiles(Array.from(e.dataTransfer.files));
     }, []);
 
-
-    const handleRemoveFile = (index) => {
-        setFiles((prev) => prev.filter((_, i) => i !== index));
-        if (previewFile === files[index]) setPreviewFile(null);
-    };
-
     const validMimeTypes = [
         'application/pdf',
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'image/jpeg', 'image/png', 'image/gif'
+        'image/jpeg', 'image/png', 'image/gif',
+        'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp3', 'audio/mp4',
+        'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/webm'
     ];
 
     const validateFile = (file) => {
         if (!validMimeTypes.includes(file.type)) {
-            setError(`Unsupported type: ${file.name}`);
+            ToastHandle(`Unsupported file type: ${file.name}`, 'danger');
             return false;
         }
         if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-            setError(`Too large: ${file.name}`);
+            ToastHandle(`${file.name} exceeds ${MAX_FILE_SIZE_MB}MB`, 'danger');
             return false;
         }
         return true;
@@ -377,8 +373,11 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                             >
                                 {`Browse Files`}
                             </Button>
-                            <p className="small text-muted mt-2">
+                            <p className="small text-muted mt-2 mb-0">
                                 {`Allowed: PDF, DOC, DOCX, JPG, PNG, GIF. Max size:`} {MAX_FILE_SIZE_MB}{`MB`}
+                            </p>
+                            <p className="small text-muted my-0">
+                                {`A maximum of 10 documents can be uploaded.`}
                             </p>
                         </div>
                     </Col>

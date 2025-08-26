@@ -172,7 +172,7 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                     data-has-value={!!watch(`constantContact[${index}].use`)}
                                     {...register(`constantContact[${index}].use`)}
                                     onChange={(e) => handleContactChange(index, 'use', e.target.value)}>
-                                    <option value="">Select Option</option> {/* Placeholder option */}
+                                    <option value="">Select Option</option>
                                     <option value="temp">Temp</option>
                                     <option value="home">Home</option>
                                     <option value="work">Work</option>

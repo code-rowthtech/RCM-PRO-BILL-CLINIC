@@ -119,12 +119,14 @@ const MedicalHistory = () => {
                 start: data.startDate,
                 end: data.endDate,
             },
-            note: [
-                {
-                    text: data.note,
-                    time: new Date().toISOString(),
-                },
-            ],
+            ...(data.note && data.note.trim() !== '' && data.note !== '<ul><li></li></ul>' && data.note !== '<p><br></p>' && {
+                note: [
+                    {
+                        text: data.note,
+                        time: new Date().toISOString(),
+                    },
+                ],
+            }),
             subject: patientId,
         };
         if (toEdit) {

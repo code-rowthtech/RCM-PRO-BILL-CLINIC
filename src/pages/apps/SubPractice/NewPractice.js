@@ -515,7 +515,7 @@ const NewPractice = () => {
                                                 className={`text-black nav-link font_active_tabs ${activeTab === 'personalDetails' ? 'active' : ''
                                                     }`}
                                                 onClick={() => handleTabChange('personalDetails')}>
-                                                Practice Sub Information
+                                                {`Practice Sub Information`}
                                             </button>
                                         </li>
                                     </ul>
@@ -529,7 +529,7 @@ const NewPractice = () => {
                                                 </Button>
                                            */}
                                             <Button className="cancel-button" as={Link} to={'/apps/crm/addPractice'}>
-                                                Back
+                                                {`Back`}
                                             </Button>
                                         </>
                                     )}
@@ -550,7 +550,7 @@ const NewPractice = () => {
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className="mb-0">
-                                                            Practice Name <span className="text-danger">*</span>
+                                                            {`Practice Name`} <span className="text-danger">{`*`}</span>
                                                         </Form.Label>
                                                         <Form.Control
                                                             type="text"
@@ -571,7 +571,7 @@ const NewPractice = () => {
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className="mb-0">
-                                                            Practice type <span className="text-danger">*</span>
+                                                            {`Practice type`} <span className="text-danger">{`*`}</span>
                                                         </Form.Label>
                                                         <Form.Select
                                                             data-has-value={!!watch('clinicType')}
@@ -584,7 +584,7 @@ const NewPractice = () => {
                                                             className="form-control"
                                                             defaultValue="">
                                                             <option value="" hidden>
-                                                                Select Clinic type
+                                                                {`Select Clinic type`}
                                                             </option>
                                                             {clinectypes?.map((data) => (
                                                                 <option key={data?._id} value={data?.name}>
@@ -600,7 +600,7 @@ const NewPractice = () => {
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className="mb-0">
-                                                            Email <span className="text-danger">*</span>
+                                                            {`Email`} <span className="text-danger">{`*`}</span>
                                                         </Form.Label>
                                                         <Form.Control
                                                             type="email"
@@ -622,7 +622,7 @@ const NewPractice = () => {
                                                 </Col>
 
                                                 <Col sm={3}>
-                                                    <Form.Label className="mb-0">Upload Logo</Form.Label>
+                                                    <Form.Label className="mb-0">{`Upload Logo`}</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
                                                         className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading
@@ -657,8 +657,7 @@ const NewPractice = () => {
                                                                         try {
                                                                             const response = await fetch(fileUrl);
                                                                             const blob = await response.blob();
-                                                                            const url =
-                                                                                window.URL.createObjectURL(blob);
+                                                                            const url = window.URL.createObjectURL(blob);
                                                                             const link = document.createElement('a');
                                                                             link.href = url;
                                                                             link.download = fileName;
@@ -699,7 +698,7 @@ const NewPractice = () => {
                                                         <Row>
                                                             <Col sm={12}>
                                                                 <h5>
-                                                                    Identifiers
+                                                                    {`Identifiers`}
                                                                     <span
                                                                         className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
                                                                         onClick={addIdentifier}></span>
@@ -710,21 +709,21 @@ const NewPractice = () => {
                                                         {/* Table Header */}
                                                         <Row className="fw-bold">
                                                             <Col>
-                                                                <Form.Label>Identifier Type</Form.Label>
+                                                                <Form.Label>{`Identifier Type`}</Form.Label>
                                                             </Col>
                                                             <Col>
-                                                                <Form.Label>Identifier Number</Form.Label>
+                                                                <Form.Label>{`Identifier Number`}</Form.Label>
                                                             </Col>
                                                             <Col className="d-flex align-items-center gap-2">
-                                                                <Form.Label>Identifier Document</Form.Label>
+                                                                <Form.Label>{`Identifier Document`}</Form.Label>
 
                                                                 {/* Tooltip Icon */}
                                                                 <OverlayTrigger
                                                                     placement="top"
                                                                     overlay={
                                                                         <Tooltip id="tooltip-identifier">
-                                                                            File size should be less than 2MB. Supported
-                                                                            formats: JPG, PNG, JPEG, PDF.
+                                                                            {`File size should be less than 2MB. Supported
+                                                                            formats: JPG, PNG, JPEG, PDF.`}
                                                                         </Tooltip>
                                                                     }>
                                                                     <span className="text-secondary cursor-pointer mb-2">
@@ -733,20 +732,20 @@ const NewPractice = () => {
                                                                 </OverlayTrigger>
                                                             </Col>
                                                             <Col>
-                                                                <Form.Label>Issuing Authority</Form.Label>
+                                                                <Form.Label>{`Issuing Authority`}</Form.Label>
                                                             </Col>
                                                             <Col>
                                                                 <Form.Label>
-                                                                    Identifier Expiry{' '}
+                                                                    {`Identifier Expiry`}{' '}
                                                                     <span className="text-secondary">
-                                                                        (If Applicable)
+                                                                        {`(If Applicable)`}
                                                                     </span>
                                                                 </Form.Label>
                                                             </Col>
                                                         </Row>
 
                                                         {/* Dynamic Identifier Fields */}
-                                                        {constantIdentifiers.map((item, index) => (
+                                                        {constantIdentifiers?.map((item, index) => (
                                                             <Row key={index} className="mb-2">
                                                                 {/* Identifier Type */}
                                                                 <Col>
@@ -766,7 +765,7 @@ const NewPractice = () => {
                                                                             item.type
                                                                         )}>
                                                                         <option value="" disabled>
-                                                                            Select Identifier Type
+                                                                            {`Select Identifier Type`}
                                                                         </option>
                                                                         {identifierOptions.map((option) => (
                                                                             <option
@@ -779,7 +778,7 @@ const NewPractice = () => {
                                                                     </Form.Select>
                                                                     {errors?.[index]?.type && (
                                                                         <span className="text-danger">
-                                                                            This field is required
+                                                                            {`This field is required`}
                                                                         </span>
                                                                     )}
                                                                 </Col>
@@ -961,7 +960,7 @@ const NewPractice = () => {
                                                                     />
                                                                     {errors?.[index]?.file && (
                                                                         <span className="text-danger">
-                                                                            Please upload a document
+                                                                            {`Please upload a document`}
                                                                         </span>
                                                                     )}
                                                                 </Col>
@@ -986,7 +985,7 @@ const NewPractice = () => {
                                                                             )
                                                                         }>
                                                                         <option value="" disabled>
-                                                                            Select Issuing Authority
+                                                                            {`Select Issuing Authority`}
                                                                         </option>
                                                                         {defaultIssuingAuthority.map((option) => (
                                                                             <option key={option} value={option}>
@@ -996,7 +995,7 @@ const NewPractice = () => {
                                                                     </Form.Select>
                                                                     {errors?.[index]?.issuingAuthority && (
                                                                         <span className="text-danger">
-                                                                            This field is required
+                                                                            {`This field is required`}
                                                                         </span>
                                                                     )}
                                                                 </Col>
@@ -1045,7 +1044,7 @@ const NewPractice = () => {
                                                 <Row>
                                                     <Col sm={12}>
                                                         <h5 className='mb-0'>
-                                                            Points of Contact (POC)
+                                                            {`Points of Contact (POC)`}
                                                             <span
                                                                 className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
                                                                 onClick={addPoc}></span>
@@ -1100,7 +1099,7 @@ const NewPractice = () => {
 
                                                             <Col sm={6}>
                                                                 <Form.Group>
-                                                                    <Form.Label>Email</Form.Label>
+                                                                    <Form.Label>{`Email`}</Form.Label>
                                                                     <Form.Control
                                                                         type="email"
                                                                         placeholder="Enter Email"
@@ -1119,12 +1118,12 @@ const NewPractice = () => {
                                                                 <Col sm={6} key={telecomIndex}>
                                                                     <Form.Group className="mb-2 position-relative">
                                                                         <Form.Label className="mb-1">
-                                                                            Phone Number
+                                                                            {`Phone Number`}
                                                                         </Form.Label>
                                                                         <InputGroup>
                                                                             {/* Country Code Prefix */}
                                                                             <InputGroup.Text className="ps-3 pe-1 p-0 fw-bold text-black">
-                                                                                &nbsp;&nbsp;+1
+                                                                                &nbsp;&nbsp;{`+1`}
                                                                             </InputGroup.Text>
 
                                                                             {/* Phone Input Field */}
@@ -1196,7 +1195,7 @@ const NewPractice = () => {
                 <Modal.Body>
                     <div className="d-flex justify-content-center">
                         <p className="fw-bold" style={{ color: '#6169D0' }}>
-                            File Preview
+                            {`File Preview`}
                         </p>
                     </div>
                     <div

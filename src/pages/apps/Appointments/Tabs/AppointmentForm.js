@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { debounce } from 'lodash';
 import { AiOutlinePlus } from 'react-icons/ai';
 import AsyncSelect from 'react-select/async';
+import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 
 // Redux actions
@@ -297,6 +298,9 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const [repeatType, setRepeatType] = useState('day');
     const [appointmentDates, setAppointmentDates] = useState();
     const [appointmentReason, setAppointmentReason] = useState(null);
+    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [selectedProvider, setSelectedProvider] = useState(null);
+    const [selectedConsultationRoom, setSelectedConsultationRoom] = useState(null);
     const [scheduledDate, setScheduledDate] = useState();
     const [showHolidayModal, setShowHolidayModal] = useState(false);
     const [consultationModal, setConsultationModal] = useState(false);
@@ -445,10 +449,16 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
         if (appointmentDetails && id) {
             const details = appointmentDetails;
             setValue('patient', details?.subject);
+            const selectedPatientOption = formattedPatientOptions.find(option => option.value === details?.subject);
+            setSelectedPatient(selectedPatientOption || null);
             setValue('doctorName', details?.doctorId);
+            const selectedProviderOption = formattedProviderOptions.find(option => option.value === details?.doctorId);
+            setSelectedProvider(selectedProviderOption || null);
             setAppointmentReason(details?.reason?.[0]);
             setValue('appointmentType', details?.appointmentType?.coding?.[0]?.display || '');
             setValue('consultationRoom', details?.examRoom);
+            const selectedConsultationRoomOption = formattedConsultationRoomOptions.find(option => option.value === details?.examRoom);
+            setSelectedConsultationRoom(selectedConsultationRoomOption || null);
             setValue('duration', details?.minutesDuration);
             setValue('startTime', formatTime(details?.start));
             setValue('status', details?.status);
@@ -614,6 +624,107 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const handlePlusIconClick = useCallback(() => setShowModal(true), []);
     const handleClosePatientModal = useCallback(() => setShowModal(false), []);
 
+    // Patient options formatting
+    const formattedPatientOptions = useMemo(
+        () =>
+            patientsData?.map((patient) => ({
+                value: patient?._id,
+                label: patient?.name?.[0]?.text,
+            })) || [],
+        [patientsData]
+    );
+
+    // Provider options formatting
+    const formattedProviderOptions = useMemo(
+        () =>
+            doctorDetails?.map((doctor) => {
+                const doctorName = doctor?.name?.[0]?.text || 'Unnamed';
+                const emailObj = doctor?.telecom?.find((t) => t.system === 'email');
+                const email = emailObj?.value ? ` (${emailObj.value})` : '';
+                return {
+                    value: doctor?._id,
+                    label: doctorName + email,
+                };
+            }) || [],
+        [doctorDetails]
+    );
+
+    // Consultation room options formatting
+    const formattedConsultationRoomOptions = useMemo(
+        () =>
+            consultationRoomData?.map((room) => ({
+                value: room?._id,
+                label: room?.name,
+            })) || [],
+        [consultationRoomData]
+    );
+
+    // Patient handling
+    const handlePatientChange = useCallback((selectedOption) => {
+        setSelectedPatient(selectedOption);
+        setValue('patient', selectedOption ? selectedOption.value : '');
+    }, [setValue]);
+
+    // Provider handling
+    const handleProviderChange = useCallback((selectedOption) => {
+        setSelectedProvider(selectedOption);
+        setValue('doctorName', selectedOption ? selectedOption.value : '');
+    }, [setValue]);
+
+    // Consultation room handling
+    const handleConsultationRoomChange = useCallback((selectedOption) => {
+        setSelectedConsultationRoom(selectedOption);
+        setValue('consultationRoom', selectedOption ? selectedOption.value : '');
+    }, [setValue]);
+
+    const loadPatientOptions = useCallback(
+        (inputValue, callback) => {
+            if (!inputValue) {
+                callback(formattedPatientOptions.slice(0, 10));
+                return;
+            }
+
+            const filteredOptions = formattedPatientOptions.filter((option) =>
+                option.label.toLowerCase().includes(inputValue.toLowerCase())
+            );
+
+            callback(filteredOptions.slice(0, 20));
+        },
+        [formattedPatientOptions]
+    );
+
+    const loadProviderOptions = useCallback(
+        (inputValue, callback) => {
+            if (!inputValue) {
+                callback(formattedProviderOptions.slice(0, 10));
+                return;
+            }
+
+            const filteredOptions = formattedProviderOptions.filter((option) =>
+                option.label.toLowerCase().includes(inputValue.toLowerCase())
+            );
+
+            callback(filteredOptions.slice(0, 20));
+        },
+        [formattedProviderOptions]
+    );
+
+    const loadConsultationRoomOptions = useCallback(
+        (inputValue, callback) => {
+            if (!inputValue) {
+                callback(formattedConsultationRoomOptions.slice(0, 10));
+                return;
+            }
+
+            const filteredOptions = formattedConsultationRoomOptions.filter((option) =>
+                option.label.toLowerCase().includes(inputValue.toLowerCase())
+            );
+
+            callback(filteredOptions.slice(0, 20));
+        },
+        [formattedConsultationRoomOptions]
+    );
+
     // Appointment reason handling
     const formattedReasonOptions = useMemo(
         () =>
@@ -680,27 +791,36 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 </Form.Label>
 
                                 <div style={{ position: 'relative' }}>
-                                    <Form.Control
-                                        as="select"
-                                        data-has-value={!!watchedPatient}
-                                        className=""
+                                    <AsyncSelect
+                                        loadOptions={loadPatientOptions}
+                                        defaultOptions={formattedPatientOptions.slice(0, 10)}
+                                        isSearchable
+                                        className="basic-single"
+                                        classNamePrefix="select"
+                                        placeholder={store?.getPatientsReducer?.loading ? 'Loading...' : 'Select Patient'}
+                                        value={selectedPatient}
+                                        onChange={handlePatientChange}
+                                        noOptionsMessage={() => 'No Patient added yet'}
+                                        styles={{
+                                            control: (provided) => ({
+                                                ...provided,
+                                                height: '30px',
+                                                minHeight: '30px',
+                                                border: 'none',
+                                                paddingRight: '40px',
+                                                outline:'none',
+                                            }),
+                                            placeholder: (provided) => ({
+                                                ...provided,
+                                                fontSize: '12px',
+                                            }),
+                                        }}
+                                    />
+                                    <input
+                                        type="hidden"
                                         {...register('patient', { required: 'Patient is required' })}
-                                        style={{ paddingRight: '40px' }}>
-                                        <option value="" hidden>
-                                            {store?.getPatientsReducer?.loading ? 'Loading...' : 'Select Patient'}
-                                        </option>
-                                        {patientsData?.length > 0 ? (
-                                            patientsData.map((patient) => (
-                                                <option key={patient?._id} value={patient?._id}>
-                                                    {patient?.name?.[0]?.text}
-                                                </option>
-                                            ))
-                                        ) : (
-                                            <option value="" disabled>
-                                                No Patient added yet
-                                            </option>
-                                        )}
-                                    </Form.Control>
+                                        value={selectedPatient?.value || ''}
+                                    />
 
                                     <AiOutlinePlus
                                         title="Add New Patient"
@@ -713,6 +833,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                             color: '#007bff',
                                             fontSize: '20px',
                                             pointerEvents: 'auto',
+                                            zIndex: 10,
                                         }}
                                         onClick={handlePlusIconClick}
                                     />
@@ -731,31 +852,35 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     Select Provider <span className="text-danger">*</span>
                                 </Form.Label>
                                 <div>
-                                    <Form.Control
-                                        as="select"
-                                        className="form-select"
+                                    <AsyncSelect
+                                        loadOptions={loadProviderOptions}
+                                        defaultOptions={formattedProviderOptions.slice(0, 10)}
+                                        isSearchable
+                                        className="basic-single"
+                                        classNamePrefix="select"
+                                        placeholder={store?.getDoctorsReducer?.loading ? 'Loading...' : 'Select Provider'}
+                                        value={selectedProvider}
+                                        onChange={handleProviderChange}
+                                        noOptionsMessage={() => 'No Doctor added yet'}
+                                        styles={{
+                                            control: (provided) => ({
+                                                ...provided,
+                                                height: '30px',
+                                                minHeight: '30px',
+                                                border: 'none',
+                                                outline: 'none',
+                                            }),
+                                            placeholder: (provided) => ({
+                                                ...provided,
+                                                fontSize: '12px',
+                                            }),
+                                        }}
+                                    />
+                                    <input
+                                        type="hidden"
                                         {...register('doctorName', { required: 'Doctor is required' })}
-                                        data-has-value={!!watchedDoctorName}>
-                                        <option value="" hidden>
-                                            {store?.getDoctorsReducer?.loading ? 'Loading...' : 'Select Provider'}
-                                        </option>
-                                        {doctorDetails && doctorDetails.length > 0 ? (
-                                            doctorDetails.map((doctor) => {
-                                                const doctorName = doctor?.name?.[0]?.text || 'Unnamed';
-                                                const emailObj = doctor?.telecom?.find((t) => t.system === 'email');
-                                                const email = emailObj?.value ? ` (${emailObj.value})` : '';
-                                                return (
-                                                    <option key={doctor?._id} value={doctor?._id}>
-                                                        {doctorName + email}
-                                                    </option>
-                                                );
-                                            })
-                                        ) : (
-                                            <option value="" disabled>
-                                                No Doctor added yet
-                                            </option>
-                                        )}
-                                    </Form.Control>
+                                        value={selectedProvider?.value || ''}
+                                    />
                                     {errors.doctorName && <p className="text-danger">{errors.doctorName.message}</p>}
                                 </div>
                             </Form.Group>
@@ -944,30 +1069,37 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                             onClick={() => setConsultationModal(true)}></i>
                                     </span>
                                 </Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    data-has-value={!!watch('consultationRoom')}
-                                    className="form-select"
-                                    {...register('consultationRoom')}>
-                                    <option value="" hidden>
-                                        Select Consultation Room
-                                    </option>
-                                    {consultationRoomData && consultationRoomData.length > 0 ? (
-                                        consultationRoomData?.map((room) => (
-                                            <option
-                                                key={room?._id}
-                                                value={room?._id}
-                                                selected={room?._id === consultationRoomData[0]?._id}>
-                                                {room?.name}
-                                            </option>
-                                        ))
-                                    ) : (
-                                        <option value="" disabled>
-                                            No Consultation added yet
-                                        </option>
-                                    )}
-                                </Form.Control>
-                                {/* {errors.consultationRoom && <p className="text-danger">{errors.consultationRoom.message}</p>} */}
+                                <div style={{ position: 'relative' }}>
+                                    <AsyncSelect
+                                        loadOptions={loadConsultationRoomOptions}
+                                        defaultOptions={formattedConsultationRoomOptions.slice(0, 10)}
+                                        isSearchable
+                                        className="basic-single"
+                                        classNamePrefix="select"
+                                        placeholder="Select Consultation Room"
+                                        value={selectedConsultationRoom}
+                                        onChange={handleConsultationRoomChange}
+                                        noOptionsMessage={() => 'No Consultation added yet'}
+                                        styles={{
+                                            control: (provided) => ({
+                                                ...provided,
+                                                height: '30px',
+                                                minHeight: '30px',
+                                                border: 'none',
+                                                outline: 'none',
+                                            }),
+                                            placeholder: (provided) => ({
+                                                ...provided,
+                                                fontSize: '12px',
+                                            }),
+                                        }}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        {...register('consultationRoom')}
+                                        value={selectedConsultationRoom?.value || ''}
+                                    />
+                                </div>
                             </Form.Group>
                         </Col>
                         <Col sm={6}>

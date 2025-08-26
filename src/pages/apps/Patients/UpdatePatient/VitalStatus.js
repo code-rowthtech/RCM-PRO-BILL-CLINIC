@@ -33,8 +33,12 @@ const metricUnits = {
 
 
 const formatDate = (dateString) => {
-    const options = { day: 'numeric', month: 'short' };
-    return new Date(dateString).toLocaleDateString('en-GB', options);
+    const date = new Date(dateString);
+    const dateOptions = { day: 'numeric', month: 'short' };
+    const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+    const formattedDate = date.toLocaleDateString('en-GB', dateOptions);
+    const formattedTime = date.toLocaleTimeString('en-GB', timeOptions);
+    return `${formattedDate} ${formattedTime}`;
 };
 
 export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem, convertFromImperial, convertToImperial }) {
@@ -45,6 +49,8 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
+    console.log(patientVitals, 'effectiveDateTimeeffectiveDateTime')
+
     const [editingDate, setEditingDate] = useState(null);
     const now = new Date();
     const formatTwoDigits = (n) => n.toString().padStart(2, '0');
@@ -161,7 +167,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                         code: "kg/m2"
                     }
                 };
-                console.log(effectiveDateTime, 'effectiveDateTimeeffectiveDateTime')
+                console.log(observation, 'observation')
                 dispatch(createVitalsAction({ key: encryptMessage(observation) }));
             }
         }
@@ -169,11 +175,13 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
 
     // Group vitals by date and sort by date (newest first)
     const groupedVitals = patientVitals && patientVitals?.reduce((acc, vitalGroup) => {
-        const date = vitalGroup.effectiveDateTime;
-        if (!acc[date]) {
-            acc[date] = [];
-        }
-        acc[date].push(...vitalGroup.vitals);
+        vitalGroup.vitals?.forEach(vital => {
+            const date = vital.effectiveDateTime;
+            if (!acc[date]) {
+                acc[date] = [];
+            }
+            acc[date].push(vital);
+        });
         return acc;
     }, {});
 
@@ -266,6 +274,8 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                 ...baseObservation,
                 valueString: vital.value
             };
+            console.log(observation, 'observation')
+
             dispatch(createVitalsAction({ key: encryptMessage(observation) }));
         }
         else if (vital.type === 'number' && vital.value !== '') {
@@ -300,6 +310,8 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                             unitToSend === '°F' ? '[degF]' : unitToSend
                 }
             };
+            console.log(observation, 'observation')
+
             dispatch(createVitalsAction({ key: encryptMessage(observation) }));
         }
     };
@@ -360,7 +372,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                                 size="sm"
                                 className="me-1"
                             />
-                            /
+                            {`/`}
                             <Form.Control
                                 type="number"
                                 defaultValue={bpValue.diastolic}
@@ -389,7 +401,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                             onBlur={(e) => handleUpdateVital(vital.name, e.target.value, date, _id)}
                             size="sm"
                         >
-                            <option value="">Select</option>
+                            <option value="">{`Select`}</option>
                             {vital.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                         </Form.Select>
                         {editValidationErrors[editErrorKey] && (
@@ -607,15 +619,15 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                 <thead>
                     <tr className='border'>
                         <th className='text-white'>
-                            Vital Name
+                            {`Vital Name`}
                         </th>
                         {sortedDates?.map(date => (
-                            <th className='text-white' key={date}>
-                                {formatDate(date)}
+                            <th className='text-white text-nowrap ' key={date}>
+                                <span className='fs-6'>{formatDate(date)}</span>
 
                                 {editingDate === date ? (
                                     <i
-                                        className="bi bi-check-square ms-2 cursor-pointer fs-4 text-success"
+                                        className="bi bi-check-square ms-2 cursor-pointer fs-5 text-success"
                                         onClick={() => {
                                             dispatch(getVitalsByPatientIdAction({ patientId, limit: 5 }))
                                             // Save all changes for this date
@@ -625,7 +637,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                                     />
                                 ) : (
                                     <i
-                                        className="mdi mdi-square-edit-outline ms-2 cursor-pointer fs-4 text-warning"
+                                        className="mdi mdi-square-edit-outline ms-2 cursor-pointer fs-5 text-warning"
                                         onClick={() => setEditingDate(date)}
                                         title="Edit vitals"
                                     />
@@ -670,7 +682,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                                 overlay={
                                     showTooltip ? (
                                         <Tooltip>
-                                            Vitals for the selected day have already been recorded. You can edit them instead of recreating.
+                                            {`Vitals for the selected day have already been recorded. You can edit them instead of recreating.`}
                                         </Tooltip>
                                     ) : <></>
                                 }
@@ -705,7 +717,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                                                             data?.effectiveDateTime?.split('T')[0] === visitDateTime?.date
                                                     )}
                                                 />
-                                                /
+                                                {`/`}
                                                 <Form.Control
                                                     type="number"
                                                     value={vital.value.diastolic}

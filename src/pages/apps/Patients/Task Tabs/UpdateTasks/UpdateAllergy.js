@@ -53,7 +53,6 @@ const UpdateAllergy = ({ onCancel }) => {
         formattedCodeOption.find((option) => option?.value?.code === code?.code) ||
         formattedCodeOption.find((option) => option?.display === code);
 
-
     // State Vaariables
     const updateStatus = store?.updateAllergyReducer?.data?.status;
     const [selectMode, setSelectMode] = useState('appointment'); // 'appointment' or 'date'
@@ -155,22 +154,26 @@ const UpdateAllergy = ({ onCancel }) => {
                 coding: code,
                 text: code?.display, // use display text
             },
-            note: [
-                {
-                    text: data?.note,
-                    time: '',
-                    authorReference: {
-                        reference: '',
-                        type: '',
-                        identifier: {
-                            use: '',
-                            system: '',
-                            value: '',
-                        },
-                        display: '',
-                    },
-                },
-            ],
+            ...(data?.note
+                ? {
+                      note: [
+                          {
+                              text: data.note,
+                              time: '',
+                              authorReference: {
+                                  reference: '',
+                                  type: '',
+                                  identifier: {
+                                      use: '',
+                                      system: '',
+                                      value: '',
+                                  },
+                                  display: '',
+                              },
+                          },
+                      ],
+                  }
+                : {}),
         };
         if (selectMode === 'appointment' && data.appointment) {
             let appData = JSON.parse(data.appointment);
@@ -252,9 +255,7 @@ const UpdateAllergy = ({ onCancel }) => {
                                 <Form.Label htmlFor="criticality" className="mb-0">
                                     Criticality
                                 </Form.Label>
-                                <Form.Select
-                                    {...register('criticality', { required: 'Criticality is required' })}
-                                >
+                                <Form.Select {...register('criticality', { required: 'Criticality is required' })}>
                                     {criticality?.map((item) => (
                                         <option key={item?.code} value={item?.code}>
                                             {item?.display}
@@ -306,8 +307,7 @@ const UpdateAllergy = ({ onCancel }) => {
                                     {...register(
                                         'status'
                                         //  { required: 'Clinical Status is required' }
-                                    )}
-                                >
+                                    )}>
                                     {clinicalStatus?.map((status) => (
                                         <option key={status?.code} value={status?.code}>
                                             {status?.display}

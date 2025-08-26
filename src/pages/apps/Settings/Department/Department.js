@@ -15,10 +15,10 @@ import { IoMdClose } from 'react-icons/io';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 import Paginations from '../../../../helpers/Paginations';
+import DepartmentModal from './DepartmentModal';
 
 const Department = () => {
     const store = useSelector((state) => state);
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const {
         register,
         handleSubmit,
@@ -47,23 +47,6 @@ const Department = () => {
         setValue('reEnterName', data.name);
         setValue('description', data.description);
         setAddDepartmentModal(true);
-    };
-
-    const addDepartment = (data) => {
-        const payload = {
-            //   id: edit?._id,
-            ...(edit ? { id: edit?._id } : {}),
-            name: data?.name,
-            description: data?.description || 'N/A',
-            category: 'Department',
-            clinicId: clinic_id,
-            showTo: 'clinic',
-        };
-        if (edit) {
-            dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
-        } else {
-            dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-        }
     };
 
     const createResponse = store?.createMastersDataReducer?.data?.status;
@@ -301,111 +284,11 @@ const Department = () => {
                     </Card.Body>
                 </Card>
             </Col>
-
-            <Modal centered show={addDepartmentModal} onHide={closeAddModal}>
-                <Modal.Body>
-                    <Row className="border-bottom mb-2 pb-2">
-                        <Col sm={11} className="text-center">
-                            <h4>{edit ? 'Edit Department' : 'New Department'}</h4>
-                        </Col>
-                        {/* <Col sm={1}>
-                            <IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} />
-                        </Col> */}
-                    </Row>
-                    <Form onSubmit={handleSubmit(addDepartment)}>
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>
-                                        Department Name <span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        {...register('name', {
-                                            required: 'Name is required',
-                                            validate: {
-                                                noEmpty: (value) =>
-                                                    value.trim() !== '' || 'Name cannot be empty or only spaces',
-                                                noSpacesBeforeText: (value) =>
-                                                    !/^\s/.test(value) || 'First character cannot be a space',
-                                            },
-                                        })}
-                                        placeholder="Enter Department Name"
-                                        onInput={(e) => {
-                                            const value = e.target.value;
-                                            if (value.trim() === '') {
-                                                e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
-                                            }
-                                        }}
-                                    />
-                                    {errors.name && <p className="text-danger">{errors.name.message}</p>}
-                                </Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>
-                                        Re-Enter Name <span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        {...register('reEnterName', {
-                                            required: 'Re-enter department name',
-                                            validate: {
-                                                noEmpty: (value) =>
-                                                    value.trim() !== '' || 'Name cannot be empty or only spaces',
-                                                noSpacesBeforeText: (value) =>
-                                                    !/^\s/.test(value) || 'First character cannot be a space',
-                                                matchName: (value) => value === watch('name') || 'Name do not match', // Match with 'name' field value
-                                            },
-                                        })}
-                                        placeholder="Re-enter Department Name"
-                                        onInput={(e) => {
-                                            const value = e.target.value;
-                                            if (value.trim() === '') {
-                                                e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
-                                            }
-                                        }}
-                                    />
-
-                                    {errors.reEnterName && <p className="text-danger">{errors.reEnterName.message}</p>}
-                                </Form.Group>
-                            </Col>
-                            <Col md={12}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Description</Form.Label>
-                                    <Form.Control
-                                        as="textarea"
-                                        rows={3}
-                                        {...register('description')}
-                                        placeholder="Enter description"
-                                        onInput={(e) => {
-                                            const value = e.target.value;
-                                            if (value.trim() === '') {
-                                                e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
-                                            }
-                                        }}
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Modal.Footer>
-                            <Button onClick={closeAddModal} className="custom-buttons">
-                                Close
-                            </Button>
-                            <Button type="submit" className="custom-buttons" style={{ width: '65px' }}>
-                                {store?.createMastersDataReducer?.loading ||
-                                store?.updateMastersDataReducer?.loading ? (
-                                    <div class="spinner-border spinner-border-sm" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                ) : (
-                                    'Submit'
-                                )}
-                            </Button>
-                        </Modal.Footer>
-                    </Form>
-                </Modal.Body>
-            </Modal>
+            <DepartmentModal 
+                addDepartmentModal={addDepartmentModal} 
+                closeAddModal={() => setAddDepartmentModal(false)} 
+                edit={edit} 
+            />
         </Row>
     );
 };

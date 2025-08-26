@@ -126,19 +126,27 @@ const Alcohol = () => {
             }
         });
 
-        data.subject = patientId;
-        data.effectiveDateTime = new Date().toISOString();
-        data.note = [
-            {
-                text: data.note,
-                time: new Date().toISOString(),
-            },
-        ];
+        // Remove note from data to prevent it from being included via spread
+        const { note, ...dataWithoutNote } = data;
+
+        const payload = {
+            ...dataWithoutNote,
+            subject: patientId,
+            effectiveDateTime: new Date().toISOString(),
+            ...(note && note.trim() !== '' && note !== '<ul><li></li></ul>' && note !== '<p><br></p>' && {
+                note: [
+                    {
+                        text: note,
+                        time: new Date().toISOString(),
+                    },
+                ],
+            }),
+        };
         if (toEdit) {
-            data.id = toEdit?._id;
-            dispatch(updateAlcoholHistoryAction({ key: encryptMessage(data) }));
+            payload.id = toEdit?._id;
+            dispatch(updateAlcoholHistoryAction({ key: encryptMessage(payload) }));
         } else {
-            dispatch(createAlcoholHistoryAction({ key: encryptMessage(data) }));
+            dispatch(createAlcoholHistoryAction({ key: encryptMessage(payload) }));
         }
     };
 
