@@ -205,8 +205,12 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                                         },
                                     })}
                                     onChange={(e) => {
-                                        let rawValue = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                        e.target.value = rawValue.replace(/(\d{3})(\d{3})(\d{4})/, '($1)$2-$3');
+                                        const rawValue = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                        e.target.value = rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
+                                            if (p3) return `(${p1})${p2}-${p3}`;
+                                            if (p2) return `(${p1})${p2}`;
+                                            return `(${p1}`;
+                                        });
                                         clearErrors('phone');
                                     }}
                                     placeholder="(XXX)XXX-XXXX"

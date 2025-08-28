@@ -311,7 +311,6 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                                     height: '30px',
                                                                     minHeight: '30px',
                                                                     border: '0px',
-                                                                    zIndex: 9999,
                                                                 }),
                                                                 placeholder: (provided) => ({
                                                                     ...provided,
@@ -324,6 +323,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                             menuPortalTarget={document.body} // renders menu to body
                                                             menuPosition="fixed" // avoids clipping
                                                         />
+
                                                     </Form.Group>
                                                 </Col>
 

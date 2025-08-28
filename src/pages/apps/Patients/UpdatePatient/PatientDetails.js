@@ -71,6 +71,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
     const [logo, setLogo] = useState(null);
     const [age, setAge] = useState(null);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    console.log('selectedDoctor', selectedDoctor);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
@@ -262,9 +263,17 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                             </Form.Label>
                             <Form.Control
                                 type="text"
-                                // value={patientDetails?.name[0]?.given[0] || ''}
                                 placeholder="First Name"
-                                {...register('firstName', { required: 'First name is required' })}
+                                {...register('firstName', {
+                                    required: 'First name is required',
+                                    validate: {
+                                        noSpacesOnly: (value) => value.trim() !== '' || 'First name is required',
+                                        alphabetsOnly: (value) => /^[A-Za-z\s]*$/.test(value) || 'Only alphabets are allowed'
+                                    }
+                                })}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                                }}
                             />
                             {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
                         </Form.Group>
@@ -278,7 +287,14 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                 id="middleName"
                                 type="text"
                                 placeholder="Middle Name"
-                                {...register('middleName')}
+                                {...register('middleName', {
+                                    validate: {
+                                        alphabetsOnly: (value) => !value || /^[A-Za-z\s]*$/.test(value) || 'Only alphabets are allowed'
+                                    }
+                                })}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                                }}
                             />
                             {errors.middleName && <span className="text-danger">{errors.middleName.message}</span>}
                         </Form.Group>
@@ -292,7 +308,16 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                 id="lastName"
                                 type="text"
                                 placeholder="Last Name"
-                                {...register('lastName', { required: 'Last Name is required' })}
+                                {...register('lastName', {
+                                    required: 'Last Name is required',
+                                    validate: {
+                                        noSpacesOnly: (value) => value.trim() !== '' || 'Last Name is required',
+                                        alphabetsOnly: (value) => /^[A-Za-z\s]*$/.test(value) || 'Only alphabets are allowed'
+                                    }
+                                })}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                                }}
                             />
                             {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
                         </Form.Group>
@@ -637,9 +662,16 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                             <Form.Control
                                 type="text"
                                 placeholder="Previous Birth Name"
-                                {...register('previousBirthName')}
+                                {...register('previousBirthName', {
+                                    validate: {
+                                        alphabetsOnly: (value) => !value || /^[A-Za-z\s]*$/.test(value) || 'Only alphabets are allowed'
+                                    }
+                                })}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                                }}
                             />
-                            {errors.birthName && <span className="text-danger">{errors.birthName.message}</span>}
+                            {errors.previousBirthName && <span className="text-danger">{errors.previousBirthName.message}</span>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 col-12">
@@ -679,29 +711,35 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                     <div className="col-md-3 col-12">
                         <Form.Group controlId="doctorName">
                             <Form.Label className="mb-0">Primary Provider( Doctor Name)</Form.Label>
-                            <Form.Control
-                                as="select"
-                                className="border-0"
+                            <Select
+                                options={doctorOptions || []}
+                                isLoading={store?.getDoctorsReducer?.loading}
+                                isSearchable={true}
+                                isClearable={true}
+                                value={selectedDoctor}
+                                onChange={handleChange}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="Select Doctor Name"
+                                noOptionsMessage={() => 'No doctors found'}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: 'none',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontSize: '12px',
+                                    }),
+                                }}
+                            />
+                            <input
+                                type="hidden"
                                 {...register('selectedDoctor')}
-                                value={selectedDoctor ? selectedDoctor.value : ''}
-                                onChange={(e) => {
-                                    const selectedOption = doctorOptions.find(
-                                        (option) => option.value === e.target.value
-                                    );
-                                    setValue('selectedDoctor', selectedOption);
-                                    handleChange(selectedOption);
-                                    clearErrors('selectedDoctor');
-                                }}>
-                                <option value="" hidden>
-                                    Select Doctor Name
-                                </option>
-                                {doctorOptions &&
-                                    doctorOptions?.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                            </Form.Control>
+                                value={selectedDoctor?.value || ''}
+                            />
                         </Form.Group>
                     </div>
                     <div className="col-md-3 col-12">

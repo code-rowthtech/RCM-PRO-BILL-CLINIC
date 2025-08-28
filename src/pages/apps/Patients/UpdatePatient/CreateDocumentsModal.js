@@ -342,12 +342,12 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
 
     return (
         <Modal className={`upload-documents`} show={showUploadModal} onHide={closeModal} size="lg" centered>
-            <Modal.Header className="p-0 border-0 pb-0 d-flex justify-content-center">
+            <Modal.Header className="p-0 mt-1 border-0 pb-0 d-flex justify-content-center">
                 <Modal.Title className="fw-semibold ">
                     {`Upload Documents`}
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body className='pt-0'>
+            <Modal.Body className='pt-1'>
                 <Row>
                     <Col xs={6}>
                         <div
@@ -532,7 +532,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                             theme="snow"
                             value={notes}
                             onChange={setNotes}
-                            style={{ height: '30vh' }}
+                            style={{ height: '35vh' }}
                             modules={{
                                 toolbar: [
                                     ['bold', 'italic', 'underline'],
@@ -558,7 +558,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                             setNotes('');
                             setEncounter('');
                         }} disabled={isLoading}>{`Cancel`}</Button>
-                        <Button className='custom-buttons' onClick={handleUpload} disabled={isLoading}>
+                        <Button className='custom-buttons' onClick={handleUpload} disabled={ isLoading || !files?.length}>
                             {isLoading ? <Spinner className='spinner-border-sm' color='white' /> : 'Upload'}
                         </Button>
                     </Col>

@@ -71,6 +71,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const [btnShow, setBtnShow] = useState(true);
     const [stateToSelect, setStateToSelect] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    console.log('selectedDoctor', selectedDoctor);
     const [responsibleParty, setResponsibleParty] = useState('');
     const [referringPhysician, setReferringPhysician] = useState('');
     const [showModalPic, setShowModalPic] = useState(false);

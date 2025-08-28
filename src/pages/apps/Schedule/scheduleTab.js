@@ -263,13 +263,29 @@ const ScheduleTab = () => {
                         {...register('perPatientTime')}
                         defaultValue={time}
                         onChange={(e) => {
-                            const value = e.target.value;
-                            if (/^\d*\.?\d{0,2}$/.test(value)) {
-                                // Matches numbers like "10", "10.", "10.0", "10.00"
-                                setTime(value);
+                            let value = e.target.value;
+                            // Remove any non-digit and non-decimal characters
+                            value = value.replace(/[^\d.]/g, '');
+                            // Ensure only one decimal point
+                            const parts = value.split('.');
+                            if (parts.length > 2) {
+                                value = parts[0] + '.' + parts.slice(1).join('');
                             }
+                            // Limit to 3 digits before decimal
+                            if (parts[0].length > 3) {
+                                parts[0] = parts[0].slice(0, 3);
+                                value = parts.join('.');
+                            }
+                            // Limit to 2 digits after decimal
+                            if (parts[1] && parts[1].length > 2) {
+                                parts[1] = parts[1].slice(0, 2);
+                                value = parts.join('.');
+                            }
+                            e.target.value = value;
+                            setTime(value);
                         }}
                         placeholder="Enter time (e.g., 10.00)"
+                        maxLength={6}
                     />
                 </div>
             </div>
