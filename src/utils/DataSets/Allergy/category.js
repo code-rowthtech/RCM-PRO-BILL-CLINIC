@@ -1,4 +1,4 @@
-export const category = [
+const categoryList = [
     {
         system: 'http://hl7.org/fhir/allergy-intolerance-category',
         code: 'food',
@@ -27,20 +27,25 @@ export const category = [
     },
 ];
 
+export const category = categoryList.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);
+
+
 export const criticality = [
-    {
-        system: 'http://hl7.org/fhir/allergy-intolerance-criticality',
-        code: 'low',
-        display: 'Low Risk',
-        definition:
-            'Worst case result of a future exposure is not assessed to be life-threatening or having high potential for organ system failure.',
-    },
     {
         system: 'http://hl7.org/fhir/allergy-intolerance-criticality',
         code: 'high',
         display: 'High Risk',
         definition:
             'Worst case result of a future exposure is assessed to be life-threatening or having high potential for organ system failure.',
+    },
+    {
+        system: 'http://hl7.org/fhir/allergy-intolerance-criticality',
+        code: 'low',
+        display: 'Low Risk',
+        definition:
+            'Worst case result of a future exposure is not assessed to be life-threatening or having high potential for organ system failure.',
     },
     {
         system: 'http://hl7.org/fhir/allergy-intolerance-criticality',

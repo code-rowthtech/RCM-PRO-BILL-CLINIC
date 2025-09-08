@@ -348,14 +348,14 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 occupation: data?.occupation,
                 workLocation: data?.employerAddress
                     ? {
-                          address: {
-                              line: [data?.employerAddress],
-                              city: data?.employerCity,
-                              state: data?.employerStateName,
-                              postalCode: data?.employerZip,
-                              country: 'United States',
-                          },
-                      }
+                        address: {
+                            line: [data?.employerAddress],
+                            city: data?.employerCity,
+                            state: data?.employerStateName,
+                            postalCode: data?.employerZip,
+                            country: 'United States',
+                        },
+                    }
                     : {},
             },
             identifier: finalIdentifiers,
@@ -393,15 +393,15 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
         });
     };
 
-    const formattedEthnicityOptions = ethnicityOptions.map((ethnicity) => ({
+    const formattedEthnicityOptions = ethnicityOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((ethnicity) => ({
         value: ethnicity, // Code as the value
         label: ethnicity.display, // Display text as the label
     }));
-    const formattedTribleOptions = tribalEntitiesOptions.map((tribal) => ({
+    const formattedTribleOptions = tribalEntitiesOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((tribal) => ({
         value: tribal, // Code as the value
         label: tribal.display, // Display text as the label
     }));
-    const relationshipOption = dataList?.map((relation) => ({
+    const relationshipOption = dataList?.sort((a, b) => a.display.localeCompare(b.display))?.map((relation) => ({
         value: relation, // Code as the value
         label: relation.display, // Display text as the label
     }));
@@ -449,10 +449,10 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 <Row className="pb-2">
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sex</Form.Label>
+                            <Form.Label className="mb-0">Gender</Form.Label>
                             <Form.Select {...register('sex')}>
                                 <option value="" hidden>
-                                    Select Sex
+                                    Select Gender
                                 </option>
                                 {sexAssignedAtBirthOptions.map((option) => (
                                     <option key={option.value} value={option.value}>
@@ -470,7 +470,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                 <option value="" hidden>
                                     Select
                                 </option>
-                                {genderIdentityOptions?.map((option) => (
+                                {genderIdentityOptions?.sort((a, b) => a.show.localeCompare(b.show))?.map((option) => (
                                     <option key={option?.value} value={option?.value}>
                                         {option?.show}
                                     </option>
@@ -481,7 +481,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
+                            <Form.Label className="mb-0">Sex Assigned At Birth</Form.Label>
                             <Form.Select {...register('sexParameter')}>
                                 <option value="" hidden>
                                     Select
@@ -496,7 +496,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Personal Pronouns</Form.Label>
+                            <Form.Label className="mb-0">Preferred Pronouns</Form.Label>
                             <Form.Select {...register('personalPronouns')}>
                                 <option value="" hidden>
                                     Select Pronouns
@@ -514,7 +514,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                             <Form.Label className="mb-0">Race</Form.Label>
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
-                                {raceOptions.map((race) => (
+                                {raceOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((race) => (
                                     <option key={race.code} value={race.display} className="text-capitalize">
                                         {race.display}
                                     </option>
@@ -558,19 +558,11 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                         <Form.Group>
                             <Form.Label className="mb-0">Preferred Language</Form.Label>
                             <Form.Select {...register('preferredLanguage')}>
-                                <option value="">Select Preferred Language</option>
-                                <option value="English">English</option>
-                                <option value="Chinese">Chinese</option>
-                                <option value="French">French</option>
-                                <option value="Italian">Italian</option>
-                                <option value="Japanese">Japanese</option>
-                                <option value="Spanish">Spanish</option>
-                                <option value="Portugese">Portugese</option>
-                                <option value="Russian">Russian</option>
-                                <option value="Castilian">Castilian</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Declined to specify">Declined to specify</option>
+                                <option key={''} value={''}>{'Select Preferred Language'}</option>
+                                {["English", "Chinese", "French", "Italian", "Japanese", "Spanish",
+                                    "Portugese", "Russian", "Castilian", "Other", "Unknown", "Declined to specify"]?.sort((a, b) => a.localeCompare(b))?.map(language => (
+                                        <option key={language} value={language}>{language}</option>
+                                    ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
@@ -819,14 +811,14 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={3}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className="mb-0">Employment Status</Form.Label>
+                                            <Form.Label className="mb-0">{`Employment Status`}</Form.Label>
                                             <Form.Select {...register('employmentStatus')}>
                                                 <option value="">Select Employment Status</option>
                                                 <option value="employed">Employed</option>
-                                                <option value="self-employed">Self-Employed</option>
-                                                <option value="unemployed">Unemployed</option>
                                                 <option value="retired">Retired</option>
+                                                <option value="self-employed">Self-Employed</option>
                                                 <option value="student">Student</option>
+                                                <option value="unemployed">Unemployed</option>
                                                 <option value="unknown">Unknown</option>
                                             </Form.Select>
                                             {errors.employmentStatus && (
@@ -836,7 +828,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={3}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className="mb-0">Occupation</Form.Label>
+                                            <Form.Label className="mb-0">{`Occupation`}</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Enter Occupation"
@@ -858,7 +850,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                 <Row className="position-relative">
                                     <Col sm={12}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">Address</Form.Label>
+                                            <Form.Label className="mb-0">{`Address`}</Form.Label>
                                             <div style={{ position: 'relative' }}>
                                                 <Form.Control
                                                     type="text"
@@ -887,11 +879,10 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -933,7 +924,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">State</Form.Label>
+                                            <Form.Label className="mb-0">{`State`}</Form.Label>
                                             <Form.Select
                                                 {...register('employerStateName')}
                                                 onChange={(e) => {
@@ -960,7 +951,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">City</Form.Label>
+                                            <Form.Label className="mb-0">{`City`}</Form.Label>
                                             <Form.Select
                                                 disabled={
                                                     store?.getCitiesReducer?.loading ||
@@ -968,7 +959,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                 }
                                                 {...register('employerCity')}>
                                                 {store?.getCitiesReducer?.loading ||
-                                                store?.getCitiesReducer?.cities4?.loading ? (
+                                                    store?.getCitiesReducer?.cities4?.loading ? (
                                                     <option value="" hidden>
                                                         Loading...
                                                     </option>
@@ -996,10 +987,10 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                 <Row>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">Postal Code </Form.Label>
+                                            <Form.Label className="mb-0">ZIP Code </Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                placeholder="Postal code"
+                                                placeholder="ZIP code"
                                                 maxLength={5}
                                                 {...register('employerZip', {
                                                     minLength: {

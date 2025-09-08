@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Col, Modal, Row } from 'react-bootstrap';
+import { Button, Col, Modal, Row } from 'react-bootstrap';
 import { Calendar, momentLocalizer, Views, Toolbar } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -7,24 +7,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IoMdClose } from 'react-icons/io';
 import Spinner from '../../../constants/Spinner';
 import AppointmentForm from './Tabs/AppointmentForm';
-import ToastHandle from '../../../helpers/ToastMessage';
 import {
-    transformAppointments,
     formatMonthYear,
-    debouncedFetchAppointments,
     getEventStyle
 } from '../../../utils/calendarUtils';
 import { getAppointmentsAction } from '../../../redux/actions';
+import { decryptMessage } from '../../../cryptoUtils';
 
 const localizer = momentLocalizer(moment);
-const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+// const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
 const AppointmentCalendar = ({ selectedDoctor }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
-    console.log(createAppointmentResponse, 'createAppointmentResponse');
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
 
     // State management
@@ -34,11 +32,12 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [calendarView, setCalendarView] = useState('month');
     const [loading, setLoading] = useState(true);
+    const [showPastDateModal, setShowPastDateModal] = useState(false);
+    const [pendingSlot, setPendingSlot] = useState(null);
     const [monthYearFilter, setMonthYearFilter] = useState(() => {
         const today = new Date();
         return today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     });
-
     // Initial data fetch
     useEffect(() => {
         dispatch(
@@ -107,33 +106,6 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         }
     }, [updateSuccess]);
 
-    // useEffect(() => {
-    //     if (appointmentsList?.length > 0) {
-    //         const transformedEvents = appointmentsList
-    //             .map((data) => {
-    //                 const start = new Date(data.start);
-    //                 const end = new Date(data.end);
-    //                 console.log(start, end, 'datadatasdjif')
-
-    //                 if (isNaN(start) || isNaN(end)) return null;
-
-    //                 return {
-    //                     event_id: data?._id,
-    //                     title: data?.reason?.[0]?.coding?.[0]?.display,
-    //                     status: data?.status,
-    //                     start: start,
-    //                     end: end,
-    //                     slotStart: data?.start,
-    //                     slotEnd: data?.end,
-    //                     patientName: data?.subject?.name?.find((data) => data?.use === 'official')?.text,
-    //                 };
-    //             })
-    //             .filter(Boolean);
-
-    //         setEvents(transformedEvents);
-    //     }
-    // }, [appointmentsList]);
-
     useEffect(() => {
         if (appointmentsList?.length > 0) {
             const transformedEvents = appointmentsList
@@ -165,7 +137,13 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                             minute: '2-digit',
                             hour12: true,
                         }),
-                        patientName: data?.subject?.name?.find((d) => d?.use === 'official')?.text,
+                        // patientName: data?.subject?.name?.find((d) => d?.use === 'official')?.text,
+                        patientName: ((name = data?.subject?.name?.find((d) => d?.use === 'official')) =>
+                            name ? (name?.prefix?.[0] ? name?.prefix?.[0] + ' ' : '') +
+                                (name?.family || '') +
+                                (name?.given?.length > 0 ? ' ' + name?.given?.join(' ') : '') || 'N/A'
+                                : 'N/A')(),
+
                     };
                 })
                 .filter(Boolean);
@@ -173,9 +151,6 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
             setEvents(transformedEvents);
         }
     }, [appointmentsList]);
-
-
-
 
     const handleEventClick = (event) => {
         setShow(true); // Open modal for event details
@@ -265,7 +240,8 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         slotDate.setHours(0, 0, 0, 0);
 
         if (slotDate < today) {
-            ToastHandle('Appointments cannot be created for past dates', 'danger');
+            setPendingSlot(slotInfo);
+            setShowPastDateModal(true);
         } else {
             setSelectedSlot(slotInfo);
             setShow(true);
@@ -275,6 +251,25 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     const handleViewChange = useCallback((view) => {
         setCalendarView(view);
     }, []);
+
+    const dayPropGetter = useCallback((date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const currentDate = new Date(date);
+        currentDate.setHours(0, 0, 0, 0);
+
+        const currentMonth = new Date();
+        const filterDate = new Date(monthYearFilter + ' 1');
+
+        if (currentDate < today && currentDate.getMonth() === filterDate.getMonth() && currentDate.getFullYear() === filterDate.getFullYear()) {
+            return {
+                style: {
+                    backgroundColor: '#e6e6e67b',
+                }
+            };
+        }
+        return {};
+    }, [monthYearFilter]);
 
     return (
         <div className="background_Color">
@@ -296,6 +291,7 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                                     toolbar: CustomToolbar,
                                 }}
                                 eventPropGetter={memoizedEventStyle}
+                                dayPropGetter={dayPropGetter}
                                 onView={handleViewChange}
                                 view={calendarView}
                             />
@@ -310,11 +306,11 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
             </div>
             <Modal centered show={show} size="xl" onHide={closeModal}>
                 <Modal.Body>
-                    <Row className="border-bottom mb-1 pb-2">
-                        <Col sm={11} className="text-center">
-                            <h4>{selectedEvent ? 'Appointment Details' : 'Create New Appointment'}</h4>
+                    <Row className="border-bottom mb-1 ">
+                        <Col sm={11} className="text-start">
+                            <h5>{selectedEvent ? 'Appointment Details' : 'Create Appointment'}</h5>
                         </Col>
-                        <Col sm={1}>
+                        <Col sm={1} className='text-end'>
                             <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
                         </Col>
                     </Row>
@@ -324,6 +320,26 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                         calendarView={calendarView}
                     />
                 </Modal.Body>
+            </Modal>
+            <Modal show={showPastDateModal} onHide={() => setShowPastDateModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Past Date Confirmation</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>You are scheduling an appointment for a past date. Do you want to continue?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button className='cancel-button' onClick={() => setShowPastDateModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button className="custom-buttons" onClick={() => {
+                        setSelectedSlot(pendingSlot);
+                        setShow(true);
+                        setShowPastDateModal(false);
+                    }}>
+                        Continue
+                    </Button>
+                </Modal.Footer>
             </Modal>
         </div>
     );

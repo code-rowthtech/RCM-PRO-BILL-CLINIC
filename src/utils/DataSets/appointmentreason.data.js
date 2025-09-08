@@ -1,4 +1,4 @@
-export const appointmentReasonOptions = [
+const appointmentReasonOptionsList = [
     {
         "code": "Code",
         "system": "System",
@@ -20005,3 +20005,7 @@ export const appointmentReasonOptions = [
         "display": "Accident caused by breakage of cable in cable car not running on rails"
     }
 ]
+
+export const appointmentReasonOptions = appointmentReasonOptionsList.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);

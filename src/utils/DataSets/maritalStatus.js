@@ -1,4 +1,4 @@
-export const maritalStatusOptions = [
+const maritalStatusOptionsList = [
     { show: "Separated", value: "A", label: "Separated", system: "http://terminology.hl7.org/CodeSystem/v2-0002" },
     { show: "Divorced", value: "D", label: "Divorced", system: "http://terminology.hl7.org/CodeSystem/v2-0002" },
     { show: "Married", value: "M", label: "Married", system: "http://terminology.hl7.org/CodeSystem/v2-0002" },
@@ -16,3 +16,7 @@ export const maritalStatusOptions = [
     { show: "Other", value: "O", label: "Other", system: "http://terminology.hl7.org/CodeSystem/v2-0002" },
     { show: "Unreported", value: "T", label: "Unreported", system: "http://terminology.hl7.org/CodeSystem/v2-0002" }
 ];
+
+export const maritalStatusOptions = maritalStatusOptionsList.sort((a, b) =>
+    a.show.localeCompare(b.show)
+);

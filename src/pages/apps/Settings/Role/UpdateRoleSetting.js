@@ -80,7 +80,6 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
             name: formData.name,
             description: formData.description,
             permissions: permissionIds,  // Only send permission ids
-            status: true
         };
 
         dispatch(updateRoleDataAction({ key: encryptMessage(payload) }));

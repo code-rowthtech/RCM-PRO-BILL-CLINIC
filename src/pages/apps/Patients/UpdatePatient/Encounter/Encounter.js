@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 import { getDoctorsAction, getEncounterByIdAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
 import { decryptMessage } from '../../../../../cryptoUtils';
+import { formatDate } from '../../../../../helpers/dateFormat';
 
 let decryptedUser = null;
 
@@ -108,9 +109,11 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
         }
     }, [dispatch])
 
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     useEffect(() => {
         if (!store?.getEncounterNotesTypeReducer?.data?.data) {
-            dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType, clinicId: decryptedUser?.clinicId, userId: decryptedUser?._id }))
+            dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType, clinicId: clinicId, userId: decryptedUser?._id }))
         }
     }, [dispatch, searchNoteType, store?.getEncounterNotesTypeReducer?.data?.data])
 
@@ -140,7 +143,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                     {encounterTabs?.map((tab) => (
                         <div
                             key={tab?.id}
-                            className={`cursor-pointer p-1 fs-6 rounded-0 list-group-item  
+                            className={`${encounterTabs?.length > 1 ? 'cursor-pointer' : ''}  p-1 fs-6 rounded-0 list-group-item  
                                     d-flex align-items-center flex-fill justify-content-center fw-bold 
                                      ${activeTab === tab?.id ? 'active-patient-chart-tab fw-medium border border-muted' : 'border border-muted'}`}
                             onClick={() => {
@@ -153,7 +156,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 setActiveTab(tab?.id)
                             }}
                         >
-                            <span className="text-nowrap">{tab?.title}</span>
+                            <span className="text-nowrap">{tab?.title === 'Encounter list' ? tab?.title : formatDate(tab?.title)}</span>
                             {tab.type !== 'default' && (
                                 <span
                                     className="p-0 ms-2 m-0"

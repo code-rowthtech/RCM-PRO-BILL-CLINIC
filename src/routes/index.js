@@ -54,11 +54,9 @@ const Doctors = React.lazy(() => import('../pages/apps/Doctors/index'));
 const NewDoctor = React.lazy(() => import('../pages/apps/Doctors/NewDoctor'));
 const DepartmentDetails = React.lazy(() => import('../pages/apps/Doctors/DepartmentDetails'));
 
-
 const Patients = React.lazy(() => import('../pages/apps/Patients/index'));
 const NewPatient = React.lazy(() => import('../pages/apps/Patients/NewPatient'));
 const UpdatePatient = React.lazy(() => import('../pages/apps/Patients/UpdatePatient/index'));
-
 
 const NewPractice = React.lazy(() => import('../pages/apps/SubPractice/NewPractice'));
 const UpdateSubClinic = React.lazy(() => import('../pages/apps/SubPractice/updateSubClinic'));
@@ -77,16 +75,9 @@ const TaskCategory = React.lazy(() => import('../pages/apps/Settings/Task Catego
 // Notes Templates
 const ClinicalNotesType = React.lazy(()=> import ('../pages/apps/NotesAndTemplates/NotesTypes'));
 const NotesTemplates = React.lazy(()=>import('../pages/apps/NotesAndTemplates/NotesTemplates'));
-
 const RoleManagement = React.lazy(() => import('../pages/apps/RoleManagement/index'));
 const RoleSetting = React.lazy(() => import('../pages/apps/Settings/Role/RoleSetting'));
 const AuditReport = React.lazy(() => import('../pages/apps/AuditReport/index'));
-
-
-
-
-
-
 const Permissions = React.lazy(() => import('../pages/apps/Permissions/index'))
 const Roles = React.lazy(() => import('../pages/apps/Roles/index'))
 // pages

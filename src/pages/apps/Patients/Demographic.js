@@ -3,7 +3,7 @@ import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 
 import { useForm } from 'react-hook-form';
 import { FiDownloadCloud, FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getStatesByCountryAction, updatePatientsAction, getCities4Action } from '../../../redux/actions';
 import Select from 'react-select';
 import us from '../../../assets/images/flags/us.jpg';
@@ -19,9 +19,9 @@ import { maritalStatusOptions } from '../../../utils/DataSets/maritalStatus';
 import AddressForm from '../Common Pages/AddressForm';
 import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
+import ToastHandle from '../../../helpers/ToastMessage';
 
 const Demographicdetails = ({
-    patientId,
     activeTab,
     setActiveTab,
     showResponsibleTab,
@@ -41,6 +41,8 @@ const Demographicdetails = ({
         watch,
         getValues,
     } = useForm();
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('updateid');
     const [longitude, setLongitude] = useState(null);
     const [latitude, setLatitude] = useState(null);
     const [mailingLongitude, setMailingLongitude] = useState(null);
@@ -76,6 +78,11 @@ const Demographicdetails = ({
     }, [employerCitySearch, cities4]);
 
     const onSubmit = (data) => {
+        if (!patientId) {
+            setActiveTab('personalDetails');
+            ToastHandle('Please create a patient record first before adding demographic details.', 'danger');
+            return;
+        }
         const selectedGenderIdentity = genderIdentityOptions.find((option) => option.show === data.genderIdentity);
         const selectedSexualOrientation = sexParameterOptions.find((option) => option.show === data.sexParameter);
         const selectedPersonalPronouns = personalPronounsOptions.find(
@@ -291,15 +298,15 @@ const Demographicdetails = ({
         dispatch(getCities4Action({ state_code: key, name: '', limit: 25 }));
     };
 
-    const formattedEthnicityOptions = ethnicityOptions.map((ethnicity) => ({
+    const formattedEthnicityOptions = ethnicityOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((ethnicity) => ({
         value: ethnicity, // Code as the value
         label: ethnicity.display, // Display text as the label
     }));
-    const formattedTribleOptions = tribalEntitiesOptions.map((tribal) => ({
+    const formattedTribleOptions = tribalEntitiesOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((tribal) => ({
         value: tribal, // Code as the value
         label: tribal.display, // Display text as the label
     }));
-    const relationshipOption = dataList?.map((relation) => ({
+    const relationshipOption = dataList?.sort((a, b) => a.display.localeCompare(b.display))?.map((relation) => ({
         value: relation, // Code as the value
         label: relation.display, // Display text as the label
     }));
@@ -374,14 +381,16 @@ const Demographicdetails = ({
                 <Row className="pb-2">
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sex</Form.Label>
+                            <Form.Label className="mb-0">Gender</Form.Label>
                             <Form.Select {...register('sex')}>
-                                {
-                                    sexAssignedAtBirthOptions.map((option) => (
-                                        <option key={option.value} value={option?.value}>
-                                            {option.label}
-                                        </option>
-                                    ))
+                                <option key={''} value={''}>
+                                    {"Select Gender"}
+                                </option>
+                                {sexAssignedAtBirthOptions?.map((option) => (
+                                    <option key={option.value} value={option?.value}>
+                                        {option.label}
+                                    </option>
+                                ))
                                 }
                             </Form.Select >
                         </Form.Group >
@@ -391,7 +400,10 @@ const Demographicdetails = ({
                         <Form.Group>
                             <Form.Label className="mb-0">Gender Identity</Form.Label>
                             <Form.Select {...register('genderIdentity')}>
-                                {genderIdentityOptions?.map((option) => (
+                                <option key={''} value={''}>
+                                    {"Select Gender Identity"}
+                                </option>
+                                {genderIdentityOptions?.sort((a, b) => a.show.localeCompare(b.show))?.map((option) => (
                                     <option key={option?.value} value={option?.show}>
                                         {option?.show}
                                     </option>
@@ -402,8 +414,11 @@ const Demographicdetails = ({
 
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
+                            <Form.Label className="mb-0">Sex Assigned At Birth</Form.Label>
                             <Form.Select {...register('sexParameter')}>
+                                <option key={''} value={''}>
+                                    {"Select Option"}
+                                </option>
                                 {sexParameterOptions.map((option) => (
                                     <option key={option.value} value={option?.show}>
                                         {option.show}
@@ -414,7 +429,7 @@ const Demographicdetails = ({
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Personal Pronouns</Form.Label>
+                            <Form.Label className="mb-0">Preferred Pronouns</Form.Label>
                             <Form.Select {...register('personalPronouns')}>
                                 <option value="" hidden>
                                     Select Pronouns
@@ -432,7 +447,7 @@ const Demographicdetails = ({
                             <Form.Label className="mb-0">Race</Form.Label>
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
-                                {raceOptions.map((race) => (
+                                {raceOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((race) => (
                                     <option key={race.code} value={race.code} className="text-capitalize">
                                         {race.display}
                                     </option>
@@ -480,18 +495,10 @@ const Demographicdetails = ({
                                 {...register('preferredLanguage')}
                                 data-has-value={!!watch('preferredLanguage')}
                                 defaultValue={'English'}>
-                                <option value="English">English</option>
-                                <option value="Chinese">Chinese</option>
-                                <option value="French">French</option>
-                                <option value="Italian">Italian</option>
-                                <option value="Japanese">Japanese</option>
-                                <option value="Spanish">Spanish</option>
-                                <option value="Portugese">Portugese</option>
-                                <option value="Russian">Russian</option>
-                                <option value="Castilian">Castilian</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Declined to specify">Declined to specify</option>
+                                {["English", "Chinese", "French", "Italian", "Japanese", "Spanish",
+                                    "Portugese", "Russian", "Castilian", "Other", "Unknown", "Declined to specify"]?.sort((a, b) => a.localeCompare(b))?.map(language => (
+                                        <option key={language} value={language}>{language}</option>
+                                    ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
@@ -533,7 +540,7 @@ const Demographicdetails = ({
                             </Form.Label>
                             <Form.Select id="marital" {...register('maritalStatus')}>
                                 <option value="">Select marital status</option>
-                                {maritalStatusOptions.map((option) => (
+                                {maritalStatusOptions?.sort((a, b) => a.show.localeCompare(b.show))?.map((option) => (
                                     <option key={option.value} value={option?.show}>
                                         {option.show}
                                     </option>
@@ -737,10 +744,10 @@ const Demographicdetails = ({
                                             <Form.Select {...register('employmentStatus')}>
                                                 <option value="">Select Employment Status</option>
                                                 <option value="employed">Employed</option>
-                                                <option value="self-employed">Self-Employed</option>
-                                                <option value="unemployed">Unemployed</option>
                                                 <option value="retired">Retired</option>
+                                                <option value="self-employed">Self-Employed</option>
                                                 <option value="student">Student</option>
+                                                <option value="unemployed">Unemployed</option>
                                                 <option value="unknown">Unknown</option>
                                             </Form.Select>
                                             {errors.employmentStatus && (
@@ -824,13 +831,13 @@ const Demographicdetails = ({
                                                                 setEmployerLatitude(data?.bounds?.southwest?.lat);
                                                                 setEmployerLongitude(data?.bounds?.southwest?.lng);
                                                                 setValue('employerAddress', data?.formatted);
-                                                                
+
                                                                 // Trigger state selection to load cities
                                                                 const stateData = statesData?.states?.find(state => state.state_code === data?.components?.state_code);
                                                                 if (stateData) {
                                                                     dispatch(getCities4Action({ state_code: stateData.id, name: '', limit: 25 }));
                                                                 }
-                                                                
+
                                                                 setEmployerFocused(false);
                                                             }}
                                                             style={{
@@ -901,10 +908,10 @@ const Demographicdetails = ({
                                 <Row>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className="mb-0">Postal code</Form.Label>
+                                            <Form.Label className="mb-0">ZIP code</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                placeholder="Postal code"
+                                                placeholder="ZIP code"
                                                 maxLength={5}
                                                 {...register('employerZip', {
                                                     minLength: {

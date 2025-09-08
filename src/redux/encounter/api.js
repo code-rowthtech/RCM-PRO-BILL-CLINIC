@@ -1,3 +1,4 @@
+import { decryptMessage } from '../../cryptoUtils';
 import { APICore } from '../../helpers/api/apiCore';
 import * as URL from '../../helpers/api/apiEndpoints';
 import { loggedInUser } from '../../helpers/api/loggedInUser';
@@ -25,7 +26,7 @@ export function getPastEncounterApi(params: any): any {
 
 export function getEncounterNotesTypeApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.encounterNotesType}?clinicId=${data?.clinicId || loggedInUser?.clinicId}&userId=${data?.userId || loggedInUser?._id}&page=${data?.skip}&search=${data?.search || ''}`);
+    return api.get(`${URL.encounterNotesType}?clinicId=${decryptMessage(localStorage?.getItem('subClinicLocation')) || data?.clinicId || loggedInUser?.clinicId}&userId=${data?.userId || loggedInUser?._id}&page=${data?.skip}&search=${data?.search || ''}`);
 }
 
 export function getEncounterNoteFieldsApi(params: any): any {

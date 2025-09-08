@@ -19,7 +19,6 @@ import { createSuggestionAction } from '../../../../../redux/suggestions/action'
 import Spinner from '../../../../../constants/Spinner';
 
 const UpdateProblem = ({ onCancel, problem }) => {
-    console.log(problem,'problem')
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -100,7 +99,6 @@ const UpdateProblem = ({ onCancel, problem }) => {
         }
     }, [problem, appointments, setValue]);
 
-
     // FUNCTIONALITY FUNCTIONS
     const handleEditorFocus = () => {
         dispatch(createSuggestionAction({ module: 'problem' }));
@@ -141,19 +139,27 @@ const UpdateProblem = ({ onCancel, problem }) => {
                 text: selectedStatus?.display,
             },
             appointment: data.appointment,
-            onsetDateTime: data.diagnosisDate,
-            note: [
-                {
-                    authorReference: {
-                        reference: '',
-                        type: '',
-                        display: '',
-                    },
-                    authorString: ' ',
-                    time: '',
-                    text: data?.note,
-                },
-            ],
+            onsetDateTime: data.datetimeDiagnosis,
+            ...(data?.note
+                ? {
+                    note: [
+                        {
+                            text: data.note,
+                            time: '',
+                            authorReference: {
+                                reference: '',
+                                type: '',
+                                identifier: {
+                                    use: '',
+                                    system: '',
+                                    value: '',
+                                },
+                                display: '',
+                            },
+                        },
+                    ],
+                }
+                : {}),
         };
         dispatch(updateProblemListAction({ key: encryptMessage(payload) }));
     };
@@ -303,12 +309,16 @@ const UpdateProblem = ({ onCancel, problem }) => {
                 </Col>
 
                 <Col sm={12} className="d-flex justify-content-end gap-2 mt-3">
-                    <Button type="submit" className="custom-buttons" disabled={store?.updateProblemListReducer?.loading} style={{width: '65px'}}>
-                        {store?.updateProblemListReducer?.loading ?
-                            <Spinner className='spinner-border-sm' color='white' />
-                            :
+                    <Button
+                        type="submit"
+                        className="custom-buttons"
+                        disabled={store?.updateProblemListReducer?.loading}
+                        style={{ width: '65px' }}>
+                        {store?.updateProblemListReducer?.loading ? (
+                            <Spinner className="spinner-border-sm" color="white" />
+                        ) : (
                             `Update`
-                        }
+                        )}
                     </Button>
                 </Col>
             </Row>

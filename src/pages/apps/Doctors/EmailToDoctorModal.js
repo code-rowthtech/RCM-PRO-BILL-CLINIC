@@ -8,7 +8,6 @@ import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 
 const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
-
     const {
         register,
         handleSubmit,
@@ -17,9 +16,22 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
     } = useForm();
     const dispatch = useDispatch();
     const onSubmit = () => {
-        // alert(JSON.stringify(formData))
-        dispatch(createDoctorAction({ key: encryptMessage(formData) }));
-
+        const payload = {
+            ...formData,
+            telecom: [
+                {
+                    system: 'phone',
+                    value: formData?.phone,
+                    use: 'work',
+                },
+                {
+                    system: 'email',
+                    value: formData?.email,
+                    use: 'work',
+                },
+            ],
+        };
+        dispatch(createDoctorAction({ key: encryptMessage(payload) }));
     }
     const store = useSelector((state) => state);
     const createResponse = store?.createtDoctorsReducer?.data?.status

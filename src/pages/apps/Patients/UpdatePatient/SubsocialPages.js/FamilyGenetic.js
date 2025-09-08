@@ -23,7 +23,7 @@ import { createSuggestionAction } from '../../../../../redux/suggestions/action'
 import { sexAssignedAtBirthOptions } from '../../../../../utils/DataSets/sex';
 import { dataList, familyGenticList } from '../../../../../utils/DataSets/relations.data';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
-import { encryptMessage } from '../../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../../cryptoUtils';
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
 import useQuillWordLimit from '../../../../../helpers/quillWordLimit';
 import ToastHandle from '../../../../../helpers/ToastMessage';
@@ -39,7 +39,7 @@ const FamilyHistory = () => {
     const quillRef = useRef();
 
     // Form handling
-    const { register, handleSubmit, reset, getValues, formState : {errors}, control, setValue, watch } = useForm({
+    const { register, handleSubmit, reset, getValues, formState: { errors }, control, setValue, watch } = useForm({
         defaultValues: {
             name: '',
             dob: '',
@@ -181,6 +181,7 @@ const FamilyHistory = () => {
         const current = getValues('note');
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     const onSubmit = (data) => {
         const selected = data.problem;
@@ -188,7 +189,7 @@ const FamilyHistory = () => {
 
         const payload = {
             name: data?.name,
-            clinicId: loggedInUser?._id,
+            clinicId: clinicId || loggedInUser?._id,
             subject: patientId,
             condition: [
                 {
@@ -212,11 +213,13 @@ const FamilyHistory = () => {
             bornDate: data?.dob,
             deceasedBoolean: data.deceased === 'yes',
             deceasedDate: data?.dateOfDeath,
-            note: [
-                {
-                    text: data?.note,
-                },
-            ],
+            ...(data?.note && data.note.trim() !== '' && data.note !== '<ul><li></li></ul>' && data.note !== '<p><br></p>' && {
+                note: [
+                    {
+                        text: data?.note,
+                    },
+                ],
+            }),
         };
 
         if (toEdit) {
@@ -284,7 +287,7 @@ const FamilyHistory = () => {
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group controlId="name">
-                                            <Form.Label className="fw-medium mb-1">Name <span className ='text-danger'>*</span></Form.Label>
+                                            <Form.Label className="fw-medium mb-1">Name <span className='text-danger'>*</span></Form.Label>
                                             <Form.Control
                                                 {...register('name', { required: 'Name is required' })}
                                                 placeholder="Enter Name"
@@ -308,12 +311,12 @@ const FamilyHistory = () => {
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group controlId="sex">
-                                            <Form.Label className="fw-medium mb-1">Sex <span className='text-danger'>*</span></Form.Label>
+                                            <Form.Label className="fw-medium mb-1">Gender <span className='text-danger'>*</span></Form.Label>
                                             <Form.Select
-                                                {...register('sex', { required: 'Sex is required' })}
+                                                {...register('sex', { required: 'Gender is required' })}
                                                 className="form-select-sm">
                                                 <option value="" disabled>
-                                                    Select Sex
+                                                    Select Gender
                                                 </option>
                                                 {sexAssignedAtBirthOptions.map((option) => (
                                                     <option key={option.value} value={option.value}>

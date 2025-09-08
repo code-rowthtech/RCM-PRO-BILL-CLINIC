@@ -17,7 +17,7 @@ import EmailToDoctorModal from './EmailToDoctorModal';
 import DepartmentDetails from './DepartmentDetails';
 import Documents from './Documents';
 import { handleUpload } from '../../../helpers/HandleUpload';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons for eye visibility toggle
@@ -27,6 +27,7 @@ import { FiUploadCloud, FiDownloadCloud } from 'react-icons/fi';
 import DoctorAddress from './DoctorAddressForm';
 import DoctorQualifications from './Qualifications';
 import Select from 'react-select';
+import DepartmentModal from '../Settings/Department/DepartmentModal';
 
 const NewDoctor = () => {
     const {
@@ -57,6 +58,8 @@ const NewDoctor = () => {
     const [modalFileUrl, setModalFileUrl] = useState('');
     const [imageLoading, setImageLoading] = useState(true);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
+    const [addDepartmentModal, setAddDepartmentModal] = useState(false);
+
     const handleShowModal = (url) => {
         setModalFileUrl(url);
         setShowModalPic(true);
@@ -109,7 +112,6 @@ const NewDoctor = () => {
         };
         dispatch(getDoctorDetailsAction(payload));
         dispatch(getStatesByCountryAction());
-
     }, [dispatch]);
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
@@ -117,12 +119,14 @@ const NewDoctor = () => {
     const updateResponse = store?.createtDoctorsDetailReducer?.data?.status;
     const newDoctorId = store?.createtDoctorsReducer?.data?.doctor?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
+    const createDepartmentResponse = store?.createMastersDataReducer?.data?.status;
     const departmentOptions = store?.getDepartmentDataReducer?.data?.result?.map((department) => ({
         value: department?.name,
-        label: department?.name
+        label: department?.name,
     }));
-
     useEffect(() => {
         dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 50, skip: 1, search: '' }));
     }, [dispatch]);
@@ -230,13 +234,13 @@ const NewDoctor = () => {
     const handleNewDoctor = () => {
         navigate('/apps/providers/list');
         reset();
-        setSelectedDepartment(null)
+        setSelectedDepartment(null);
     };
 
     const submitData = (data) => {
         const payload = {
             ...(updateId ? { doctorId: store?.getDoctorDetailsReducer?.data?.result?._id } : {}), // Conditionally add id if updateId exists
-            // clinicId: clinicId,
+            clinicId: clinicId,
             email: data?.email,
             ...(!updateId ? { password: data?.password } : {}),
             dob: data?.dateOfBirth,
@@ -273,7 +277,7 @@ const NewDoctor = () => {
             ],
             address: demographicAddresses,
             specialties: [data?.specialist],
-            department: selectedDepartment?.value
+            department: selectedDepartment?.value,
         };
 
         if (updateId) {
@@ -379,7 +383,13 @@ const NewDoctor = () => {
     }, [formData, id]);
 
     const requiredFieldTooltip = <Tooltip id="button-tooltip">Please fill all required fields.</Tooltip>;
-
+    useEffect(() => {
+        if (createDepartmentResponse === 201) {
+            setAddDepartmentModal(false);
+            // Refresh department list after creating new department
+            dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 50, skip: 1, search: '' }));
+        }
+    }, [createDepartmentResponse, dispatch]);
     return (
         <>
             <div className="pt-1 pb-2 px-0">
@@ -440,7 +450,7 @@ const NewDoctor = () => {
                                                                             : {}
                                                                     }
                                                                     className="custom-buttons text-nowrap">
-                                                                    Email to Provider
+                                                                    {`Email to Provider`}
                                                                 </Button>
                                                             </span>
                                                         </OverlayTrigger>
@@ -449,7 +459,7 @@ const NewDoctor = () => {
                                             )}
                                             <div className="d-none d-md-block me-2">
                                                 <Button className="cancel-button" onClick={handleNewDoctor}>
-                                                    Back
+                                                    {`Back`}
                                                 </Button>
                                             </div>
                                         </div>
@@ -468,7 +478,11 @@ const NewDoctor = () => {
                                                 <>
                                                     <div
                                                         className="col-12 mt-1 scroll-container"
-                                                        style={{ height: '75vh', overflow: 'scroll', overflowX: 'hidden' }}>
+                                                        style={{
+                                                            height: '75vh',
+                                                            overflow: 'scroll',
+                                                            overflowX: 'hidden',
+                                                        }}>
                                                         <div className="row  px-0" style={{ overflowX: 'hidden' }}>
                                                             <div className="col-md-6 col-lg-3 col-sm-6  col-12">
                                                                 <Form.Group className="mb-1">
@@ -511,7 +525,8 @@ const NewDoctor = () => {
                                                             <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Last Name`} <span className="text-danger">*</span>
+                                                                        {`Last Name`}{' '}
+                                                                        <span className="text-danger">*</span>
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
@@ -549,7 +564,8 @@ const NewDoctor = () => {
                                                                 <div className="mb-1">
                                                                     <Form.Group className="mb-0 position-relative">
                                                                         <Form.Label className="mb-0">
-                                                                            {`Phone`} <span className="text-danger">*</span>
+                                                                            {`Phone`}{' '}
+                                                                            <span className="text-danger">*</span>
                                                                         </Form.Label>
                                                                         <Form.Group>
                                                                             <InputGroup>
@@ -647,7 +663,7 @@ const NewDoctor = () => {
                                                                             )
                                                                                 .toISOString()
                                                                                 .split('T')[0]
-                                                                        } // Set max date to 18 years ago
+                                                                        }
                                                                         {...register('dateOfBirth', {
                                                                             required: 'Date of birth is required',
                                                                             validate: (value) => {
@@ -681,7 +697,8 @@ const NewDoctor = () => {
                                                             <div className="col-md-6 col-lg-3 col-sm-6 col-12 ">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Email`} <span className="text-danger">{`*`}</span>
+                                                                        {`Email`}{' '}
+                                                                        <span className="text-danger">{`*`}</span>
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="email"
@@ -730,8 +747,8 @@ const NewDoctor = () => {
                                                                         <option value="" hidden>
                                                                             {`Select Gender`}
                                                                         </option>
-                                                                        <option value="Male">{`Male`}</option>
                                                                         <option value="Female">{`Female`}</option>
+                                                                        <option value="Male">{`Male`}</option>
                                                                         <option value="Other">{`Other`}</option>
                                                                     </Form.Select>
                                                                     {errors.gender && (
@@ -744,7 +761,8 @@ const NewDoctor = () => {
                                                             <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Password`} <span className="text-danger">{`*`}</span>
+                                                                        {`Password`}{' '}
+                                                                        <span className="text-danger">{`*`}</span>
                                                                     </Form.Label>
                                                                     <div className="position-relative">
                                                                         <Form.Control
@@ -857,7 +875,7 @@ const NewDoctor = () => {
                                                                     </Form.Label>
                                                                     <div
                                                                         onClick={() => logoFileInputRef.current.click()}
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading
+                                                                        className={`custom-file-upload justify-content-between position-relative cursor-pointer form-control ${logoName || logoUploading
                                                                             ? ''
                                                                             : 'custom-form-fields'
                                                                             }`}>
@@ -870,6 +888,8 @@ const NewDoctor = () => {
                                                                                         : logoName
                                                                                     : 'Upload Profile Image'}
                                                                         </span>
+                                                                        {!logoName && <i className="bi bi-cloud-arrow-up position-absolute fs-5" style={{ right: '2.5%' }}></i>}
+
 
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {(logo?.url?.split('?')[0] ||
@@ -878,7 +898,9 @@ const NewDoctor = () => {
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
                                                                                             handleShowModal(
-                                                                                                logo?.url?.split('?')[0] || doctorDetails?.photo?.[0]?.url
+                                                                                                logo?.url?.split('?')[0] ||
+                                                                                                doctorDetails
+                                                                                                    ?.photo?.[0]?.url
                                                                                             );
                                                                                         }}
                                                                                         className="text-dark cursor-pointer"
@@ -891,7 +913,9 @@ const NewDoctor = () => {
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
                                                                                             handleDownload(
-                                                                                                logo || doctorDetails?.photo?.[0]
+                                                                                                logo ||
+                                                                                                doctorDetails
+                                                                                                    ?.photo?.[0]
                                                                                             );
                                                                                         }}
                                                                                         className="text-dark cursor-pointer"
@@ -918,7 +942,7 @@ const NewDoctor = () => {
                                                             <div className="col-md-3 col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Specialist`}{' '}
+                                                                        {`Speciality`}{' '}
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
@@ -926,14 +950,24 @@ const NewDoctor = () => {
                                                                         onChange={(e) => {
                                                                             clearErrors('specialist');
                                                                         }}
-                                                                        placeholder="Enter Specialist Name"
+                                                                        placeholder="Enter Speciality Name"
                                                                     />
                                                                 </Form.Group>
                                                             </div>
                                                             <div className="col-md-3 col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Department`}<span className='text-danger'>{' *'}</span>
+                                                                        {`Department`}{' '}
+                                                                        <span>
+                                                                            <i
+                                                                                className="bi bi-plus-circle text-primary ms-1 cursor-pointer"
+                                                                                style={{ fontSize: '0.7rem' }}
+                                                                                title="Add Department"
+                                                                                onClick={() => {
+                                                                                    setAddDepartmentModal(true);
+                                                                                }}></i>
+                                                                        </span>
+                                                                        <span className="text-danger">{' *'}</span>
                                                                     </Form.Label>
                                                                     <Select
                                                                         options={departmentOptions}
@@ -942,7 +976,14 @@ const NewDoctor = () => {
                                                                         classNamePrefix="select"
                                                                         placeholder="Select"
                                                                         required
-                                                                        value={selectedDepartment || departmentOptions?.find((data) => data?.value === selectedDepartment?.value)}
+                                                                        value={
+                                                                            selectedDepartment ||
+                                                                            departmentOptions?.find(
+                                                                                (data) =>
+                                                                                    data?.value ===
+                                                                                    selectedDepartment?.value
+                                                                            )
+                                                                        }
                                                                         styles={{
                                                                             control: (provided) => ({
                                                                                 ...provided,
@@ -958,7 +999,15 @@ const NewDoctor = () => {
                                                                             }),
                                                                         }}
                                                                         onInputChange={(data) => {
-                                                                            dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 50, skip: 1, search: data }))
+                                                                            dispatch(
+                                                                                getDepartmentDataAction({
+                                                                                    status: true,
+                                                                                    category: 'Department',
+                                                                                    limit: 50,
+                                                                                    skip: 1,
+                                                                                    search: data,
+                                                                                })
+                                                                            );
                                                                         }}
                                                                         onChange={(data) => {
                                                                             setSelectedDepartment(data);
@@ -1012,7 +1061,11 @@ const NewDoctor = () => {
                     </Card>
                 </div>
                 <EmailToDoctorModal closeModal={closeModal} show={show} formData={formData} setFormData={setFormData} />
-
+                <DepartmentModal
+                    addDepartmentModal={addDepartmentModal}
+                    closeAddModal={() => setAddDepartmentModal(false)}
+                // edit={edit}
+                />
                 <Modal show={showModalPic} onHide={handleCloseModal} centered>
                     <Modal.Body>
                         <div className="d-flex justify-content-center">

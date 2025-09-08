@@ -7,7 +7,6 @@ import { useSelector } from 'react-redux';
 const SuggestionOffcanvas = ({ show, onClose, onSelect }) => {
     const store = useSelector((state) => state);
     const suggestions = store?.createSuggestionsReducer?.data?.data;
-    console.log("Suggestions:", suggestions);
     const loading = store?.createSuggestionsReducer?.loading;
     const [copiedIndex, setCopiedIndex] = useState(null);
     const handleCopy = (text, index) => {

@@ -17,7 +17,7 @@ export const defaultVitals = [
     { name: 'Inhaled Oxygen Flow Rate', code: "3151-8", system: "http://loinc.org", unit: 'l/min', value: '', type: 'number' },
 ];
 
-export const medicationStatus = [
+export const medicationStatusList = [
     { value: 'active', label: 'Active' },
     { value: 'on-hold', label: 'On Hold' },
     { value: 'cancelled', label: 'Cancelled' },
@@ -27,6 +27,10 @@ export const medicationStatus = [
     { value: 'draft', label: 'Draft' },
     { value: 'unknown', label: 'Unknown' }
 ]
+export const medicationStatus = medicationStatusList.sort((a, b) =>
+    a.label.localeCompare(b.label)
+);
+
 
 
 export const practiceTypeOptions = [

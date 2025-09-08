@@ -8,7 +8,7 @@ import { FiInfo } from 'react-icons/fi';
 
 // import EmailToSubClinicModal from './EmailToSubClinicModal';
 import { handleUpload } from '../../../helpers/HandleUpload';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import {
@@ -78,7 +78,9 @@ const NewPractice = () => {
     const navigate = useNavigate();
     const store = useSelector((state) => state);
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
     const createLoading = store?.createSubClinicsReducer?.loading;
@@ -125,7 +127,7 @@ const NewPractice = () => {
         dispatch(getClinicTypeAction());
     }, [dispatch]);
     useEffect(() => {
-        dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_MainId?.clinicId }) }));
+        dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_id }) }));
     }, [dispatch]);
 
     const [formData, setFormData] = useState({
@@ -152,9 +154,9 @@ const NewPractice = () => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                              url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                          }
+                            url: data?.documents?.[0], // Store URL
+                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -291,7 +293,7 @@ const NewPractice = () => {
                 // documents: item.file
                 //     ? { url: item.file.url?.url, fileName: item?.file.url?.name || '' }
                 //     : { url: item.file?.url, fileName: item?.file?.name || '' },
-                ...(item?.file && { documents: { url: item?.file?.url, fileName: item?.file?.name || '' } }),
+                ...(item?.file && { documents: { url: item?.file?.url?.url, fileName: item?.file?.name || '' } }),
                 expirationDate: item.expiry,
                 status: 'active',
                 system: 'urn:oid:2.16.840.1.113883.4.7',
@@ -304,9 +306,7 @@ const NewPractice = () => {
             flag: 'subClinic',
             // ...(posDetails && { pos: posDetails }),
         };
-
         dispatch(createSubClinicAction({ key: encryptMessage(newPayload) }));
-        console.log(newPayload, 'newPayload');
     };
 
     useEffect(() => {
@@ -512,11 +512,10 @@ const NewPractice = () => {
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
                                             <button
-                                                className={`text-black nav-link font_active_tabs ${
-                                                    activeTab === 'personalDetails' ? 'active' : ''
-                                                }`}
+                                                className={`text-black nav-link font_active_tabs ${activeTab === 'personalDetails' ? 'active' : ''
+                                                    }`}
                                                 onClick={() => handleTabChange('personalDetails')}>
-                                                Practice Sub Information
+                                                {`Practice Sub Information`}
                                             </button>
                                         </li>
                                     </ul>
@@ -530,7 +529,7 @@ const NewPractice = () => {
                                                 </Button>
                                            */}
                                             <Button className="cancel-button" as={Link} to={'/apps/crm/addPractice'}>
-                                                Back
+                                                {`Back`}
                                             </Button>
                                         </>
                                     )}
@@ -551,7 +550,7 @@ const NewPractice = () => {
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className="mb-0">
-                                                            Practice Name <span className="text-danger">*</span>
+                                                            {`Practice Name`} <span className="text-danger">{`*`}</span>
                                                         </Form.Label>
                                                         <Form.Control
                                                             type="text"
@@ -572,7 +571,7 @@ const NewPractice = () => {
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className="mb-0">
-                                                            Practice type <span className="text-danger">*</span>
+                                                            {`Practice type`} <span className="text-danger">{`*`}</span>
                                                         </Form.Label>
                                                         <Form.Select
                                                             data-has-value={!!watch('clinicType')}
@@ -585,7 +584,7 @@ const NewPractice = () => {
                                                             className="form-control"
                                                             defaultValue="">
                                                             <option value="" hidden>
-                                                                Select Clinic type
+                                                                {`Select Clinic type`}
                                                             </option>
                                                             {clinectypes?.map((data) => (
                                                                 <option key={data?._id} value={data?.name}>
@@ -601,7 +600,7 @@ const NewPractice = () => {
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className="mb-0">
-                                                            Email <span className="text-danger">*</span>
+                                                            {`Email`} <span className="text-danger">{`*`}</span>
                                                         </Form.Label>
                                                         <Form.Control
                                                             type="email"
@@ -623,19 +622,18 @@ const NewPractice = () => {
                                                 </Col>
 
                                                 <Col sm={3}>
-                                                    <Form.Label className="mb-0">Upload Logo</Form.Label>
+                                                    <Form.Label className="mb-0">{`Upload Logo`}</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
-                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                            logoName || logoUploading
-                                                                ? 'form-control'
-                                                                : 'custom-form-fields'
-                                                        }`}>
+                                                        className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading
+                                                            ? 'form-control'
+                                                            : 'custom-form-fields'
+                                                            }`}>
                                                         {logoName
                                                             ? logoName.split('/').pop().slice(0, 30) + '...'
                                                             : logoUploading
-                                                              ? 'Uploading...'
-                                                              : 'Upload Logo'}
+                                                                ? 'Uploading...'
+                                                                : 'Upload Logo'}
                                                         <div className="d-flex align-items-center gap-2">
                                                             <FiEye
                                                                 onClick={(e) => {
@@ -648,11 +646,12 @@ const NewPractice = () => {
                                                                 className="text-dark cursor-pointer"
                                                                 style={{ zIndex: 1 }}
                                                             />
-                                                            <p 
+                                                            <p
                                                                 className="mb-0 cursor-pointer"
                                                                 onClick={async (e) => {
                                                                     e.stopPropagation();
-                                                                    const fileUrl = logo?.url || clinicsDataGet?.orgLogo?.url;
+                                                                    const fileUrl =
+                                                                        logo?.url || clinicsDataGet?.orgLogo?.url;
                                                                     const fileName = logoName || 'logo';
                                                                     if (fileUrl) {
                                                                         try {
@@ -666,7 +665,10 @@ const NewPractice = () => {
                                                                             link.click();
                                                                             document.body.removeChild(link);
                                                                             window.URL.revokeObjectURL(url);
-                                                                            setTimeout(() => window.open(fileUrl, '_blank'), 100);
+                                                                            setTimeout(
+                                                                                () => window.open(fileUrl, '_blank'),
+                                                                                100
+                                                                            );
                                                                         } catch (error) {
                                                                             const link = document.createElement('a');
                                                                             link.href = fileUrl;
@@ -696,7 +698,7 @@ const NewPractice = () => {
                                                         <Row>
                                                             <Col sm={12}>
                                                                 <h5>
-                                                                    Identifiers
+                                                                    {`Identifiers`}
                                                                     <span
                                                                         className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
                                                                         onClick={addIdentifier}></span>
@@ -707,21 +709,21 @@ const NewPractice = () => {
                                                         {/* Table Header */}
                                                         <Row className="fw-bold">
                                                             <Col>
-                                                                <Form.Label>Identifier Type</Form.Label>
+                                                                <Form.Label>{`Identifier Type`}</Form.Label>
                                                             </Col>
                                                             <Col>
-                                                                <Form.Label>Identifier Number</Form.Label>
+                                                                <Form.Label>{`Identifier Number`}</Form.Label>
                                                             </Col>
                                                             <Col className="d-flex align-items-center gap-2">
-                                                                <Form.Label>Identifier Document</Form.Label>
+                                                                <Form.Label>{`Identifier Document`}</Form.Label>
 
                                                                 {/* Tooltip Icon */}
                                                                 <OverlayTrigger
                                                                     placement="top"
                                                                     overlay={
                                                                         <Tooltip id="tooltip-identifier">
-                                                                            File size should be less than 2MB. Supported
-                                                                            formats: JPG, PNG, JPEG, PDF.
+                                                                            {`File size should be less than 2MB. Supported
+                                                                            formats: JPG, PNG, JPEG, PDF.`}
                                                                         </Tooltip>
                                                                     }>
                                                                     <span className="text-secondary cursor-pointer mb-2">
@@ -730,20 +732,20 @@ const NewPractice = () => {
                                                                 </OverlayTrigger>
                                                             </Col>
                                                             <Col>
-                                                                <Form.Label>Issuing Authority</Form.Label>
+                                                                <Form.Label>{`Issuing Authority`}</Form.Label>
                                                             </Col>
                                                             <Col>
                                                                 <Form.Label>
-                                                                    Identifier Expiry{' '}
+                                                                    {`Identifier Expiry`}{' '}
                                                                     <span className="text-secondary">
-                                                                        (If Applicable)
+                                                                        {`(If Applicable)`}
                                                                     </span>
                                                                 </Form.Label>
                                                             </Col>
                                                         </Row>
 
                                                         {/* Dynamic Identifier Fields */}
-                                                        {constantIdentifiers.map((item, index) => (
+                                                        {constantIdentifiers?.map((item, index) => (
                                                             <Row key={index} className="mb-2">
                                                                 {/* Identifier Type */}
                                                                 <Col>
@@ -763,7 +765,7 @@ const NewPractice = () => {
                                                                             item.type
                                                                         )}>
                                                                         <option value="" disabled>
-                                                                            Select Identifier Type
+                                                                            {`Select Identifier Type`}
                                                                         </option>
                                                                         {identifierOptions.map((option) => (
                                                                             <option
@@ -776,7 +778,7 @@ const NewPractice = () => {
                                                                     </Form.Select>
                                                                     {errors?.[index]?.type && (
                                                                         <span className="text-danger">
-                                                                            This field is required
+                                                                            {`This field is required`}
                                                                         </span>
                                                                     )}
                                                                 </Col>
@@ -791,8 +793,8 @@ const NewPractice = () => {
                                                                             item.type === 'NPI' || item.type === 'CLIA'
                                                                                 ? 10
                                                                                 : item.type === 'NAIC'
-                                                                                  ? 5
-                                                                                  : 10
+                                                                                    ? 5
+                                                                                    : 10
                                                                         }
                                                                         {...register(`identifiers[${index}].number`, {
                                                                             // required: defaultIdentifiers.includes(item.type)
@@ -857,62 +859,89 @@ const NewPractice = () => {
                                                                                 )
                                                                                 .click()
                                                                         }
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                                            item.file
-                                                                                ? 'form-control'
-                                                                                : 'custom-form-fields'
-                                                                        }`}>
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${item.file
+                                                                            ? 'form-control'
+                                                                            : 'custom-form-fields'
+                                                                            }`}>
                                                                         {index === selectedIndex
                                                                             ? 'Uploading...'
                                                                             : item.file?.name
-                                                                              ? item.file.name.length > 30
-                                                                                  ? item.file.name.slice(0, 25) + '...'
-                                                                                  : item.file.name
-                                                                              : 'Upload Document'}
+                                                                                ? item.file.name.length > 30
+                                                                                    ? item.file.name.slice(0, 25) + '...'
+                                                                                    : item.file.name
+                                                                                : 'Upload Document'}
 
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {(item?.file?.url ||
                                                                                 clinicsDataGet?.orgLogo?.url) && (
-                                                                                <FiEye
-                                                                                    className="cursor-pointer"
-                                                                                    onClick={(e) => {
-                                                                                        e.preventDefault();
-                                                                                        e.stopPropagation();
-                                                                                        handleShowModal(
-                                                                                            item?.file?.url ||
+                                                                                    <FiEye
+                                                                                        className="cursor-pointer"
+                                                                                        onClick={(e) => {
+                                                                                            e.preventDefault();
+                                                                                            e.stopPropagation();
+                                                                                            handleShowModal(
+                                                                                                item?.file?.url ||
                                                                                                 clinicsDataGet?.orgLogo
                                                                                                     ?.url
-                                                                                        );
-                                                                                    }}
-                                                                                />
-                                                                            )}
+                                                                                            );
+                                                                                        }}
+                                                                                    />
+                                                                                )}
                                                                             <p
                                                                                 className="mb-0 cursor-pointer"
                                                                                 onClick={async (e) => {
                                                                                     e.stopPropagation();
                                                                                     const fileUrl = item?.file?.url;
-                                                                                    const fileName = item?.file?.name || 'document';
+                                                                                    const fileName =
+                                                                                        item?.file?.name || 'document';
                                                                                     if (fileUrl) {
                                                                                         try {
-                                                                                            const response = await fetch(fileUrl);
-                                                                                            const blob = await response.blob();
-                                                                                            const url = window.URL.createObjectURL(blob);
-                                                                                            const link = document.createElement('a');
+                                                                                            const response =
+                                                                                                await fetch(fileUrl);
+                                                                                            const blob =
+                                                                                                await response.blob();
+                                                                                            const url =
+                                                                                                window.URL.createObjectURL(
+                                                                                                    blob
+                                                                                                );
+                                                                                            const link =
+                                                                                                document.createElement(
+                                                                                                    'a'
+                                                                                                );
                                                                                             link.href = url;
                                                                                             link.download = fileName;
-                                                                                            document.body.appendChild(link);
+                                                                                            document.body.appendChild(
+                                                                                                link
+                                                                                            );
                                                                                             link.click();
-                                                                                            document.body.removeChild(link);
-                                                                                            window.URL.revokeObjectURL(url);
-                                                                                            window.open(fileUrl, '_blank');
+                                                                                            document.body.removeChild(
+                                                                                                link
+                                                                                            );
+                                                                                            window.URL.revokeObjectURL(
+                                                                                                url
+                                                                                            );
+                                                                                            window.open(
+                                                                                                fileUrl,
+                                                                                                '_blank'
+                                                                                            );
                                                                                         } catch (error) {
-                                                                                            const link = document.createElement('a');
+                                                                                            const link =
+                                                                                                document.createElement(
+                                                                                                    'a'
+                                                                                                );
                                                                                             link.href = fileUrl;
                                                                                             link.download = fileName;
-                                                                                            document.body.appendChild(link);
+                                                                                            document.body.appendChild(
+                                                                                                link
+                                                                                            );
                                                                                             link.click();
-                                                                                            document.body.removeChild(link);
-                                                                                            window.open(fileUrl, '_blank');
+                                                                                            document.body.removeChild(
+                                                                                                link
+                                                                                            );
+                                                                                            window.open(
+                                                                                                fileUrl,
+                                                                                                '_blank'
+                                                                                            );
                                                                                         }
                                                                                     }
                                                                                 }}>
@@ -931,7 +960,7 @@ const NewPractice = () => {
                                                                     />
                                                                     {errors?.[index]?.file && (
                                                                         <span className="text-danger">
-                                                                            Please upload a document
+                                                                            {`Please upload a document`}
                                                                         </span>
                                                                     )}
                                                                 </Col>
@@ -956,7 +985,7 @@ const NewPractice = () => {
                                                                             )
                                                                         }>
                                                                         <option value="" disabled>
-                                                                            Select Issuing Authority
+                                                                            {`Select Issuing Authority`}
                                                                         </option>
                                                                         {defaultIssuingAuthority.map((option) => (
                                                                             <option key={option} value={option}>
@@ -966,7 +995,7 @@ const NewPractice = () => {
                                                                     </Form.Select>
                                                                     {errors?.[index]?.issuingAuthority && (
                                                                         <span className="text-danger">
-                                                                            This field is required
+                                                                            {`This field is required`}
                                                                         </span>
                                                                     )}
                                                                 </Col>
@@ -1014,8 +1043,8 @@ const NewPractice = () => {
                                                 <hr className="mb-1" />
                                                 <Row>
                                                     <Col sm={12}>
-                                                        <h5>
-                                                            Points of Contact (POC)
+                                                        <h5 className='mb-0'>
+                                                            {`Points of Contact (POC)`}
                                                             <span
                                                                 className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
                                                                 onClick={addPoc}></span>
@@ -1023,11 +1052,11 @@ const NewPractice = () => {
                                                     </Col>
                                                 </Row>
                                                 {pocs.map((poc, pocIndex) => (
-                                                    <div key={pocIndex} className="p-2">
+                                                    <div key={pocIndex} className={`p-2 ${pocs.length > 1 ? 'pe-3' : ''}`}>
                                                         <Row>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-2">
-                                                                    <Form.Label>Full Name</Form.Label>
+                                                                    <Form.Label>{`Full Name`}</Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         value={poc.name.text}
@@ -1044,7 +1073,7 @@ const NewPractice = () => {
                                                             </Col>
                                                             <Col sm={6} className="position-relative">
                                                                 <Form.Group>
-                                                                    <Form.Label>Role</Form.Label>
+                                                                    <Form.Label>{`Role`}</Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         placeholder="Enter Role"
@@ -1061,7 +1090,7 @@ const NewPractice = () => {
                                                                 {pocs.length > 1 && (
                                                                     <span
                                                                         className="text-danger cursor-pointer position-absolute fs-5 fw-bolder"
-                                                                        style={{ right: '-1%', top: '45%' }}
+                                                                        style={{ right: '-0.5%', top: '45%' }}
                                                                         onClick={() => removePoc(pocIndex)}>
                                                                         <CiCircleMinus />
                                                                     </span>
@@ -1070,7 +1099,7 @@ const NewPractice = () => {
 
                                                             <Col sm={6}>
                                                                 <Form.Group>
-                                                                    <Form.Label>Email</Form.Label>
+                                                                    <Form.Label>{`Email`}</Form.Label>
                                                                     <Form.Control
                                                                         type="email"
                                                                         placeholder="Enter Email"
@@ -1089,12 +1118,12 @@ const NewPractice = () => {
                                                                 <Col sm={6} key={telecomIndex}>
                                                                     <Form.Group className="mb-2 position-relative">
                                                                         <Form.Label className="mb-1">
-                                                                            Phone Number
+                                                                            {`Phone Number`}
                                                                         </Form.Label>
                                                                         <InputGroup>
                                                                             {/* Country Code Prefix */}
                                                                             <InputGroup.Text className="ps-3 pe-1 p-0 fw-bold text-black">
-                                                                                &nbsp;&nbsp;+1
+                                                                                &nbsp;&nbsp;{`+1`}
                                                                             </InputGroup.Text>
 
                                                                             {/* Phone Input Field */}
@@ -1161,14 +1190,12 @@ const NewPractice = () => {
                         </div>
                     </Card>
                 </div>
-                {/* <EmailToSubClinicModal setIsModalRequest={setIsModalRequest} closeModal={closeModal} show={show} formData={formData} /> */}
-                {/* <ResetPassword closeModal={closepassModal} show={passShow} /> */}
             </div>
             <Modal show={showModalPic} onHide={handleCloseModal} centered>
                 <Modal.Body>
                     <div className="d-flex justify-content-center">
                         <p className="fw-bold" style={{ color: '#6169D0' }}>
-                            File Preview
+                            {`File Preview`}
                         </p>
                     </div>
                     <div

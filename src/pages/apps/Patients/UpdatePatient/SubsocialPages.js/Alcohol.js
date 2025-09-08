@@ -42,7 +42,7 @@ const Alcohol = () => {
     const alcoholData = store?.getAlcoholHistoryReducer?.data?.data;
 
     // Form handling
-    const { register, handleSubmit, reset, formState:{errors}, control, watch, getValues, setValue } = useForm();
+    const { register, handleSubmit, reset, formState: { errors }, control, watch, getValues, setValue } = useForm();
     const watchUseStatus = watch('useStatus');
     const heavyFrequency = watch('frequency');
 
@@ -126,19 +126,27 @@ const Alcohol = () => {
             }
         });
 
-        data.subject = patientId;
-        data.effectiveDateTime = new Date().toISOString();
-        data.note = [
-            {
-                text: data.note,
-                time: new Date().toISOString(),
-            },
-        ];
+        // Remove note from data to prevent it from being included via spread
+        const { note, ...dataWithoutNote } = data;
+
+        const payload = {
+            ...dataWithoutNote,
+            subject: patientId,
+            effectiveDateTime: new Date().toISOString(),
+            ...(note && note.trim() !== '' && note !== '<ul><li></li></ul>' && note !== '<p><br></p>' && {
+                note: [
+                    {
+                        text: note,
+                        time: new Date().toISOString(),
+                    },
+                ],
+            }),
+        };
         if (toEdit) {
-            data.id = toEdit?._id;
-            dispatch(updateAlcoholHistoryAction({ key: encryptMessage(data) }));
+            payload.id = toEdit?._id;
+            dispatch(updateAlcoholHistoryAction({ key: encryptMessage(payload) }));
         } else {
-            dispatch(createAlcoholHistoryAction({ key: encryptMessage(data) }));
+            dispatch(createAlcoholHistoryAction({ key: encryptMessage(payload) }));
         }
     };
 
@@ -183,9 +191,9 @@ const Alcohol = () => {
                         <Form
                             onSubmit={handleSubmit(onSubmit)}
                             className="flex-grow-1 d-flex flex-column"
-                             style={{ height: '100%' }}
-                           >
-                            <div className='scroll-container px-0' style={{ height: '40vh', overflowX:"hidden" }}>
+                            style={{ height: '100%' }}
+                        >
+                            <div className='scroll-container px-0' style={{ height: '40vh', overflowX: "hidden" }}>
                                 <Row className="">
                                     <Col sm={12}>
                                         <Form.Group>
@@ -213,7 +221,7 @@ const Alcohol = () => {
                                                         <option key="" value="">
                                                             Select
                                                         </option>
-                                                        {['Occasionally', 'Weekly', 'Daily', 'Heavy', 'Unknown']?.map(
+                                                        {['Occasionally', 'Weekly', 'Daily', 'Heavy', 'Unknown']?.sort((a, b) => a.localeCompare(b))?.map(
                                                             (data) => (
                                                                 <option value={data} key={data}>
                                                                     {data}
@@ -267,7 +275,7 @@ const Alcohol = () => {
                                                                 'Monthly',
                                                                 'Weekly',
                                                                 'Daily or almost daily',
-                                                            ]?.map((data) => (
+                                                            ]?.sort((a, b) => a.localeCompare(b))?.map((data) => (
                                                                 <option value={data} key={data}>
                                                                     {data}
                                                                 </option>
@@ -288,7 +296,7 @@ const Alcohol = () => {
                                                         <option key="" value="">
                                                             Select
                                                         </option>
-                                                        {['Beer', 'Wine', 'Spirits', 'Other', 'All']?.map((data) => (
+                                                        {['Beer', 'Wine', 'Spirits', 'Other', 'All']?.sort((a, b) => a.localeCompare(b))?.map((data) => (
                                                             <option value={data} key={data}>
                                                                 {data}
                                                             </option>
@@ -429,7 +437,7 @@ const Alcohol = () => {
                                 </Row>
                             </div>
 
-                            <div className="mt-5 d-flex justify-content-end"  style={{ height: '' }}>
+                            <div className="mt-5 d-flex justify-content-end" style={{ height: '' }}>
                                 <Button
                                     variant="primary"
                                     type="submit"

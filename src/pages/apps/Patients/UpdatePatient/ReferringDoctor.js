@@ -9,7 +9,7 @@ import {
     getPatientByIdAction,
 } from '../../../../redux/actions';
 import us from '../../../../assets/images/flags/us.jpg';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import AddressForm from '../../Common Pages/AddressForm';
 import { useSearchParams } from 'react-router-dom';
 
@@ -18,7 +18,9 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const {
         register,
         handleSubmit,
@@ -33,7 +35,6 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
     ]);
     const [submissionType, setSubmissionType] = useState(null);
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log(patientDetails, 'patents');
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
 
     const primaryState = watch('primaryStateName');
@@ -51,10 +52,10 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                 'phone',
                 patientDetails?.referringDocId?.telecom?.[0]?.value
                     ? patientDetails?.referringDocId?.telecom?.[0]?.value
-                          .replace(/\D/g, '')
-                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                          )
+                        .replace(/\D/g, '')
+                        .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                        )
                     : ''
             );
             // setValue('phone', patientDetails?.referringDocId?.telecom?.[0]?.value);
@@ -170,7 +171,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                                 placeholder="NPI Number"
                                 type="text"
                             />
-                              {errors.npiNumber && (
+                            {errors.npiNumber && (
                                 <span
                                     className="text-danger position-absolute"
                                     style={{ top: '74%', left: '15px', fontSize: '0.8rem' }}>
@@ -205,8 +206,12 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                                         },
                                     })}
                                     onChange={(e) => {
-                                        let rawValue = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                        e.target.value = rawValue.replace(/(\d{3})(\d{3})(\d{4})/, '($1)$2-$3');
+                                        const rawValue = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                        e.target.value = rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
+                                            if (p3) return `(${p1})${p2}-${p3}`;
+                                            if (p2) return `(${p1})${p2}`;
+                                            return `(${p1}`;
+                                        });
                                         clearErrors('phone');
                                     }}
                                     placeholder="(XXX)XXX-XXXX"

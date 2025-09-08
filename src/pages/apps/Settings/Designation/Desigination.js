@@ -5,7 +5,7 @@ import { FormInput } from '../../../../components';
 import { FiFileText, FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import {
     createMastersDataAction,
     getMastersDataAction,
@@ -18,7 +18,9 @@ import Paginations from '../../../../helpers/Paginations';
 
 const Designation = () => {
     const store = useSelector((state) => state);
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const {
         register,
         handleSubmit,
@@ -116,14 +118,14 @@ const Designation = () => {
                                     onClick={() => handleStatusChange(true)}
                                     className={` active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
                                         } me-2 py-1`}>
-                                    Active
+                                    {`Active`}
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
                                     className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
                                         } me-2 py-1`}>
-                                    Inactive
+                                    {`Inactive`}
                                 </Button>
                             </Col>
                             <Col sm={6} className="text-end mt-md-0 mt-2 mt-sm-0">
@@ -197,7 +199,7 @@ const Designation = () => {
                                                 setEdit(null);
                                             }}
                                             className="custom-buttons py-1">
-                                            New Desigination
+                                            {`New Desigination`}
                                         </Button>
                                     </Col>
                                 </Row>
@@ -209,21 +211,11 @@ const Designation = () => {
                             style={{ height: tableGetData?.length === 0 ? '' : 'auto' }}>
                             <thead className="text-white">
                                 <tr className="">
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        S.No.
-                                    </th>
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        Department Name
-                                    </th>
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        Created Date
-                                    </th>
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        Status
-                                    </th>
-                                    <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                        Action
-                                    </th>
+                                    {['S.No.', 'Designation Name', 'Created Date', 'Status', 'Action']?.map((header, index) => (
+                                        <th key={index} className="text-white py-2" style={{ fontSize: '13px' }}>
+                                            {header}
+                                        </th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>
@@ -262,7 +254,7 @@ const Designation = () => {
                                 ) : (
                                     <tr key={''}>
                                         <td colSpan={6} className="text-center">
-                                            <h3 className="my-5">No Data Found</h3>
+                                            <h3 className="my-5">{`No Data Found`}</h3>
                                         </td>
                                     </tr>
                                 )}
@@ -297,7 +289,7 @@ const Designation = () => {
                         <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label>Desigination Name *</Form.Label>
+                                    <Form.Label>{`Desigination Name`} <span className='text-danger'>{`*`}</span></Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('name', {

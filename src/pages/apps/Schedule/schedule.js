@@ -9,7 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch } from 'react-icons/fi';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
 import { getScheduleAction } from '../../../redux/schedule/action';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,7 +20,8 @@ const Schedule = () => {
     const store = useSelector((state) => state);
     const [activeTab, setActiveTab] = useState('DoctorHolidays');
     const [searchQuery, setSearchQuery] = useState('');
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [status, setStatus] = useState(true);
@@ -29,13 +30,20 @@ const Schedule = () => {
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log('doctorDetails', doctorDetails);
-    const scheduleResponse = store?.getScheduleReducer?.data?.holidays;
 
     const navigate = useNavigate('');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.name[0]?.text + ' ' + data?.userId?.email,
+        label: (data?.name?.[0]?.prefix?.[0]
+            ? data?.name?.[0]?.prefix?.[0] + ' '
+            : '') +
+            (data?.name?.[0]?.family || '') +
+            (data?.name?.[0]?.given?.length > 0
+                ? ' ' + data?.name?.[0]?.given?.join(' ')
+                : '') + ' ' +
+            (data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value ?
+                `(******${data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value.slice(-4)})`
+                : '') || ''
     }));
 
     useEffect(() => {
@@ -66,18 +74,7 @@ const Schedule = () => {
         setStartDate(start);
         setEndDate(end);
     };
-    // useEffect(() => {
-    //     const hasFilters = (startDate) !== null ||  (endDate) !== null || scheduleResponse === undefined  ;
-    //     const payload = {
-    //         clinicId: clinicId,
-    //         fromDate: startDate || null,
-    //         toDate: endDate || null,
-    //         ...(selectedDoctor?.value ? { doctorId: selectedDoctor?.value } : {}),
-    //     };
-    //     if (hasFilters) {
-    //         dispatch(getScheduleAction({ key: encryptMessage(payload) }));
-    //     }
-    // }, [dispatch, startDate , endDate ]);
+
     useEffect(() => {
         const payload = {
             clinicId: clinicId,
@@ -86,7 +83,6 @@ const Schedule = () => {
             page: skip,
             ...(selectedDoctor?.value ? { doctorId: selectedDoctor?.value } : {}),
         };
-
         dispatch(getScheduleAction({ key: encryptMessage(payload) }));
     }, [startDate, endDate, clinicId, selectedDoctor, dispatch, skip]);
 
@@ -101,12 +97,15 @@ const Schedule = () => {
             setSelectedDoctor(selectedOption);
         }
     };
+
     const handleAddHoliday = () => {
         navigate('/apps/schedule/addHoliday');
     };
+
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
+
     return (
         <div className="schedule-container">
             <Row className="mt-2">

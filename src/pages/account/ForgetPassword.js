@@ -48,7 +48,6 @@ const ForgetPassword = (): React$Element<any> => {
         passwordReset: state.Auth.passwordReset,
         resetPasswordSuccess: state.Auth.resetPasswordSuccess,
     }));
-    console.log('resetPasswordSuccess', resetPasswordSuccess);
     /*
      * form validation schema
      */
@@ -65,7 +64,7 @@ const ForgetPassword = (): React$Element<any> => {
     /*
      * handle form submission
      */
-    const  onSubmit = (formData) => {
+    const onSubmit = (formData) => {
         dispatch(forgotPassword({ email: formData['username'] }));
     };
 
@@ -98,7 +97,7 @@ const ForgetPassword = (): React$Element<any> => {
                             placeholder={t('Enter your Email')}
                             containerClass={'mb-3'}
                             onChange={(e) => {
-                                e.target.value = e.target.value.replace(/\s+/g, ''); 
+                                e.target.value = e.target.value.replace(/\s+/g, '');
                             }}
                             onKeyPress={(e) => {
                                 if (e.key === ' ') {

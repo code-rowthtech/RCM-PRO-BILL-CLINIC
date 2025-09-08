@@ -6,7 +6,7 @@ import Spinner from '../../../../constants/Spinner';
 import Paginations from '../../../../helpers/Paginations';
 import CreateRoleSetting from './CreateRoleSetting';
 import UpdateRoleSetting from './UpdateRoleSetting';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { FormInput } from '../../../../components';
 import {
     getRoleDataAction,
@@ -30,7 +30,9 @@ const RoleSetting = () => {
     const handleClosemodal = () => {
         setShowModal(false);
     };
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     useEffect(() => {
         dispatch(
             getRoleDataAction({

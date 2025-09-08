@@ -20,7 +20,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
     const identifierOptions = [
-        { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
+        // { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
         // { label: 'State Medical License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MED-LIC' },
         { label: 'DEA Number (Controlled Substances)', value: 'http://www.nabp.pharmacy/DEA', code: 'DEA' },
         { label: 'Board Certification', value: 'http://www.abms.org/certification', code: 'BOARD-CERT' },
@@ -204,7 +204,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             }}
                         >
                             <option value="" disabled>Select Identifier Type</option>
-                            {identifierOptions.map((option) => (
+                            {identifierOptions?.sort((a, b) => a.label.localeCompare(b.label))?.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
@@ -237,7 +237,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                                             ? item?.file?.name?.slice(0, 25) + '...'
                                             : item?.file?.name
                                         : 'Upload Document'}
+
                             </span>
+                            {!item.file?.name && <i className="bi bi-cloud-arrow-up position-absolute fs-5 text-" style={{ right: '8%' }}></i>}
                             <div className="d-flex align-items-center gap-2">
                                 {item.file?.url && (
                                     <FiEye
@@ -281,7 +283,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             <option value="" disabled>
                                 Select Issuing Authority
                             </option>
-                            {defaultIssuingAuthority.map((option) => (
+                            {defaultIssuingAuthority?.sort((a, b) => a.localeCompare(b))?.map((option) => (
                                 <option key={option} value={option}>
                                     {option}
                                 </option>
@@ -307,7 +309,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     </Col>
                 </Row>
             ))}
-            
+
             <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
                 <Modal.Body>
                     <div className="d-flex justify-content-center">
@@ -322,20 +324,29 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             justifyContent: 'center',
                             alignItems: 'center',
                         }}>
-                        <img
-                            src={previewUrl}
-                            alt="File Preview"
-                            style={{
-                                maxWidth: '100%',
-                                maxHeight: '100vh',
-                                objectFit: 'contain',
-                                display: 'block',
-                            }}
-                        />
+                        {previewUrl?.toLowerCase().endsWith('.pdf') ? (
+                            <iframe
+                                src={previewUrl}
+                                title="PDF Preview"
+                                width="100%"
+                                height="500px"
+                                style={{ border: 'none' }}
+                            />
+                        ) : (
+                            <img
+                                src={previewUrl}
+                                alt="File Preview"
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '100vh',
+                                    objectFit: 'contain',
+                                    display: 'block',
+                                }}
+                            />
+                        )}
                     </div>
                 </Modal.Body>
-            </Modal>
-        </div>
+            </Modal>        </div>
     );
 };
 

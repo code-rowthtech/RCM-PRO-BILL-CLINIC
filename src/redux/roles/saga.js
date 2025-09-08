@@ -18,8 +18,6 @@ function* createRolesFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success')
-
-
             yield put({
                 type: RolesActionTypes.CREATE_ROLES_SUCCESS,
                 payload: { ...decryptedData },

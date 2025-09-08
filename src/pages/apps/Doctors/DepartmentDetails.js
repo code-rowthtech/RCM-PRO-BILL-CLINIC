@@ -11,7 +11,6 @@ import DoctorIdentifierForm from './DoctorIdentifier';
 import { taxonomyOptions as taxonomy } from '../../../utils/DataSets/commonData';
 import AsyncSelect from 'react-select/async';
 const DepartmentDetails = ({ setActiveTab, docId }) => {
-    console.log('DepartmentDetails docId', docId);
     // const defaultIdentifiers = ['NPI'];
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -23,7 +22,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
     const [searchParams] = useSearchParams();
 
     const updateId = searchParams.get('id');
-    const formattedTaxonomyOptions = taxonomy.map((option) => ({
+    const formattedTaxonomyOptions = taxonomy?.map((option) => ({
         value: option,
         label: option.code + ' - ' + option.displayName,
     }));
@@ -52,7 +51,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
         if (doctorDetails?.identifier) {
             const identifierData = [];
             const licensureData = [];
-            
+
             doctorDetails.identifier.forEach((item) => {
                 const formattedItem = {
                     type: {
@@ -68,14 +67,14 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                     ennumerationDate: item.ennumerationDate ? new Date(item.ennumerationDate).toISOString().split('T')[0] : '',
                     licenseState: item.licenseState
                 };
-                
+
                 if (item.licenseState) {
                     licensureData.push(formattedItem);
                 } else {
                     identifierData.push(formattedItem);
                 }
             });
-            
+
             setIdentifiers(identifierData);
             setLicensure(licensureData);
         }
@@ -198,7 +197,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
 
     useEffect(() => {
         dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }));
-        
+
         // Load doctor details when component mounts
         if (updateId || docId) {
             const payload = { id: updateId || docId };
@@ -207,7 +206,12 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
     }, [dispatch, updateId, docId]);
 
     const [taxonomyCodesList, setTaxonomyCodesList] = useState([
-        { type: 'primary', code: '', state: '', licenseNumber: '', status: '' },
+        {
+            type: 'primary',
+            code: '',
+            //   state: '', licenseNumber: '',
+            status: ''
+        },
     ]);
     const addTaxonomyCode = () => {
         setTaxonomyCodesList([
@@ -283,7 +287,10 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                             </h5>
                                         </Col>
                                         {taxonomyCodesList?.map((data, index) => (
-                                            <Row key={index} className="pe-0">
+                                            <Row key={index} className={`mb-1 position-relative ${taxonomyCodesList?.length > 1 ? 'px-3 ' : ''}`}>
+                                                {taxonomyCodesList?.length > 1 ? (
+                                                    <strong className='position-absolute fw-semibold fs-6' style={{ top: '28%', left: '0.2%' }}>{index + 1}.</strong>
+                                                ) : (<></>)}
                                                 <Col sm={3} className="mb-1">
                                                     <Form.Group>
                                                         <Form.Label className="mb-0">Code</Form.Label>
@@ -311,7 +318,6 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                                     height: '30px',
                                                                     minHeight: '30px',
                                                                     border: '0px',
-                                                                    zIndex: 9999,
                                                                 }),
                                                                 placeholder: (provided) => ({
                                                                     ...provided,
@@ -324,10 +330,11 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                             menuPortalTarget={document.body} // renders menu to body
                                                             menuPosition="fixed" // avoids clipping
                                                         />
+
                                                     </Form.Group>
                                                 </Col>
 
-                                                <Col sm={3}>
+                                                {/* <Col sm={3}>
                                                     <Form.Label className="mb-0">License Number</Form.Label>
                                                     <Form.Control
                                                         type="text"
@@ -341,7 +348,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                         }}
                                                         maxLength={10}
                                                     />
-                                                </Col>
+                                                </Col> */}
                                                 <Col sm={3} style={{ paddingRight: '3px' }}>
                                                     <Form.Label className="mb-0">Type</Form.Label>
                                                     <Form.Select
@@ -356,7 +363,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                         <option value="secondary">Secondary</option>
                                                     </Form.Select>
                                                 </Col>
-                                                <Col sm={3} className="pe-0" style={{ paddingLeft: '20px ' }}>
+                                                {/* <Col sm={3} className="pe-0" style={{ paddingLeft: '20px ' }}>
                                                     <Form.Label className="mb-0">State</Form.Label>
                                                     <Form.Select
                                                         value={data.state}
@@ -372,7 +379,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                             </option>
                                                         ))}
                                                     </Form.Select>
-                                                </Col>
+                                                </Col> */}
                                                 <Col sm={3} className="position-relative">
                                                     <Form.Label className="mb-0">Status</Form.Label>
                                                     <Form.Select
@@ -388,17 +395,6 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                         <option value="active">Active</option>
                                                         <option value="inactive">Inactive</option>
                                                     </Form.Select>
-                                                    {/* {index > 0 && (
-                            <span
-                              className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                              style={{ right: '-2%', top: '12%' }}
-                              onClick={() => {
-                                const updatedList = taxonomyCodesList.filter((_, i) => i !== index);
-                                setTaxonomyCodesList(updatedList);
-                              }}>
-                              <CiCircleMinus />
-                            </span>
-                          )} */}
                                                     {index > 0 && (
                                                         <span
                                                             className="text-danger cursor-pointer position-absolute fs-5 fw-bold"

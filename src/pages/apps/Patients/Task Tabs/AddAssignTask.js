@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { useForm } from 'react-hook-form';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import { createTaskAction, getClinicEmployeesAction } from '../../../../redux/assigntasks/action';
@@ -15,7 +15,9 @@ const AddAsignTask = () => {
     const id = searchParams.get('id');
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const employees = store?.getClinicEmployeesReducer?.data?.result || [];
     const {

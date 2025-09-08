@@ -5,8 +5,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
 import PageTitle from '../../../components/PageTitle';
 import { FormInput } from '../../../components';
-import { patientsData } from './data';
-import { GrDocumentText } from 'react-icons/gr';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { FiArchive, FiClock, FiFilter, FiSun } from 'react-icons/fi';
 import { IoCalendarOutline, IoCloseCircleOutline } from 'react-icons/io5';
@@ -14,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAppointmentsAction, rescheduleAppointmentAction } from '../../../redux/appointments/action';
 import Spinner from '../../../constants/Spinner';
 import { getDoctorsAction } from '../../../redux/actions';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
 import { FcViewDetails } from 'react-icons/fc';
 import { useForm } from 'react-hook-form';
@@ -24,31 +22,18 @@ import { FaCalendar, FaCalendarWeek, FaRegListAlt } from 'react-icons/fa';
 import { LucideCalendarDays } from 'lucide-react';
 import { CiCalendar } from 'react-icons/ci';
 import Paginations from '../../../helpers/Paginations';
-const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+// const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
-// Define the types for each order item
-type OrderListItems = {
-    orderId: string,
-    avatar: string,
-    name: string,
-    projectName: string,
-    country: string,
-    city: string,
-    date: string,
-    orderStatus: string,
-};
 
-type OrderListProps = {
-    patientsData: Array<OrderListItems>,
-};
+
 
 // Component for Appointments List Table
 const AppointmentsList = ({
-    patientsData,
     appointmentPeriod,
     setSkip,
     skip,
-}: OrderListProps): React$Element<React$FragmentType> => {
+}): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
@@ -57,7 +42,6 @@ const AppointmentsList = ({
     const [selectedStatus, setSelectedStatus] = useState('');
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
     const {
-        register,
         handleSubmit,
         formState: { errors },
     } = useForm();
@@ -226,7 +210,13 @@ const AppointmentsList = ({
                                     )}
                                 </td>
                                 <td className="text-capitalize">
-                                    {data?.subject?.name?.[0]?.text}
+                                    {(data?.subject?.name?.[0]?.prefix?.[0]
+                                        ? data?.subject?.name?.[0]?.prefix?.[0] + ' '
+                                        : '') +
+                                        (data?.subject?.name?.[0]?.family || '') +
+                                        (data?.subject?.name?.[0]?.given?.length > 0
+                                            ? ' ' + data?.subject?.name?.[0]?.given?.join(' ')
+                                            : '') || 'N/A'}
                                     <div className="d-flex gap-2">
                                         <span>
                                             {data?.subject?.birthDate
@@ -236,7 +226,7 @@ const AppointmentsList = ({
                                         <span>
                                             {data?.subject?.telecom?.find(
                                                 (item) => item.system === 'phone' && item.value
-                                            )?.value || 'No phone number'}
+                                            )?.value || 'Phone number not available'}
                                         </span>
                                     </div>
                                 </td>
@@ -250,18 +240,22 @@ const AppointmentsList = ({
                                     data-toggle="tooltip"
                                     data-placement="top"
                                     title={data?.appointmentType?.coding?.[0]?.display}>
-                                    {data?.appointmentType?.coding?.[0]?.display?.length > 20
-                                        ? data?.appointmentType?.coding?.[0]?.display?.slice(0, 19) + '...'
-                                        : data?.appointmentType?.coding?.[0]?.display}
+                                    {data?.appointmentType?.coding?.[0]?.display
+                                        ? data?.appointmentType?.coding?.[0]?.display?.length > 20
+                                            ? data?.appointmentType?.coding?.[0]?.display?.slice(0, 19) + '...'
+                                            : data?.appointmentType?.coding?.[0]?.display
+                                        : 'N/A'}
                                 </td>
                                 <td
                                     className="text-capitalize cursor-pointer"
                                     data-toggle="tooltip"
                                     data-placement="top"
-                                    title={data?.reason?.[0]?.coding?.[0]?.display}>
-                                    {data?.reason?.[0]?.coding?.[0]?.display?.length > 20
-                                        ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...'
-                                        : data?.reason?.[0]?.coding?.[0]?.display}
+                                    title={data?.reason?.[0]?.coding?.[0]?.display || 'N/A'}>
+                                    {data?.reason?.[0]?.coding?.[0]?.display
+                                        ? data?.reason?.[0]?.coding?.[0]?.display?.length > 20
+                                            ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...'
+                                            : data?.reason?.[0]?.coding?.[0]?.display
+                                        : 'N/A'}
                                 </td>
                                 <td>
                                     <Link
@@ -289,7 +283,7 @@ const AppointmentsList = ({
 };
 
 // Main Appointments Component
-const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> }): React$Element<React$FragmentType> => {
+const Appointments = (): React$Element<React$FragmentType> => {
     const {
         register,
         formState: { errors },
@@ -307,7 +301,16 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
-        label: data?.name[0]?.text + ' ',
+        label: (data?.name?.[0]?.prefix?.[0]
+            ? data?.name?.[0]?.prefix?.[0] + ' '
+            : '') +
+            (data?.name?.[0]?.family || '') +
+            (data?.name?.[0]?.given?.length > 0
+                ? ' ' + data?.name?.[0]?.given?.join(' ')
+                : '') + ' ' +
+            (data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value ?
+                `(******${data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value.slice(-4)})`
+                : '') || ''
     }));
     useEffect(() => {
         const doctorPayload = { status: true, search: doctorSearch };
@@ -347,7 +350,6 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     };
     const [showTooltip, setShowTooltip] = useState(false);
 
-
     return (
         <>
             <Row className="mt-2">
@@ -367,7 +369,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     }
                                                 )}
                                                 onClick={() => setActiveTab('appointmentCalendar')}>
-                                                <CiCalendar /> Appointment Calendar
+                                                <CiCalendar /> {`Appointment Calendar`}
                                             </span>
                                         </li>
                                         <li className="nav-item">
@@ -380,7 +382,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     }
                                                 )}
                                                 onClick={() => setActiveTab('appointments')}>
-                                                <FaRegListAlt /> Appointment List
+                                                <FaRegListAlt /> {`Appointment List`}
                                             </span>
                                         </li>
                                     </ul>
@@ -533,6 +535,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                         zIndex: 9999, // 🔥 z-index if using portal
                                                     }),
                                                 }}
+                                                menuPlacement="auto"
+                                                menuPosition="fixed"
                                             />
 
                                             {/* Additional controls shown only in the "Appointments" tab */}
@@ -595,7 +599,6 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                 <AppointmentsList
                                     setSkip={setSkip}
                                     skip={skip}
-                                    patientsData={patientsData}
                                     appointmentPeriod={appointmentPeriod}
                                 />
                             ) : (

@@ -4,7 +4,7 @@ import { Button, Card, Form } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { createScheduleAction } from '../../../redux/schedule/action';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import { getDoctorsAction } from '../../../redux/actions';
 import Spinner from '../../../constants/Spinner';
 import Select from 'react-select';
@@ -21,8 +21,15 @@ const AddHoliday = () => {
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.name[0]?.text + ' ',
+        label: ((data?.name?.[0]?.prefix?.[0]
+            ? data?.name?.[0]?.prefix?.[0] + ' '
+            : '') +
+            (data?.name?.[0]?.family || '') +
+            (data?.name?.[0]?.given?.length > 0
+                ? ' ' + data?.name?.[0]?.given?.join(' ')
+                : '') || 'N/A') + ' (' + data?.userId?.email + ')',
     }));
+
     useEffect(() => {
         if (addResponse === 200) {
             reset();
@@ -44,7 +51,9 @@ const AddHoliday = () => {
         formState: { errors },
         watch,
     } = useForm();
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
 
     const onSubmit = (data) => {
         // const doctorInfo = JSON.parse(data.doctorInfo);

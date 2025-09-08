@@ -5,7 +5,7 @@ import { FormInput } from '../../../../components';
 import { FiFileText, FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import {
     createMastersDataAction,
     getMastersDataAction,
@@ -18,7 +18,9 @@ import Paginations from '../../../../helpers/Paginations';
 
 const Office = () => {
     const store = useSelector((state) => state);
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const {
         register,
         handleSubmit,
@@ -390,7 +392,7 @@ const Office = () => {
                             </Button>
                             <Button type="submit" className="custom-buttons" style={{ width: '65px' }}>
                                 {store?.createMastersDataReducer?.loading ||
-                                store?.updateMastersDataReducer?.loading ? (
+                                    store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>

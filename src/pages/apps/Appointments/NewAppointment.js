@@ -50,7 +50,7 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
     };
 
     const handleAppointment = () => {
-        navigate('/apps/appointments/list');
+        navigate(-1);
     };
     const closeVitalsModal = () => {
         setVitalsModal(false);
@@ -83,7 +83,7 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
                             <Modal.Body>
                                 <Row className="border-bottom mb-1 pb-2">
                                     <Col sm={11} className="text-center">
-                                        <h4>Vitals</h4>
+                                        <h4>{`Vitals`}</h4>
                                     </Col>
                                     <Col sm={1}>
                                         <IoMdClose className="fs-4 cursor-pointer" onClick={closeVitalsModal} />
@@ -93,7 +93,7 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
                             </Modal.Body>
                         </Modal>
                         <Button className="cancel-button" onClick={handleAppointment}>
-                            Back
+                            {`Back`}
                         </Button>
                     </Col>
                 </Row>

@@ -38,7 +38,6 @@ const SubUpdateClinic = () => {
     ]);
     const [subUpdatePracticeTelecom, setSubUpdatePracticeTelecom] = useState([{ system: '', value: '', use: '' }]);
     const [modalFileUrl, setModalFileUrl] = useState(''); // State to store file URL for modal
-    console.log(modalFileUrl,'modalFileUrl')
     const handleShowModal = (url) => {
         setModalFileUrl(url); // Set the URL of the file to display in modal
         setShowModalPic(true); // Open the modal
@@ -70,7 +69,6 @@ const SubUpdateClinic = () => {
     const store = useSelector((state) => state);
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
-    console.log('subClinicsDetailsGet:', subClinicsDetailsGet);
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     useEffect(() => {
         if (subClinicsDetailsGet?.orgLogo?.url) {
@@ -90,7 +88,7 @@ const SubUpdateClinic = () => {
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
-  
+
     useEffect(() => {
         if (stateToSelect) {
             dispatch(getCitiesAction({ state_code: stateToSelect, name: '', limit: 25, skip: '' }));
@@ -143,9 +141,9 @@ const SubUpdateClinic = () => {
                     number: data?.value || '',
                     file: data?.documents?.[0]?.url
                         ? {
-                              url: data?.documents?.[0]?.url,
-                              name: data?.documents?.[0]?.fileName || data?.documents?.[0]?.url?.split('/').pop(),
-                          }
+                            url: data?.documents?.[0]?.url,
+                            name: data?.documents?.[0]?.fileName || data?.documents?.[0]?.url?.split('/').pop(),
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -231,7 +229,7 @@ const SubUpdateClinic = () => {
             );
         }
     }, [subClinicsDetailsGet, setValue, clinectypes]);
-  
+
     const [posDetails, setPosDetails] = useState([{ name: '', email: '', role: '', contact: '', fileName: '' }]);
 
     const handleAddPOS = () => {
@@ -584,11 +582,10 @@ const SubUpdateClinic = () => {
                                                     />
                                                     <span
                                                         style={{ right: '2%', top: '43%' }}
-                                                        className={`${
-                                                            subClinicsDetailsGet?.userId?.email
-                                                                ? 'text-success position-absolute fs-4'
-                                                                : 'd-none'
-                                                        }`}>
+                                                        className={`${subClinicsDetailsGet?.userId?.email
+                                                            ? 'text-success position-absolute fs-4'
+                                                            : 'd-none'
+                                                            }`}>
                                                         <MdVerified />
                                                     </span>
                                                     {errors.email && (
@@ -601,16 +598,15 @@ const SubUpdateClinic = () => {
                                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                                 <div
                                                     onClick={handleLogoClick}
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                        logoName || logoUploading
-                                                            ? 'form-control'
-                                                            : 'custom-form-fields'
-                                                    }`}>
+                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading
+                                                        ? 'form-control'
+                                                        : 'custom-form-fields'
+                                                        }`}>
                                                     {logoName
                                                         ? logoName.split('/').pop().slice(0, 30) + '...'
                                                         : logoUploading
-                                                          ? 'Uploading...'
-                                                          : 'Upload Logo'}
+                                                            ? 'Uploading...'
+                                                            : 'Upload Logo'}
                                                     <div className="d-flex align-items-center gap-2">
                                                         <FiEye
                                                             onClick={(e) => {
@@ -623,7 +619,7 @@ const SubUpdateClinic = () => {
                                                             className="text-dark cursor-pointer"
                                                             style={{ zIndex: 1 }}
                                                         />
-                                                        <p 
+                                                        <p
                                                             className="mb-0 cursor-pointer"
                                                             onClick={async (e) => {
                                                                 e.stopPropagation();
@@ -748,8 +744,8 @@ const SubUpdateClinic = () => {
                                                                         item.type === 'NPI' || item.type === 'CLIA'
                                                                             ? 10
                                                                             : item.type === 'NAIC'
-                                                                              ? 5
-                                                                              : undefined
+                                                                                ? 5
+                                                                                : undefined
                                                                     }
                                                                     {...register(`identifiers[${index}].number`, {
                                                                         // required: defaultIdentifiers.includes(item.type)
@@ -812,35 +808,34 @@ const SubUpdateClinic = () => {
                                                                             )
                                                                             .click()
                                                                     }
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                                        item.file
-                                                                            ? 'form-control'
-                                                                            : 'custom-form-fields'
-                                                                    }`}>
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${item.file
+                                                                        ? 'form-control'
+                                                                        : 'custom-form-fields'
+                                                                        }`}>
                                                                     {index === selectedIndex
                                                                         ? 'Uploading...'
                                                                         : item.file?.name
-                                                                          ? item.file.name.length > 30
-                                                                              ? item.file.name.slice(0, 25) + '...'
-                                                                              : item.file.name
-                                                                          : 'Upload Document'}
+                                                                            ? item.file.name.length > 30
+                                                                                ? item.file.name.slice(0, 25) + '...'
+                                                                                : item.file.name
+                                                                            : 'Upload Document'}
                                                                     <div className="d-flex align-items-center gap-2">
                                                                         {(item?.file?.url ||
                                                                             subClinicsDetailsGet?.orgLogo?.url) && (
-                                                                            <FiEye
-                                                                                className="cursor-pointer"
-                                                                                onClick={(e) => {
-                                                                                    e.preventDefault();
-                                                                                    e.stopPropagation();
-                                                                                    handleShowModal(
-                                                                                        item?.file?.url ||
+                                                                                <FiEye
+                                                                                    className="cursor-pointer"
+                                                                                    onClick={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        e.stopPropagation();
+                                                                                        handleShowModal(
+                                                                                            item?.file?.url ||
                                                                                             subClinicsDetailsGet
                                                                                                 ?.orgLogo?.url
-                                                                                    );
-                                                                                }}
-                                                                            />
-                                                                        )}
-                                                                        <p 
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        <p
                                                                             className="mb-0 cursor-pointer"
                                                                             onClick={async (e) => {
                                                                                 e.stopPropagation();

@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Row, Col, Form, InputGroup } from 'react-bootstrap';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import { FiDownloadCloud } from 'react-icons/fi';
+import { useForm } from 'react-hook-form';
 import { CiCircleMinus } from 'react-icons/ci';
 import { getCities2Action, getCities3Action, getCitiesAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import us from '../../../assets/images/flags/us.jpg';
 
 const formatDisplayValue = (value) => {
@@ -22,7 +21,6 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
-    const [selectedState, setSelectedState] = useState(null);
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
@@ -33,13 +31,9 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    const [selectedLocation, setSelectedLocation] = useState(null);
+    // const [selectedLocation, setSelectedLocation] = useState(null);
     const {
-        control,
         register,
-        setValue,
-        getValues,
-        handleSubmit,
         formState: { errors },
         watch,
     } = useForm();
@@ -93,7 +87,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
         }
     };
 
-    const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
+    // const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
     const addressTypes = ['primary', 'mailing', 'secondary'];
 
     const getGeolocation = (e) => {
@@ -103,14 +97,11 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
             const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
                 location
             )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
             try {
                 const response = await fetch(url);
-
                 if (!response.ok) {
                     throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
                 }
-
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -125,7 +116,25 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
         });
     };
 
-    const handleAddressChange = (index, field, value, lineIndex = 0) => {
+    const fetchLocationByZip = async (zipCode) => {
+        if (zipCode.length === 5 && /^[0-9]+$/.test(zipCode)) {
+            try {
+                const response = await fetch(`https://api.zippopotam.us/us/${zipCode}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return {
+                        state: data.places[0]['state'],
+                        city: data.places[0]['place name']
+                    };
+                }
+            } catch (error) {
+                console.error('Error fetching location:', error);
+            }
+        }
+        return null;
+    };
+
+    const handleAddressChange = async (index, field, value, lineIndex = 0) => {
         if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
             ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
             return;
@@ -147,8 +156,35 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
             }
         } else {
             updatedAddresses[index][field] = value;
-        }
 
+            // Auto-populate state and city when ZIP code is entered
+            if (field === 'postalCode') {
+                const locationData = await fetchLocationByZip(value);
+                if (locationData) {
+                    updatedAddresses[index].state = locationData.state;
+                    updatedAddresses[index].city = locationData.city;
+
+                    // Find state object and dispatch cities action
+                    const stateObj = statesData?.states?.find((s) => s.name === locationData.state);
+                    if (stateObj) {
+                        const cityPayload = {
+                            state_code: stateObj.id,
+                            name: locationData.city,
+                            limit: 25,
+                            skip: '',
+                        };
+
+                        if (updatedAddresses[index].type === 'primary') {
+                            dispatch(getCitiesAction(cityPayload));
+                        } else if (updatedAddresses[index].type === 'mailing') {
+                            dispatch(getCities2Action(cityPayload));
+                        } else {
+                            dispatch(getCities3Action(cityPayload));
+                        }
+                    }
+                }
+            }
+        }
         setAddresses(updatedAddresses);
     };
 
@@ -217,7 +253,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                             <option value="" key="" hidden>
                                 Select
                             </option>
-                            {addressTypes?.map((type) => (
+                            {addressTypes?.sort((a, b) => a.localeCompare(b))?.map((type) => (
                                 <option key={type} className="text-capitalize" value={type}>
                                     {type}
                                 </option>
@@ -281,7 +317,6 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                                                 data.components?.town ||
                                                 data.components?.village ||
                                                 '';
-
                                             // Dispatch city load based on address type
                                             if (item?.type === 'primary') {
                                                 dispatch(
@@ -318,8 +353,8 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                                                 line: [data.formatted || '', ...(item.line?.slice(1) || [])], // keep existing lines after the first
                                                 state: data.components?.state || '',
                                                 city: cityName,
-                                                postalCode: data.components?.postcode || '',
-                                                country: data.components?.country || '',
+                                                postalCode: data?.components?.postcode || '',
+                                                country: data?.components?.country || '',
                                             };
 
                                             const updatedAddresses = [...addresses];
@@ -336,20 +371,20 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                                             cursor: 'pointer',
                                         }}
                                         className="hover-bg-change text-black">
-                                        {data.formatted}
+                                        {data?.formatted}
                                     </p>
                                 ))}
                             </div>
                         )}
                     </Col>
-                    {item.line.slice(1).map((line, lineIndex) => (
+                    {item?.line?.slice(1).map((line, lineIndex) => (
                         <Col
                             key={lineIndex}
                             sm={3}
                             className="mb-1 position-relative"
                             style={{ height: 'fit-content' }}>
                             <Form.Label className="mb-0">
-                                Line {lineIndex + 2}
+                                {`Line`} {lineIndex + 2}
                                 <span
                                     className="fs-5 uil-minus-circle minusicon ms-1 fw-bold cursor-pointer text-danger"
                                     onClick={() => removeAddressLine(index, lineIndex + 1)}></span>
@@ -368,7 +403,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                             value={item.state || ''}
                             {...register(`address[${index}].state`)}
                             onChange={(e) => handleStateSelection(e, item?.type, index)}>
-                            <option value="">Select State</option>
+                            <option value="">{`Select State`}</option>
                             {statesData?.states?.map((data) => (
                                 <option key={data.id} data-key={JSON.stringify(data)} value={data.name}>
                                     {data.name}
@@ -401,19 +436,19 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
 
                     <Col sm={3} style={{ height: 'fit-content' }}>
                         <Form.Group className="mb-0">
-                            <Form.Label className="mb-0">Postal Code</Form.Label>
+                            <Form.Label className="mb-0">ZIP Code</Form.Label>
                             <Form.Control
                                 type="text"
                                 value={item.postalCode || ''} // Ensure empty string if undefined
-                                placeholder="Postal Code"
+                                placeholder="ZIP Code"
                                 {...register(`address[${index}].postalCode`, {
                                     minLength: {
                                         value: 5,
-                                        message: 'Postal code must be at least 5 characters long',
+                                        message: 'ZIP code must be at least 5 characters long',
                                     },
                                     pattern: {
                                         value: /^[0-9]+$/,
-                                        message: 'Postal code must contain numbers only',
+                                        message: 'ZIP code must contain numbers only',
                                     },
                                 })}
                                 maxLength={5}

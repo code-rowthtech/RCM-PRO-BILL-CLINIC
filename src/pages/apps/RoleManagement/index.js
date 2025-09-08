@@ -4,7 +4,7 @@ import Spinner from '../../../constants/Spinner';
 import { FormInput } from '../../../components';
 import { FiEdit } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
 import { getRoleDataAction, getRolesAction, updateRolesAction } from '../../../redux/actions';
 import Paginations from '../../../helpers/Paginations';
@@ -22,7 +22,8 @@ const RoleManagement = () => {
     const [addDepartmentModal, setAddDepartmentModal] = useState(false);
     const [status, setStatus] = useState(true);
     const [skip, setSkip] = useState(1);
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchQuery, setSearchQuery] = useState('');
     const [dataToEdit, setDataToEdit] = useState(null);
 
@@ -99,17 +100,15 @@ const RoleManagement = () => {
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`active_inactive_buttons ${
-                                        status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={`active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`active_inactive_buttons ${
-                                        !status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Inactive
                                 </Button>
                             </Col>

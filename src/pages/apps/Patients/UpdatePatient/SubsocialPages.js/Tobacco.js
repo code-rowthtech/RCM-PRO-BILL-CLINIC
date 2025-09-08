@@ -9,7 +9,7 @@ import {
     getTobaccooAction,
     updateTobaccooAction,
 } from '../../../../../redux/actions';
-import { encryptMessage } from '../../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 import 'react-quill/dist/quill.snow.css';
@@ -90,19 +90,26 @@ const Tobacco = () => {
         }
     }, [createSuccess, updateSuccess]);
 
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const onSubmit = (data) => {
-        data.subject = patientId;
-        data.note = [
-            {
-                text: data.note,
-                time: new Date().toISOString(),
-            },
-        ];
-        data.clinicId = loggedInUser?._id;
+        const payload = {
+            ...data,
+            subject: patientId,
+            clinicId: clinicId || loggedInUser?._id,
+            ...(data.note && data.note.trim() !== '' && data.note !== '<ul><li></li></ul>' && data.note !== '<p><br></p>' && {
+                note: [
+                    {
+                        text: data.note,
+                        time: new Date().toISOString(),
+                    },
+                ],
+            }),
+        };
         if (toEdit) {
-            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }));
+            dispatch(updateTobaccooAction({ key: encryptMessage(payload), id: toEdit?._id }));
         } else {
-            dispatch(createTobaccooAction({ key: encryptMessage(data) }));
+            dispatch(createTobaccooAction({ key: encryptMessage(payload) }));
         }
     };
 
@@ -155,42 +162,33 @@ const Tobacco = () => {
                                                 required: 'Tobacco use is required',
                                             })}
                                             className="form-select-sm">
-                                            <option value="">{`Select an option`}</option>
-                                            <option value="Very heavy cigarette smoker (40+ cigs/day)">
-                                                {`Very heavy cigarette smoker (40+ cigs/day)`}
-                                            </option>
-                                            <option value="Cigar smoker">{`Cigar smoker`}</option>
-                                            <option value="Pipe smoker">{`Pipe smoker`}</option>
-                                            <option value="Chews tobacco">{`Chews tobacco`}</option>
-                                            <option value="Chews products containing tobacco">
-                                                {`Chews products containing tobacco`}
-                                            </option>
-                                            <option value="Snuff user">{`Snuff user`}</option>
-                                            <option value="Electronic cigarette user">{`Electronic cigarette user`}</option>
-                                            <option value="Heavy tobacco smoker">{`Heavy tobacco smoker`}</option>
-                                            <option value="Light tobacco smoker">{`Light tobacco smoker`}</option>
-                                            <option value="Current some day smoker">{`Current some day smoker`}</option>
-                                            <option value="Non-Smoker">{`Non-Smoker`}</option>
-                                            <option value="Ex-Smoker">{`Ex-Smoker`}</option>
-                                            <option value="Ex-user of moist powdered tobacco">
-                                                {`Ex-user of moist powdered tobacco`}
-                                            </option>
-                                            <option value="Smoker">{`Smoker`}</option>
-                                            <option value="Unknown if ever smoked">{`Unknown if ever smoked`}</option>
-                                            <option value="Current non smoker but past smoking history unknown">
-                                                {`Current non smoker but past smoking history unknown`}
-                                            </option>
-                                            <option value="Current every day smoker">{`Current every day smoker`}</option>
-                                            <option value="Light cigarette smoker (1-9 cigs/day)">
-                                                {`Light cigarette smoker (1-9 cigs/day)`}
-                                            </option>
-                                            <option value="Moderate cigarette smoker (10-19 cigs/day)">
-                                                {`Moderate cigarette smoker (10-19 cigs/day)`}
-                                            </option>
-                                            <option value="Heavy cigarette smoker (20-39 cigs/day)">
-                                                {`Heavy cigarette smoker (20-39 cigs/day)`}
-                                            </option>
-                                        </Form.Select>
+                                            {[
+                                                { value: "", label: "Select an option" },
+                                                { value: "Chews products containing tobacco", label: "Chews products containing tobacco" },
+                                                { value: "Chews tobacco", label: "Chews tobacco" },
+                                                { value: "Cigar smoker", label: "Cigar smoker" },
+                                                { value: "Current every day smoker", label: "Current every day smoker" },
+                                                { value: "Current non smoker but past smoking history unknown", label: "Current non smoker but past smoking history unknown" },
+                                                { value: "Current some day smoker", label: "Current some day smoker" },
+                                                { value: "Electronic cigarette user", label: "Electronic cigarette user" },
+                                                { value: "Ex-Smoker", label: "Ex-Smoker" },
+                                                { value: "Ex-user of moist powdered tobacco", label: "Ex-user of moist powdered tobacco" },
+                                                { value: "Heavy cigarette smoker (20-39 cigs/day)", label: "Heavy cigarette smoker (20-39 cigs/day)" },
+                                                { value: "Heavy tobacco smoker", label: "Heavy tobacco smoker" },
+                                                { value: "Light cigarette smoker (1-9 cigs/day)", label: "Light cigarette smoker (1-9 cigs/day)" },
+                                                { value: "Light tobacco smoker", label: "Light tobacco smoker" },
+                                                { value: "Moderate cigarette smoker (10-19 cigs/day)", label: "Moderate cigarette smoker (10-19 cigs/day)" },
+                                                { value: "Non-Smoker", label: "Non-Smoker" },
+                                                { value: "Pipe smoker", label: "Pipe smoker" },
+                                                { value: "Smoker", label: "Smoker" },
+                                                { value: "Snuff user", label: "Snuff user" },
+                                                { value: "Unknown if ever smoked", label: "Unknown if ever smoked" },
+                                                { value: "Very heavy cigarette smoker (40+ cigs/day)", label: "Very heavy cigarette smoker (40+ cigs/day)" }
+                                            ].map(option => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}                                        </Form.Select>
                                         {errors.tobaccoUse && (
                                             <div className="text-danger small">{errors.tobaccoUse.message}</div>
                                         )}

@@ -2,28 +2,27 @@ import logo_sm from '../../../../../assets/images/logo_sm.png';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 
 export const handlePrintProblems = ({ patientDetails, problemData = [] }) => {
+    const originalContent = document.body.innerHTML;
 
-  const originalContent = document.body.innerHTML;
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const year = date.getUTCFullYear();
+        return `${day}-${month}-${year}`;
+    };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const year = date.getUTCFullYear();
-    return `${day}-${month}-${year}`;
-  };
+    const getAgeString = (birthDate) => {
+        const dob = new Date(birthDate);
+        const ageDifMs = Date.now() - dob.getTime();
+        const ageDate = new Date(ageDifMs); // miliseconds from epoch
+        return `${Math.abs(ageDate.getUTCFullYear() - 1970)} yrs`;
+    };
 
-  const getAgeString = (birthDate) => {
-    const dob = new Date(birthDate);
-    const ageDifMs = Date.now() - dob.getTime();
-    const ageDate = new Date(ageDifMs); // miliseconds from epoch
-    return `${Math.abs(ageDate.getUTCFullYear() - 1970)} yrs`;
-  };
+    const filteredProblem = problemData;
 
-  const filteredProblem = problemData;
-
-  const sectionHtml = `
+    const sectionHtml = `
   <div class="section-title">Problem Report</div>
   <table>
     <thead>
@@ -37,17 +36,18 @@ export const handlePrintProblems = ({ patientDetails, problemData = [] }) => {
     </thead>
     <tbody>
     
-    ${filteredProblem.length === 0
-      ? `<tr><td colspan="5">No Problem recorded</td></tr>`
-      : filteredProblem
-        .map((a) => {
-          const problem = a.code?.text || a.code?.coding?.[0]?.display || '-';
-          const code = a.code?.coding?.[0]?.code;
-          const clinicalStatus =
-            a.clinicalStatus?.text || a.clinicalStatus?.[0]?.coding?.[0]?.display || '-';
-          const date = a?.onsetDateTime;
-          const notes = a.note?.[0]?.text || a.note?.[0]?.coding?.[0]?.display || '-';
-          return `
+    ${
+        filteredProblem.length === 0
+            ? `<tr><td colspan="5">No Problem recorded</td></tr>`
+            : filteredProblem
+                  .map((a) => {
+                      const problem = a.code?.text || a.code?.coding?.[0]?.display || '-';
+                      const code = a.code?.coding?.[0]?.code;
+                      const clinicalStatus =
+                          a.clinicalStatus?.text || a.clinicalStatus?.[0]?.coding?.[0]?.display || '-';
+                      const date = a?.onsetDateTime;
+                      const notes = a.note?.[0]?.text || a.note?.[0]?.coding?.[0]?.display || '-';
+                      return `
                 <tr>
                   <td>${problem}</td>
                   <td>${code}</td>
@@ -55,14 +55,14 @@ export const handlePrintProblems = ({ patientDetails, problemData = [] }) => {
                   <td>${clinicalStatus}</td>
                   <td>${notes}</td>
                 </tr>`;
-        })
-        .join('')
+                  })
+                  .join('')
     }
     </tbody>
   </table>
 `;
 
-  const printContent = `
+    const printContent = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -124,8 +124,9 @@ export const handlePrintProblems = ({ patientDetails, problemData = [] }) => {
       <div class="header">
         <div>
           <strong>PATIENT</strong><br>
-          ${patientDetails?.name?.[0]?.prefix || ''} ${patientDetails?.name?.[0]?.given?.join(' ') || ''} ${patientDetails?.name?.[0]?.family || ''
-    }<br>
+          ${patientDetails?.name?.[0]?.prefix || ''} ${patientDetails?.name?.[0]?.given?.join(' ') || ''} ${
+              patientDetails?.name?.[0]?.family || ''
+          }<br>
           <strong>DOB:</strong> ${formatDate(patientDetails?.birthDate)}<br>
           <strong>AGE:</strong> ${getAgeString(patientDetails?.birthDate)}<br>
           <strong>SEX:</strong> ${patientDetails?.gender || 'Unknown'}<br>
@@ -146,8 +147,24 @@ export const handlePrintProblems = ({ patientDetails, problemData = [] }) => {
     </html>
   `;
 
-  document.body.innerHTML = printContent;
-  window.print();
-  document.body.innerHTML = originalContent;
-  window.location.reload();
+    // document.body.innerHTML = printContent;
+    // window.print();
+    // document.body.innerHTML = originalContent;
+    // window.location.reload();
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert('Popup blocked. Please allow popups for this site.');
+        return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for window to finish loading styles and layout
+    printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+        // printWindow.close(); // optional
+    };
 };

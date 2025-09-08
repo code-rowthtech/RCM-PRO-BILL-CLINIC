@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from '../../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../../cryptoUtils';
 import AsyncSelect from 'react-select/async';
 import { allergyType } from '../../../../../utils/DataSets/Allergy/allergyType';
 import { clinicalStatus } from '../../../../../utils/DataSets/Allergy/clinicalStatus';
@@ -35,7 +35,9 @@ const UpdateAllergy = ({ onCancel }) => {
     // Variables
     const patientId = searchParams.get('id');
     const today = new Date().toISOString().split('T')[0];
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
     const appointments = store?.getPatientAppointmentReducer?.data?.appointments || [];
     const allergyDetails = store?.getAllergyDetailsReducer?.data?.allergy;
@@ -52,7 +54,6 @@ const UpdateAllergy = ({ onCancel }) => {
     const selectedCodeOption =
         formattedCodeOption.find((option) => option?.value?.code === code?.code) ||
         formattedCodeOption.find((option) => option?.display === code);
-
 
     // State Vaariables
     const updateStatus = store?.updateAllergyReducer?.data?.status;
@@ -155,22 +156,26 @@ const UpdateAllergy = ({ onCancel }) => {
                 coding: code,
                 text: code?.display, // use display text
             },
-            note: [
-                {
-                    text: data?.note,
-                    time: '',
-                    authorReference: {
-                        reference: '',
-                        type: '',
-                        identifier: {
-                            use: '',
-                            system: '',
-                            value: '',
+            ...(data?.note
+                ? {
+                    note: [
+                        {
+                            text: data.note,
+                            time: '',
+                            authorReference: {
+                                reference: '',
+                                type: '',
+                                identifier: {
+                                    use: '',
+                                    system: '',
+                                    value: '',
+                                },
+                                display: '',
+                            },
                         },
-                        display: '',
-                    },
-                },
-            ],
+                    ],
+                }
+                : {}),
         };
         if (selectMode === 'appointment' && data.appointment) {
             let appData = JSON.parse(data.appointment);
@@ -252,9 +257,7 @@ const UpdateAllergy = ({ onCancel }) => {
                                 <Form.Label htmlFor="criticality" className="mb-0">
                                     Criticality
                                 </Form.Label>
-                                <Form.Select
-                                    {...register('criticality', { required: 'Criticality is required' })}
-                                >
+                                <Form.Select {...register('criticality', { required: 'Criticality is required' })}>
                                     {criticality?.map((item) => (
                                         <option key={item?.code} value={item?.code}>
                                             {item?.display}
@@ -306,8 +309,7 @@ const UpdateAllergy = ({ onCancel }) => {
                                     {...register(
                                         'status'
                                         //  { required: 'Clinical Status is required' }
-                                    )}
-                                >
+                                    )}>
                                     {clinicalStatus?.map((status) => (
                                         <option key={status?.code} value={status?.code}>
                                             {status?.display}

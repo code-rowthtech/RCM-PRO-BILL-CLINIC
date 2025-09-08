@@ -10,7 +10,7 @@ import {
     getTaskDetailsAction,
     updateTaskAction,
 } from '../../../../../redux/actions';
-import { encryptMessage } from '../../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../../cryptoUtils';
 import { useForm } from 'react-hook-form';
 import { handleUpload } from '../../../../../helpers/HandleUpload';
 import { useSearchParams } from 'react-router-dom';
@@ -19,7 +19,9 @@ import Spinner from '../../../../../constants/Spinner';
 const UpdateAsignTask = ({ taskId }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const doctorId = JSON.parse(sessionStorage.getItem('hyper_user'))?.doctorId;
     const {
         register,
@@ -123,9 +125,9 @@ const UpdateAsignTask = ({ taskId }) => {
             ...(logo?.url === null
                 ? {}
                 : {
-                      associatedItemUrl: logo?.url?.split('?')[0],
-                      associatedItemName: logoName,
-                  }),
+                    associatedItemUrl: logo?.url?.split('?')[0],
+                    associatedItemName: logoName,
+                }),
         };
 
         dispatch(updateTaskAction({ key: encryptMessage(payload) }));
@@ -144,7 +146,7 @@ const UpdateAsignTask = ({ taskId }) => {
                         <Col sm={6}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="taskTitle" className="mb-0">
-                                    Task Title 
+                                    Task Title
                                 </Form.Label>
                                 <Form.Control
                                     data-has-value={!!watch('taskTitle')}
@@ -304,9 +306,8 @@ const UpdateAsignTask = ({ taskId }) => {
                                 <Form.Label className="mb-0">Add Associated Item</Form.Label>
                                 <div
                                     onClick={() => logoFileInputRef.current.click()}
-                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                        logoName || profileUploading ? '' : 'custom-form-fields'
-                                    }`}
+                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
+                                        }`}
                                     // className="custom-file-upload d-flex justify-content-between cursor-pointer"
                                     style={{ backgroundColor: '#e8f0fe', fontSize: '12px', fontWeight: 600 }}>
                                     {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Patient Photo'}

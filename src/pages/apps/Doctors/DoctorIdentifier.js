@@ -106,11 +106,11 @@ const DoctorIdentifierForm = ({
     const handleIdentifierFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
-        
+
         const setLoadingForIndex = (loading) => {
             setIdentifierDocument((prev) => ({ ...prev, [index]: loading }));
         };
-        
+
         try {
             const url = await handleUpload(selectedFile, setLoadingForIndex);
             setIdentifiers((prevDetails) => {
@@ -161,7 +161,7 @@ const DoctorIdentifierForm = ({
     const handleLicensureFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
-        
+
         const setLoadingForIndex = (loading) => {
             setLicensureDocument((prev) => ({ ...prev, [index]: loading }));
         };
@@ -224,7 +224,11 @@ const DoctorIdentifierForm = ({
             </Row>
             {/* Dynamic Identifier Fields */}
             {identifiers.map((item, index) => (
-                <Row key={index} className="mb-0">
+                <Row key={index} className={`mb-0 position-relative ${identifiers?.length > 1 ? 'px-2 ' : ''}`}>
+                    {identifiers?.length > 1 ?
+                        <strong className='position-absolute fw-semibold fs-6' style={{ top: '28%', left: '-0.4%' }}>{index + 1}.</strong>
+                        :
+                        <></>}
                     <Col sm={3}>
                         <Form.Label className="mb-0 mt-2">Identifier Type</Form.Label>
                         {index === 0 && defaultIdentifiers.length > 0 ? (
@@ -251,7 +255,7 @@ const DoctorIdentifierForm = ({
                                 <option value="" disabled>
                                     Select Identifier Type
                                 </option>
-                                {identifierOptions.map((option) => (
+                                {identifierOptions?.sort((a, b) => a.label.localeCompare(b.label))?.map((option) => (
                                     <option key={option.value} value={option.value}>
                                         {option.label}
                                     </option>
@@ -295,7 +299,7 @@ const DoctorIdentifierForm = ({
                             <option value="" disabled>
                                 Select Issuing Authority
                             </option>
-                            {defaultIssuingAuthority.map((option) => (
+                            {defaultIssuingAuthority?.sort((a, b) => a.localeCompare(b))?.map((option) => (
                                 <option key={option} value={option}>
                                     {option}
                                 </option>
@@ -319,10 +323,10 @@ const DoctorIdentifierForm = ({
                             min={
                                 item?.ennumerationDate
                                     ? (() => {
-                                          const start = new Date(item.ennumerationDate);
-                                          start.setDate(start.getDate() + 1);
-                                          return start.toISOString().split('T')[0];
-                                      })()
+                                        const start = new Date(item.ennumerationDate);
+                                        start.setDate(start.getDate() + 1);
+                                        return start.toISOString().split('T')[0];
+                                    })()
                                     : new Date().toISOString().split('T')[0]
                             }
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
@@ -357,18 +361,18 @@ const DoctorIdentifierForm = ({
                         </Form.Label>
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${
-                                item?.file?.name ? 'form-control' : 'custom-form-fields'
-                            }`}>
+                            className={`custom-file-upload justify-content-between position-relative cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
+                                }`}>
                             <span>
                                 {identifierDocument[index] === true
                                     ? 'Uploading...'
                                     : item.file?.name
-                                      ? item.file.name.length > 30
-                                          ? item.file.name.slice(0, 25) + '...'
-                                          : item.file.name
-                                      : 'Upload Document'}
+                                        ? item.file.name.length > 30
+                                            ? item.file.name.slice(0, 25) + '...'
+                                            : item.file.name
+                                        : 'Upload Document'}
                             </span>
+                            {!item.file?.name && <i className="bi bi-cloud-arrow-up position-absolute fs-5" style={{ right: '2.5%' }}></i>}
                             <div className="d-flex align-items-center gap-2">
                                 {item.file?.url && (
                                     <FiEye
@@ -402,13 +406,6 @@ const DoctorIdentifierForm = ({
                             accept=".png, .jpg, .jpeg, .pdf"
                             onChange={(e) => handleIdentifierFileChange(e, index)}
                         />
-                        {/* <Form.Control
-                            type="file"
-                            id={`fileInput-identifier-${index}`}
-                            style={{ display: 'none' }}
-                            accept=".png, .jpg, .jpeg, .pdf"
-                            onChange={(e) => handleIdentifierFileChange(e, index)}
-                        /> */}
                         {errors?.[index]?.file && <span className="text-danger">Please upload a document</span>}
                         {index >= defaultIdentifiers?.length && (
                             <span
@@ -423,7 +420,7 @@ const DoctorIdentifierForm = ({
                 </Row>
             ))}
             <Row>
-                <Col sm={12} className="">
+                <Col sm={12} className="mt-1">
                     <h5>
                         Licensure & Certification
                         <span
@@ -434,7 +431,12 @@ const DoctorIdentifierForm = ({
             </Row>
 
             {licensure?.map((item, index) => (
-                <Row key={index} className="mb-0">
+                <Row key={index} className={`position-relative mb-0 ${licensure?.length > 1 ? 'px-2 ' : ''}`}>
+                    {licensure?.length > 1 ?
+                        <strong className='position-absolute fw-semibold fs-6' style={{ top: '28%', left: '-0.4%' }}>{index + 1}.</strong>
+                        :
+                        <></>
+                    }
                     <Col sm={3}>
                         <Form.Label className="mb-0 mt-2">License Type</Form.Label>
                         <Form.Select
@@ -499,7 +501,7 @@ const DoctorIdentifierForm = ({
                             value={item?.ennumerationDate || ''}
                             onChange={(e) => handleLicensureChange(index, 'ennumerationDate', e.target.value)}
                             maxLength={10}
-                            // onChange={(e) => handleChange(index, 'number', e.target.value)}
+                        // onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
                     </Col>
                     <Col sm={3}>
@@ -540,18 +542,18 @@ const DoctorIdentifierForm = ({
                         </Form.Label>
                         <div
                             onClick={() => document.getElementById(`fileInput-licensure-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${
-                                item?.file?.name ? 'form-control' : 'custom-form-fields'
-                            }`}>
+                            className={`custom-file-upload justify-content-between position-relative cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
+                                }`}>
                             <span>
                                 {licensureDocument[index] === true
                                     ? 'Uploading...'
                                     : item.file?.name
-                                      ? item.file.name.length > 30
-                                          ? item.file.name.slice(0, 25) + '...'
-                                          : item.file.name
-                                      : 'Upload Document'}
+                                        ? item.file.name.length > 30
+                                            ? item.file.name.slice(0, 25) + '...'
+                                            : item.file.name
+                                        : 'Upload Document'}
                             </span>
+                            {!item.file?.name && <i className="bi bi-cloud-arrow-up position-absolute fs-5" style={{ right: '2.5%' }}></i>}
                             <div className="d-flex align-items-center gap-2">
                                 {item.file?.url && (
                                     <FiEye
@@ -595,9 +597,10 @@ const DoctorIdentifierForm = ({
                         )}
                     </Col>
                     {licensure?.length > 1 && index < licensure.length - 1}
-                </Row>
+                </Row >
             ))}
-            
+
+
             <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
                 <Modal.Body>
                     <div className="d-flex justify-content-center">

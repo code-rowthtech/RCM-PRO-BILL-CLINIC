@@ -1,4 +1,4 @@
-import { loggedInUser } from "./api/loggedInUser";
+import { loggedInUser } from './api/loggedInUser';
 
 export const handlePrintMedication = ({ medicationList, patientDetails }) => {
     // Define all possible vital types with their display names and units
@@ -12,7 +12,7 @@ export const handlePrintMedication = ({ medicationList, patientDetails }) => {
             'entered-in-error': 'status-danger',
             stopped: 'status-secondary',
             draft: 'status-muted',
-            unknown: 'status-dark'
+            unknown: 'status-dark',
         };
         return map[status] || '';
     };
@@ -69,7 +69,8 @@ export const handlePrintMedication = ({ medicationList, patientDetails }) => {
   </div>
 
   <h4>Drug Details</h4>
-${medicationList?.map((data, index) => (
+${medicationList?.map(
+    (data, index) =>
         `  <div class='border-bottom'>
 <div class='drug-header'>
 <div>
@@ -81,7 +82,7 @@ ${medicationList?.map((data, index) => (
   <p>${data?.dosageInstruction?.[0]?.text}</p>
   <p>${data?.note?.[0]?.text}</p>
   </div>`
-    ))}
+)}
 
  
 </div>
@@ -91,8 +92,24 @@ ${medicationList?.map((data, index) => (
 </html>
 `;
 
-    document.body.innerHTML = printContent;
-    window.print();
-    document.body.innerHTML = originalContent;
-    window.location.reload();
+    // document.body.innerHTML = printContent;
+    // window.print();
+    // document.body.innerHTML = originalContent;
+    // window.location.reload();
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert('Popup blocked. Please allow popups for this site.');
+        return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for window to finish loading styles and layout
+    printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+        // printWindow.close(); // optional
+    };
 };

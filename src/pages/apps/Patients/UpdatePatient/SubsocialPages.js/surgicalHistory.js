@@ -136,12 +136,14 @@ const SurgicalHistory = () => {
                 ],
                 text: bodySiteSelected?.display,
             },
-            note: [
-                {
-                    text: data.note,
-                    time: new Date().toISOString(),
-                },
-            ],
+            ...(data.note && data.note.trim() !== '' && data.note !== '<ul><li></li></ul>' && data.note !== '<p><br></p>' && {
+                note: [
+                    {
+                        text: data.note,
+                        time: new Date().toISOString(),
+                    },
+                ],
+            }),
             subject: patientId,
             performedDateTime: data?.effectiveDateTime,
         };
@@ -259,7 +261,7 @@ const SurgicalHistory = () => {
                                             className="form-control-sm"
                                         />
                                         {errors.effectiveDateTime && (
-                                            <span className="text-danger">This field is required</span>
+                                            <span className="text-danger small">This field is required</span>
                                         )}
                                     </Form.Group>
                                 </Col>
@@ -287,7 +289,7 @@ const SurgicalHistory = () => {
                                                 </option>
                                             ))}
                                         </Form.Select>
-                                        {errors.bodySite && <span className="text-danger">This field is required</span>}
+                                        {errors.bodySite && <span className="text-danger small">This field is required</span>}
                                     </Form.Group>
                                 </Col>
                                 <Col xs={12} className="flex-grow-1 d-flex flex-column">

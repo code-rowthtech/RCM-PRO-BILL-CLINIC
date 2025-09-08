@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import Multiselect from 'multiselect-react-dropdown';
 import { IoMdClose } from 'react-icons/io';
 import Spinner from '../../../../constants/Spinner';
@@ -42,7 +42,9 @@ const CreateRoleSetting = ({ show, closeModal }) => {
         }
     }, [show]);
 
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const onSubmit = (data) => {
         if (selectedPermissionIds?.length === 0) {
             setPermissionError(true);
@@ -51,7 +53,7 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 name: data.name,
                 description: data.description,
                 permissions: selectedPermissionIds,
-                // clinicId: clinicId,
+                clinicId: clinicId,
                 // createdById: idFromStorage?._id,
                 // showto: 'clinic'
             };

@@ -10,6 +10,7 @@ import Paginations from '../../../helpers/Paginations';
 import { IoSearchSharp } from 'react-icons/io5';
 import dummyProfile from '../../../assets/images/dummyProfile.png';
 import { IoMdClose } from 'react-icons/io';
+import { decryptMessage } from '../../../cryptoUtils';
 const Patients = () => {
     const navigate = useNavigate('');
     const [smShow, setSmShow] = useState(false);
@@ -18,42 +19,15 @@ const Patients = () => {
     const [status, setStatus] = useState(true);
 
     const dispatch = useDispatch();
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsReducer?.data?.data;
-
     useEffect(() => {
         const payload = { search: search, page: skip, limit: 10, clinicId: clinicId };
         dispatch(getPatientsAction(payload));
     }, [dispatch, skip, search]);
-    // useEffect(() => {
-    //     const data = {
-    //         clinicId: clinicId,
-    //         page: skip,
-    //         limit: 10,
-    //         search: search,
-    //     };
-    //     dispatch(getPatientsAction(data));
-    // }, [dispatch, skip, search]);
-
-    // const handlePasswordSubmit = (e) => {
-    //     e.preventDefault();
-    //     if (password === '1234') {
-    //         setIsPasswordCorrect(true);
-    //         setSmShow(false);
-    //         setIsVisible(true);
-    //         ToastHandle("password success", "success");
-
-    //         const id = setTimeout(() => {
-    //             setIsPasswordCorrect(false);
-    //             setIsVisible(false);
-    //         }, 300000);
-
-    //         setTimeoutId(id);
-    //     } else {
-    //         ToastHandle("password incorrect", "danger");
-    //     }
-    // };
 
     const handleNewPatients = () => {
         navigate('/apps/patients/new-patient');
@@ -66,71 +40,28 @@ const Patients = () => {
         <>
             <Row className="mt-2">
                 <Col xs={12} className="px-0">
-                    <Card>
-                        <Card.Body className="page-height scroll-container">
+                    <Card className='page-height scroll-container'>
+                        <Card.Body>
                             <Row className="mb-2">
                                 <Col style={{ cursor: 'not-allowed' }} title={'In-progress'} sm={6} xs={6}>
                                     <Button
                                         onClick={() => setStatus(true)}
                                         disabled
-                                        className={`me-md-2 active_inactive_buttons ${
-                                            status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                        }`}>
-                                        Active
+                                        className={`me-md-2 active_inactive_buttons ${status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
+                                        {`Active`}
                                     </Button>
                                     <Button
                                         onClick={() => setStatus(false)}
                                         disabled
-                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
-                                            !status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                        }`}>
-                                        Inactive
+                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
+                                        {`Inactive`}
                                     </Button>
                                 </Col>
-
                                 <Col sm={6} className="text-end">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col xs="auto" className="d-flex gap-2">
-                                            {/* <div
-                                                className="input_search_box"
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    borderRadius: '4px',
-                                                    backgroundColor: '#e8f0fe',
-                                                    padding: '0px 5px',
-                                                }}>
-                                                <IoSearchSharp
-                                                    style={{
-                                                        fontSize: '1.2rem',
-                                                        color: 'black',
-                                                        marginRight: '10px',
-                                                    }}
-                                                />
-                                                <FormInput
-                                                    type="text"
-                                                    // onChange={(e) => setSearch(e.target.value)}
-                                                    onChange={(e) => {
-                                                        const currentValue = e.target.value;
-                                                        setSearch(currentValue);
-                                                        dispatch(
-                                                            getPatientsAction({
-                                                                search: currentValue,
-                                                                page: 1,
-                                                                limit: 10,
-                                                                clinicId: clinicId
-                                                            })
-                                                        );
-                                                    }}
-                                                    className="input_search_box"
-                                                    style={{
-                                                        border: 'none',
-                                                        outline: 'none',
-                                                        flex: 1,
-                                                        backgroundColor: '#ccc',
-                                                    }}
-                                                />
-                                            </div> */}
                                             <div
                                                 className="input_search_box position-relative"
                                                 style={{
@@ -217,14 +148,9 @@ const Patients = () => {
                                         style={{ height: patientsData?.length === 0 ? '100vh' : 'auto' }}>
                                         <thead className="text-white">
                                             <tr>
-                                                <th className="text-white">Patient</th>
-                                                <th className="text-white">Demographics</th>
-                                                {/* <th className='text-white'>Gender</th> */}
-                                                <th className="text-white">Contact</th>
-                                                <th className="text-white">Address</th>
-                                                {/* <th className='text-white'>Last Visit</th> */}
-                                                {/* <th className='text-white'>Next Visit</th> */}
-                                                <th className="text-white">Action</th>
+                                                {["Patient", "Demographics", "Contact", "Address", "Action"]?.map((header, index) => (
+                                                    <th key={index}>{header}</th>
+                                                ))}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -260,7 +186,11 @@ const Patients = () => {
                                                                 <div>
                                                                     {(data?.name?.[0]?.prefix?.[0]
                                                                         ? data?.name?.[0]?.prefix?.[0] + ' '
-                                                                        : '') + (data?.name?.[0]?.text || 'N/A')}
+                                                                        : '') +
+                                                                        (data?.name?.[0]?.family || '') +
+                                                                        (data?.name?.[0]?.given?.length > 0
+                                                                            ? ' ' + data?.name?.[0]?.given?.join(' ')
+                                                                            : '') || 'N/A'}
                                                                     <div className="text-info fw-bold fs-6">
                                                                         <span className="text-dark">MRN: </span>
                                                                         {data?.chartNumber}
@@ -272,15 +202,14 @@ const Patients = () => {
                                                             <div className="text-capitalize">
                                                                 {data?.gender || 'N/A'}
                                                                 <div
-                                                                    className={`${
-                                                                        data?.birthDate
-                                                                            ? ''
-                                                                            : 'text-danger fs-6 fw-semibold'
-                                                                    }`}>
+                                                                    className={`${data?.birthDate
+                                                                        ? ''
+                                                                        : 'text-danger fs-6 fw-semibold'
+                                                                        }`}>
                                                                     {data?.birthDate
                                                                         ? new Date(data?.birthDate)
-                                                                              .toISOString()
-                                                                              .split('T')[0]
+                                                                            .toISOString()
+                                                                            .split('T')[0]
                                                                         : 'Missing'}
                                                                 </div>
                                                             </div>
@@ -295,13 +224,12 @@ const Patients = () => {
                                                                     )?.value || 'N/A')}
 
                                                                 <div
-                                                                    className={`${
-                                                                        data?.telecom?.find(
-                                                                            (item) => item?.system === 'email'
-                                                                        )?.value
-                                                                            ? ''
-                                                                            : 'text-danger'
-                                                                    }`}>
+                                                                    className={`${data?.telecom?.find(
+                                                                        (item) => item?.system === 'email'
+                                                                    )?.value
+                                                                        ? ''
+                                                                        : 'text-danger'
+                                                                        }`}>
                                                                     {data?.telecom?.find(
                                                                         (item) => item?.system === 'email'
                                                                     )?.value || 'Email (Missing)'}
@@ -315,10 +243,10 @@ const Patients = () => {
                                                             {data?.address?.[0]?.line?.[0]?.length > 30
                                                                 ? data?.address?.[0]?.line?.[0]?.slice(0, 29) + '...'
                                                                 : data?.address?.[0]?.line?.[0] || (
-                                                                      <span className="text-danger fw-semibold fs-6">
-                                                                          Missing
-                                                                      </span>
-                                                                  )}
+                                                                    <span className="text-danger fw-semibold fs-6">
+                                                                        Missing
+                                                                    </span>
+                                                                )}
 
                                                             <div className="fw-semibold fs-6">
                                                                 {[data?.address?.[0]?.city, data?.address?.[0]?.state]
@@ -349,15 +277,15 @@ const Patients = () => {
                                         </tbody>
                                     </Table>
                                 </Col>
-                                <Col className="mt-2 d-flex justify-content-end">
-                                    <Paginations
-                                        currentPage={skip}
-                                        totalPages={store?.getPatientsReducer?.data?.pagination?.totalPages}
-                                        onPageChange={handlePageChange}
-                                    />
-                                </Col>
                             </Row>
                         </Card.Body>
+                        <Card.Footer className="text-end border-0 py-0">
+                            <Paginations
+                                currentPage={skip}
+                                totalPages={store?.getPatientsReducer?.data?.pagination?.totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        </Card.Footer>
                     </Card>
                 </Col>
             </Row>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Row, Col, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { createContractAction } from '../../../../redux/actions';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import { IoMdClose } from 'react-icons/io';
 import { FiDownload } from 'react-icons/fi';
@@ -13,7 +13,10 @@ const Contract = ({ billingId, activeTab }) => {
     const { createContractReducer, getContractReducer } = useSelector((state) => state);
 
     const [show, setShow] = useState(false);
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const contract = createContractReducer?.data;
     useEffect(() => {
         if (activeTab === 'contract') {

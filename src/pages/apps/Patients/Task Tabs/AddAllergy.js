@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { clinicalStatus } from '../../../../utils/DataSets/Allergy/clinicalStatus';
 import { allergyType } from '../../../../utils/DataSets/Allergy/allergyType';
 import { category, criticality } from '../../../../utils/DataSets/Allergy/category';
@@ -41,7 +41,9 @@ const AddAllergy = ({ onCancel }) => {
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
     const appointments = store?.getPatientAppointmentReducer?.data?.appointments;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
     const createStatus = store?.createAllergyReducer?.data?.status;
 
@@ -126,22 +128,26 @@ const AddAllergy = ({ onCancel }) => {
                 coding: code,
                 text: code?.display, // use display text
             },
-            note: [
-                {
-                    text: data?.note,
-                    time: '',
-                    authorReference: {
-                        reference: '',
-                        type: '',
-                        identifier: {
-                            use: '',
-                            system: '',
-                            value: '',
+            ...(data?.note
+                ? {
+                    note: [
+                        {
+                            text: data.note,
+                            time: '',
+                            authorReference: {
+                                reference: '',
+                                type: '',
+                                identifier: {
+                                    use: '',
+                                    system: '',
+                                    value: '',
+                                },
+                                display: '',
+                            },
                         },
-                        display: '',
-                    },
-                },
-            ],
+                    ],
+                }
+                : {}),
         };
         if (selectMode === 'appointment' && data.appointment) {
             let appData = JSON.parse(data.appointment);
@@ -287,7 +293,7 @@ const AddAllergy = ({ onCancel }) => {
                     <Col sm={6}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="criticality" className="mb-0">
-                                Criticality <span className='text-danger'>*</span>
+                                Criticality <span className="text-danger">*</span>
                             </Form.Label>
                             <Form.Select
                                 {...register('criticality', { required: 'Criticality is required' })}
@@ -349,17 +355,25 @@ const AddAllergy = ({ onCancel }) => {
 
                             {selectMode === 'appointment' ? (
                                 <>
-                                    <Form.Label className="mb-0">Appointment</Form.Label>
+                                    <Form.Label className="mb-0">
+                                        Appointment <span className="text-danger">*</span>
+                                    </Form.Label>
                                     <Form.Select
                                         {...register('appointment', {
                                             required: selectMode === 'appointment' ? 'Appointment is required' : false,
                                         })}>
                                         <option value="">Select Appointment Date</option>
-                                        {appointments?.map((item) => (
-                                            <option key={item?._id} value={JSON.stringify(item)}>
-                                                {item?.date ? new Date(item.date).toISOString().split('T')[0] : 'N/A'}
-                                            </option>
-                                        ))}
+                                        {appointments?.length > 0 ? (
+                                            appointments.map((item) => (
+                                                <option key={item?._id} value={JSON.stringify(item)}>
+                                                    {item?.date
+                                                        ? new Date(item.date).toISOString().split('T')[0]
+                                                        : 'N/A'}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option disabled>No appointment scheduled yet</option>
+                                        )}
                                     </Form.Select>
                                     {errors.appointment && (
                                         <small className="text-danger">{errors.appointment.message}</small>

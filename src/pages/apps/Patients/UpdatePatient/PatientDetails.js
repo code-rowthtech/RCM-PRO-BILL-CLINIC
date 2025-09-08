@@ -5,16 +5,12 @@ import { FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-    getStatesByCountryAction,
-    getCitiesAction,
-    getCities2Action,
-    getCities3Action,
     updatePatientsAction,
     getDoctorsAction,
     getPatientByIdAction,
 } from '../../../../redux/actions';
 import us from '../../../../assets/images/flags/us.jpg';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import Select from 'react-select';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import Spinner from '../../../../constants/Spinner';
@@ -77,9 +73,16 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
-        label: data?.name?.[0]?.text,
+        label: (data?.name?.[0]?.prefix?.[0]
+            ? data?.name?.[0]?.prefix?.[0] + ' '
+            : '') +
+            (data?.name?.[0]?.family || '') +
+            (data?.name?.[0]?.given?.length > 0
+                ? ' ' + data?.name?.[0]?.given?.join(' ')
+                : '') || 'N/A',
     }));
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     useEffect(() => {
         const doctorPayload = { status: status, search: search };
@@ -262,9 +265,17 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                             </Form.Label>
                             <Form.Control
                                 type="text"
-                                // value={patientDetails?.name[0]?.given[0] || ''}
                                 placeholder="First Name"
-                                {...register('firstName', { required: 'First name is required' })}
+                                {...register('firstName', {
+                                    required: 'First name is required',
+                                    validate: {
+                                        noSpacesOnly: (value) => value.trim() !== '' || 'First name is required',
+                                        alphabetsOnly: (value) => /^[A-Za-z\s]*$/.test(value) || 'Only alphabets are allowed'
+                                    }
+                                })}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                                }}
                             />
                             {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
                         </Form.Group>
@@ -278,7 +289,14 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                 id="middleName"
                                 type="text"
                                 placeholder="Middle Name"
-                                {...register('middleName')}
+                                {...register('middleName', {
+                                    validate: {
+                                        alphabetsOnly: (value) => !value || /^[A-Za-z\s]*$/.test(value) || 'Only alphabets are allowed'
+                                    }
+                                })}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                                }}
                             />
                             {errors.middleName && <span className="text-danger">{errors.middleName.message}</span>}
                         </Form.Group>
@@ -292,7 +310,16 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                 id="lastName"
                                 type="text"
                                 placeholder="Last Name"
-                                {...register('lastName', { required: 'Last Name is required' })}
+                                {...register('lastName', {
+                                    required: 'Last Name is required',
+                                    validate: {
+                                        noSpacesOnly: (value) => value.trim() !== '' || 'Last Name is required',
+                                        alphabetsOnly: (value) => /^[A-Za-z\s]*$/.test(value) || 'Only alphabets are allowed'
+                                    }
+                                })}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                                }}
                             />
                             {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
                         </Form.Group>
@@ -314,19 +341,19 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                             'homePhone',
                                             !id
                                                 ? {
-                                                      pattern: {
-                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                          message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                      },
-                                                      maxLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not exceed 13 digits',
-                                                      },
-                                                      minLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not be less than 13 digits',
-                                                      },
-                                                  }
+                                                    pattern: {
+                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                    },
+                                                    maxLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not exceed 13 digits',
+                                                    },
+                                                    minLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not be less than 13 digits',
+                                                    },
+                                                }
                                                 : {}
                                         )}
                                         onChange={(e) => {
@@ -377,19 +404,19 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                             'cellPhone',
                                             !id
                                                 ? {
-                                                      pattern: {
-                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                          message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                      },
-                                                      maxLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not exceed 13 digits',
-                                                      },
-                                                      minLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not be less than 13 digits',
-                                                      },
-                                                  }
+                                                    pattern: {
+                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                    },
+                                                    maxLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not exceed 13 digits',
+                                                    },
+                                                    minLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not be less than 13 digits',
+                                                    },
+                                                }
                                                 : {}
                                         )}
                                         onChange={(e) => {
@@ -440,19 +467,19 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                             'officePhone',
                                             !id
                                                 ? {
-                                                      pattern: {
-                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                          message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                      },
-                                                      maxLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not exceed 13 digits',
-                                                      },
-                                                      minLength: {
-                                                          value: 13,
-                                                          message: 'Contact must not be less than 13 digits',
-                                                      },
-                                                  }
+                                                    pattern: {
+                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                    },
+                                                    maxLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not exceed 13 digits',
+                                                    },
+                                                    minLength: {
+                                                        value: 13,
+                                                        message: 'Contact must not be less than 13 digits',
+                                                    },
+                                                }
                                                 : {}
                                         )}
                                         onChange={(e) => {
@@ -488,11 +515,11 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label htmlFor="email" className="mb-0">
-                                Email ID
+                                Email
                             </Form.Label>
                             <Form.Control
                                 type="email"
-                                placeholder="Email ID"
+                                placeholder="Email"
                                 {...register('email', {
                                     pattern: {
                                         value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
@@ -507,7 +534,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                             <Form.Label className="mb-0">Alternate Email</Form.Label>
                             <Form.Control
                                 type="email"
-                                placeholder="Alternate Email ID"
+                                placeholder="Alternate Email"
                                 {...register('alternateEmail', {
                                     pattern: {
                                         value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
@@ -549,25 +576,44 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                     'gender'
                                     //  { required: 'Gender is required' }
                                 )}>
-                                <option value="unknown">Unknown</option>
-                                <option value="male">Male</option>
                                 <option value="female">Female</option>
+                                <option value="male">Male</option>
                                 <option value="other">Other</option>
+                                <option value="unknown">Unknown</option>
                             </Form.Select>
                             {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                         </Form.Group>
                     </div>
                 </div>
                 <hr className="border border-muted" />
+
                 <div className="row">
                     <div className="col-md-3 col-12">
+                        <Form.Group>
+                            <Form.Label htmlFor="patientstatus" className="mb-0">
+                                Patient Status
+                            </Form.Label>
+                            <Form.Select
+                                as="select" // Use 'select' to make it a dropdown
+                                id="patientstatus"
+                                {...register('patientStatus')}
+                                data-has-value={!!watch('patientStatus')}>
+                                <option value="">Select Status</option> {/* Default option */}
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Inactive-Deceased">Inactive-Deceased</option>
+                                <option value="Inactive-In Collections">Inactive-In Collections</option>
+                                <option value="Inactive-Terminated">Inactive-Terminated</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </div>
+                    <div className="col-md-3 col-12">
                         <div className="mb-1 d-flex flex-column position-relative">
-                            <Form.Label className="mb-0">Patient Photo</Form.Label>
+                            <Form.Label className="mb-0">{`Patient Photo`}</Form.Label>
                             <div
                                 onClick={() => !profileUploading && logoFileInputRef.current.click()}
-                                className={`custom-file-upload justify-content-between cursor-pointer ${
-                                    logoName || profileUploading ? '' : 'custom-form-fields'
-                                }`}
+                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? 'form-control' : 'custom-form-fields'
+                                    }`}
                                 style={{
                                     backgroundColor: '#d9ddd6',
                                     opacity: profileUploading ? 0.7 : 1,
@@ -576,10 +622,10 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                 {profileUploading
                                     ? 'Uploading...'
                                     : logoName
-                                      ? logoName.length > 25
-                                          ? `${logoName.substring(0, 22)}...`
-                                          : logoName.split('/').pop().slice(0, 30) + '...'
-                                      : 'Upload Patient Chart Photo'}
+                                        ? logoName.length > 25
+                                            ? `${logoName.substring(0, 22)}...`
+                                            : logoName.split('/').pop().slice(0, 30) + '...'
+                                        : 'Upload Patient Chart Photo'}
                                 <p className="mb-0">
                                     <FiUploadCloud />
                                 </p>
@@ -597,25 +643,6 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                     </div>
                     <div className="col-md-3 col-12">
                         <Form.Group>
-                            <Form.Label htmlFor="patientstatus" className="mb-0">
-                                Status
-                            </Form.Label>
-                            <Form.Select
-                                as="select" // Use 'select' to make it a dropdown
-                                id="patientstatus"
-                                {...register('patientStatus')}
-                                data-has-value={!!watch('patientStatus')}>
-                                <option value="">Select status</option> {/* Default option */}
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                                <option value="Inactive-Deceased">Inactive-Deceased</option>
-                                <option value="Other">Other</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </div>
-
-                    <div className="col-md-3 col-12">
-                        <Form.Group>
                             <Form.Label htmlFor="title" className="mb-0">
                                 Title
                             </Form.Label>
@@ -624,11 +651,9 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                 data-has-value={!!watch('title')}
                                 aria-label="Select Title">
                                 <option value="">Select Title</option>
-                                <option value="Mr.">Mr.</option>
-                                <option value="Mrs.">Mrs.</option>
-                                <option value="Miss">Miss</option>
-                                <option value="Dr.">Dr.</option>
-                                <option value="Other">Other</option>
+                                {["Mr.", "Mrs.", "Miss", "Dr.", "Other"]?.sort((a, b) => a.localeCompare(b))?.map((title, index) => (
+                                    <option value={title} key={index}>{title}</option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                     </div>
@@ -638,24 +663,35 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                             <Form.Control
                                 type="text"
                                 placeholder="Previous Birth Name"
-                                {...register('previousBirthName')}
+                                {...register('previousBirthName', {
+                                    validate: {
+                                        alphabetsOnly: (value) => !value || /^[A-Za-z\s]*$/.test(value) || 'Only alphabets are allowed'
+                                    }
+                                })}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                                }}
                             />
-                            {errors.birthName && <span className="text-danger">{errors.birthName.message}</span>}
+                            {errors.previousBirthName && <span className="text-danger">{errors.previousBirthName.message}</span>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 col-12">
                         <Form.Group>
                             <Form.Label className="mb-0">Preferred Communication</Form.Label>
                             <Form.Select {...register('preferredCommunication')} aria-label="Select Title">
-                                <option value="">Select Preferred Communication</option>
-                                <option value="Home Phone">Home Phone</option>
+                                <option value="">Select</option>
+                                {["Home Phone", "Work Phone", "Cell Phone", "Email",
+                                    "Text Message", "Declined", "Snail Mail", "Other"]?.sort((a, b) => a.localeCompare(b))?.map((prefCom, index) => (
+                                        <option key={index} value={prefCom}>{prefCom}</option>
+                                    ))}
+                                {/* <option value="Home Phone">Home Phone</option>
                                 <option value="Work Phone">Work Phone</option>
                                 <option value="Cell Phone">Cell Phone</option>
                                 <option value="Email">Email</option>
                                 <option value="Text Message">Text Message</option>
                                 <option value="Declined">Declined</option>
                                 <option value="Snail Mail">Snail Mail</option>
-                                <option value="Other">Other</option>
+                                <option value="Other">Other</option> */}
                             </Form.Select>
                             {errors.preferredCommunication && (
                                 <span className="text-danger">{errors.preferredCommunication.message}</span>
@@ -665,12 +701,12 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
 
                     <div className="col-md-3 col-12">
                         <Form.Group>
-                            <Form.Label className="mb-0">Reminder Language</Form.Label>
+                            <Form.Label className="mb-0">Preferred Language</Form.Label>
                             <Form.Select {...register('reminderLanguage')}>
-                                <option value="">Select Reminder Language</option>
+                                <option value="">Select Preferred Language</option>
                                 <option value="English">English</option>
-                                <option value="Spanish">Spanish</option>
                                 <option value="French">French</option>
+                                <option value="Spanish">Spanish</option>
                             </Form.Select>
                         </Form.Group>
                     </div>
@@ -680,29 +716,35 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                     <div className="col-md-3 col-12">
                         <Form.Group controlId="doctorName">
                             <Form.Label className="mb-0">Primary Provider( Doctor Name)</Form.Label>
-                            <Form.Control
-                                as="select"
-                                className="border-0"
+                            <Select
+                                options={doctorOptions || []}
+                                isLoading={store?.getDoctorsReducer?.loading}
+                                isSearchable={true}
+                                isClearable={true}
+                                value={selectedDoctor}
+                                onChange={handleChange}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="Select Doctor Name"
+                                noOptionsMessage={() => 'No doctors found'}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: 'none',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontSize: '12px',
+                                    }),
+                                }}
+                            />
+                            <input
+                                type="hidden"
                                 {...register('selectedDoctor')}
-                                value={selectedDoctor ? selectedDoctor.value : ''}
-                                onChange={(e) => {
-                                    const selectedOption = doctorOptions.find(
-                                        (option) => option.value === e.target.value
-                                    );
-                                    setValue('selectedDoctor', selectedOption);
-                                    handleChange(selectedOption);
-                                    clearErrors('selectedDoctor');
-                                }}>
-                                <option value="" hidden>
-                                    Select Doctor Name
-                                </option>
-                                {doctorOptions &&
-                                    doctorOptions?.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                            </Form.Control>
+                                value={selectedDoctor?.value || ''}
+                            />
                         </Form.Group>
                     </div>
                     <div className="col-md-3 col-12">
@@ -710,23 +752,20 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                             <Form.Label className="mb-0">Medical History Concent</Form.Label>
                             <Form.Select {...register('medicationHistoryConsent')}>
                                 <option value="">Select Medication History Concent</option>
-                                <option value={'true'}>Yes</option>
                                 <option value={'false'}>No</option>
+                                <option value={'true'}>Yes</option>
                             </Form.Select>
                         </Form.Group>
                     </div>
 
                     <div className="col-md-3 col-12">
                         <Form.Group>
-                            <Form.Label className="mb-0">Payment Profile</Form.Label>
+                            <Form.Label className="mb-0">{`Financial Class`}</Form.Label>
                             <Form.Select {...register('paymentProfile')} aria-label="Payment Profile">
-                                <option value="">Select Payment Profile</option>
-                                <option value="Cash">Cash</option>
-                                <option value="Insurance">Insurance</option>
-                                <option value="Insurance Out of Network">Insurance Out of Network</option>
-                                <option value="Auto Accident">Auto Accident</option>
-                                <option value="Worker's Comp">Worker's Comp</option>
-                                <option value="Other">Other</option>
+                                <option value="">Select Financial Class</option>
+                                {["Cash", "Insurance", "Insurance Out of Network", "Auto Accident", "Worker's Comp", "Other"]?.sort((a, b) => a.localeCompare(b))?.map((paymentProf, index) => (
+                                    <option selected={paymentProf === 'Cash'} value={paymentProf} key={index}>{paymentProf}</option>
+                                ))}
                             </Form.Select>
                             {errors.paymentProfile && (
                                 <span className="text-danger">{errors.paymentProfile.message}</span>

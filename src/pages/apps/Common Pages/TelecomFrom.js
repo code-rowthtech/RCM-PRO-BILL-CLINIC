@@ -64,19 +64,6 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
             return `(${p1}`;
         });
     };
-    // Function to handle Telecom (Contact) field changes inside POCs
-    const handleTelecomChange = (pocIndex, telecomIndex, field, value) => {
-        let rawValue = value.replace(/\D/g, ''); // Remove non-numeric characters
-
-        // Limit to 10 digits
-        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
-
-        // Format as (XXX)XXXXXXX
-        const formattedValue = rawValue.replace(/(\d{1,3})(\d{0,7})/, (match, p1, p2) => {
-            if (p2) return `(${p1})${p2}`;
-            return `(${p1}`;
-        });
-    };
 
     return (
         <div>
@@ -85,7 +72,7 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                     <Row className="">
                         <Col sm={12}>
                             <h5>
-                                Contact Details
+                                {`Contact Details`}
                                 <span
                                     className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
                                     onClick={addContactDetails}></span>
@@ -95,17 +82,17 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
 
                     <Row>
                         <Col sm={4}>
-                            <Form.Label>Contact Type</Form.Label>
+                            <Form.Label>{`Contact Type`}</Form.Label>
                         </Col>
                         <Col sm={4}>
-                            <Form.Label>Value </Form.Label>
+                            <Form.Label>{`Value`}</Form.Label>
                         </Col>
                         <Col sm={4}>
-                            <Form.Label>Use</Form.Label>
+                            <Form.Label>{`Use`}</Form.Label>
                         </Col>
                     </Row>
 
-                    {constantContact.map((item, index) => (
+                    {constantContact?.map((item, index) => (
                         <Row key={index} className="mb-2">
                             <Col sm={4}>
                                 <Form.Select
@@ -116,9 +103,9 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                     onChange={(e) => handleContactChange(index, 'system', e.target.value)}
                                     disabled={contactDetails.includes(item.type)}>
                                     <option value="" disabled>
-                                        Select Contact Type
+                                        {`Select Contact Type`}
                                     </option>
-                                    {contactOptions.map((option) => (
+                                    {contactOptions?.sort((a, b) => a.localeCompare(b))?.map((option) => (
                                         <option className="text-capitalize" key={option} value={option}>
                                             {option}
                                         </option>
@@ -130,7 +117,7 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                     <InputGroup className="position-relative">
                                         {/* Country Code Prefix */}
                                         <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">
-                                            +1
+                                            {`+1`}
                                         </InputGroup.Text>
 
                                         {/* Phone Input */}
@@ -166,18 +153,18 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                 )}
                             </Col>
 
-                            <Col sm={4} className={`position-relative  ${contactDetails?.length > 1 ? 'pe-4 d-flex align-items-center' : ''}`}>
+                            <Col sm={4} className={`position-relative  ${contactDetails?.length > 1 ? 'pe-3 d-flex align-items-center' : ''}`}>
                                 <Form.Select
                                     value={item.use}
                                     data-has-value={!!watch(`constantContact[${index}].use`)}
                                     {...register(`constantContact[${index}].use`)}
                                     onChange={(e) => handleContactChange(index, 'use', e.target.value)}>
-                                    <option value="">Select Option</option> {/* Placeholder option */}
-                                    <option value="temp">Temp</option>
+                                    <option value="">Select Option</option>
                                     <option value="home">Home</option>
-                                    <option value="work">Work</option>
-                                    <option value="old">Old</option>
                                     <option value="mobile">Mobile</option>
+                                    <option value="old">Old</option>
+                                    <option value="temp">Temp</option>
+                                    <option value="work">Work</option>
                                     {/* Add more options as needed */}
                                 </Form.Select>
                                 {index >= contactDetails.length && (
@@ -185,7 +172,7 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                         className="text-danger cursor-pointer fs-5 ms-2"
                                         onClick={() => removeContact(index)}
                                         title="Remove">
-                                        <FiMinusCircle  />
+                                        <FiMinusCircle />
                                     </span>
                                 )}
                             </Col>

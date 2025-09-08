@@ -5,8 +5,17 @@ import AutoAccident from './AutoAccident';
 import WorkersCamp from './WorkersCamp';
 import { useSearchParams } from 'react-router-dom';
 
-const Insurance = ({ patientId }) => {
+const Insurance = () => {
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('updateid');
     const [activeTab, setActiveTab] = useState("primaryInsurance");
+
+    const tabs = [
+        { key: "primaryInsurance", label: "Primary Insurance" },
+        { key: "secondaryInsurance", label: "Secondary Insurance" },
+        { key: "autoAccident", label: "Auto Accident" },
+        { key: "workersCamp", label: "Worker's Comp" }
+    ];
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -17,38 +26,16 @@ const Insurance = ({ patientId }) => {
             <div className='row'>
                 <div className="col-12">
                     <ul className="nav nav-underline">
-                        <li className="nav-item">
-                            <button
-                                className={`text-black nav-link fw-medium ${activeTab === "primaryInsurance" ? "active fw-bold" : ""}`}
-                                onClick={() => handleTabChange("primaryInsurance")}
-                            >
-                                Primary Insurance
-                            </button>
-                        </li>
-                        <li className="nav-item">
-                            <button
-                                className={`text-black nav-link fw-medium ${activeTab === "secondaryInsurance" ? "active fw-bold" : ""}`}
-                                onClick={() => handleTabChange("secondaryInsurance")}
-                            >
-                                Secondary Insurance
-                            </button>
-                        </li>
-                        <li className="nav-item">
-                            <button
-                                className={`text-black nav-link fw-medium ${activeTab === "autoAccident" ? "active fw-bold" : ""}`}
-                                onClick={() => handleTabChange("autoAccident")}
-                            >
-                                Auto Accident
-                            </button>
-                        </li>
-                        <li className="nav-item">
-                            <button
-                                className={`text-black nav-link fw-medium ${activeTab === "workersCamp" ? "active fw-bold" : ""}`}
-                                onClick={() => handleTabChange("workersCamp")}
-                            >
-                                Worker's Comp
-                            </button>
-                        </li>
+                        {tabs.map(tab => (
+                            <li key={tab.key} className="nav-item">
+                                <button
+                                    className={`text-black nav-link fw-medium ${activeTab === tab.key ? "active fw-bold" : ""}`}
+                                    onClick={() => handleTabChange(tab.key)}
+                                >
+                                    {tab.label}
+                                </button>
+                            </li>
+                        ))}
                     </ul>
                 </div>
                 <div className="col-12 mt-2">

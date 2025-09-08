@@ -7,7 +7,7 @@ import {
     updateNoteCategoriesAction,
 } from '../../../../redux/noteCategories/action';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 
 const NOTE_TYPE_OPTIONS = {
     'Encounter-Based': [
@@ -117,17 +117,18 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
             setValue('private', selectedNote?.private?.toString() || 'false');
         }
     }, [selectedNote, setValue]);
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     const onSubmit = (data) => {
         const payload = {
             ...(selectedNote?.title !== data?.title && ({ title: data.title === 'Other' ? data.customTitle : data.title })),
-            clinicId: clinic_id?.clinicId || store?.Auth?.user?.clinicId,
+            // clinicId: clinicId||clinic_id?.clinicId || store?.Auth?.user?.clinicId,
+            clinicId: clinicId || store?.Auth?.user?.clinicId,
             noteType: data.noteType,
             active: 'true',
             format: data.format,
             private: data.private === 'true',
         };
-
         if (selectedNote?._id) {
             dispatch(updateNoteCategoriesAction({ id: selectedNote._id, key: encryptMessage(payload) }));
         } else {
@@ -142,7 +143,8 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                     search: '',
                     skip: 1,
                     limit: 8,
-                    clinicId: clinic_id?.clinicId || store?.Auth?.user?.clinicId,
+                    // clinicId: clinic_id?.clinicId || store?.Auth?.user?.clinicId,
+                    clinicId: clinicId || store?.Auth?.user?.clinicId,
                     active: true,
                     noteType: '',
                 })

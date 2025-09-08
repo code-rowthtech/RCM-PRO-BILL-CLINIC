@@ -36,10 +36,12 @@ const AddressForm = ({ addresses, setAddresses }) => {
         formState: { errors },
         watch,
     } = useForm();
+    const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
+    const addressTypes = ['physical', 'mailing'];
 
     const addAddress = () => {
-        if (addresses?.length === 3) {
-            ToastHandle('Maximum 3 addresses are allowed.', 'danger');
+        if (addresses?.length === addressTypes?.length) {
+            ToastHandle(`Maximum ${addressTypes?.length} addresses are allowed.`, 'danger');
             return;
         }
 
@@ -52,15 +54,11 @@ const AddressForm = ({ addresses, setAddresses }) => {
             { type: availableType, use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
         ]);
     };
-
     const removeAddress = (index) => {
         if (addresses.length > 1) {
             setAddresses(addresses.filter((_, i) => i !== index));
         }
     };
-
-    const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
-    const addressTypes = ['physical', 'postal', 'both'];
 
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -91,7 +89,25 @@ const AddressForm = ({ addresses, setAddresses }) => {
         });
     };
 
-    const handleAddressChange = (index, field, value, lineIndex = 0) => {
+    const fetchLocationByZip = async (zipCode) => {
+        if (zipCode.length === 5 && /^[0-9]+$/.test(zipCode)) {
+            try {
+                const response = await fetch(`https://api.zippopotam.us/us/${zipCode}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return {
+                        state: data.places[0]['state'],
+                        city: data.places[0]['place name']
+                    };
+                }
+            } catch (error) {
+                console.error('Error fetching location:', error);
+            }
+        }
+        return null;
+    };
+
+    const handleAddressChange = async (index, field, value, lineIndex = 0) => {
         if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
             ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
             return; // Prevent selection
@@ -104,7 +120,35 @@ const AddressForm = ({ addresses, setAddresses }) => {
             updatedAddresses[index].line = updatedLines;
         } else {
             updatedAddresses[index][field] = value;
-            
+
+            // Auto-populate state and city when ZIP code is entered
+            if (field === 'postalCode') {
+                const locationData = await fetchLocationByZip(value);
+                if (locationData) {
+                    updatedAddresses[index].state = locationData.state;
+                    updatedAddresses[index].city = locationData.city;
+                    
+                    // Find state object and dispatch cities action
+                    const stateObj = statesData?.states?.find((s) => s.name === locationData.state);
+                    if (stateObj) {
+                        const cityPayload = {
+                            state_code: stateObj.id,
+                            name: locationData.city,
+                            limit: 25,
+                            skip: '',
+                        };
+
+                        if (updatedAddresses[index].type === 'physical') {
+                            dispatch(getCitiesAction(cityPayload));
+                        } else if (updatedAddresses[index].type === 'mailing') {
+                            dispatch(getCities2Action(cityPayload));
+                        } else {
+                            dispatch(getCities3Action(cityPayload));
+                        }
+                    }
+                }
+            }
+
             // If type is changed and state is already selected, reload cities
             if (field === 'type' && updatedAddresses[index].state) {
                 updatedAddresses[index].city = ''; // Clear city selection
@@ -116,10 +160,10 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         limit: 25,
                         skip: '',
                     };
-                    
+
                     if (value === 'physical') {
                         dispatch(getCitiesAction(cityPayload));
-                    } else if (value === 'postal') {
+                    } else if (value === 'mailing') {
                         dispatch(getCities2Action(cityPayload));
                     } else {
                         dispatch(getCities3Action(cityPayload));
@@ -155,7 +199,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
             // Fetch cities for selected state
             if (addressType === 'physical') {
                 dispatch(getCitiesAction({ state_code: stateData?.id, name: '', limit: 25, skip: '' }));
-            } else if (addressType === 'postal') {
+            } else if (addressType === 'mailing') {
                 dispatch(getCities2Action({ state_code: stateData?.id, name: '', limit: 25, skip: '' }));
             } else {
                 dispatch(getCities3Action({ state_code: stateData?.id, name: '', limit: 25, skip: '' }));
@@ -183,7 +227,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                     case 'physical':
                         dispatch(getCitiesAction(cityPayload));
                         break;
-                    case 'postal':
+                    case 'mailing':
                         dispatch(getCities2Action(cityPayload));
                         break;
                     default:
@@ -242,7 +286,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             <option value="" hidden>
                                 Select
                             </option>
-                            {addressTypes?.map((type) => (
+                            {addressTypes?.sort((a, b) => a.localeCompare(b))?.map((type) => (
                                 <option key={type} className="text-capitalize" value={type}>
                                     {type}
                                 </option>
@@ -259,7 +303,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             <option value="" hidden>
                                 Select
                             </option>
-                            {addressUses?.map((use) => (
+                            {addressUses?.sort((a, b) => a.localeCompare(b))?.map((use) => (
                                 <option key={use} className="text-capitalize" value={use}>
                                     {use}
                                 </option>
@@ -324,7 +368,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                                 data.components?.city ||
                                                 data.components?.town ||
                                                 data.components?.village ||
-                                                data.components?.normalize_city||
+                                                data.components?.normalize_city ||
                                                 '';
 
                                             // Dispatch city load based on address type
@@ -337,7 +381,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                                         skip: '',
                                                     })
                                                 );
-                                            } else if (item?.type === 'postal') {
+                                            } else if (item?.type === 'mailing') {
                                                 dispatch(
                                                     getCities2Action({
                                                         state_code: stateCode,
@@ -430,26 +474,26 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             disabled={
                                 item?.type === 'physical'
                                     ? store?.getCitiesReducer?.cities1?.loading
-                                    : item?.type === 'postal'
-                                      ? store?.getCitiesReducer?.cities2?.loading
-                                      : store?.getCitiesReducer?.cities3?.loading
+                                    : item?.type === 'mailing'
+                                        ? store?.getCitiesReducer?.cities2?.loading
+                                        : store?.getCitiesReducer?.cities3?.loading
                             }>
                             <option value="">
                                 {item?.type === 'physical'
                                     ? store?.getCitiesReducer?.cities1?.loading
                                         ? 'Loading...'
                                         : 'Select City'
-                                    : item?.type === 'postal'
-                                      ? store?.getCitiesReducer?.cities2?.loading
-                                          ? 'Loading...'
-                                          : 'Select City'
-                                      : store?.getCitiesReducer?.cities3?.loading
-                                        ? 'Loading...'
-                                        : 'Select City'}
+                                    : item?.type === 'mailing'
+                                        ? store?.getCitiesReducer?.cities2?.loading
+                                            ? 'Loading...'
+                                            : 'Select City'
+                                        : store?.getCitiesReducer?.cities3?.loading
+                                            ? 'Loading...'
+                                            : 'Select City'}
                             </option>
                             {(() => {
                                 const cities =
-                                    item?.type === 'physical' ? cities1 : item?.type === 'postal' ? cities2 : cities3;
+                                    item?.type === 'physical' ? cities1 : item?.type === 'mailing' ? cities2 : cities3;
 
                                 return cities?.map((data) => (
                                     <option key={data?._id} value={data?.name}>
@@ -457,13 +501,13 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                             ? store?.getCitiesReducer?.cities1?.loading
                                                 ? 'Loading...'
                                                 : data?.name
-                                            : item?.type === 'postal'
-                                              ? store?.getCitiesReducer?.cities2?.loading
-                                                  ? 'Loading...'
-                                                  : data?.name
-                                              : store?.getCitiesReducer?.cities3?.loading
-                                                ? 'Loading...'
-                                                : data?.name}
+                                            : item?.type === 'mailing'
+                                                ? store?.getCitiesReducer?.cities2?.loading
+                                                    ? 'Loading...'
+                                                    : data?.name
+                                                : store?.getCitiesReducer?.cities3?.loading
+                                                    ? 'Loading...'
+                                                    : data?.name}
                                     </option>
                                 ));
                             })()}
@@ -471,20 +515,20 @@ const AddressForm = ({ addresses, setAddresses }) => {
                     </Col>
                     <Col sm={2} style={{ height: 'fit-content' }} className={` ${addresses?.length > 1 ? 'pe-4 d-flex align-items-center' : ''}`}>
                         <Form.Group className="mb-0">
-                            <Form.Label className="mb-0">Postal Code</Form.Label>
+                            <Form.Label className="mb-0">ZIP Code</Form.Label>
                             <Form.Control
                                 type="text"
                                 value={item.postalCode || ''}
-                                placeholder="Postal Code"
+                                placeholder="ZIP Code"
                                 maxLength={5}
                                 {...register(`address[${index}].postalCode`, {
                                     minLength: {
                                         value: 5,
-                                        message: 'Postal code must be at least 5 characters long',
+                                        message: 'ZIP code must be at least 5 characters long',
                                     },
                                     pattern: {
                                         value: /^[0-9]+$/,
-                                        message: 'Postal code must contain numbers only',
+                                        message: 'ZIP code must contain numbers only',
                                     },
                                 })}
                                 onKeyDown={(e) => {
@@ -501,16 +545,16 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                 <span className="text-danger">{errors.address[index].postalCode.message}</span>
                             )}
                         </Form.Group>
-                           {addresses.length > 1 && index !== 0 && (
+                        {addresses.length > 1 && index !== 0 && (
                             <span
                                 onClick={() => removeAddress(index)}
                                 className="text-danger cursor-pointer fs-5 ms-2 mt-3"
                                 title="Remove Address">
-                                <FiMinusCircle  />
+                                <FiMinusCircle />
                             </span>
-                    )}
+                        )}
                     </Col>
-                 
+
                 </Row>
             ))}
         </Form>
