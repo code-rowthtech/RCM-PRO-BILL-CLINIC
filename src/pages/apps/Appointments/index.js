@@ -5,8 +5,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
 import PageTitle from '../../../components/PageTitle';
 import { FormInput } from '../../../components';
-import { patientsData } from './data';
-import { GrDocumentText } from 'react-icons/gr';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { FiArchive, FiClock, FiFilter, FiSun } from 'react-icons/fi';
 import { IoCalendarOutline, IoCloseCircleOutline } from 'react-icons/io5';
@@ -14,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAppointmentsAction, rescheduleAppointmentAction } from '../../../redux/appointments/action';
 import Spinner from '../../../constants/Spinner';
 import { getDoctorsAction } from '../../../redux/actions';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
 import { FcViewDetails } from 'react-icons/fc';
 import { useForm } from 'react-hook-form';
@@ -24,31 +22,18 @@ import { FaCalendar, FaCalendarWeek, FaRegListAlt } from 'react-icons/fa';
 import { LucideCalendarDays } from 'lucide-react';
 import { CiCalendar } from 'react-icons/ci';
 import Paginations from '../../../helpers/Paginations';
-const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+// const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
-// Define the types for each order item
-type OrderListItems = {
-    orderId: string,
-    avatar: string,
-    name: string,
-    projectName: string,
-    country: string,
-    city: string,
-    date: string,
-    orderStatus: string,
-};
 
-type OrderListProps = {
-    patientsData: Array<OrderListItems>,
-};
+
 
 // Component for Appointments List Table
 const AppointmentsList = ({
-    patientsData,
     appointmentPeriod,
     setSkip,
     skip,
-}: OrderListProps): React$Element<React$FragmentType> => {
+}): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
@@ -225,7 +210,13 @@ const AppointmentsList = ({
                                     )}
                                 </td>
                                 <td className="text-capitalize">
-                                    {data?.subject?.name?.[0]?.text}
+                                    {(data?.subject?.name?.[0]?.prefix?.[0]
+                                        ? data?.subject?.name?.[0]?.prefix?.[0] + ' '
+                                        : '') +
+                                        (data?.subject?.name?.[0]?.family || '') +
+                                        (data?.subject?.name?.[0]?.given?.length > 0
+                                            ? ' ' + data?.subject?.name?.[0]?.given?.join(' ')
+                                            : '') || 'N/A'}
                                     <div className="d-flex gap-2">
                                         <span>
                                             {data?.subject?.birthDate
@@ -292,7 +283,7 @@ const AppointmentsList = ({
 };
 
 // Main Appointments Component
-const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> }): React$Element<React$FragmentType> => {
+const Appointments = (): React$Element<React$FragmentType> => {
     const {
         register,
         formState: { errors },
@@ -310,7 +301,16 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
-        label: data?.name[0]?.text + ' ' + data?.telecom?.find((tel) => tel?.system === 'email')?.value || '',
+        label: (data?.name?.[0]?.prefix?.[0]
+            ? data?.name?.[0]?.prefix?.[0] + ' '
+            : '') +
+            (data?.name?.[0]?.family || '') +
+            (data?.name?.[0]?.given?.length > 0
+                ? ' ' + data?.name?.[0]?.given?.join(' ')
+                : '') + ' ' +
+            (data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value ?
+                `(******${data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value.slice(-4)})`
+                : '') || ''
     }));
     useEffect(() => {
         const doctorPayload = { status: true, search: doctorSearch };
@@ -563,9 +563,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                             <ul className="nav nav-pills">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`nav-link ${
-                                                            appointmentPeriod === 'today' ? 'active' : 'text-black'
-                                                        }`}
+                                                        className={`nav-link ${appointmentPeriod === 'today' ? 'active' : 'text-black'
+                                                            }`}
                                                         onClick={() => setAppointmentPeriod('today')}>
                                                         <FiSun className="me-1" />
                                                         Today
@@ -573,9 +572,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${
-                                                            appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
-                                                        }`}
+                                                        className={`nav-link ${appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
+                                                            }`}
                                                         onClick={() => setAppointmentPeriod('upcoming')}>
                                                         <FiClock className="me-1" />
                                                         Upcoming
@@ -583,9 +581,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${
-                                                            appointmentPeriod === 'history' ? 'active' : 'text-black'
-                                                        }`}
+                                                        className={`nav-link ${appointmentPeriod === 'history' ? 'active' : 'text-black'
+                                                            }`}
                                                         onClick={() => setAppointmentPeriod('history')}>
                                                         <FiArchive className="me-1" />
                                                         History
@@ -602,7 +599,6 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                 <AppointmentsList
                                     setSkip={setSkip}
                                     skip={skip}
-                                    patientsData={patientsData}
                                     appointmentPeriod={appointmentPeriod}
                                 />
                             ) : (

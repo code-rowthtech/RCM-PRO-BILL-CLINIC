@@ -1,3 +1,4 @@
+import { decryptMessage } from '../../cryptoUtils';
 import { APICore } from '../../helpers/api/apiCore';
 import * as URL from '../../helpers/api/apiEndpoints';
 
@@ -11,7 +12,7 @@ export function getDoctorsApi(params: any): any {
 
 export function getDoctorsRolesApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getDoctorRoles}?search=${data?.search}&clinicId=${data?.clinicId}`);
+    return api.get(`${URL.getDoctorRoles}?search=${data?.search}&clinicId=${decryptMessage(localStorage?.getItem('subClinicLocation')) || data?.clinicId}`);
 }
 
 export function getDoctorsDetailApi(params: any): any {

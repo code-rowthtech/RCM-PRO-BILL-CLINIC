@@ -5,7 +5,7 @@ import { FormInput } from '../../../../components';
 import { FiFileText, FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import {
     createMastersDataAction,
     getMastersDataAction,
@@ -19,7 +19,8 @@ import Paginations from '../../../../helpers/Paginations';
 
 const ConsultationRoom = () => {
     const store = useSelector((state) => state);
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
     const {
         register,
         handleSubmit,

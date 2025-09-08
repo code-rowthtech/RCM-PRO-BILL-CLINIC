@@ -11,7 +11,7 @@ import {
     updateSettingsTabAction,
 } from '../../../redux/noteCategories/action';
 import { loggedInUser } from '../../../helpers/api/loggedInUser';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 
 const NOTE_TYPE_OPTIONS = {
@@ -114,10 +114,11 @@ const SettingTabs = ({ noteType }) => {
             ...(s.inputType && { inputType: s.inputType }),
         }));
 
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation'));
     // Call update API
     const saveSectionsAPI = (sections) => {
         const payload = {
-            userId: loggedInUser?._id,
+            userId: clinicId || loggedInUser,
             noteTypeId: noteType._id,
             displaySettings: {
                 mainPanel: [
@@ -128,6 +129,7 @@ const SettingTabs = ({ noteType }) => {
                 ],
             },
         };
+
         if (hasSettings) {
             // Update
             dispatch(
@@ -398,7 +400,7 @@ const SettingTabs = ({ noteType }) => {
                                 onClick={() => handleOffcanvasCardClick(section)}
                                 style={{ cursor: 'pointer' }}>
                                 <div className="w-100 d-flex justify-content-between align-items-center">
-                                    <strong>{section.label}</strong>
+                                    <strong>{section?.label}</strong>
                                 </div>
                             </Card>
                         ))}

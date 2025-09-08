@@ -20,6 +20,7 @@ import { getAppointmentsAction } from '../../../../redux/actions';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import ToastHandle from '../../../../helpers/ToastMessage';
 import useQuillWordLimit from '../../../../helpers/quillWordLimit';
+import { decryptMessage } from '../../../../cryptoUtils';
 
 const MAX_WORDS = 1000;
 const WAX_WORD_LENGTH = 45;
@@ -52,12 +53,13 @@ const AddProblem = ({ onCancel }) => {
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
     const appointments = store?.getPatientAppointmentReducer?.data?.appointments || [];
 
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     useEffect(() => {
         if (createAppointmentResponse === 201) {
             dispatch(
                 getAppointmentsAction({
-                    clinicId: loggedInUser?.clinicId,
+                    clinicId: clinicId || loggedInUser?.clinicId,
                     status: '',
                     doctorId: '',
                     limit: '',
@@ -129,28 +131,29 @@ const AddProblem = ({ onCancel }) => {
                 ],
                 text: selectedStatus?.display,
             },
+            // problem: data.problem,
             ...(data.appointment && { appointment: data.appointment }),
             ...(data.diagnosisDate && { onsetDateTime: data.diagnosisDate }),
             // onsetDate: data.onsetDate,
-             ...(data?.note
+            ...(data?.note
                 ? {
-                      note: [
-                          {
-                              text: data.note,
-                              time: '',
-                              authorReference: {
-                                  reference: '',
-                                  type: '',
-                                  identifier: {
-                                      use: '',
-                                      system: '',
-                                      value: '',
-                                  },
-                                  display: '',
-                              },
-                          },
-                      ],
-                  }
+                    note: [
+                        {
+                            text: data.note,
+                            time: '',
+                            authorReference: {
+                                reference: '',
+                                type: '',
+                                identifier: {
+                                    use: '',
+                                    system: '',
+                                    value: '',
+                                },
+                                display: '',
+                            },
+                        },
+                    ],
+                }
                 : {}),
         };
         dispatch(createProblemListAction(payload));

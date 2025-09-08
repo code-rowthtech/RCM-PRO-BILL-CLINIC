@@ -9,7 +9,7 @@ import {
     getMedicalHistoryAction,
     updateMedicalHistoryAction,
 } from '../../../../../redux/actions';
-import { encryptMessage } from '../../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 import 'react-quill/dist/quill.snow.css';
@@ -43,8 +43,7 @@ const MedicalHistory = () => {
     const [toEdit, setToEdit] = useState(null);
     const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
     const quillRef = useRef(null);
-
-    const { register, handleSubmit, reset, formState: {errors} , getValues, control, setValue, watch } = useForm();
+    const { register, handleSubmit, reset, formState: { errors }, getValues, control, setValue, watch } = useForm();
 
     useEffect(() => {
         dispatch(getMedicalHistoryAction({ patientId: patientId }));
@@ -100,11 +99,12 @@ const MedicalHistory = () => {
             reset();
         }
     }, [toEdit]);
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     const onSubmit = (data) => {
         const selected = data.problem;
         const payload = {
-            clinicId: loggedInUser?._id,
+            clinicId: clinicId || loggedInUser?._id,
             code: {
                 coding: [
                     {
@@ -226,9 +226,9 @@ const MedicalHistory = () => {
                                             )}
                                         />
                                     </Form.Group>
-                                     {errors.problem && (
-                                            <div className="text-danger small">{errors.problem.message}</div>
-                                        )}
+                                    {errors.problem && (
+                                        <div className="text-danger small">{errors.problem.message}</div>
+                                    )}
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group controlId="startDate">
@@ -370,16 +370,16 @@ const MedicalHistory = () => {
                                                     </span>
                                                     <small className="text-black" style={{ fontSize: '12px' }}>
                                                         (
-                                                        {item?.note?.[0]?.time
-                                                            ? new Date(item.note[0].time).toLocaleDateString('en-US', {
+                                                        {item?.createdAt
+                                                            ? new Date(item.createdAt).toLocaleDateString('en-US', {
                                                                 month: 'short',
                                                                 day: 'numeric',
                                                                 year: 'numeric',
                                                             })
                                                             : 'No date'}
                                                         -
-                                                        {item?.note?.[0]?.time
-                                                            ? new Date(item.note[0].time).toLocaleTimeString()
+                                                        {item?.createdAt
+                                                            ? new Date(item.createdAt).toLocaleTimeString()
                                                             : 'No time'}
                                                         )
                                                     </small>

@@ -1,4 +1,4 @@
-export const identifierOptions = [
+const identifierOptionsList = [
     { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
     { label: `Tax Identification Number (TIN)`, value: 'http://hl7.org/fhir/sid/us-tin', code: 'TIN' },
     { label: 'Medicaid Provider Number', value: 'http://hl7.org/fhir/sid/us-medicaid', code: 'Medicaid' },
@@ -7,17 +7,20 @@ export const identifierOptions = [
     { label: 'Health Plan Beneficiary Number', value: 'http://hl7.org/fhir/sid/us-medicare', code: 'HPI' },
     { label: 'Passport Number', value: 'urn:oid:2.16.840.1.113883.4.3.2', code: 'PPN' },
     { label: 'Veterans Affairs ID (VA ID)', value: 'http://va.gov/fhir/sid/va', code: 'VA' },
-
-
 ];
+export const identifierOptions = identifierOptionsList.sort((a, b) =>
+    a.label.localeCompare(b.label)
+);
+
 
 export const licensureOptions = [
     { label: 'Board Certification', value: 'http://www.abms.org/certification', code: 'BOARD-CERT' },
     { label: 'DEA Number (Controlled Substances)', value: 'http://www.nabp.pharmacy/DEA', code: 'DEA' },
-    { label: 'State License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'SL' },
+    { label: 'State controlled Substance License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'SL' },
+    { label: 'Other', value: '', code: '' },
 ]
 
-export const taxonomyOptions = [
+const taxonomyOptionsList = [
     {
         code: "193200000X",
         grouping: "Group",
@@ -4495,7 +4498,7 @@ export const taxonomyOptions = [
         specialization: "Prosthetics Case Management",
         definition: "A case manager who provides services for patients with prosthetics. ",
         notes: "Source National Uniform Claim Committee, www.nucc.org",
-        displayName: " Prosthetics Case Management",
+        displayName: "Prosthetics Case Management",
         section: "Individual"
     },
     {
@@ -6545,7 +6548,7 @@ export const taxonomyOptions = [
         specialization: "Registered Record Administrator",
         definition: "None",
         notes: "[1/1/2023: marked inactive]<br/>Deactivation Date: 3/31/2023",
-        displayName: " Registered Record Administrator",
+        displayName: "Registered Record Administrator",
         section: "Individual "
     },
     {
@@ -10765,7 +10768,7 @@ export const taxonomyOptions = [
         specialization: "Prosthetics Case Management",
         definition: "A case manager who provides services for patients with prosthetics. ",
         notes: "Source National Uniform Claim Committee, www.nucc.org",
-        displayName: " Prosthetics Case Management",
+        displayName: "Prosthetics Case Management",
         section: "Individual"
     },
     {
@@ -12559,6 +12562,10 @@ export const taxonomyOptions = [
         section: "Individual"
     }
 ]
+// sort alphabetically by displayName
+export const taxonomyOptions = taxonomyOptionsList.sort((a, b) =>
+    a.displayName.localeCompare(b.displayName)
+);
 
 // export function getFilteredTaxonomies(search: string, limit: number) {
 //     const pattern = search ? new RegExp(search, 'i') : null;
@@ -12571,7 +12578,7 @@ export const taxonomyOptions = [
 //     return filtered.slice(0, limit || 15);
 // }
 
-export const appointmentStatus = [
+const appointmentStatusList = [
     {
         code: "proposed",
         system: "http://hl7.org/fhir/appointmentstatus",
@@ -12596,12 +12603,12 @@ export const appointmentStatus = [
         display: "Arrived",
         definition: "The patient/patients has/have arrived and is/are waiting to be seen."
     },
-    {
-        code: "fulfilled",
-        system: "http://hl7.org/fhir/appointmentstatus",
-        display: "Fulfilled",
-        definition: "The planning stages of the appointment are now complete, the encounter resource will exist and will track further status changes. Note that an encounter may exist before the appointment status is fulfilled for many reasons."
-    },
+    // {
+    //     code: "fulfilled",
+    //     system: "http://hl7.org/fhir/appointmentstatus",
+    //     display: "Fulfilled",
+    //     definition: "The planning stages of the appointment are now complete, the encounter resource will exist and will track further status changes. Note that an encounter may exist before the appointment status is fulfilled for many reasons."
+    // },
     {
         code: "cancelled",
         system: "http://hl7.org/fhir/appointmentstatus",
@@ -12627,12 +12634,21 @@ export const appointmentStatus = [
         definition: "When checked in, all pre-encounter administrative work is complete, and the encounter may begin. (where multiple patients are involved, they are all present)."
     },
     {
+        code: "checked-out",
+        system: "http://hl7.org/fhir/appointmentstatus",
+        display: "Checked Out",
+        definition: ""
+    },
+    {
         code: "waitlist",
         system: "http://hl7.org/fhir/appointmentstatus",
         display: "Waitlisted",
         definition: "The appointment has been placed on a waitlist, to be scheduled/confirmed in the future when a slot/service is available. A specific time might or might not be pre-allocated."
     }
 ]
+export const appointmentStatus = appointmentStatusList.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);
 
 export const appointmentRecurrence = [
     {
@@ -12645,19 +12661,9 @@ export const appointmentRecurrence = [
         "system": "http://unitsofmeasure.org",
         "display": "week",
     },
-    // {
-    //     "code": "mo",
-    //     "system": "http://unitsofmeasure.org",
-    //     "display": "month",
-    // },
-    // {
-    //     "code": "a",
-    //     "system": "http://unitsofmeasure.org",
-    //     "display": "year",
-    // }
 ]
 
-export const encounterTypes = [
+const encounterTypesList = [
     {
         code: '308335008',
         system: 'http://snomed.info/sct',
@@ -12709,8 +12715,12 @@ export const encounterTypes = [
         display: 'Online Consultation'
     }
 ];
+export const encounterTypes = encounterTypesList.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);
 
-export const encounterClassCodes = [
+
+const encounterClassCodesList = [
     { code: 'AMB', display: 'Ambulatory' },
     { code: 'EMER', display: 'Emergency' },
     { code: 'FLD', display: 'Field' },
@@ -12723,3 +12733,7 @@ export const encounterClassCodes = [
     { code: 'SS', display: 'Short stay' },
     { code: 'VR', display: 'Virtual' }
 ];
+
+export const encounterClassCodes = encounterClassCodesList.sort((a, b) =>
+    a.code.localeCompare(b.code)
+);

@@ -60,11 +60,6 @@ const ClinicForm = ({ clinicId }) => {
         }
     }, [showModalPic, modalFileUrl]);
     const closeModal = () => setShowModal(false);
-    // const [longitude, setLongitude] = useState(null);
-    // const [longitude1, setLongitude1] = useState(null);
-    // const [latitude, setLatitude] = useState(null);
-    // const [latitude1, setLatitude1] = useState(null);
-    // const [stateToSelect, setStateToSelect] = useState(null);
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
@@ -72,9 +67,7 @@ const ClinicForm = ({ clinicId }) => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    // const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
-    // const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
     const [practiceAddresses, setPracticeAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
@@ -83,7 +76,6 @@ const ClinicForm = ({ clinicId }) => {
     useEffect(() => {
         dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_id?.clinicId }) }));
         dispatch(getSubClinicAction());
-        // dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
     const setField = (key, value) => value && setValue(key, value);
@@ -95,7 +87,6 @@ const ClinicForm = ({ clinicId }) => {
             if (clinicsDataGet?.orgLogo) {
                 setLogoName(clinicsDataGet.orgLogo.fileName);
             }
-
             // ✅ Ensure at least 'NPI', 'CLIA', 'NAIC' are set
             let identifiers =
                 clinicsDataGet?.identifier?.map((data) => ({
@@ -255,7 +246,6 @@ const ClinicForm = ({ clinicId }) => {
                 use: item.use,
                 value: item.number,
                 documents: item.file ? { url: item.file.url, fileName: item.file.name || '' } : null,
-                // documents: [item?.file?.url],
                 expirationDate: item.expiry,
                 status: 'active',
                 system: 'urn:oid:2.16.840.1.113883.4.7',
@@ -292,7 +282,7 @@ const ClinicForm = ({ clinicId }) => {
         }
     }, [clinicsDataGet, setValue]);
 
-    const getTableData = store.getSubClinicsReducer?.data?.clinics;
+    const getTableData = store?.getSubClinicsReducer?.data?.clinics;
     const [statesMenu, setStatesMenu] = useState(false);
     const menuRef = useRef(null); // Reference for the menu
     const containerRef = useRef(null); // Reference for the container
@@ -320,8 +310,6 @@ const ClinicForm = ({ clinicId }) => {
         'Other',
     ];
     const contactDetails = ['phone', 'email'];
-    const addressUses = ['work', 'temp', 'old', 'billing'];
-    const addressTypes = ['physical', 'postal', 'both'];
     const uses = ['usual', 'old', 'temp', 'secondary', 'official'];
     const identifierOptions = [
         'NPI',
@@ -338,7 +326,6 @@ const ClinicForm = ({ clinicId }) => {
         'Facility ID',
     ];
 
-    const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
     const [name, setName] = useState({
         use: '',
@@ -378,11 +365,6 @@ const ClinicForm = ({ clinicId }) => {
         setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
     };
 
-    const removeAddress = (index) => {
-        if (addresses.length > 1) {
-            setAddresses(addresses.filter((_, i) => i !== index));
-        }
-    };
 
     const handleChange = (index, field, value) => {
         const updatedIdentifiers = [...constantIdentifiers];
@@ -506,10 +488,7 @@ const ClinicForm = ({ clinicId }) => {
         const date = new Date(dateString);
         return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
     };
-    //  const handleUpdate = (patient) => {
-    //         const payload = { id: patient?._id, active: !patient?.active, category: 'Department' };
-    //         dispatch(updateSubClinicAction({ key: encryptMessage(payload) }));
-    //     };
+
     return (
         <>
             {store.getClinicsReducer?.loading ? (
@@ -594,7 +573,6 @@ const ClinicForm = ({ clinicId }) => {
                                     {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
-
                             <Col sm={3}>
                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                 <div
@@ -664,7 +642,6 @@ const ClinicForm = ({ clinicId }) => {
                                     onChange={handleFileChange}
                                 />
                             </Col>
-
                             <hr className="mb-1" />
                             <Row>
                                 <Col sm={12}>
@@ -724,14 +701,13 @@ const ClinicForm = ({ clinicId }) => {
                                                     value={item.type}
                                                     {...register(
                                                         `identifiers[${index}].type`
-                                                        //  { required: 'Identifier Type is required' }
                                                     )}
                                                     onChange={(e) => handleChange(index, 'type', e.target.value)}
                                                     disabled={defaultIdentifiers.includes(item.type)}>
                                                     <option value="" disabled>
                                                         Select Identifier Type
                                                     </option>
-                                                    {identifierOptions.map((option) => (
+                                                    {identifierOptions?.sort((a, b) => a.localeCompare(b))?.map((option) => (
                                                         <option key={option} className="" value={option}>
                                                             {option}
                                                         </option>
@@ -772,9 +748,6 @@ const ClinicForm = ({ clinicId }) => {
                                                                                                 : 20
                                                     }
                                                     {...register(`identifiers[${index}].number`, {
-                                                        // required: defaultIdentifiers.includes(item.type)
-                                                        //     ? 'Document Number is required'
-                                                        //     : false,
                                                         validate: (value) => {
                                                             if (!value) return true;
 
@@ -948,7 +921,7 @@ const ClinicForm = ({ clinicId }) => {
                                                     <option value="" disabled>
                                                         Select Issuing Authority
                                                     </option>
-                                                    {defaultIssuingAuthority.map((option) => (
+                                                    {defaultIssuingAuthority?.sort((a, b) => a.localeCompare(b))?.map((option) => (
                                                         <option key={option} value={option}>
                                                             {option}
                                                         </option>
@@ -1148,20 +1121,12 @@ const ClinicForm = ({ clinicId }) => {
                                                                 : patient?.address?.[0]?.line?.[0] || 'N/A'}
                                                         </td>
                                                         <td>{patient.orgType}</td>
-                                                        {/* <td>{patient.practiceSpecialty || 'N/A'}</td> */}
-                                                        {/* <td>
-                                                            <Form.Switch
-                                                                className={patient.active ? 'custom-active' : ''}
-                                                                checked={patient.active === patient.status}
-                                                            />
-                                                        </td> */}
                                                         <td
                                                             className="py-1"
                                                             style={{ fontSize: '13px', fontWeight: '400' }}>
                                                             <Form.Switch
                                                                 className={patient.active ? 'custom-active' : ''}
                                                                 checked={patient.active}
-                                                            // onChange={() => handleUpdate(patient)}
                                                             />
                                                         </td>
                                                         <td>
@@ -1195,7 +1160,7 @@ const ClinicForm = ({ clinicId }) => {
                                     display: 'flex',
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                    minHeight: '300px', // minimum height to keep space for loader
+                                    minHeight: '300px',
                                 }}>
                                 {imageLoading && (
                                     <div className="d-flex justify-content-center align-items-center">
@@ -1206,12 +1171,12 @@ const ClinicForm = ({ clinicId }) => {
                                     src={modalFileUrl?.url || modalFileUrl}
                                     alt="File Preview"
                                     onLoad={() => setImageLoading(false)}
-                                    onError={() => setImageLoading(false)} // hide spinner on error too
+                                    onError={() => setImageLoading(false)}
                                     style={{
                                         maxWidth: '100%',
                                         maxHeight: '100vh',
                                         objectFit: 'contain',
-                                        display: imageLoading ? 'none' : 'block', // hide while loading
+                                        display: imageLoading ? 'none' : 'block',
                                     }}
                                 />
                             </div>

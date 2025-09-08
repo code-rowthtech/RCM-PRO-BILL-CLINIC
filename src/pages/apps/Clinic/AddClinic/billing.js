@@ -9,7 +9,7 @@ import ToastHandle from '../../../../helpers/ToastMessage';
 import Spinner from '../../../../constants/Spinner';
 import us from '../../../../assets/images/flags/us.jpg';
 
-const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple }) => {
+const BillingForm = ({ activeTab, setActiveTab, multiple }) => {
     const {
         register,
         handleSubmit,

@@ -17,7 +17,7 @@ import EmailToDoctorModal from './EmailToDoctorModal';
 import DepartmentDetails from './DepartmentDetails';
 import Documents from './Documents';
 import { handleUpload } from '../../../helpers/HandleUpload';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons for eye visibility toggle
@@ -119,7 +119,9 @@ const NewDoctor = () => {
     const updateResponse = store?.createtDoctorsDetailReducer?.data?.status;
     const newDoctorId = store?.createtDoctorsReducer?.data?.doctor?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const createDepartmentResponse = store?.createMastersDataReducer?.data?.status;
     const departmentOptions = store?.getDepartmentDataReducer?.data?.result?.map((department) => ({
         value: department?.name,
@@ -238,7 +240,7 @@ const NewDoctor = () => {
     const submitData = (data) => {
         const payload = {
             ...(updateId ? { doctorId: store?.getDoctorDetailsReducer?.data?.result?._id } : {}), // Conditionally add id if updateId exists
-            // clinicId: clinicId,
+            clinicId: clinicId,
             email: data?.email,
             ...(!updateId ? { password: data?.password } : {}),
             dob: data?.dateOfBirth,
@@ -402,27 +404,24 @@ const NewDoctor = () => {
                                             <ul className="nav nav-underline">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'personalDetails' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'personalDetails' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('personalDetails')}>
                                                         {`Personal Details`}
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'departmentDetails' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'departmentDetails' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('departmentDetails')}>
                                                         {`Professional Information`}
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'qualifications' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'qualifications' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('qualifications')}>
                                                         {`Qualifications`}
                                                     </button>
@@ -444,10 +443,10 @@ const NewDoctor = () => {
                                                                     style={
                                                                         isButtonDisabled
                                                                             ? {
-                                                                                  pointerEvents: 'none',
-                                                                                  opacity: 0.6, // Visual indication that the button is disabled
-                                                                                  cursor: 'not-allowed', // Shows the "not allowed" cursor
-                                                                              }
+                                                                                pointerEvents: 'none',
+                                                                                opacity: 0.6, // Visual indication that the button is disabled
+                                                                                cursor: 'not-allowed', // Shows the "not allowed" cursor
+                                                                            }
                                                                             : {}
                                                                     }
                                                                     className="custom-buttons text-nowrap">
@@ -664,7 +663,7 @@ const NewDoctor = () => {
                                                                             )
                                                                                 .toISOString()
                                                                                 .split('T')[0]
-                                                                        } // Set max date to 18 years ago
+                                                                        }
                                                                         {...register('dateOfBirth', {
                                                                             required: 'Date of birth is required',
                                                                             validate: (value) => {
@@ -748,8 +747,8 @@ const NewDoctor = () => {
                                                                         <option value="" hidden>
                                                                             {`Select Gender`}
                                                                         </option>
-                                                                        <option value="Male">{`Male`}</option>
                                                                         <option value="Female">{`Female`}</option>
+                                                                        <option value="Male">{`Male`}</option>
                                                                         <option value="Other">{`Other`}</option>
                                                                     </Form.Select>
                                                                     {errors.gender && (
@@ -792,12 +791,12 @@ const NewDoctor = () => {
                                                                                 ...(updateId
                                                                                     ? {} // Don't apply pattern if updating
                                                                                     : {
-                                                                                          pattern: {
-                                                                                              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                              message:
-                                                                                                  'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
-                                                                                          },
-                                                                                      }),
+                                                                                        pattern: {
+                                                                                            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                            message:
+                                                                                                'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
+                                                                                        },
+                                                                                    }),
                                                                             })}
                                                                         />
 
@@ -876,52 +875,53 @@ const NewDoctor = () => {
                                                                     </Form.Label>
                                                                     <div
                                                                         onClick={() => logoFileInputRef.current.click()}
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                                            logoName || logoUploading
-                                                                                ? ''
-                                                                                : 'custom-form-fields'
-                                                                        }`}>
+                                                                        className={`custom-file-upload justify-content-between position-relative cursor-pointer form-control ${logoName || logoUploading
+                                                                            ? ''
+                                                                            : 'custom-form-fields'
+                                                                            }`}>
                                                                         <span>
                                                                             {logoUploading === true
                                                                                 ? 'Uploading...'
                                                                                 : logoName
-                                                                                  ? logoName.length > 30
-                                                                                      ? logoName.slice(0, 25) + '...'
-                                                                                      : logoName
-                                                                                  : 'Upload Profile Image'}
+                                                                                    ? logoName.length > 30
+                                                                                        ? logoName.slice(0, 25) + '...'
+                                                                                        : logoName
+                                                                                    : 'Upload Profile Image'}
                                                                         </span>
+                                                                        {!logoName && <i className="bi bi-cloud-arrow-up position-absolute fs-5" style={{ right: '2.5%' }}></i>}
+
 
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {(logo?.url?.split('?')[0] ||
                                                                                 doctorDetails?.photo?.[0]?.url) && (
-                                                                                <FaEye
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        handleShowModal(
-                                                                                            logo?.url?.split('?')[0] ||
+                                                                                    <FaEye
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleShowModal(
+                                                                                                logo?.url?.split('?')[0] ||
                                                                                                 doctorDetails
                                                                                                     ?.photo?.[0]?.url
-                                                                                        );
-                                                                                    }}
-                                                                                    className="text-dark cursor-pointer"
-                                                                                    title="Preview"
-                                                                                />
-                                                                            )}
+                                                                                            );
+                                                                                        }}
+                                                                                        className="text-dark cursor-pointer"
+                                                                                        title="Preview"
+                                                                                    />
+                                                                                )}
                                                                             {(logo?.url?.split('?')[0] ||
                                                                                 doctorDetails?.photo?.[0]?.url) && (
-                                                                                <FiDownloadCloud
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        handleDownload(
-                                                                                            logo ||
+                                                                                    <FiDownloadCloud
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleDownload(
+                                                                                                logo ||
                                                                                                 doctorDetails
                                                                                                     ?.photo?.[0]
-                                                                                        );
-                                                                                    }}
-                                                                                    className="text-dark cursor-pointer"
-                                                                                    title="Download"
-                                                                                />
-                                                                            )}
+                                                                                            );
+                                                                                        }}
+                                                                                        className="text-dark cursor-pointer"
+                                                                                        title="Download"
+                                                                                    />
+                                                                                )}
                                                                         </div>
                                                                     </div>
                                                                     <Form.Control
@@ -942,7 +942,7 @@ const NewDoctor = () => {
                                                             <div className="col-md-3 col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        {`Specialist`}{' '}
+                                                                        {`Speciality`}{' '}
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
@@ -950,7 +950,7 @@ const NewDoctor = () => {
                                                                         onChange={(e) => {
                                                                             clearErrors('specialist');
                                                                         }}
-                                                                        placeholder="Enter Specialist Name"
+                                                                        placeholder="Enter Speciality Name"
                                                                     />
                                                                 </Form.Group>
                                                             </div>
@@ -1035,7 +1035,7 @@ const NewDoctor = () => {
                                                             disabled={store?.createtDoctorsReducer?.loading}
                                                             style={{ width: '120px' }}>
                                                             {store?.createtDoctorsReducer?.loading ||
-                                                            store?.createtDoctorsDetailReducer?.loading ? (
+                                                                store?.createtDoctorsDetailReducer?.loading ? (
                                                                 <Spinner color="white" className="spinner-border-sm" />
                                                             ) : id ? (
                                                                 'Update & Next'
@@ -1064,7 +1064,7 @@ const NewDoctor = () => {
                 <DepartmentModal
                     addDepartmentModal={addDepartmentModal}
                     closeAddModal={() => setAddDepartmentModal(false)}
-                    // edit={edit}
+                // edit={edit}
                 />
                 <Modal show={showModalPic} onHide={handleCloseModal} centered>
                     <Modal.Body>

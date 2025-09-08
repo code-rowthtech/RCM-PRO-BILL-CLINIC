@@ -49,7 +49,6 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
-    console.log(patientVitals, 'effectiveDateTimeeffectiveDateTime')
 
     const [editingDate, setEditingDate] = useState(null);
     const now = new Date();
@@ -167,7 +166,6 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                         code: "kg/m2"
                     }
                 };
-                console.log(observation, 'observation')
                 dispatch(createVitalsAction({ key: encryptMessage(observation) }));
             }
         }
@@ -274,7 +272,6 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                 ...baseObservation,
                 valueString: vital.value
             };
-            console.log(observation, 'observation')
 
             dispatch(createVitalsAction({ key: encryptMessage(observation) }));
         }
@@ -310,7 +307,6 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                             unitToSend === '°F' ? '[degF]' : unitToSend
                 }
             };
-            console.log(observation, 'observation')
 
             dispatch(createVitalsAction({ key: encryptMessage(observation) }));
         }

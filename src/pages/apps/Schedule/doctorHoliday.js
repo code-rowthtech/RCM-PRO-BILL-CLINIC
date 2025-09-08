@@ -1,34 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Col, OverlayTrigger, Spinner, Table, Tooltip } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { OverlayTrigger, Spinner, Table, Tooltip } from 'react-bootstrap';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
-import { encryptMessage } from '../../../cryptoUtils';
-import Paginations from '../../../helpers/Paginations';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 
 const DoctorHoliday = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
     const scheduleResponse = store?.getScheduleReducer?.data?.holidays || [];
     const isLoading = store?.getScheduleReducer?.loading;
     const deleteResponse = store?.deleteScheduleReducer?.data?.response?.status;
 
-    // useEffect(() => {
-    //     const hasFilters = scheduleResponse === undefined;
-    //     const payload = {
-    //       clinicId: clinicId,
-    //     }
-    //     if (hasFilters) {
-    //         dispatch(getScheduleAction({  key:encryptMessage(payload)}));
-    //     }
-    // }, [dispatch]);
-    // useEffect(() => {
-    //     const payload = {
-    //         clinicId: clinicId,
-    //     };
-    //     dispatch(getScheduleAction({ key: encryptMessage(payload) }));
-    // }, [dispatch]);
     useEffect(() => {
         if (deleteResponse === 200) {
             const payload = {
@@ -51,19 +36,19 @@ const DoctorHoliday = () => {
                 <thead className="text-white">
                     <tr>
                         <th className="text-white " style={{ fontSize: '13px' }}>
-                            Sr.No.
+                            {`Sr.No.`}
                         </th>
                         <th className="text-white " style={{ fontSize: '13px' }}>
-                            Provider Name
+                            {`Provider Name`}
                         </th>
                         <th className="text-white " style={{ fontSize: '13px' }}>
-                            Reason
+                            {`Reason`}
                         </th>
                         <th className="text-white " style={{ fontSize: '13px' }}>
-                            Date
+                            {`Date`}
                         </th>
                         <th className="text-white " style={{ fontSize: '13px' }}>
-                            Action
+                            {`Action`}
                         </th>
                     </tr>
                 </thead>
@@ -77,7 +62,7 @@ const DoctorHoliday = () => {
                     ) : scheduleResponse.length === 0 ? (
                         <tr>
                             <td colSpan={7} className="text-center">
-                                <h3 className="my-5">No Data Found</h3>
+                                <h3 className="my-5">{`No Data Found`}</h3>
                             </td>
                         </tr>
                     ) : (
@@ -87,7 +72,14 @@ const DoctorHoliday = () => {
                                     {index + 1}
                                 </td>
                                 <td className="text-capitalize " style={{ fontSize: '13px', fontWeight: '400' }}>
-                                    {holiday?.doctorId?.name[0]?.text + ' '}
+                                    {(holiday?.doctorId?.name?.[0]?.prefix?.[0]
+                                        ? holiday?.doctorId?.name?.[0]?.prefix?.[0] + ' '
+                                        : '') +
+                                        (holiday?.doctorId?.name?.[0]?.family || '') +
+                                        (holiday?.doctorId?.name?.[0]?.given?.length > 0
+                                            ? ' ' + holiday?.doctorId?.name?.[0]?.given?.join(' ')
+                                            : '') || 'N/A'}
+
                                 </td>
                                 <td className="text-capitalize " style={{ fontSize: '13px', fontWeight: '400' }}>
                                     {(holiday?.reason?.length || 0) > 20 ? (

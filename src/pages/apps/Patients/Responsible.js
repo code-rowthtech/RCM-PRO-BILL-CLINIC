@@ -4,19 +4,22 @@ import { useForm } from 'react-hook-form';
 import AddressForm from '../Common Pages/AddressForm';
 import TelecomFrom from '../Common Pages/TelecomFrom';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import { createResponsiblePartyAction } from '../../../redux/actions';
 import { dataList } from '../../../utils/DataSets/relations.data';
 import Select from 'react-select';
 import Spinner from '../../../constants/Spinner';
 import { useSearchParams } from 'react-router-dom';
+import ToastHandle from '../../../helpers/ToastMessage';
 
 const Responsiblle = ({ activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('updateid');
     const [submissionType, setSubmissionType] = useState(null);
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const dispatch = useDispatch();
     const [responsibleAddresses, setResponsibleAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
@@ -37,7 +40,7 @@ const Responsiblle = ({ activeTab, setActiveTab }) => {
         if (patientDetails && patientDetails?._id === patientId) {
             setValue('title', patientDetails?.name?.[0]?.prefix);
             setValue('fullName', patientDetails?.name?.[0]?.text);
-            setValue('gender', patientDetails?.gender);
+            // setValue('gender', patientDetails?.gender);
             setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0]);
             setValue(
                 'dateOfBirth',
@@ -63,7 +66,14 @@ const Responsiblle = ({ activeTab, setActiveTab }) => {
             setResponsibleTelecom(updateTelecom);
         }
     }, [patientDetails]);
+
     const onSubmit = (data) => {
+        if (!patientId) {
+            setActiveTab('personalDetails');
+            ToastHandle('Please create a patient record first before adding responsible party.', 'danger');
+            return;
+        }
+
         const payload = {
             patientId: patientId,
             clinicId: clinicId,
@@ -85,7 +95,7 @@ const Responsiblle = ({ activeTab, setActiveTab }) => {
                 },
             ],
             address: responsibleAddresses,
-            gender: data?.gender,
+            // gender: data?.gender,
             dateOfBirth: data?.dateOfBirth,
             telecom: responsibleTelecom,
         };
@@ -102,7 +112,7 @@ const Responsiblle = ({ activeTab, setActiveTab }) => {
             }
         }
     }, [createResponse]);
-    const relationshipOption = dataList?.map((relation) => ({
+    const relationshipOption = dataList?.sort((a, b) => a.display.localeCompare(b.display))?.map((relation) => ({
         value: relation, // Code as the value
         label: relation.display, // Display text as the label
     }));
@@ -110,6 +120,7 @@ const Responsiblle = ({ activeTab, setActiveTab }) => {
     const handleRelationChange = (selectedOption) => {
         setRela(selectedOption ? selectedOption.value : '');
     };
+
     return (
         <>
             <Form onSubmit={handleSubmit(onSubmit)}>
@@ -117,14 +128,14 @@ const Responsiblle = ({ activeTab, setActiveTab }) => {
                     <div className="row pt-1 pe-0">
                         <div className="col-md-3 col-12 pe-1 position-relative" style={{ minHeight: '70px' }}>
                             <Form.Label className="mb-0">
-                                Title <span className="text-danger">*</span>
+                                Title
                             </Form.Label>
-                            <Form.Select {...register('title', { required: 'This field is required' })}>
+                            <Form.Select {...register('title')}>
                                 <option value="">Select Title</option>
+                                <option value="Dr.">Dr.</option>
+                                <option value="Miss">Miss</option>
                                 <option value="Mr.">Mr.</option>
                                 <option value="Mrs.">Mrs.</option>
-                                <option value="Miss">Miss</option>
-                                <option value="Dr.">Dr.</option>
                                 <option value="Other">Other</option>
                             </Form.Select>
                             {errors.title && (
@@ -153,7 +164,7 @@ const Responsiblle = ({ activeTab, setActiveTab }) => {
                             )}
                         </div>
 
-                        <div className="col-md-3 col-12 position-relative" style={{ minHeight: '70px' }}>
+                        {/* <div className="col-md-3 col-12 position-relative" style={{ minHeight: '70px' }}>
                             <Form.Label htmlFor="gender" className="mb-0">
                                 Gender <span className="text-danger">*</span>
                             </Form.Label>
@@ -173,16 +184,16 @@ const Responsiblle = ({ activeTab, setActiveTab }) => {
                                     {errors.gender.message}
                                 </span>
                             )}
-                        </div>
+                        </div> */}
                         <div className="col-md-3 col-12 pe-0 position-relative" style={{ minHeight: '70px' }}>
                             <Form.Label htmlFor="DOB" className="mb-0">
-                                Date of Birth <span className="text-danger">*</span>
+                                Date of Birth
                             </Form.Label>
                             <Form.Control
                                 type="date"
                                 placeholder="Date of Birth"
                                 max={new Date().toISOString().split('T')[0]} // today's date in YYYY-MM-DD format
-                                {...register('dateOfBirth', { required: 'This field is required' })}
+                                {...register('dateOfBirth')}
                             />
                             {errors.dateOfBirth && (
                                 <span

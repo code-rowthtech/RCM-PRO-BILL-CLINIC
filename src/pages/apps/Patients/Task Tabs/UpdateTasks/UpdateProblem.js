@@ -142,23 +142,23 @@ const UpdateProblem = ({ onCancel, problem }) => {
             onsetDateTime: data.datetimeDiagnosis,
             ...(data?.note
                 ? {
-                      note: [
-                          {
-                              text: data.note,
-                              time: '',
-                              authorReference: {
-                                  reference: '',
-                                  type: '',
-                                  identifier: {
-                                      use: '',
-                                      system: '',
-                                      value: '',
-                                  },
-                                  display: '',
-                              },
-                          },
-                      ],
-                  }
+                    note: [
+                        {
+                            text: data.note,
+                            time: '',
+                            authorReference: {
+                                reference: '',
+                                type: '',
+                                identifier: {
+                                    use: '',
+                                    system: '',
+                                    value: '',
+                                },
+                                display: '',
+                            },
+                        },
+                    ],
+                }
                 : {}),
         };
         dispatch(updateProblemListAction({ key: encryptMessage(payload) }));

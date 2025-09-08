@@ -10,6 +10,7 @@ import Paginations from '../../../helpers/Paginations';
 import { IoSearchSharp } from 'react-icons/io5';
 import dummyProfile from '../../../assets/images/dummyProfile.png';
 import { IoMdClose } from 'react-icons/io';
+import { decryptMessage } from '../../../cryptoUtils';
 const Patients = () => {
     const navigate = useNavigate('');
     const [smShow, setSmShow] = useState(false);
@@ -18,10 +19,11 @@ const Patients = () => {
     const [status, setStatus] = useState(true);
 
     const dispatch = useDispatch();
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsReducer?.data?.data;
-
     useEffect(() => {
         const payload = { search: search, page: skip, limit: 10, clinicId: clinicId };
         dispatch(getPatientsAction(payload));
@@ -184,7 +186,11 @@ const Patients = () => {
                                                                 <div>
                                                                     {(data?.name?.[0]?.prefix?.[0]
                                                                         ? data?.name?.[0]?.prefix?.[0] + ' '
-                                                                        : '') + (data?.name?.[0]?.text || 'N/A')}
+                                                                        : '') +
+                                                                        (data?.name?.[0]?.family || '') +
+                                                                        (data?.name?.[0]?.given?.length > 0
+                                                                            ? ' ' + data?.name?.[0]?.given?.join(' ')
+                                                                            : '') || 'N/A'}
                                                                     <div className="text-info fw-bold fs-6">
                                                                         <span className="text-dark">MRN: </span>
                                                                         {data?.chartNumber}

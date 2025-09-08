@@ -64,19 +64,6 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
             return `(${p1}`;
         });
     };
-    // Function to handle Telecom (Contact) field changes inside POCs
-    const handleTelecomChange = (pocIndex, telecomIndex, field, value) => {
-        let rawValue = value.replace(/\D/g, ''); // Remove non-numeric characters
-
-        // Limit to 10 digits
-        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
-
-        // Format as (XXX)XXXXXXX
-        const formattedValue = rawValue.replace(/(\d{1,3})(\d{0,7})/, (match, p1, p2) => {
-            if (p2) return `(${p1})${p2}`;
-            return `(${p1}`;
-        });
-    };
 
     return (
         <div>
@@ -118,7 +105,7 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                     <option value="" disabled>
                                         {`Select Contact Type`}
                                     </option>
-                                    {contactOptions.map((option) => (
+                                    {contactOptions?.sort((a, b) => a.localeCompare(b))?.map((option) => (
                                         <option className="text-capitalize" key={option} value={option}>
                                             {option}
                                         </option>
@@ -173,11 +160,11 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                     {...register(`constantContact[${index}].use`)}
                                     onChange={(e) => handleContactChange(index, 'use', e.target.value)}>
                                     <option value="">Select Option</option>
-                                    <option value="temp">Temp</option>
                                     <option value="home">Home</option>
-                                    <option value="work">Work</option>
-                                    <option value="old">Old</option>
                                     <option value="mobile">Mobile</option>
+                                    <option value="old">Old</option>
+                                    <option value="temp">Temp</option>
+                                    <option value="work">Work</option>
                                     {/* Add more options as needed */}
                                 </Form.Select>
                                 {index >= contactDetails.length && (

@@ -11,7 +11,7 @@ import {
 } from '../../../redux/patients/actions';
 import { useForm, Controller } from 'react-hook-form';
 import us from '../../../assets/images/flags/us.jpg';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import {
     getCitiesAction,
@@ -50,7 +50,8 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation'));
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const [submissionType, setSubmissionType] = useState(null);
     const [patientId, setPatientId] = useState(null);
@@ -71,7 +72,6 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const [btnShow, setBtnShow] = useState(true);
     const [stateToSelect, setStateToSelect] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    console.log('selectedDoctor', selectedDoctor);
     const [responsibleParty, setResponsibleParty] = useState('');
     const [referringPhysician, setReferringPhysician] = useState('');
     const [showModalPic, setShowModalPic] = useState(false);
@@ -80,6 +80,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const [showCellPhone, setShowCellPhone] = useState(false);
     const [showOfficePhone, setShowOfficePhone] = useState(false);
     const [showAltEmail, setShowAltEmail] = useState(false);
+    const [selectedPhoneTypes, setSelectedPhoneTypes] = useState(['homePhone']);
     const [profileUploading, setProfileUploading] = useState(false);
 
     const handleShowModal = (url) => {
@@ -105,8 +106,15 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
 
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
-        label: data?.name?.[0]?.text,
+        label: (data?.name?.[0]?.prefix?.[0]
+            ? data?.name?.[0]?.prefix?.[0] + ' '
+            : '') +
+            (data?.name?.[0]?.family || '') +
+            (data?.name?.[0]?.given?.length > 0
+                ? ' ' + data?.name?.[0]?.given?.join(' ')
+                : '') || 'N/A',
     }));
+
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -239,7 +247,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
             setLogo(url);
             setLogoName(selectedFile?.name);
             clearErrors('profileImage');
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -279,13 +287,13 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                         rules={
                             !id
                                 ? {
-                                      pattern: {
-                                          value: /^\(\d{3}\)\d{3}-\d{4}$/,
-                                          message: 'Format must be (XXX)XXX-XXXX',
-                                      },
-                                      maxLength: { value: 13, message: 'Max 13 characters' },
-                                      minLength: { value: 13, message: 'Min 13 characters' },
-                                  }
+                                    pattern: {
+                                        value: /^\(\d{3}\)\d{3}-\d{4}$/,
+                                        message: 'Format must be (XXX)XXX-XXXX',
+                                    },
+                                    maxLength: { value: 13, message: 'Max 13 characters' },
+                                    minLength: { value: 13, message: 'Min 13 characters' },
+                                }
                                 : {}
                         }
                         render={({ field: { onChange, value, ref } }) => (
@@ -315,8 +323,6 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
         </div>
     );
 
-    const maxInputsReached = showCellPhone && showOfficePhone;
-
     const onSubmit = (data) => {
         const payload = {
             clinicId: clinicId || '',
@@ -332,15 +338,15 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
             refferingDoctor: showReferringTab, // Convert string to boolean
             photo: logo?.url
                 ? [
-                      {
-                          contentType: logo?.fileType || 'image/jpeg', // Assuming fileType exists, default to 'image/jpeg'
-                          url: logo?.url?.split('?')[0], // Remove query params from URL
-                          data: logo?.base64 || undefined, // If base64 data is available
-                          hash: logo?.hash || '', // If you have a hash for verification
-                          title: logoName || '', // Use provided file name as title
-                          creation: new Date().toISOString(), // Current timestamp
-                      },
-                  ]
+                    {
+                        contentType: logo?.fileType || 'image/jpeg', // Assuming fileType exists, default to 'image/jpeg'
+                        url: logo?.url?.split('?')[0], // Remove query params from URL
+                        data: logo?.base64 || undefined, // If base64 data is available
+                        hash: logo?.hash || '', // If you have a hash for verification
+                        title: logoName || '', // Use provided file name as title
+                        creation: new Date().toISOString(), // Current timestamp
+                    },
+                ]
                 : [],
             patientStatus: data?.patientStatus || '',
             paymentProfile: data?.paymentProfile || '',
@@ -402,6 +408,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const handleInputChange = (data) => {
         setDoctorSearch(data);
     };
+
     const handleChange = (selectedOption) => {
         setSelectedDoctor(selectedOption);
     };
@@ -410,8 +417,9 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
         { key: 'personalDetails', label: 'Personal Details', show: true },
         { key: 'demographicDetails', label: 'Demographic', show: true },
         { key: 'responsible', label: 'Responsible Party', show: showResponsibleTab },
-        { key: 'referringDoctor', label: 'Referring Doctor', show: showReferringTab }
+        { key: 'referringDoctor', label: 'Referring Source', show: showReferringTab }
     ];
+
     return (
         <div className="background_Color">
             <div className={`container-fluid ${isModal ? 'mt-0 ' : 'mt-2'} px-0`}>
@@ -419,7 +427,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                     <div className="d-flex justify-content-between">
                         <div>
                             <ul className="nav nav-underline">
-                                {tabs.filter(tab => tab.show).map(tab => (
+                                {tabs?.filter(tab => tab.show).map(tab => (
                                     <li key={tab.key} className="nav-item">
                                         <button
                                             className={`text-black nav-link fw-medium ${activeTab === tab.key ? 'active fw-bold' : ''}`}
@@ -514,44 +522,76 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         </Form.Group>
                                     </div>
 
-                                    {renderPhoneField(
-                                        'Home Phone',
-                                        'homePhone',
-                                        !maxInputsReached && (
-                                            <span
-                                                className=" uil-plus-circle plusicon cursor-pointer"
-                                                onClick={() => {
-                                                    if (!showCellPhone) setShowCellPhone(true);
-                                                    else if (!showOfficePhone) setShowOfficePhone(true);
+                                    <div className="col-md-3 col-12 mb-2">
+                                        <Form.Group>
+                                            <Form.Label className="mb-0">Phone Types</Form.Label>
+                                            <Select
+                                                isMulti
+                                                value={[
+                                                    { value: 'cellPhone', label: 'Cell Phone' },
+                                                    { value: 'homePhone', label: 'Home Phone' },
+                                                    { value: 'officePhone', label: 'Office Phone' }
+                                                ].filter(option => selectedPhoneTypes.includes(option.value))}
+                                                onChange={(selected) => {
+                                                    setSelectedPhoneTypes(selected ? selected.map(item => item.value) : []);
+                                                }}
+                                                options={[
+                                                    { value: 'cellPhone', label: 'Cell Phone' },
+                                                    { value: 'homePhone', label: 'Home Phone' },
+                                                    { value: 'officePhone', label: 'Office Phone' }
+                                                ]}
+                                                placeholder="Select phone types"
+                                                styles={{
+                                                    control: (provided) => ({
+                                                        ...provided,
+                                                        height: '30px',
+                                                        minHeight: '30px',
+                                                        background: '#e8f0fe',
+                                                        border: 'none',
+                                                        overflowY: 'scroll'
+                                                    }),
+                                                    valueContainer: (base) => ({
+                                                        ...base,
+                                                        padding: '2px 8px',
+                                                        flexWrap: 'wrap'
+                                                    }),
+                                                    multiValue: (base) => ({
+                                                        ...base,
+                                                        fontSize: '11px',
+                                                        margin: '1px'
+                                                    }),
+                                                    multiValueLabel: (base) => ({
+                                                        ...base,
+                                                        fontSize: '11px',
+                                                        padding: '2px 6px'
+                                                    }),
+                                                    input: (base) => ({
+                                                        ...base,
+                                                        margin: '0px',
+                                                        fontSize: '12px'
+                                                    }),
+                                                    placeholder: (base) => ({
+                                                        ...base,
+                                                        fontSize: '12px'
+                                                    }),
+                                                    option: (base) => ({
+                                                        ...base,
+                                                        fontSize: '12px'
+                                                    }),
+                                                    menu: (base) => ({ ...base, zIndex: 9999 })
                                                 }}
                                             />
-                                        )
-                                    )}
+                                        </Form.Group>
+                                    </div>
 
-                                    {showCellPhone &&
-                                        renderPhoneField(
-                                            'Cell Phone',
-                                            'cellPhone',
-                                            <span
-                                                className=" uil-minus-circle minusicon text-danger cursor-pointer"
-                                                onClick={() => setShowCellPhone(false)}
-                                            />
-                                        )}
-
-                                    {showOfficePhone &&
-                                        renderPhoneField(
-                                            'Office Phone',
-                                            'officePhone',
-                                            <span
-                                                className=" uil-minus-circle minusicon text-danger cursor-pointer"
-                                                onClick={() => setShowOfficePhone(false)}
-                                            />
-                                        )}
+                                    {selectedPhoneTypes.includes('homePhone') && renderPhoneField('Home Phone', 'homePhone')}
+                                    {selectedPhoneTypes.includes('cellPhone') && renderPhoneField('Cell Phone', 'cellPhone')}
+                                    {selectedPhoneTypes.includes('officePhone') && renderPhoneField('Office Phone', 'officePhone')}
 
                                     <div className="col-md-3 col-12 mb-2 mt-1">
                                         <Form.Group>
                                             <Form.Label className="mb-0 d-flex justify-content-start gap-1 align-items-center">
-                                                {`Email ID`}
+                                                {`Email`}
                                                 {!showAltEmail && (
                                                     <span
                                                         className=" uil-plus-circle plusicon cursor-pointer"
@@ -561,7 +601,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                             </Form.Label>
                                             <Form.Control
                                                 type="email"
-                                                placeholder="Email ID"
+                                                placeholder="Email"
                                                 {...register('email', {
                                                     pattern: {
                                                         value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
@@ -651,7 +691,8 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                                     'gender'
                                                     //  { required: 'Gender is required' }
                                                 )}>
-                                                {["unknown", "male", "female", "other"]?.map((gender, index) => (
+                                                <option className='text-capitalize' value={''} key={''}>{'Select Gender'}</option>
+                                                {["unknown", "male", "female", "other"]?.sort((a, b) => a.localeCompare(b))?.map((gender, index) => (
                                                     <option className='text-capitalize' value={gender} key={index}>{gender}</option>
                                                 ))}
                                             </Form.Select>
@@ -672,7 +713,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                                 as="select" // Use 'select' to make it a dropdown
                                                 id="patientstatus"
                                                 {...register('patientStatus')}>
-                                                {["Active", "Inactive", "Inactive-Deceased"]?.map((pStatus, index) => (
+                                                {["Active", "Inactive", "Inactive-Deceased", "Inactive-Terminated", "Inactive-In Collections"]?.sort((a, b) => a.localeCompare(b))?.map((pStatus, index) => (
                                                     <option value={pStatus} key={index}>{pStatus}</option>
                                                 ))}
                                             </Form.Select>
@@ -701,14 +742,13 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                             <div
                                                 onClick={() => logoFileInputRef.current.click()}
                                                 style={{ height: '30px', marginTop: '3px' }}
-                                                className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                    logoName || profileUploading ? 'form-control' : 'custom-form-fields'
-                                                }`}>
+                                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? 'form-control' : 'custom-form-fields'
+                                                    }`}>
                                                 {logoName
                                                     ? logoName.split('/').pop().slice(0, 30) + '...'
                                                     : profileUploading
-                                                      ? 'Uploading...'
-                                                      : 'Upload Photo'}
+                                                        ? 'Uploading...'
+                                                        : 'Upload Photo'}
                                                 <div className="d-flex align-items-center gap-2">
                                                     {(logo?.url || logo) && (
                                                         <FiEye
@@ -748,7 +788,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                                 <option value="" hidden>
                                                     {`Select`}
                                                 </option>
-                                                {["Mr.", "Mrs.", "Miss", "Dr.", "Other"]?.map((title, index) => (
+                                                {["Mr.", "Mrs.", "Miss", "Dr.", "Other"]?.sort((a, b) => a.localeCompare(b))?.map((title, index) => (
                                                     <option value={title} key={index}>{title}</option>
                                                 ))}
                                             </Form.Select>
@@ -786,7 +826,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                                     {`Select`}
                                                 </option>
                                                 {["Home Phone", "Work Phone", "Cell Phone", "Email",
-                                                    "Text Message", "Declined", "Snail Mail", "Other"]?.map((prefCom, index) => (
+                                                    "Text Message", "Declined", "Snail Mail", "Other"]?.sort((a, b) => a.localeCompare(b))?.map((prefCom, index) => (
                                                         <option key={index} value={prefCom}>{prefCom}</option>
                                                     ))}
                                             </Form.Select>
@@ -800,9 +840,10 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
 
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">{`Reminder Language`}</Form.Label>
+                                            <Form.Label className="mb-0">{`Preferred Language`}</Form.Label>
                                             <Form.Select {...register('reminderLanguage')} defaultValue="English">
-                                                {["English", "Spanish", "French"]?.map((lang, index) => (
+                                                <option value={''} key={''}>{`Select Preferred Language`}</option>
+                                                {["English", "Spanish", "French"]?.sort((a, b) => a.localeCompare(b))?.map((lang, index) => (
                                                     <option value={lang} key={index}>{lang}</option>
                                                 ))}
                                             </Form.Select>
@@ -812,8 +853,9 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         <Form.Group>
                                             <Form.Label className="mb-0">{`Responsible Party`}</Form.Label>
                                             <Form.Select onChange={handleResponsibleChange} value={responsibleParty}>
-                                                <option value="true">{`Yes`}</option>
+                                                <option value="">{`Select option`}</option>
                                                 <option value="false">{`No`}</option>
+                                                <option value="true">{`Yes`}</option>
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
@@ -822,8 +864,9 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                         <Form.Group>
                                             <Form.Label className="mb-0">{`Referring Doctor`}</Form.Label>
                                             <Form.Select onChange={handleReferringChange} value={referringPhysician}>
-                                                <option value="true">{`Yes`}</option>
+                                                <option value="">{`Select option`}</option>
                                                 <option value="false">{`No`}</option>
+                                                <option value="true">{`Yes`}</option>
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
@@ -877,24 +920,24 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                             <Form.Label className="mb-0">{`Medical History Concent`}</Form.Label>
                                             <Form.Select
                                                 {...register('medicationHistoryConsent')}
-                                                // defaultValue={'true'}
+                                            // defaultValue={'true'}
                                             >
-                                                <option value={''}>{`Select`}</option>
-                                                <option value={'true'}>{`Yes`}</option>
+                                                <option value={''}>{`Select Option`}</option>
                                                 <option value={'false'}>{`No`}</option>
+                                                <option value={'true'}>{`Yes`}</option>
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
 
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">{`Payment Profile`}</Form.Label>
+                                            <Form.Label className="mb-0">{`Financial Class`}</Form.Label>
                                             <Form.Select
                                                 {...register('paymentProfile')}
                                                 aria-label="Payment Profile"
                                                 defaultValue={'Cash'}>
-                                                {["Cash", "Insurance", "Insurance Out of Network", "Auto Accident", "Worker's Comp", "Other"]?.map((paymentProf, index) => (
-                                                    <option value={paymentProf} key={index}>{paymentProf}</option>
+                                                {["Cash", "Insurance", "Insurance Out of Network", "Auto Accident", "Worker's Comp", "Other"]?.sort((a, b) => a.localeCompare(b))?.map((paymentProf, index) => (
+                                                    <option selected={paymentProf === 'Cash'} value={paymentProf} key={index}>{paymentProf}</option>
                                                 ))}
                                             </Form.Select>
                                             {errors.paymentProfile && (

@@ -5,14 +5,16 @@ import '../settingtabs.css';
 import { useSelector, useDispatch } from 'react-redux';
 import Spinner from '../../../../constants/Spinner';
 import { getNoteCategoriesAction, updateNoteCategoriesAction } from '../../../../redux/noteCategories/action';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { FiFileText } from 'react-icons/fi';
 
 const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [noteTypes, setNoteTypes] = useState([]);
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const notesCategoriesData = store?.getNoteCategoriesReducer?.data?.data;
     const loading = store?.getNoteCategoriesReducer?.loading;
 

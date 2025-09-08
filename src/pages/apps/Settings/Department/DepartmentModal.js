@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { createMastersDataAction, updateMastersDataAction } from '../../../../redux/settings/action';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { Button, Col, Modal, Row, Form } from 'react-bootstrap';
 
 const DepartmentModal = ({ addDepartmentModal, closeAddModal, edit }) => {
@@ -17,7 +17,8 @@ const DepartmentModal = ({ addDepartmentModal, closeAddModal, edit }) => {
     } = useForm();
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     useEffect(() => {
         if (edit) {
@@ -35,7 +36,7 @@ const DepartmentModal = ({ addDepartmentModal, closeAddModal, edit }) => {
             reset();
         }
     }, [addDepartmentModal, edit, reset]);
-    
+
     const addDepartment = (data) => {
         const payload = {
             //   id: edit?._id,
@@ -147,7 +148,7 @@ const DepartmentModal = ({ addDepartmentModal, closeAddModal, edit }) => {
                             </Button>
                             <Button type="submit" className="custom-buttons" style={{ width: '65px' }}>
                                 {store?.createMastersDataReducer?.loading ||
-                                store?.updateMastersDataReducer?.loading ? (
+                                    store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>

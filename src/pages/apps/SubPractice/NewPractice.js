@@ -8,7 +8,7 @@ import { FiInfo } from 'react-icons/fi';
 
 // import EmailToSubClinicModal from './EmailToSubClinicModal';
 import { handleUpload } from '../../../helpers/HandleUpload';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import {
@@ -78,7 +78,9 @@ const NewPractice = () => {
     const navigate = useNavigate();
     const store = useSelector((state) => state);
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
     const createLoading = store?.createSubClinicsReducer?.loading;
@@ -125,7 +127,7 @@ const NewPractice = () => {
         dispatch(getClinicTypeAction());
     }, [dispatch]);
     useEffect(() => {
-        dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_MainId?.clinicId }) }));
+        dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_id }) }));
     }, [dispatch]);
 
     const [formData, setFormData] = useState({
@@ -291,7 +293,7 @@ const NewPractice = () => {
                 // documents: item.file
                 //     ? { url: item.file.url?.url, fileName: item?.file.url?.name || '' }
                 //     : { url: item.file?.url, fileName: item?.file?.name || '' },
-                ...(item?.file && { documents: { url: item?.file?.url, fileName: item?.file?.name || '' } }),
+                ...(item?.file && { documents: { url: item?.file?.url?.url, fileName: item?.file?.name || '' } }),
                 expirationDate: item.expiry,
                 status: 'active',
                 system: 'urn:oid:2.16.840.1.113883.4.7',
@@ -304,9 +306,7 @@ const NewPractice = () => {
             flag: 'subClinic',
             // ...(posDetails && { pos: posDetails }),
         };
-
         dispatch(createSubClinicAction({ key: encryptMessage(newPayload) }));
-        console.log(newPayload, 'newPayload');
     };
 
     useEffect(() => {

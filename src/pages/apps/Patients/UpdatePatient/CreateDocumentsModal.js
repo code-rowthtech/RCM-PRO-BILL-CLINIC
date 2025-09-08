@@ -125,66 +125,6 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
     // DOCUMENT Category HANDLING
     const [documentCategory, setDocumentCategory] = useState(null);
 
-    // const formattedDocumentCategory = useMemo(() =>
-    //     documentCategories.map((type) => ({
-    //         value: type,
-    //         label: type?.display,
-    //     })), []);
-    // const selectedDocumentCategoryOption = useMemo(() =>
-    //     formattedDocumentCategory.find((option) => option?.value?.display === documentCategory?.text) ||
-    //     formattedDocumentCategory.find((option) => option?.display === documentCategory),
-    //     [formattedDocumentCategory, documentCategory]
-    // );
-
-    // const loadDocumentCategoryOptions = useCallback((inputValue, callback) => {
-    //     if (!inputValue) {
-    //         callback(formattedDocumentCategory.slice(0, 10));
-    //         return;
-    //     }
-
-    //     const filteredOptions = formattedDocumentCategory.filter((option) =>
-    //         option.label.toLowerCase().includes(inputValue.toLowerCase())
-    //     );
-
-    //     callback(filteredOptions.slice(0, 20));
-    // }, [formattedDocumentCategory]);
-
-    // const handleDocumentCategoryChange = useCallback((selectedOption) => {
-    //     setDocumentCategory(selectedOption ? selectedOption.value : '');
-    // }, []);
-
-
-    // const handleDrop = useCallback((e) => {
-    //     e.preventDefault();
-    //     const dropped = Array.from(e.dataTransfer.files).filter(validateFile);
-    //     setFiles((prev) => [...prev, ...dropped]);
-    // }, []);
-
-    // const handleFileInput = (e) => {
-    //     const selected = Array.from(e.target.files).filter(validateFile);
-    //     setFiles((prev) => [...prev, ...selected]);
-    //     e.target.value = '';
-    // };
-    // const handleFileInput = (e) => {
-    //     const selected = Array.from(e.target.files).filter(validateFile);
-
-    //     setFiles((prev) => {
-    //         const totalFiles = prev.length + selected.length;
-    //         if (totalFiles > MAX_FILES) {
-    //             const availableSlots = MAX_FILES - prev.length;
-    //             const acceptedFiles = selected.slice(0, availableSlots);
-    //             if (availableSlots > 0) {
-    //                 return [...prev, ...acceptedFiles];
-    //             }
-    //             // Optionally show a warning to the user here
-    //             alert(`You can only upload up to ${MAX_FILES} files.`);
-    //             return prev;
-    //         }
-    //         return [...prev, ...selected];
-    //     });
-
-    //     e.target.value = '';
-    // };
     const addFiles = (incomingFiles) => {
         const validFiles = incomingFiles.filter(validateFile);
         setFiles((prev) => {
@@ -330,15 +270,6 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
         setSelectedFiles([]);
         if (selectedFiles.some(idx => files[idx] === previewFile)) setPreviewFile(null);
     };
-
-    // useEffect(() => {
-    //     if (documentData) {
-    //         setEncounter(documentData?.context?.encounter?.[0] || '');
-    //         setDocumentType(documentData?.type?.[0]?.coding?.[0] || null);
-    //         setDocumentCategory(documentData?.category?.[0]?.coding?.[0] || null);
-    //         setNotes(documentData?.notes || '');
-    //     }
-    // }, [documentData])
 
     return (
         <Modal className={`upload-documents`} show={showUploadModal} onHide={closeModal} size="lg" centered>
@@ -558,7 +489,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
                             setNotes('');
                             setEncounter('');
                         }} disabled={isLoading}>{`Cancel`}</Button>
-                        <Button className='custom-buttons' onClick={handleUpload} disabled={ isLoading || !files?.length}>
+                        <Button className='custom-buttons' onClick={handleUpload} disabled={isLoading || !files?.length}>
                             {isLoading ? <Spinner className='spinner-border-sm' color='white' /> : 'Upload'}
                         </Button>
                     </Col>

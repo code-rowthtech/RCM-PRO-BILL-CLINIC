@@ -1,4 +1,4 @@
-export const additionalInformation = [
+const additionalInformationList = [
     {
         code: "419492006",
         system: "http://snomed.info/sct",
@@ -214,9 +214,12 @@ export const additionalInformation = [
         system: "http://snomed.info/sct",
         display: "Until symptoms improve",
     }
-]
+];
+export const additionalInformation = additionalInformationList.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);
 
-export const dosageTime = [
+const dosageTimeList = [
     { value: "With food", label: "With food" },
     { value: "After meals", label: "After meals" },
     { value: "Before meals", label: "Before meals" },
@@ -226,8 +229,11 @@ export const dosageTime = [
     { value: "Once daily", label: "Once daily" },
     { value: "Every 8 hours", label: "Every 8 hours" }
 ]
+export const dosageTime = dosageTimeList.sort((a, b) =>
+    a.label.localeCompare(b.label)
+);
 
-export const dosageMethods = [
+const dosageMethodsList = [
     {
         code: "736665006",
         system: "http://snomed.info/sct",
@@ -329,3 +335,6 @@ export const dosageMethods = [
         display: "Bathe",
     }
 ]
+export const dosageMethods = dosageMethodsList.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);

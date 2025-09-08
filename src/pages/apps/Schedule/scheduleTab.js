@@ -8,7 +8,7 @@ import {
     getScheduleAction,
     updateTimingsAction,
 } from '../../../redux/schedule/action';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
 import { getDoctorsAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
@@ -68,9 +68,20 @@ const ScheduleTab = () => {
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.name[0]?.text + ' ' + "(" +data?.userId?.email +")", // Added email to label
+        label: (data?.name?.[0]?.prefix?.[0]
+            ? data?.name?.[0]?.prefix?.[0] + ' '
+            : '') +
+            (data?.name?.[0]?.family || '') +
+            (data?.name?.[0]?.given?.length > 0
+                ? ' ' + data?.name?.[0]?.given?.join(' ')
+                : '') + ' ' +
+            (data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value ?
+                `(******${data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value.slice(-4)})`
+                : '') || ''
     }));
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
     const practitionerTimings = store?.getPractitionerTimingsReducer?.data?.schedule;
     useEffect(() => {
         const payload = {
@@ -378,9 +389,8 @@ const ScheduleTab = () => {
                                                         </td>
                                                         <td style={{ width: '20%' }}>
                                                             <span
-                                                                className={`uil-plus-circle plusicon fw-bold cursor-pointer ${
-                                                                    day.slots.length >= 10 ? 'disabled' : ''
-                                                                }`}
+                                                                className={`uil-plus-circle plusicon fw-bold cursor-pointer ${day.slots.length >= 10 ? 'disabled' : ''
+                                                                    }`}
                                                                 onClick={() =>
                                                                     day.slots.length < 10 && handleAddSlots(dayIndex)
                                                                 }></span>

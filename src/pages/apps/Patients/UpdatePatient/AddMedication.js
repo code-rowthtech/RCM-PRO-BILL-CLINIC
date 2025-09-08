@@ -77,9 +77,9 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
             setValue(
                 'drugInfo',
                 selectedMedication?.drugId?.proprietaryName +
-                    ' (' +
-                    selectedMedication?.drugId?.nonProprietaryName +
-                    ')'
+                ' (' +
+                selectedMedication?.drugId?.nonProprietaryName +
+                ')'
             );
             setValue('frequency', selectedMedication?.dosageInstruction?.[0]?.timing?.repeat?.frequency);
             setValue('period', selectedMedication?.dosageInstruction?.[0]?.timing?.repeat?.period);
@@ -265,7 +265,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                 <Form.Label className="mb-0">{`Drug`} <span className='text-danger'>{`*`}</span></Form.Label>
                                 <Form.Control
                                     type="text"
-                                    {...register('drugInfo', { 
+                                    {...register('drugInfo', {
                                         required: 'This field is required.',
                                         validate: value => value?.trim() !== '' || 'Drug name cannot be empty or contain only spaces'
                                     })}
@@ -273,7 +273,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                     onFocus={() => drugsData.length > 0 && setShowDropdown(true)}
                                     placeholder="Enter drug name"
                                     autoComplete="off"
-                                    // disabled={selectedMedication}
+                                // disabled={selectedMedication}
                                 />
                                 {errors.drugInfo && (
                                     <span className="text-danger  fs-6">{errors.drugInfo.message}</span>
@@ -311,10 +311,10 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                 </Form.Label>
                                 <Form.Select {...register('periodUnit', { required: 'This field is required.' })}>
                                     <option value="">Select unit</option>
-                                    <option value="hours">Hour(s)</option>
                                     <option value="days">Day(s)</option>
-                                    <option value="weeks">Week(s)</option>
+                                    <option value="hours">Hour(s)</option>
                                     <option value="months">Month(s)</option>
+                                    <option value="weeks">Week(s)</option>
                                 </Form.Select>
                                 {errors.periodUnit && (
                                     <span className="text-danger fs-6">{errors.periodUnit.message}</span>
@@ -431,7 +431,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                 )}
                             </Form.Group>
                         </Col>
-                         <Col sm={6}>
+                        <Col sm={6}>
                             <Form.Group>
                                 <Form.Label className="mb-0">
                                     End Date <span className="text-danger">*</span>

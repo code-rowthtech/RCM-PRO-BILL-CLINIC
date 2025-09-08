@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { createMastersDataAction, getMastersDataAction, updateMastersDataAction } from '../../../../redux/settings/action';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 
 const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
     const {
@@ -20,7 +20,9 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
 
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const updateResponse = store?.updateMastersDataReducer?.data?.status;
     const createResponse = store?.createMastersDataReducer?.data?.status;
 
@@ -38,29 +40,29 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
             clinicId: clinic_id,
             showTo: 'clinic',
         };
-        
+
         if (isEdit) {
             dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
         } else {
             dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
         }
     };
-    
-        useEffect(() => {
-            if (createResponse === 200 || updateResponse === 200) {
-                onClose();
-                reset();
-                dispatch(
-                    getMastersDataAction({
-                        status: true,
-                        category: 'Consultation Room',
-                        search: '',
-                        limit: 10,
-                        skip: 1,
-                    })
-                );
-            }
-        }, [createResponse, updateResponse]);
+
+    useEffect(() => {
+        if (createResponse === 200 || updateResponse === 200) {
+            onClose();
+            reset();
+            dispatch(
+                getMastersDataAction({
+                    status: true,
+                    category: 'Consultation Room',
+                    search: '',
+                    limit: 10,
+                    skip: 1,
+                })
+            );
+        }
+    }, [createResponse, updateResponse]);
 
     return (
         <Modal centered show={show} onHide={onClose}>
@@ -159,11 +161,11 @@ const ConsultationModal = ({ show, onClose, defaultValues, isEdit }) => {
                         </Col>
                     </Row>
                     <Modal.Footer>
-                      
-                            <Button onClick={onClose} className="custom-buttons">
+
+                        <Button onClick={onClose} className="custom-buttons">
                             Close
                         </Button>
-                        <Button type="submit" className="custom-buttons"  style={{width:'65px'}}>
+                        <Button type="submit" className="custom-buttons" style={{ width: '65px' }}>
                             {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
                                 <div class="spinner-border spinner-border-sm" role="status">
                                     <span class="visually-hidden">Loading...</span>

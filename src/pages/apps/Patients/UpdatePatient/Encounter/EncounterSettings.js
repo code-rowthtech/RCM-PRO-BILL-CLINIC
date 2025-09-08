@@ -8,7 +8,7 @@ import { Trash, Plus, GripVertical } from 'lucide-react';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 import { useDispatch } from 'react-redux';
 import { createEncounterSettingsAction, getEncounterSettingsAction, updateEncounterSettingsAction } from '../../../../../redux/actions';
-import { encryptMessage } from '../../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../../cryptoUtils';
 import { useSelector } from 'react-redux';
 
 // Schema validation using Yup
@@ -123,6 +123,7 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
         }
     }, [settingsData])
 
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     const onSubmit = (data) => {
         const submissionData = {
@@ -135,7 +136,7 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                 })) || []
             })),
             userId: loggedInUser?._id,
-            clinicId: loggedInUser?.clinicId
+            clinicId: clinicId || loggedInUser?.clinicId
         };
         if (settingsData?._id) {
             submissionData._id = settingsData?._id;

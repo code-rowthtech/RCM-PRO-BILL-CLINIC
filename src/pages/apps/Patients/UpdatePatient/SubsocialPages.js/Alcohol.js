@@ -42,7 +42,7 @@ const Alcohol = () => {
     const alcoholData = store?.getAlcoholHistoryReducer?.data?.data;
 
     // Form handling
-    const { register, handleSubmit, reset, formState:{errors}, control, watch, getValues, setValue } = useForm();
+    const { register, handleSubmit, reset, formState: { errors }, control, watch, getValues, setValue } = useForm();
     const watchUseStatus = watch('useStatus');
     const heavyFrequency = watch('frequency');
 
@@ -191,9 +191,9 @@ const Alcohol = () => {
                         <Form
                             onSubmit={handleSubmit(onSubmit)}
                             className="flex-grow-1 d-flex flex-column"
-                             style={{ height: '100%' }}
-                           >
-                            <div className='scroll-container px-0' style={{ height: '40vh', overflowX:"hidden" }}>
+                            style={{ height: '100%' }}
+                        >
+                            <div className='scroll-container px-0' style={{ height: '40vh', overflowX: "hidden" }}>
                                 <Row className="">
                                     <Col sm={12}>
                                         <Form.Group>
@@ -221,7 +221,7 @@ const Alcohol = () => {
                                                         <option key="" value="">
                                                             Select
                                                         </option>
-                                                        {['Occasionally', 'Weekly', 'Daily', 'Heavy', 'Unknown']?.map(
+                                                        {['Occasionally', 'Weekly', 'Daily', 'Heavy', 'Unknown']?.sort((a, b) => a.localeCompare(b))?.map(
                                                             (data) => (
                                                                 <option value={data} key={data}>
                                                                     {data}
@@ -275,7 +275,7 @@ const Alcohol = () => {
                                                                 'Monthly',
                                                                 'Weekly',
                                                                 'Daily or almost daily',
-                                                            ]?.map((data) => (
+                                                            ]?.sort((a, b) => a.localeCompare(b))?.map((data) => (
                                                                 <option value={data} key={data}>
                                                                     {data}
                                                                 </option>
@@ -296,7 +296,7 @@ const Alcohol = () => {
                                                         <option key="" value="">
                                                             Select
                                                         </option>
-                                                        {['Beer', 'Wine', 'Spirits', 'Other', 'All']?.map((data) => (
+                                                        {['Beer', 'Wine', 'Spirits', 'Other', 'All']?.sort((a, b) => a.localeCompare(b))?.map((data) => (
                                                             <option value={data} key={data}>
                                                                 {data}
                                                             </option>
@@ -437,7 +437,7 @@ const Alcohol = () => {
                                 </Row>
                             </div>
 
-                            <div className="mt-5 d-flex justify-content-end"  style={{ height: '' }}>
+                            <div className="mt-5 d-flex justify-content-end" style={{ height: '' }}>
                                 <Button
                                     variant="primary"
                                     type="submit"

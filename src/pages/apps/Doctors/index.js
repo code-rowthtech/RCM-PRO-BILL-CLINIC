@@ -23,8 +23,8 @@ const Doctors = () => {
     const navigate = useNavigate('');
     const [skip, setSkip] = useState(1);
     const dispatch = useDispatch();
-    const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.result);
-    const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
+    const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    const updateStatus = store?.createtDoctorsDetailReducer?.data?.status || [];
     useEffect(() => {
         dispatch(getDoctorsAction({ status: status, search: search, page: skip, limit: 10 }));
     }, [dispatch, skip, status, search]);
@@ -65,19 +65,18 @@ const Doctors = () => {
                                 <Col sm={6} xs={6}>
                                     <Button
                                         onClick={() => handleActiveTab(true)}
-                                        className={`me-md-2 active_inactive_buttons ${
-                                            status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                        }`}>
+                                        className={`me-md-2 position-relative active_inactive_buttons ${status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
                                         Active
+                                        <span className={`fw-semibold p-1 fs-6 position-absolute fs-5 text-white  rounded-circle bg-primary`} style={{ right: '-14%', top: '-34%' }}>{store?.getDoctorsReducer?.data?.activeDoctors}</span>
                                     </Button>
                                     <Button
                                         onClick={() => handleActiveTab(false)}
-                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
-                                            !status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                        }`}>
+                                        className={`me-md-2 position-relative ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
                                         Inactive
-                                    </Button>
-                                </Col>
+                                        <span className={`fw-semibold p-1 fs-6 position-absolute fs-5 text-white  rounded-circle bg-primary `} style={{ right: '-14%', top: '-34%' }}>{store?.getDoctorsReducer?.data?.inactiveDoctors}</span>
+                                    </Button>                                </Col>
 
                                 <Col sm={6} xs={6} className="text-end">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end ">
@@ -156,12 +155,12 @@ const Doctors = () => {
                                             <Button
                                                 onClick={handleNewDoctor}
                                                 className="custom-buttons py- d-none d-md-block">
-                                                New Provider
+                                                {`Add Provider`}
                                             </Button>
                                             <Button
                                                 onClick={handleNewDoctor}
                                                 className="custom-buttons py d-block d-md-none">
-                                                +
+                                                {`+`}
                                             </Button>
                                         </Col>
                                     </Row>
@@ -190,7 +189,7 @@ const Doctors = () => {
                                                 </th>
 
                                                 <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                                    Specialist
+                                                    Speciality
                                                 </th>
                                                 {/* <th className='text-white py-2' style={{ fontSize: '13px' }}>Contact No.</th> */}
                                                 <th className="text-white py-2" style={{ fontSize: '13px' }}>
@@ -250,8 +249,13 @@ const Doctors = () => {
                                                                         />
                                                                         <span>
                                                                             <div className="fw-semibold">
-                                                                                {data?.name?.[0]?.given || []} {''}
-                                                                                {data?.name?.[0]?.family || ''}
+                                                                                {(data?.name?.[0]?.prefix?.[0]
+                                                                                    ? data?.name?.[0]?.prefix?.[0] + ' '
+                                                                                    : '') +
+                                                                                    (data?.name?.[0]?.family || '') +
+                                                                                    (data?.name?.[0]?.given?.length > 0
+                                                                                        ? ' ' + data?.name?.[0]?.given?.join(' ')
+                                                                                        : '') || 'N/A'}
                                                                             </div>
                                                                             <div className="fs-6 fw-semibold">
                                                                                 {data?.telecom?.[0]?.value
@@ -275,8 +279,8 @@ const Doctors = () => {
                                                                     <div className="d-flex flex-column justify-content-center">
                                                                         <p className="mb-0">
                                                                             {data?.address?.[0]?.line &&
-                                                                            data?.address?.[0]?.line.length > 0 &&
-                                                                            data?.address?.[0]?.line[0] !== '' ? (
+                                                                                data?.address?.[0]?.line.length > 0 &&
+                                                                                data?.address?.[0]?.line[0] !== '' ? (
                                                                                 <span
                                                                                     title={data?.address?.[0]?.line.join(
                                                                                         ''

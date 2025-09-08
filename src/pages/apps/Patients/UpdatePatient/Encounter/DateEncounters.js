@@ -40,6 +40,7 @@ import EncounterSummary from './EncounterSummary';
 import EncounterTemplates from './EncounterTemplates';
 import PastEncounters from './PastEncounters';
 import ChangeNoteTypeModal from './ChangeNoteTypeModal';
+import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 
 // ============================================================================
 // CONSTANTS
@@ -49,7 +50,7 @@ const MAX_WORDS = 700;
 const MAX_WORD_LENGTH = 45;
 const SOAP_SECTIONS = ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'];
 const PATIENT_INFO_FIELDS = ['Address', 'Age', 'Date of Birth', 'Email', 'Patient Name', 'Phone'];
-const ENCOUNTER_STATUSES = ['planned', 'arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'cancelled'];
+const ENCOUNTER_STATUSES = ['arrived', 'planned', 'triaged', 'in-progress', 'onleave', 'finished', 'cancelled'];
 const DEFAULT_TABS = ['Summary', 'Templates', 'Past Encounters'];
 
 // ============================================================================
@@ -116,10 +117,15 @@ const DateEncounters = ({
     // Doctor/Provider data
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const providerOptions = doctorDetails?.map((data) => ({
-        label: `${data?.name?.[0]?.text + ' ' + data?.userId?.email}`,
-        value: data?._id
+        value: data?._id,
+        label: (data?.name?.[0]?.prefix?.[0]
+            ? data?.name?.[0]?.prefix?.[0] + ' '
+            : '') +
+            (data?.name?.[0]?.family || '') +
+            (data?.name?.[0]?.given?.length > 0
+                ? ' ' + data?.name?.[0]?.given?.join(' ')
+                : '') || 'N/A',
     }));
-
     // Encounter data
     const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
     const createEncounterData = store?.createEncounterReducer;
@@ -836,6 +842,7 @@ const DateEncounters = ({
             period: {
                 start: data?.startDate,
             }
+            // clinicId: loggedInUser
         };
 
         if (encounterAction === 'updateEncounter') {
@@ -846,7 +853,6 @@ const DateEncounters = ({
             setUpdateClicked(true);
             dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
         } else {
-            console.log(payload, 'payloadpayload')
             dispatch(createEncounterAction({ key: encryptMessage(payload) }));
         }
 
@@ -1064,7 +1070,7 @@ const DateEncounters = ({
                                                 }}
                                                 className='text-capitalize'>
                                                 <option key='' value=''>{`Select Status`}</option>
-                                                {ENCOUNTER_STATUSES?.map((data, index) => (
+                                                {ENCOUNTER_STATUSES?.sort((a, b) => a.localeCompare(b))?.map((data, index) => (
                                                     <option value={data} className='text-capitalize' key={index}>
                                                         {data}
                                                     </option>

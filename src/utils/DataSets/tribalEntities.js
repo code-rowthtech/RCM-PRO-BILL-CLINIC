@@ -1,4 +1,4 @@
-export const tribalEntitiesOptions = [
+export const tribalEntitiesOptionsList = [
     {
         code: 338,
         system: 'http://terminology.hl7.org/CodeSystem/v3-TribalEntityUS',
@@ -482,3 +482,7 @@ export const tribalEntitiesOptions = [
         // inactive: false,
     },
 ];
+
+export const tribalEntitiesOptions = tribalEntitiesOptionsList.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);

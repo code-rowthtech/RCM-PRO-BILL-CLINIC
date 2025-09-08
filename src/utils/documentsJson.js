@@ -1,4 +1,4 @@
-export const documentTypes = [
+const documentTypesList = [
     {
         code: "100018-1",
         system: "http://loinc.org",
@@ -5001,26 +5001,32 @@ export const documentTypes = [
     }
 ]
 
+export const documentTypes = documentTypesList.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);
+
+
+
 export const documentCategories = [
-    {
-        code: "image",
-        system: "http://terminology.hl7.org/CodeSystem/media-category",
-        display: "Image"
-    },
-    {
-        code: "video",
-        system: "http://terminology.hl7.org/CodeSystem/media-category",
-        display: "Video"
-    },
     {
         code: "audio",
         system: "http://terminology.hl7.org/CodeSystem/media-category",
         display: "Audio"
     },
     {
+        code: "image",
+        system: "http://terminology.hl7.org/CodeSystem/media-category",
+        display: "Image"
+    },
+    {
         code: "STYLESHEET",
         system: "http://terminology.hl7.org/CodeSystem/media-category",
         display: "Stylesheet"
+    },
+    {
+        code: "video",
+        system: "http://terminology.hl7.org/CodeSystem/media-category",
+        display: "Video"
     },
     {
         code: "WORKFLOW_DEFINITION",

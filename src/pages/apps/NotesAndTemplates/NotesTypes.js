@@ -13,6 +13,7 @@ import { Controller, Form, useForm } from 'react-hook-form';
 import Paginations from '../../../helpers/Paginations';
 import { IoMdClose } from 'react-icons/io';
 import Spinner from '../../../constants/Spinner';
+import { decryptMessage } from '../../../cryptoUtils';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
@@ -34,11 +35,10 @@ const NotesTypes = () => {
     ];
     const [selectedNote, setSelectedNote] = useState(null);
     const [status, setStatus] = useState('active');
-    const ClinicId = loggedInUser?.clinicId || store?.Auth?.user?.clinicId;
+    // const ClinicId = loggedInUser?.clinicId || store?.Auth?.user?.clinicId;
+    const ClinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || store?.Auth?.user?.clinicId || '';
+
     const {
-        control,
-        setValue,
-        getValues,
         formState: { errors },
     } = useForm();
 
@@ -78,10 +78,6 @@ const NotesTypes = () => {
         setSelectedNote(note);
         setAddModal(true);
     };
-    const handleActiveTab = () => {
-        dispatch(getNoteCategoriesAction({ search: search, page: skip, limit: 8, clinicId: ClinicId }));
-    };
-
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);

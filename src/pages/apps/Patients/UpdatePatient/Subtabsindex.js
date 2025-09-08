@@ -47,7 +47,7 @@ const Subtabs = ({ patientId, isAccordionOpen }) => {
                         'Patient Details',
                         'Demographics',
                         'Responsible Party',
-                        'Reffering Doctor',
+                        'Reffering Source',
                         // 'Insurances',
                         // 'Eligibility',
                         // 'Authorizations',
@@ -72,7 +72,7 @@ const Subtabs = ({ patientId, isAccordionOpen }) => {
                     {activeTab === 'Patient Details' && <PatientDetails isAccordionOpen={isAccordionOpen} />}
                     {activeTab === 'Demographics' && <Demographicdetails isAccordionOpen={isAccordionOpen} />}
                     {activeTab === 'Responsible Party' && <ResponsiblleParty isAccordionOpen={isAccordionOpen} />}
-                    {activeTab === 'Reffering Doctor' && <ReferringDoctor isAccordionOpen={isAccordionOpen} />}
+                    {activeTab === 'Reffering Source' && <ReferringDoctor isAccordionOpen={isAccordionOpen} />}
                     {activeTab === 'Insurances' && <Insurance isAccordionOpen={isAccordionOpen} />}
                     {activeTab === 'Eligibility' && <>In-progress...</>}
                     {activeTab === 'Authorizations' && <>In-progress...</>}

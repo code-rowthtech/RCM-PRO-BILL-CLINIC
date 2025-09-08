@@ -8,7 +8,6 @@ import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 
 const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
-    // console.log(formData, 'formDataformDataformData')
     const {
         register,
         handleSubmit,
@@ -32,7 +31,6 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
                 },
             ],
         };
-        console.log(payload, 'payloadpayload')
         dispatch(createDoctorAction({ key: encryptMessage(payload) }));
     }
     const store = useSelector((state) => state);

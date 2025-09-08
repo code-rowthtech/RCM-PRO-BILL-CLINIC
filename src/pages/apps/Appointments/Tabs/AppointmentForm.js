@@ -28,7 +28,7 @@ import NewPatient from '../../Patients/NewPatient';
 import Spinner from '../../../../constants/Spinner';
 
 // Utils and data
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { appointmentTypeOptions, timezoneOptions } from '../../../../utils/DataSets/apppointmenttype.data';
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
 import { appointmentRecurrence, appointmentStatus } from '../../../../utils/DataSets/commonData';
@@ -38,7 +38,7 @@ import HolidayModal from '../HolidayModal';
 import ConsultationModal from '../../Settings/Consultation Room/ConsultationModal';
 
 // Memoized components
-const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, scheduledDate, id }) => {
+const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, scheduledDate, id, errors }) => {
     const daysNumberDaily = watch('daysNumberDaily') || 1;
     const dailyOccurrenceDate = watch('dailyOccurrenceDate');
     const startDate = watch('scheduled');
@@ -93,10 +93,10 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
             </Col>
             <Col sm={4}>
                 <Form.Group className="mb-1">
-                    <Form.Label className="mb-0">Ends On</Form.Label>
+                    <Form.Label className="mb-0">Ends On <span className="text-danger">*</span></Form.Label>
                     <span className="d-flex">
                         <Form.Control
-                            {...register('dailyOccurrenceDate')}
+                            {...register('dailyOccurrenceDate', { required: 'End date is required' })}
                             type="date"
                             min={minEndDate}
                             max={oneMonthLaterString}
@@ -105,6 +105,7 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
                         />
                         <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;after</Form.Text>
                     </span>
+                    {errors.dailyOccurrenceDate && <span className="text-danger small">{errors.dailyOccurrenceDate.message}</span>}
                 </Form.Group>
             </Col>
 
@@ -128,7 +129,7 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
     );
 });
 
-const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, id, scheduledDate }) => {
+const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, id, scheduledDate, errors }) => {
     const appointmentDays = watch('appointmentDay');
     const weekInterval = watch('weekInterval');
     const weeklyOccurrenceDate = watch('weeklyOccurrenceDate');
@@ -235,10 +236,10 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
 
             <Col sm={4}>
                 <Form.Group className="mb-1" controlId="weeklyOccurrenceDate">
-                    <Form.Label className="mb-0">Ends On</Form.Label>
+                    <Form.Label className="mb-0">Ends On <span className="text-danger">*</span></Form.Label>
                     <span className="d-flex">
                         <Form.Control
-                            {...register('weeklyOccurrenceDate')}
+                            {...register('weeklyOccurrenceDate', { required: 'End date is required' })}
                             type="date"
                             min={minEndDate}
                             max={oneYearLaterString}
@@ -247,6 +248,7 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                         />
                         <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;after</Form.Text>
                     </span>
+                    {errors.weeklyOccurrenceDate && <span className="text-danger small">{errors.weeklyOccurrenceDate.message}</span>}
                 </Form.Group>
             </Col>
 
@@ -286,7 +288,9 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const patientsData = useMemo(() => store?.getPatientsReducer?.data?.data, [store]);
     const practitionerSchedule = useMemo(() => store?.getPractitionerScheduleReducer?.data?.holidays, [store]);
     const isLoading = store?.getAppointmentByIdReducer?.loading;
-    const clinicId = useMemo(() => JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId, []);
+    // const clinicId = useMemo(() => JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId, []);
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const [status, setStatus] = useState(true);
     const [patientId, setPatientId] = useState(null);
     const [search, setSearch] = useState('');
@@ -304,6 +308,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const [scheduledDate, setScheduledDate] = useState();
     const [showHolidayModal, setShowHolidayModal] = useState(false);
     const [consultationModal, setConsultationModal] = useState(false);
+    const [showPastDateModal, setShowPastDateModal] = useState(false);
+    const [pendingDate, setPendingDate] = useState('');
 
     function formatDateToYYYYMMDD(date) {
         const d = new Date(date);
@@ -403,9 +409,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             const month = String(rawDate.getMonth() + 1).padStart(2, '0');
             const day = String(rawDate.getDate()).padStart(2, '0');
             const localDateString = `${year}-${month}-${day}`;
-            const sanitized = sanitizeScheduledDate(localDateString);
 
-            setScheduledDate(sanitized);
+            setScheduledDate(localDateString);
 
             if (calendarView !== 'month') {
                 setValue('startTime', formatTime(selectedSlot?.start));
@@ -520,10 +525,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
         }
     }, [practitionerSchedule, scheduledDate]);
 
-    // Handle form submission
-    // const onSubmit = useCallback((data) => {
-
-    // }, [id, appointmentDetails, clinicId, appointmentReason, repeat, repeatType, appointmentDates, dispatch]);
     const onSubmit = (data) => {
         const selectedAppointmentType = appointmentTypeOptions.find((option) => option.show === data.appointmentType);
         const appointmentTypePayload = {
@@ -629,7 +630,15 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
         () =>
             patientsData?.map((patient) => ({
                 value: patient?._id,
-                label: patient?.name?.[0]?.text,
+                label: (patient?.name?.[0]?.prefix?.[0]
+                    ? patient?.name?.[0]?.prefix?.[0].charAt(0).toUpperCase() + patient?.name?.[0]?.prefix?.[0].slice(1) + ' '
+                    : '') +
+                    (patient?.name?.[0]?.family
+                        ? patient?.name?.[0]?.family.charAt(0).toUpperCase() + patient?.name?.[0]?.family.slice(1)
+                        : '') +
+                    (patient?.name?.[0]?.given?.length > 0
+                        ? ' ' + patient?.name?.[0]?.given.map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' ')
+                        : '') + " " + `(${patient?.chartNumber})` || 'N/A',
             })) || [],
         [patientsData]
     );
@@ -638,12 +647,21 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const formattedProviderOptions = useMemo(
         () =>
             doctorDetails?.map((doctor) => {
-                const doctorName = doctor?.name?.[0]?.text || 'Unnamed';
+                const doctorName = (doctor?.name?.[0]?.prefix?.[0]
+                    ? doctor?.name?.[0]?.prefix?.[0] + ' '
+                    : '') +
+                    (doctor?.name?.[0]?.family || '') +
+                    (doctor?.name?.[0]?.given?.length > 0
+                        ? ' ' + doctor?.name?.[0]?.given?.join(' ')
+                        : '') + ' ' +
+                    (doctor?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value ?
+                        `(******${doctor?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value.slice(-4)})`
+                        : '') || '';
                 const emailObj = doctor?.telecom?.find((t) => t.system === 'email');
                 const email = emailObj?.value ? ` (${emailObj.value})` : '';
                 return {
                     value: doctor?._id,
-                    label: doctorName + email,
+                    label: doctorName,
                 };
             }) || [],
         [doctorDetails]
@@ -749,7 +767,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const loadReasonOptions = useCallback(
         (inputValue, callback) => {
             if (!inputValue) {
-                callback(formattedReasonOptions.slice(0, 10));
+                callback(formattedReasonOptions.slice(0, 30));
                 return;
             }
 
@@ -757,7 +775,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 option.label.toLowerCase().includes(inputValue.toLowerCase())
             );
 
-            callback(filteredOptions.slice(0, 20));
+            callback(filteredOptions.slice(0, 40));
         },
         [formattedReasonOptions]
     );
@@ -782,228 +800,213 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     </Col>
                 </Row>
             ) : (
-                <Form onSubmit={handleSubmit(onSubmit)}>
-                    <Row>
-                        <Col sm={6}>
-                            <Form.Group className="mb-1" controlId="patient">
-                                <Form.Label className="mb-0">
-                                    Patient <span className="text-danger">*</span>
-                                </Form.Label>
+                <Form className='d-flex flex-column align-items-between' onSubmit={handleSubmit(onSubmit)}>
+                    <div style={{ height: '55vh' }}>
+                        <Row>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1" controlId="patient">
+                                    <Form.Label className="mb-0">
+                                        Patient <span className="text-danger">*</span>
+                                    </Form.Label>
 
-                                <div style={{ position: 'relative' }}>
-                                    <AsyncSelect
-                                        loadOptions={loadPatientOptions}
-                                        defaultOptions={formattedPatientOptions.slice(0, 10)}
-                                        isSearchable
-                                        className="basic-single"
-                                        classNamePrefix="select"
-                                        placeholder={store?.getPatientsReducer?.loading ? 'Loading...' : 'Select Patient'}
-                                        value={selectedPatient}
-                                        onChange={handlePatientChange}
-                                        noOptionsMessage={() => 'No Patient added yet'}
-                                        styles={{
-                                            control: (provided) => ({
-                                                ...provided,
-                                                height: '30px',
-                                                minHeight: '30px',
-                                                border: 'none',
-                                                paddingRight: '40px',
-                                                outline:'none',
-                                            }),
-                                            placeholder: (provided) => ({
-                                                ...provided,
-                                                fontSize: '12px',
-                                            }),
-                                        }}
-                                    />
-                                    <input
-                                        type="hidden"
-                                        {...register('patient', { required: 'Patient is required' })}
-                                        value={selectedPatient?.value || ''}
-                                    />
-
-                                    <AiOutlinePlus
-                                        title="Add New Patient"
-                                        style={{
-                                            position: 'absolute',
-                                            right: '10px',
-                                            top: '50%',
-                                            transform: 'translateY(-50%)',
-                                            cursor: 'pointer',
-                                            color: '#007bff',
-                                            fontSize: '20px',
-                                            pointerEvents: 'auto',
-                                            zIndex: 10,
-                                        }}
-                                        onClick={handlePlusIconClick}
-                                    />
-                                </div>
-                                {errors.patient && (
-                                    <span className="text-danger" style={{ display: 'block', marginTop: '2px' }}>
-                                        {errors.patient.message}
-                                    </span>
-                                )}
-                            </Form.Group>
-                        </Col>
-
-                        <Col sm={6}>
-                            <Form.Group className="mb-1" controlId="doctorName">
-                                <Form.Label className="mb-0">
-                                    Select Provider <span className="text-danger">*</span>
-                                </Form.Label>
-                                <div>
-                                    <AsyncSelect
-                                        loadOptions={loadProviderOptions}
-                                        defaultOptions={formattedProviderOptions.slice(0, 10)}
-                                        isSearchable
-                                        className="basic-single"
-                                        classNamePrefix="select"
-                                        placeholder={store?.getDoctorsReducer?.loading ? 'Loading...' : 'Select Provider'}
-                                        value={selectedProvider}
-                                        onChange={handleProviderChange}
-                                        noOptionsMessage={() => 'No Doctor added yet'}
-                                        styles={{
-                                            control: (provided) => ({
-                                                ...provided,
-                                                height: '30px',
-                                                minHeight: '30px',
-                                                border: 'none',
-                                                outline: 'none',
-                                            }),
-                                            placeholder: (provided) => ({
-                                                ...provided,
-                                                fontSize: '12px',
-                                            }),
-                                        }}
-                                    />
-                                    <input
-                                        type="hidden"
-                                        {...register('doctorName', { required: 'Doctor is required' })}
-                                        value={selectedProvider?.value || ''}
-                                    />
-                                    {errors.doctorName && <p className="text-danger">{errors.doctorName.message}</p>}
-                                </div>
-                            </Form.Group>
-                        </Col>
-                        <Col sm={6}>
-                            <Form.Group className="mb-1" controlId="appointmentType">
-                                <Form.Label className="mb-0">
-                                    Appointment Type <span className="text-danger">*</span>
-                                </Form.Label>
-                                <Form.Select
-                                    className="form-select"
-                                    {...register('appointmentType', { required: 'Appointment Type is required' })}
-                                    data-has-value={!!watchedAppointmentType}>
-                                    <option value="" hidden>
-                                        Select
-                                    </option>
-                                    {appointmentTypeOptions.map((option) => (
-                                        <option key={option?.value} value={option?.show}>
-                                            {option?.show}
-                                        </option>
-                                    ))}
-                                </Form.Select>
-                                {errors.appointmentType && (
-                                    <p className="text-danger">{errors.appointmentType.message}</p>
-                                )}
-                            </Form.Group>
-                        </Col>
-                        <Col sm={6}>
-                            <Form.Group className="mb-1" controlId="timezone">
-                                <Form.Label className="mb-0">
-                                    TimeZone <span className="text-danger">*</span>
-                                </Form.Label>
-                                <Form.Select
-                                    className="form-select"
-                                    {...register('timezone', { required: 'TimeZone is required' })}
-                                    data-has-value={!!watchedtimezone}>
-                                    <option value="" hidden>
-                                        Select
-                                    </option>
-                                    {timezoneOptions?.map((option) => (
-                                        <option key={option?.value} value={option?.value}>
-                                            {option?.show}
-                                        </option>
-                                    ))}
-                                </Form.Select>
-                                {errors.timezone && <p className="text-danger">{errors.timezone.message}</p>}
-                            </Form.Group>
-                        </Col>
-                        <Toast
-                            show={showToast}
-                            onClose={() => setShowToast(false)}
-                            delay={2000}
-                            autohide
-                            style={{
-                                position: 'fixed',
-                                top: '10px',
-                                right: '10px',
-                                backgroundColor: '#dc3545',
-                                color: 'white',
-                                padding: '10px',
-                                borderRadius: '5px',
-                            }}>
-                            <Toast.Body>Please select a doctor first!</Toast.Body>
-                        </Toast>
-                        <Col sm={6} className="d-flex gap-2">
-                            <Form.Group className="mb-1" style={{ width: '150px' }} controlId="scheduled">
-                                <Form.Label className="mb-0">Scheduled</Form.Label>
-                                <OverlayTrigger
-                                    placement="top"
-                                    overlay={renderTooltip}
-                                    delay={{ show: 200, hide: 200 }}>
-                                    <span>
-                                        <Form.Control
-                                            type="date"
-                                            className=""
-                                            {...register('scheduled', {
-                                                required: 'Scheduled date is required',
-                                                validate: (value) => {
-                                                    const today = new Date().setHours(0, 0, 0, 0);
-                                                    const selected = new Date(value).setHours(0, 0, 0, 0);
-                                                    return selected >= today || 'Date must be today or in the future';
-                                                },
-                                            })}
-                                            value={scheduledDate}
-                                            min={new Date().toISOString().split('T')[0]}
-                                            onChange={(e) => setScheduledDate(e.target.value)}
-                                            onClick={handleDisabledClick}
-                                            style={{ pointerEvents: watchedDoctorName ? 'auto' : 'none' }}
+                                    <div style={{ position: 'relative' }}>
+                                        <AsyncSelect
+                                            loadOptions={loadPatientOptions}
+                                            defaultOptions={formattedPatientOptions.slice(0, 10)}
+                                            isSearchable
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            placeholder={store?.getPatientsReducer?.loading ? 'Loading...' : 'Select Patient'}
+                                            value={selectedPatient}
+                                            onChange={handlePatientChange}
+                                            noOptionsMessage={() => 'No Patient added yet'}
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    height: '30px',
+                                                    minHeight: '30px',
+                                                    border: 'none',
+                                                    paddingRight: '40px',
+                                                    outline: 'none',
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontSize: '12px',
+                                                }),
+                                            }}
                                         />
-                                    </span>
-                                </OverlayTrigger>
-                            </Form.Group>
-                            <Form.Group className="mb-1" style={{ width: '100px' }} controlId="starttime">
-                                <Form.Label className="mb-0">Start Time</Form.Label>
-                                <OverlayTrigger
-                                    placement="top"
-                                    overlay={renderTooltip}
-                                    delay={{ show: 200, hide: 200 }}>
-                                    <span>
-                                        <Form.Control
-                                            type="time"
-                                            {...register('startTime', { required: 'Time is required' })}
-                                            value={watchedStartTime}
-                                            disabled={!watchedDoctorName}
-                                            onClick={handleDisabledClick}
-                                            style={{ pointerEvents: watchedDoctorName ? 'auto' : 'none' }}
+                                        <input
+                                            type="hidden"
+                                            {...register('patient', { required: 'Patient is required' })}
+                                            value={selectedPatient?.value || ''}
                                         />
-                                    </span>
-                                </OverlayTrigger>
-                            </Form.Group>
 
-                            <div className="d-flex">
-                                <Form.Group className="mb-1" style={{ width: '100px' }} controlId="duration">
-                                    <Form.Label className="mb-0">Duration</Form.Label>
+                                        <AiOutlinePlus
+                                            title="Add Patient"
+                                            style={{
+                                                position: 'absolute',
+                                                right: '10px',
+                                                top: '50%',
+                                                transform: 'translateY(-50%)',
+                                                cursor: 'pointer',
+                                                color: '#007bff',
+                                                fontSize: '20px',
+                                                pointerEvents: 'auto',
+                                                zIndex: 10,
+                                            }}
+                                            onClick={handlePlusIconClick}
+                                        />
+                                    </div>
+                                    {errors.patient && (
+                                        <span className="text-danger small" style={{ display: 'block', marginTop: '2px' }}>
+                                            {errors.patient.message}
+                                        </span>
+                                    )}
+                                </Form.Group>
+                            </Col>
+
+                            <Col sm={6}>
+                                <Form.Group className="mb-1" controlId="doctorName">
+                                    <Form.Label className="mb-0">
+                                        Select Provider <span className="text-danger">*</span>
+                                    </Form.Label>
+                                    <div>
+                                        <AsyncSelect
+                                            loadOptions={loadProviderOptions}
+                                            defaultOptions={formattedProviderOptions.slice(0, 10)}
+                                            isSearchable
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            placeholder={store?.getDoctorsReducer?.loading ? 'Loading...' : 'Select Provider'}
+                                            value={selectedProvider}
+                                            onChange={handleProviderChange}
+                                            noOptionsMessage={() => 'No Doctor added yet'}
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    height: '30px',
+                                                    minHeight: '30px',
+                                                    border: 'none',
+                                                    outline: 'none',
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontSize: '12px',
+                                                }),
+                                            }}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            {...register('doctorName', { required: 'Doctor is required' })}
+                                            value={selectedProvider?.value || ''}
+                                        />
+                                        {errors.doctorName && <span className="text-danger small">{errors.doctorName.message}</span>}
+                                    </div>
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1" controlId="appointmentType">
+                                    <Form.Label className="mb-0">
+                                        Appointment Type <span className="text-danger">*</span>
+                                    </Form.Label>
+                                    <Form.Select
+                                        className="form-select"
+                                        {...register('appointmentType', { required: 'Appointment Type is required' })}
+                                        data-has-value={!!watchedAppointmentType}>
+                                        <option value="" hidden>
+                                            Select
+                                        </option>
+                                        {appointmentTypeOptions.map((option) => (
+                                            <option key={option?.value} value={option?.show}>
+                                                {option?.show}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.appointmentType && (
+                                        <span className="text-danger small">{errors.appointmentType.message}</span>
+                                    )}
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1" controlId="timezone">
+                                    <Form.Label className="mb-0">
+                                        TimeZone <span className="text-danger">*</span>
+                                    </Form.Label>
+                                    <div className='d-flex align-items-center gap-3'>
+                                        {timezoneOptions?.map((option) => (
+                                            <Form.Check
+                                                key={option?.value}
+                                                type="radio"
+                                                id={`timezone-${option?.value}`}
+                                                label={option?.show}
+                                                value={option?.value}
+                                                {...register('timezone', { required: 'TimeZone is required' })}
+                                            />
+                                        ))}
+                                    </div>
+                                    {errors.timezone && <span className="text-danger small">{errors.timezone.message}</span>}
+                                </Form.Group>
+
+                            </Col>
+                            <Toast
+                                show={showToast}
+                                onClose={() => setShowToast(false)}
+                                delay={2000}
+                                autohide
+                                style={{
+                                    position: 'fixed',
+                                    top: '10px',
+                                    right: '10px',
+                                    backgroundColor: '#dc3545',
+                                    color: 'white',
+                                    padding: '10px',
+                                    borderRadius: '5px',
+                                }}>
+                                <Toast.Body>Please select a provider first!</Toast.Body>
+                            </Toast>
+                            <Col sm={6} className="d-flex gap-2">
+                                <Form.Group className="mb-1" style={{ width: '150px' }} controlId="scheduled">
+                                    <Form.Label className="mb-0">Scheduled</Form.Label>
                                     <OverlayTrigger
                                         placement="top"
                                         overlay={renderTooltip}
                                         delay={{ show: 200, hide: 200 }}>
                                         <span>
                                             <Form.Control
-                                                type="number"
-                                                {...register('duration', { required: 'Duration is required' })}
-                                                value={watchedDuration}
+                                                type="date"
+                                                className=""
+                                                {...register('scheduled', {
+                                                    required: 'Scheduled date is required'
+                                                })}
+                                                value={scheduledDate}
+                                                onChange={(e) => {
+                                                    const selectedDate = new Date(e.target.value).setHours(0, 0, 0, 0);
+                                                    const today = new Date().setHours(0, 0, 0, 0);
+
+                                                    if (selectedDate < today) {
+                                                        setPendingDate(e.target.value);
+                                                        setShowPastDateModal(true);
+                                                    } else {
+                                                        setScheduledDate(e.target.value);
+                                                    }
+                                                }}
+                                                onClick={handleDisabledClick}
+                                                style={{ pointerEvents: watchedDoctorName ? 'auto' : 'none' }}
+                                            />
+                                        </span>
+                                    </OverlayTrigger>
+                                </Form.Group>
+                                <Form.Group className="mb-1" style={{ width: '100px' }} controlId="starttime">
+                                    <Form.Label className="mb-0">Start Time</Form.Label>
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={renderTooltip}
+                                        delay={{ show: 200, hide: 200 }}>
+                                        <span>
+                                            <Form.Control
+                                                type="time"
+                                                {...register('startTime', { required: 'Time is required' })}
+                                                value={watchedStartTime}
                                                 disabled={!watchedDoctorName}
                                                 onClick={handleDisabledClick}
                                                 style={{ pointerEvents: watchedDoctorName ? 'auto' : 'none' }}
@@ -1011,189 +1014,209 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         </span>
                                     </OverlayTrigger>
                                 </Form.Group>
-                                <span className="text-secondary fs-6 fw-bold mt-3 pt-1 ps-2">minutes</span>
-                            </div>
-                            <Form.Group className="mb-0 ms-2">
-                                <Form.Label className="mb-0"></Form.Label>
-                                <Form.Check
-                                    type="checkbox"
-                                    label="Repeat"
-                                    checked={repeat}
-                                    value={repeat}
-                                    disabled={appointmentDetails?.repeat && id}
-                                    style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
-                                    onChange={(e) => {
-                                        setRepeat(e.target.checked);
-                                    }}
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col sm={6}>
-                            <Form.Group>
-                                <Form.Label className="mb-0">Reason</Form.Label>
-                                <AsyncSelect
-                                    loadOptions={loadReasonOptions}
-                                    defaultOptions={formattedReasonOptions.slice(0, 10)}
-                                    isSearchable
-                                    className="basic-single"
-                                    classNamePrefix="select"
-                                    placeholder="&nbsp; Select"
-                                    value={selectedReasonOption}
-                                    onChange={handleReasonChange}
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            height: '30px',
-                                            minHeight: '30px',
-                                            border: '0px',
-                                        }),
-                                        placeholder: (provided) => ({
-                                            ...provided,
-                                            fontWeight: 'bold',
-                                            fontSize: '12px',
-                                            paddingBottom: '5px',
-                                        }),
-                                    }}
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col sm={6}>
-                            <Form.Group className="mb-1" controlId="consultationRoom">
-                                <Form.Label className="mb-0">
-                                    Consultation Room
-                                    <span>
-                                        <i
-                                            className="bi bi-plus-circle text-primary ms-1 cursor-pointer"
-                                            style={{ fontSize: '0.7rem' }}
-                                            title="Add Consultation Room"
-                                            onClick={() => setConsultationModal(true)}></i>
-                                    </span>
-                                </Form.Label>
-                                <div style={{ position: 'relative' }}>
+
+                                <div className="d-flex">
+                                    <Form.Group className="mb-1" style={{ width: '100px' }} controlId="duration">
+                                        <Form.Label className="mb-0">Duration</Form.Label>
+                                        <OverlayTrigger
+                                            placement="top"
+                                            overlay={renderTooltip}
+                                            delay={{ show: 200, hide: 200 }}>
+                                            <span>
+                                                <Form.Control
+                                                    type="number"
+                                                    {...register('duration', { required: 'Duration is required' })}
+                                                    value={watchedDuration}
+                                                    disabled={!watchedDoctorName}
+                                                    onClick={handleDisabledClick}
+                                                    style={{ pointerEvents: watchedDoctorName ? 'auto' : 'none' }}
+                                                />
+                                            </span>
+                                        </OverlayTrigger>
+                                    </Form.Group>
+                                    <span className="text-secondary fs-6 fw-bold mt-3 pt-1 ps-2">minutes</span>
+                                </div>
+                                <Form.Group className="mb-0 ms-2">
+                                    <Form.Label className="mb-0"></Form.Label>
+                                    <Form.Check
+                                        type="checkbox"
+                                        label="Repeat"
+                                        checked={repeat}
+                                        value={repeat}
+                                        disabled={appointmentDetails?.repeat && id}
+                                        style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
+                                        onChange={(e) => {
+                                            setRepeat(e.target.checked);
+                                        }}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group>
+                                    <Form.Label className="mb-0">Reason</Form.Label>
                                     <AsyncSelect
-                                        loadOptions={loadConsultationRoomOptions}
-                                        defaultOptions={formattedConsultationRoomOptions.slice(0, 10)}
+                                        loadOptions={loadReasonOptions}
+                                        defaultOptions={formattedReasonOptions.slice(0, 30)}
                                         isSearchable
                                         className="basic-single"
                                         classNamePrefix="select"
-                                        placeholder="Select Consultation Room"
-                                        value={selectedConsultationRoom}
-                                        onChange={handleConsultationRoomChange}
-                                        noOptionsMessage={() => 'No Consultation added yet'}
+                                        placeholder="&nbsp; Select"
+                                        value={selectedReasonOption}
+                                        onChange={handleReasonChange}
                                         styles={{
                                             control: (provided) => ({
                                                 ...provided,
                                                 height: '30px',
                                                 minHeight: '30px',
-                                                border: 'none',
-                                                outline: 'none',
+                                                border: '0px',
                                             }),
                                             placeholder: (provided) => ({
                                                 ...provided,
+                                                fontWeight: 'bold',
                                                 fontSize: '12px',
+                                                paddingBottom: '5px',
                                             }),
                                         }}
                                     />
-                                    <input
-                                        type="hidden"
-                                        {...register('consultationRoom')}
-                                        value={selectedConsultationRoom?.value || ''}
-                                    />
-                                </div>
-                            </Form.Group>
-                        </Col>
-                        <Col sm={6}>
-                            <Form.Group className="mb-3">
-                                <Form.Label className="mb-0">
-                                    Status <span className="text-danger">*</span>
-                                </Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    data-has-value={!!watchedStatus}
-                                    className="form-select"
-                                    {...register('status', { required: 'Status is required' })}
-                                    defaultValue="proposed">
-                                    <option value="" key={''} hidden>
-                                        Select Status
-                                    </option>
-                                    {(id
-                                        ? appointmentStatus
-                                        : appointmentStatus.filter((data) =>
-                                            ['proposed', 'booked', 'arrived', 'checked-in'].includes(data.code)
-                                        )
-                                    ).map((data, index) => (
-                                        <option value={data.code} key={index}>
-                                            {data.display}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                                {errors.status && <p className="text-danger mt-1 text-sm">{errors.status.message}</p>}
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                    <Row>
-                        {repeat && (
-                            <Col sm={12} className="mt-2">
-                                <div className="time-period-tabs">
-                                    <ul
-                                        style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
-                                        className="nav nav-pills">
-                                        {appointmentRecurrence?.map((data, index) => (
-                                            <li
-                                                key={index}
-                                                style={{
-                                                    cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '',
-                                                }}
-                                                className="nav-item">
-                                                <span
-                                                    className={`cursor-pointer text-capitalize mx-1 border border-muted nav-link py-1  
-                                                ${repeatType === data.display ? 'active' : 'text-black'}`}
-                                                    onClick={() => {
-                                                        if (appointmentDetails?.repeat && id) {
-                                                            return;
-                                                        } else {
-                                                            setRepeatType(data?.display);
-                                                        }
-                                                    }}>
-                                                    {data?.display === 'day' && 'Daily'}
-                                                    {data?.display === 'week' && 'Weekly'}
-                                                    {/* {data?.display === 'month' && 'Monthly'} */}
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                </Form.Group>
                             </Col>
-                        )}
-                    </Row>
-                    {repeat && (
-                        <Row className="mt-2">
-                            {repeatType === 'day' && (
-                                <Daily
-                                    register={register}
-                                    watch={watch}
-                                    setValue={setValue}
-                                    id={id}
-                                    appointmentDetails={appointmentDetails}
-                                    scheduledDate={scheduledDate}
-                                    onDatesCalculated={(dates) => setAppointmentDates(dates)}
-                                />
-                            )}
-                            {repeatType === 'week' && (
-                                <Weekly
-                                    errors={errors}
-                                    register={register}
-                                    watch={watch}
-                                    id={id}
-                                    setValue={setValue}
-                                    appointmentDetails={appointmentDetails}
-                                    scheduledDate={scheduledDate}
-                                    onDatesCalculated={(dates) => setAppointmentDates(dates)}
-                                />
-                            )}
-                            {/* {repeatType === 'month' && <Monthly register={register} />} */}
+                            <Col sm={6}>
+                                <Form.Group className="mb-1" controlId="consultationRoom">
+                                    <Form.Label className="mb-0">
+                                        Consultation Room
+                                        <span>
+                                            <i
+                                                className="bi bi-plus-circle text-primary ms-1 cursor-pointer"
+                                                style={{ fontSize: '0.7rem' }}
+                                                title="Add Consultation Room"
+                                                onClick={() => setConsultationModal(true)}></i>
+                                        </span>
+                                    </Form.Label>
+                                    <div style={{ position: 'relative' }}>
+                                        <AsyncSelect
+                                            loadOptions={loadConsultationRoomOptions}
+                                            defaultOptions={formattedConsultationRoomOptions.slice(0, 10)}
+                                            isSearchable
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            placeholder="Select Consultation Room"
+                                            value={selectedConsultationRoom}
+                                            onChange={handleConsultationRoomChange}
+                                            noOptionsMessage={() => 'No Consultation added yet'}
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    height: '30px',
+                                                    minHeight: '30px',
+                                                    border: 'none',
+                                                    outline: 'none',
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontSize: '12px',
+                                                }),
+                                            }}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            {...register('consultationRoom')}
+                                            value={selectedConsultationRoom?.value || ''}
+                                        />
+                                    </div>
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="mb-0">
+                                        Status <span className="text-danger">*</span>
+                                    </Form.Label>
+                                    <Form.Control
+                                        as="select"
+                                        data-has-value={!!watchedStatus}
+                                        className="form-select"
+                                        {...register('status', { required: 'Status is required' })}
+                                        defaultValue="proposed">
+                                        <option value="" key={''} hidden>
+                                            Select Status
+                                        </option>
+                                        {(id
+                                            ? appointmentStatus
+                                            : appointmentStatus.filter((data) =>
+                                                ['proposed', 'booked', 'arrived', 'checked-in', 'checked-out'].includes(data.code)
+                                            )
+                                        ).map((data, index) => (
+                                            <option value={data.code} key={index}>
+                                                {data.display}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                    {errors.status && <span className="text-danger mt-1 small">{errors.status.message}</span>}
+                                </Form.Group>
+                            </Col>
                         </Row>
-                    )}
+                        <Row>
+                            {repeat && (
+                                <Col sm={12} className="mt-2">
+                                    <div className="time-period-tabs">
+                                        <ul
+                                            style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
+                                            className="nav nav-pills">
+                                            {appointmentRecurrence?.map((data, index) => (
+                                                <li
+                                                    key={index}
+                                                    style={{
+                                                        cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '',
+                                                    }}
+                                                    className="nav-item">
+                                                    <span
+                                                        className={`cursor-pointer text-capitalize mx-1 border border-muted nav-link py-1  
+                                                ${repeatType === data.display ? 'active' : 'text-black'}`}
+                                                        onClick={() => {
+                                                            if (appointmentDetails?.repeat && id) {
+                                                                return;
+                                                            } else {
+                                                                setRepeatType(data?.display);
+                                                            }
+                                                        }}>
+                                                        {data?.display === 'day' && 'Daily'}
+                                                        {data?.display === 'week' && 'Weekly'}
+                                                    </span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </Col>
+                            )}
+                        </Row>
+                        {repeat && (
+                            <Row className="mt-2">
+                                {repeatType === 'day' && (
+                                    <Daily
+                                        register={register}
+                                        watch={watch}
+                                        setValue={setValue}
+                                        id={id}
+                                        appointmentDetails={appointmentDetails}
+                                        scheduledDate={scheduledDate}
+                                        errors={errors}
+                                        onDatesCalculated={(dates) => setAppointmentDates(dates)}
+                                    />
+                                )}
+                                {repeatType === 'week' && (
+                                    <Weekly
+                                        errors={errors}
+                                        register={register}
+                                        watch={watch}
+                                        id={id}
+                                        setValue={setValue}
+                                        appointmentDetails={appointmentDetails}
+                                        scheduledDate={scheduledDate}
+                                        onDatesCalculated={(dates) => setAppointmentDates(dates)}
+                                    />
+                                )}
+                            </Row>
+                        )}
+                    </div>
                     <Row>
                         <Col sm={12} className="d-flex justify-content-end my-2">
                             <Button
@@ -1215,9 +1238,10 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     </Row>
                 </Form>
             )}
+
             <Modal show={showModal} size="xl" centered>
                 <Modal.Header className="py-0 px-2">
-                    <Modal.Title className="px-1 py-2">{`Add New Patient`}</Modal.Title>
+                    <Modal.Title className="px-1 py-2">{`Add Patient`}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body
                     // style={{
@@ -1244,9 +1268,26 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             <ConsultationModal
                 show={consultationModal}
                 onClose={closeConsultationModal}
-            // defaultValues={edit}
-            // isEdit={!!edit}
             />
+            <Modal show={showPastDateModal} onHide={() => setShowPastDateModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Past Date Confirmation</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>You are scheduling an appointment for a past date. Do you want to continue?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button className='cancel-button' onClick={() => setShowPastDateModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button className='custom-buttons' onClick={() => {
+                        setScheduledDate(pendingDate);
+                        setShowPastDateModal(false);
+                    }}>
+                        Continue
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

@@ -109,9 +109,11 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
         }
     }, [dispatch])
 
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     useEffect(() => {
         if (!store?.getEncounterNotesTypeReducer?.data?.data) {
-            dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType, clinicId: decryptedUser?.clinicId, userId: decryptedUser?._id }))
+            dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType, clinicId: clinicId, userId: decryptedUser?._id }))
         }
     }, [dispatch, searchNoteType, store?.getEncounterNotesTypeReducer?.data?.data])
 

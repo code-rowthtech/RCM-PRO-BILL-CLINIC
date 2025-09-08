@@ -5,7 +5,7 @@ import { FormInput } from '../../../../components';
 import { FiFileText, FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import {
     createMastersDataAction,
     getMastersDataAction,
@@ -16,7 +16,9 @@ import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 const TaskCategory = () => {
     const store = useSelector((state) => state);
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const {
         register,
         handleSubmit,
@@ -67,12 +69,14 @@ const TaskCategory = () => {
     const createResponse = store?.createMastersDataReducer?.data?.status;
     const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
     const updateResponse = store?.updateMastersDataReducer?.data?.status;
+
     useEffect(() => {
         if (createResponse === 200) {
             setTaskCategoryModal(false);
             reset();
         }
     }, [createResponse]);
+
     useEffect(() => {
         if (updateResponse === 200) {
             setTaskCategoryModal(false);
@@ -80,9 +84,11 @@ const TaskCategory = () => {
             setEdit(null);
         }
     }, [updateResponse]);
+
     useEffect(() => {
         dispatch(getMastersDataAction({ status: status, category: 'task-category', limit: 10, skip, search: search }));
     }, [dispatch, status, skip, search]);
+
     useEffect(() => {
         if (createResponse === 200)
             dispatch(
@@ -95,6 +101,7 @@ const TaskCategory = () => {
                 })
             );
     }, [createResponse]);
+
     useEffect(() => {
         if (updateResponse === 200) {
             dispatch(
@@ -114,14 +121,11 @@ const TaskCategory = () => {
         setSearch('');
     };
 
-    const handlePageChange = (pageNumber) => {
-        setSkip(pageNumber);
-    };
-
     const handleUpdate = (data) => {
         const payload = { id: data?._id, isActive: !data?.isActive, category: 'task-category' };
         dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
     };
+
     return (
         <>
             <Row className="mt-2">
@@ -133,18 +137,16 @@ const TaskCategory = () => {
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`active_inactive_buttons ${
-                                            status === true ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2`}>
+                                        className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'
+                                            } me-2`}>
                                         Active
                                     </Button>
 
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={` active_inactive_buttons ${
-                                            status === false ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2`}>
+                                        className={` active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'
+                                            } me-2`}>
                                         Inactive
                                     </Button>
                                 </Col>
@@ -399,7 +401,7 @@ const TaskCategory = () => {
                                 </Button>
                                 <Button type="submit" className="custom-buttons">
                                     {store?.createMastersDataReducer?.loading ||
-                                    store?.updateMastersDataReducer?.loading ? (
+                                        store?.updateMastersDataReducer?.loading ? (
                                         <div class="spinner-border spinner-border-sm" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>

@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import AddressForm from '../../Common Pages/AddressForm';
 import TelecomFrom from '../../Common Pages/TelecomFrom';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { createResponsiblePartyAction, getPatientByIdAction } from '../../../../redux/actions';
 import { dataList } from '../../../../utils/DataSets/relations.data';
 import Select from 'react-select';
@@ -14,7 +14,9 @@ import Spinner from '../../../../constants/Spinner';
 const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
     const store = useSelector((state) => state);
     const [submissionType, setSubmissionType] = useState(null);
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
@@ -37,7 +39,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
         if (patientDetails && patientId && patientDetails?._id === patientId) {
             setValue('title', patientDetails?.relatedPerson?.name?.[0]?.prefix);
             setValue('fullName', patientDetails?.relatedPerson?.name?.find((data) => data?.use === 'official')?.text);
-            setValue('gender', patientDetails?.gender);
+            // setValue('gender', patientDetails?.gender);
             // setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0]);
             setRela(patientDetails.relatedPerson?.relationship?.[0]?.coding?.[0] ?? null);
 
@@ -61,10 +63,10 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
             const updateTelecom =
                 Array.isArray(rawTelecom) && rawTelecom.length > 0
                     ? rawTelecom.map((data) => ({
-                          system: data?.system || '',
-                          value: data?.value || '',
-                          use: data?.use || '',
-                      }))
+                        system: data?.system || '',
+                        value: data?.value || '',
+                        use: data?.use || '',
+                    }))
                     : [{ system: '', value: '', use: '' }];
 
             setResponsibleTelecom(updateTelecom);
@@ -93,7 +95,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                 },
             ],
             ...(responsibleAddresses && { address: responsibleAddresses }),
-            gender: data?.gender,
+            // gender: data?.gender,
             dateOfBirth: data?.dateOfBirth,
             telecom: responsibleTelecom,
         };
@@ -105,7 +107,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
             dispatch(getPatientByIdAction({ patientId }));
         }
     }, [createResponse]);
-    const relationshipOption = dataList?.map((relation) => ({
+    const relationshipOption = dataList?.sort((a, b) => a.display.localeCompare(b.display))?.map((relation) => ({
         value: relation,
         label: relation.display,
     }));
@@ -123,14 +125,14 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                 <div className="row  pb-2 pt-1 pe-0">
                     <div className="col-md-3 col-12 pe-1 position-relative" style={{ minHeight: '70px' }}>
                         <Form.Label className="mb-0">
-                            Title <span className="text-danger">*</span>
+                            Title
                         </Form.Label>
-                        <Form.Select {...register('title', { required: 'This field is required' })}>
+                        <Form.Select {...register('title')}>
                             <option value="">Select Title</option>
+                            <option value="Dr.">Dr.</option>
+                            <option value="Miss">Miss</option>
                             <option value="Mr.">Mr.</option>
                             <option value="Mrs.">Mrs.</option>
-                            <option value="Miss">Miss</option>
-                            <option value="Dr.">Dr.</option>
                             <option value="Other">Other</option>
                         </Form.Select>
                         {errors.title && (
@@ -166,7 +168,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                         )}
                     </div>
 
-                    <div className="col-md-3 col-12 position-relative" style={{ minHeight: '70px' }}>
+                    {/* <div className="col-md-3 col-12 position-relative" style={{ minHeight: '70px' }}>
                         <Form.Label htmlFor="gender" className="mb-0">
                             Gender <span className="text-danger">*</span>
                         </Form.Label>
@@ -186,16 +188,16 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                                 {errors.gender.message}
                             </span>
                         )}{' '}
-                    </div>
+                    </div> */}
                     <div className="col-md-3 col-12 pe-2 position-relative" style={{ minHeight: '70px' }}>
                         <Form.Label htmlFor="DOB" className="mb-0">
-                            Date of Birth <span className="text-danger">*</span>
+                            Date of Birth
                         </Form.Label>
                         <Form.Control
                             type="date"
                             placeholder="Date of Birth"
                             max={new Date().toISOString().split('T')[0]} // today's date in YYYY-MM-DD format
-                            {...register('dateOfBirth', { required: 'This field is required' })}
+                            {...register('dateOfBirth')}
                         />
                         {errors.dateOfBirth && (
                             <span

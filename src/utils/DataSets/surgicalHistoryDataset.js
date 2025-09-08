@@ -1,4 +1,4 @@
-export const bodySite = [
+const bodySiteList = [
     {
         code: "32849002",
         system: "http://snomed.info/sct",
@@ -60,3 +60,6 @@ export const bodySite = [
         display: "Osher"
     }
 ]
+export const bodySite = bodySiteList.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);

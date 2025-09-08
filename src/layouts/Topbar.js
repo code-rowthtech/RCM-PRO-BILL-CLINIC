@@ -1,11 +1,11 @@
 // @flow
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Form, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 // actions
-import { showRightSidebar, changeSidebarType } from '../redux/actions';
+import { showRightSidebar, changeSidebarType, getSubClinicAction } from '../redux/actions';
 
 // components
 import ProfileDropdown from '../components/ProfileDropdown';
@@ -22,6 +22,7 @@ import * as layoutConstants from '../constants/layout';
 import { Button } from 'react-bootstrap';
 import ModalTask from '../pages/apps/Tasks/ModalTask';
 import { MdAddCircleOutline } from 'react-icons/md';
+import { decryptMessage, encryptMessage } from '../cryptoUtils';
 
 const ProfileMenus = [
     // {
@@ -47,9 +48,12 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const dispatch = useDispatch();
     const [isopen, setIsopen] = useState(false);
     const navigate = useNavigate();
-
+    const store = useSelector((state) => state);
+    const subClinicLocations = store?.getSubClinicsReducer?.data?.clinics;
     const location = useLocation(); // Get the current location object
     const { pathname, search } = location;
+    const [taskModal, setTaskModal] = useState(false);
+    const [selectedSubClinic, setSelectedSubClinic] = useState(decryptMessage(localStorage.getItem('subClinicLocation')) || '');
     // Define a mapping of paths to titles
     const pathToTitleMap = {
         '/dashboard': 'Dashboard',
@@ -137,10 +141,17 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                 break;
         }
     };
-    const [taskModal, setTaskModal] = useState(false);
+
+    useEffect(() => {
+        dispatch(getSubClinicAction())
+    }, [dispatch]);
+
     const handleCloseTaskModal = () => {
         setTaskModal(false);
     };
+
+
+
     return (
         <>
             <div className={classNames('navbar-custom', navbarCssClasses)}>
@@ -168,12 +179,60 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                                 </button>
                             </li>
                         )}
-                        <li
-                            onClick={() => setTaskModal(true)}
-                            className="text-primary fw-bolder fs-3 cursor-pointer ms-2"
-                            title="Add New Task">
-                            <MdAddCircleOutline />
+                        <li className="notification-list">
+                            <select
+                                className="form-select mt-2 text-capitalize"
+                                style={{
+                                    minWidth: '15rem',
+                                    maxWidth: '20rem',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}
+                                onChange={(e) => {
+                                    localStorage.setItem('subClinicLocation', encryptMessage(e.target.value));
+                                    setSelectedSubClinic(e.target.value);
+                                    window.location.reload();
+                                }}
+                                value={selectedSubClinic}
+                            >
+                                <option value={store?.Auth?.user?.clinicId} selected>{store?.getSubClinicsReducer?.loading ? 'Loading...' : store?.Auth?.user?.name}</option>
+                                {subClinicLocations?.map((subClinics) => {
+                                    const address = subClinics?.address?.[0]?.line?.[0];
+                                    const displayText = `${subClinics?.name}${address ? ` - (${address})` : ''}`;
+                                    const truncatedText = displayText.length > 35 ? displayText.substring(0, 35) + '...' : displayText;
+
+                                    return (
+                                        <option
+                                            key={subClinics?._id}
+                                            value={subClinics?._id}
+                                            className="text-capitalize"
+                                            title={displayText}
+                                        >
+                                            {truncatedText}
+                                        </option>
+                                    );
+                                })}
+                            </select>
                         </li>
+                        <li className="notification-list">
+                            <button
+                                onClick={() => setTaskModal(true)}
+                                className="custom mt-2 mx-2 text-muted border-0  px-2 bg-light fw-semibold">
+                                Add Task
+                            </button>
+                        </li>
+                        {/* <li
+                            onClick={() => setTaskModal(true)}
+                            className="custom-buttons fw-bolder fs-3 cursor-pointer ms-2"
+                            title="Add New Task">
+                            <MdAddCircleOutline /> Add Task
+                        </li> */}
+                        {/* <li className="notification-list">
+                            <Button className="custom-buttons mt-1" onClick={() => setTaskModal(true)}>
+                                Add Task
+                            </Button>
+                        </li> */}
                         <ModalTask show={taskModal} handleClose={handleCloseTaskModal} />
                         <li className="dropdown notification-list">
                             <ProfileDropdown

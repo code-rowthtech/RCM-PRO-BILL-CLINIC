@@ -50,7 +50,7 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
     };
 
     const handleAppointment = () => {
-        navigate('/apps/appointments/list');
+        navigate(-1);
     };
     const closeVitalsModal = () => {
         setVitalsModal(false);

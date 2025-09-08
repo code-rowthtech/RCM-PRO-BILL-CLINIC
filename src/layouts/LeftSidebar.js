@@ -12,7 +12,7 @@ import AppMenu from './Menu';
 import dummyProfile from '../assets/images/dummyProfile.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDoctorsAction, getPatientsByAppointmentAction, logoutUser } from '../redux/actions';
-import { encryptMessage } from '../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../cryptoUtils';
 import Spinner from '../constants/Spinner';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 import { IoMdAdd } from 'react-icons/io';
@@ -76,7 +76,8 @@ const LeftSidebar = ({
         waitlist: '#8e44ad', // Dark Purple
     };
     const [search, setSearch] = useState('');
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation'));
     const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState('Today');
     // const [filter, setFilter] = useState(false);
@@ -271,9 +272,8 @@ const LeftSidebar = ({
                                     doctorDetails.map((data) => (
                                         <li
                                             key={data?._id}
-                                            className={`py-2  rounded ${
-                                                selectedDoctor === data?._id ? 'bg-primary text-white' : 'hover-effect'
-                                            }`}
+                                            className={`py-2  rounded ${selectedDoctor === data?._id ? 'bg-primary text-white' : 'hover-effect'
+                                                }`}
                                             style={{ cursor: 'pointer', transition: '0.3s' }}
                                             onClick={() => handleSelectDoctor(data?._id)}>
                                             {data?.userDetails?.firstName} {data?.userDetails?.lastName}
@@ -295,9 +295,8 @@ const LeftSidebar = ({
                             appointmentDetails.map((data) => (
                                 <li
                                     key={data?._id}
-                                    className={`py-2 px-3 rounded ${
-                                        selectedAppointment === data?._id ? 'bg-primary text-white' : 'hover-effect'
-                                    }`}
+                                    className={`py-2 px-3 rounded ${selectedAppointment === data?._id ? 'bg-primary text-white' : 'hover-effect'
+                                        }`}
                                     style={{ cursor: 'pointer', transition: '0.3s' }}
                                     onClick={() => handleSelectAppointment(data?._id)}>
                                     {data?.appointmentType}
@@ -347,7 +346,7 @@ const LeftSidebar = ({
                 className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`}
                 ref={menuNodeRef}>
                 {location?.pathname === '/apps/patients/update-patient' ||
-                location?.pathname === '/apps/patients/new-patient' ? (
+                    location?.pathname === '/apps/patients/new-patient' ? (
                     <>
                         {!isCondensed ? (
                             <ul style={{ listStyle: 'none' }} className="px-0">
@@ -485,8 +484,8 @@ const LeftSidebar = ({
                                                                 <p className="mb-0">
                                                                     {appointment?.start
                                                                         ? new Date(appointment?.start)
-                                                                              ?.toISOString()
-                                                                              ?.split('T')[0]
+                                                                            ?.toISOString()
+                                                                            ?.split('T')[0]
                                                                         : ''}
                                                                     <br />(
                                                                     {new Date(appointment?.start).toLocaleString(
@@ -662,46 +661,46 @@ const LeftSidebar = ({
                                     <ul className="ps-0 scroll-container" style={{ height: '90vh' }}>
                                         {appointmentsData &&
                                             appointmentsData
-                                                ?.filter((data, index, self) => 
+                                                ?.filter((data, index, self) =>
                                                     index === self.findIndex(item => item?.subject?._id === data?.subject?._id)
                                                 )
                                                 ?.map((data, index) => (
-                                                <li
-                                                    key={data?.subject?._id || index}
-                                                    className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
-                                                    style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
-                                                    onClick={() =>
-                                                        navigate(
-                                                            `/apps/patients/update-patient?id=${data?.subject?._id}`
-                                                        )
-                                                    }>
-                                                    <div className="text-center">
-                                                        <img
-                                                            height="40"
-                                                            width="40"
-                                                            src={
-                                                                data?.subject?.photo?.[0]?.url
-                                                                    ? data?.subject?.photo?.[0]?.url
-                                                                    : dummyProfile
-                                                            }
-                                                            // style={{ height: '5vh' }}
-                                                            className="rounded-circle border border-black object-fit-cover"
-                                                            alt="profile image"
-                                                        />
-                                                        <div>
-                                                            <p
-                                                                className="mb-0 mt-1 text-capitalize fw-semibold"
-                                                                style={{ fontSize: '9px' }}>
-                                                                {
-                                                                    data?.subject?.name?.find(
-                                                                        (ele) => ele?.use === 'official'
-                                                                    )?.text
+                                                    <li
+                                                        key={data?.subject?._id || index}
+                                                        className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
+                                                        style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/apps/patients/update-patient?id=${data?.subject?._id}`
+                                                            )
+                                                        }>
+                                                        <div className="text-center">
+                                                            <img
+                                                                height="40"
+                                                                width="40"
+                                                                src={
+                                                                    data?.subject?.photo?.[0]?.url
+                                                                        ? data?.subject?.photo?.[0]?.url
+                                                                        : dummyProfile
                                                                 }
-                                                            </p>
+                                                                // style={{ height: '5vh' }}
+                                                                className="rounded-circle border border-black object-fit-cover"
+                                                                alt="profile image"
+                                                            />
+                                                            <div>
+                                                                <p
+                                                                    className="mb-0 mt-1 text-capitalize fw-semibold"
+                                                                    style={{ fontSize: '9px' }}>
+                                                                    {
+                                                                        data?.subject?.name?.find(
+                                                                            (ele) => ele?.use === 'official'
+                                                                        )?.text
+                                                                    }
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </li>
-                                            ))}
+                                                    </li>
+                                                ))}
                                     </ul>
                                 )}
 
@@ -780,7 +779,7 @@ const LeftSidebar = ({
                                 <SimpleBar timeout={500} scrollbarMaxSize={320}>
                                     <SideBarContent
                                         data-aos="fade-down"
-                                        menuClickHandler={() => {}}
+                                        menuClickHandler={() => { }}
                                         isLight={isLight}
                                         hideUserProfile={hideUserProfile}
                                     />
@@ -800,7 +799,7 @@ const LeftSidebar = ({
                                     {!isCondensed && <div className="leftSideBarLine"></div>}
                                     <SideBarContentDown
                                         data-aos="fade-down"
-                                        menuClickHandler={() => {}}
+                                        menuClickHandler={() => { }}
                                         isLight={isLight}
                                         hideUserProfile={hideUserProfile}
                                     />

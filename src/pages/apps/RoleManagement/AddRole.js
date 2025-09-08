@@ -4,7 +4,7 @@ import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
 import { createRolesAction, getRoleDataAction, getRolesAction, updateRolesAction } from '../../../redux/actions';
-import { encryptMessage } from '../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
 import CreateRoleSetting from '../Settings/Role/CreateRoleSetting';
@@ -17,7 +17,9 @@ import ToastHandle from '../../../helpers/ToastMessage';
 const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
     const [isDropdownClicked, setIsDropdownClicked] = useState(false);
     const [isDropdownDesignation, setIsDropdownDesignation] = useState(false);
@@ -157,7 +159,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
         } else {
             dispatch(createRolesAction({ key: `${encryptMessage(data)}` }));
         }
-        console.log('Form submitted with data:', data);
     };
 
     const [showModal, setShowModal] = useState(false);
@@ -307,27 +308,27 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 minLength: dataToEdit
                                                     ? false
                                                     : {
-                                                          value: 8,
-                                                          message: 'Password must be at least 8 characters',
-                                                      },
+                                                        value: 8,
+                                                        message: 'Password must be at least 8 characters',
+                                                    },
                                                 maxLength: dataToEdit
                                                     ? false
                                                     : {
-                                                          value: 16,
-                                                          message: 'Password must not exceed 16 characters',
-                                                      },
+                                                        value: 16,
+                                                        message: 'Password must not exceed 16 characters',
+                                                    },
                                                 validate: dataToEdit
                                                     ? false
                                                     : {
-                                                          noEmpty: (value) =>
-                                                              value.trim() !== '' ||
-                                                              'Password cannot be empty or only spaces',
-                                                          noSpacesBeforeText: (value) =>
-                                                              !/^\s/.test(value) || 'First character cannot be a space',
-                                                          isStrong: (value) =>
-                                                              strongRegex.test(value) ||
-                                                              'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
-                                                      },
+                                                        noEmpty: (value) =>
+                                                            value.trim() !== '' ||
+                                                            'Password cannot be empty or only spaces',
+                                                        noSpacesBeforeText: (value) =>
+                                                            !/^\s/.test(value) || 'First character cannot be a space',
+                                                        isStrong: (value) =>
+                                                            strongRegex.test(value) ||
+                                                            'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
+                                                    },
                                             })}
                                             onChange={(e) => {
                                                 handlePasswordChange(e);
@@ -361,9 +362,9 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 validate: dataToEdit
                                                     ? false
                                                     : {
-                                                          matchPassword: (value) =>
-                                                              value === watch('password') || 'Passwords do not match',
-                                                      },
+                                                        matchPassword: (value) =>
+                                                            value === watch('password') || 'Passwords do not match',
+                                                    },
                                             })}
                                             onChange={() => trigger('confirmPassword')}
                                             maxLength={16}
@@ -427,28 +428,28 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 'phone',
                                                 !id
                                                     ? {
-                                                          required: dataToEdit ? false : 'Contact number is required',
-                                                          pattern: {
-                                                              value: /^[0-9()\-\s]*$/,
-                                                              message: 'Contact must be numeric only',
-                                                          },
-                                                          maxLength: {
-                                                              value: 13, // (XXX)XXX-XXXX is 13 chars
-                                                              message: 'Contact must not exceed 10 digits',
-                                                          },
-                                                          minLength: {
-                                                              value: 13,
-                                                              message: 'Contact must not be less than 10 digits',
-                                                          },
-                                                          validate: {
-                                                              noEmpty: (value) =>
-                                                                  value.trim() !== '' ||
-                                                                  'Contact cannot be empty or only spaces',
-                                                              noSpacesBeforeText: (value) =>
-                                                                  !/^\s/.test(value) ||
-                                                                  'First character cannot be a space',
-                                                          },
-                                                      }
+                                                        required: dataToEdit ? false : 'Contact number is required',
+                                                        pattern: {
+                                                            value: /^[0-9()\-\s]*$/,
+                                                            message: 'Contact must be numeric only',
+                                                        },
+                                                        maxLength: {
+                                                            value: 13, // (XXX)XXX-XXXX is 13 chars
+                                                            message: 'Contact must not exceed 10 digits',
+                                                        },
+                                                        minLength: {
+                                                            value: 13,
+                                                            message: 'Contact must not be less than 10 digits',
+                                                        },
+                                                        validate: {
+                                                            noEmpty: (value) =>
+                                                                value.trim() !== '' ||
+                                                                'Contact cannot be empty or only spaces',
+                                                            noSpacesBeforeText: (value) =>
+                                                                !/^\s/.test(value) ||
+                                                                'First character cannot be a space',
+                                                        },
+                                                    }
                                                     : {}
                                             )}
                                             placeholder="(845)567-9292"

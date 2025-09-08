@@ -1,3 +1,4 @@
+import { decryptMessage } from '../../cryptoUtils';
 import { APICore } from '../../helpers/api/apiCore';
 import * as URL from '../../helpers/api/apiEndpoints';
 const api = new APICore();
@@ -9,7 +10,13 @@ export function createNoteCategoriesApi(params: any): any {
 
 export function getNoteCategoriesApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getNoteCategories}?clinicId=${data?.clinicId}&page=${data?.page || 1}&limit=${data?.limit}&search=${data?.search}&active=${data?.active}&noteType=${data?.noteType}`);
+    return api.get(`${URL.getNoteCategories}`, {
+        page: data?.page || 1,
+        limit: data?.limit,
+        search: data?.search,
+        active: data?.active,
+        noteType: data?.noteType
+    });
 }
 
 export function updateNoteCategoriesApi(params: any): any {

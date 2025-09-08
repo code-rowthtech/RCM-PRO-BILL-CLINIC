@@ -159,7 +159,6 @@ function* getEncounterFunction(data) {
             payload: {},
         });
         const response = yield call(getEncounterApi, data);
-        // console.log(response, 'responseresponseresponse')
         const decryptedData = response.data.data;
         // const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {

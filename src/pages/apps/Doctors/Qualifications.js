@@ -311,7 +311,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                     .getElementById(`degree-file-input-${index}`)
                                                                     .click()
                                                             }
-                                                            className={`custom-file-upload d-flex justify-content-between align-items-center cursor-pointer form-control ${qualification.degreeName || qualification.degreeFile
+                                                            className={`custom-file-upload d-flex justify-content-between position-relative align-items-center cursor-pointer form-control ${qualification.degreeName || qualification.degreeFile
                                                                 ? ''
                                                                 : 'custom-form-fields'
                                                                 }`}
@@ -328,6 +328,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                             : qualification.degreeFile.fileName
                                                                         : 'Upload Degree'}
                                                             </span>
+                                                            {!qualification.degreeFile?.fileName && <i className="bi bi-cloud-arrow-up position-absolute fs-5" style={{ right: '2.5%' }}></i>}
                                                             <div className="d-flex align-items-center gap-2">
                                                                 {qualification.degreeFile?.url &&
                                                                     /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(
@@ -369,7 +370,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                 </Col>
                                                 <Col md={4} xs={12}>
                                                     <Form.Group className="position-relative">
-                                                        <Form.Label>Issuer Organisation</Form.Label>
+                                                        <Form.Label>Issuing Authority</Form.Label>
                                                         <div className="d-flex align-items-center gap-2">
                                                             <Form.Control
                                                                 type="text"
@@ -381,7 +382,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                         e.target.value
                                                                     )
                                                                 }
-                                                                placeholder="Enter Issuer Organisation"
+                                                                placeholder="Enter Issuing Authority"
                                                                 className="flex-grow-1"
                                                             />
                                                             {index > 0 && (
@@ -500,6 +501,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                         : data.document.fileName
                                                                                     : 'Upload Document'}
                                                                         </span>
+                                                                        {!data?.document?.fileName && <i className="bi bi-cloud-arrow-up position-absolute fs-5 text-" style={{ right: '3%' }}></i>}
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {data?.document?.url &&
                                                                                 /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(

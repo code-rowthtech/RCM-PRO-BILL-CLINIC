@@ -13,7 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { createTemplateAction, getTemplateAction, updateTemplateAction } from '../../../../redux/actions';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import TemplateSection from './TemplateSection';
 import useQuillWordLimit from '../../../../helpers/quillWordLimit';
@@ -99,11 +99,12 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
     const handleRemoveTag = (indexToRemove) => {
         setTags(prev => prev.filter((_, i) => i !== indexToRemove));
     };
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     const onSubmit = (data) => {
         data.practiceType = data.practiceType.value;
         data.tags = tags;
-        data.practiceId = loggedInUser?.clinicId;
+        data.practiceId = clinicId || loggedInUser?.clinicId;
         data.userId = loggedInUser?._id;
         if (template?._id) {
             dispatch(updateTemplateAction({ key: encryptMessage(data), templateId: template?._id }))

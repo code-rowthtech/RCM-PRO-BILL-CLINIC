@@ -60,12 +60,12 @@ const setAuthorization = (token) => {
     if (userData?._id) {
         axios.defaults.headers.common['x-user-id'] = `${encryptMessage(userData._id)}`; // Set new value for 'XUIXX'
     }
-    
+
     if (token) {
         const tokenValue = token.startsWith('token=') ? token.substring(6) : token;
         axios.defaults.headers.common['Authorization'] = `${encryptMessage(tokenValue)}`;
     }
-    
+
     else {
         delete axios.defaults.headers.common['Authorization']; // Remove the header if token is null/undefined
     }
@@ -81,50 +81,41 @@ class APICore {
     /**
      * Fetches data from given url
      */
+
     get = (url, params) => {
-        let response;
-        if (params) {
-            var queryString = params
-                ? Object.keys(params)
-                    .map((key) => key + '=' + params[key])
-                    .join('&')
-                : '';
-            response = axios.get(`${url}?${queryString}`, params);
-        } else {
-            response = axios.get(`${url}`, params);
-        }
-        return response;
+        const subClinicLocation = decryptMessage(localStorage.getItem('subClinicLocation')) || '';
+        const clinicParams = { ...params, clinicId: subClinicLocation };
+
+        const queryString = Object.keys(clinicParams)
+            .map((key) => key + '=' + clinicParams[key])
+            .join('&');
+        const separator = url.includes('?') ? '&' : '?';
+        return axios.get(`${url}${separator}${queryString}`);
     };
 
     getFile = (url, params) => {
-        let response;
-        if (params) {
-            var queryString = params
-                ? Object.keys(params)
-                    .map((key) => key + '=' + params[key])
-                    .join('&')
-                : '';
-            response = axios.get(`${url}?${queryString}`, { responseType: 'blob' });
-        } else {
-            response = axios.get(`${url}`, { responseType: 'blob' });
-        }
-        return response;
+        const subClinicLocation = decryptMessage(localStorage.getItem('subClinicLocation')) || '';
+        const clinicParams = { ...params, clinicId: subClinicLocation };
+
+        const queryString = Object.keys(clinicParams)
+            .map((key) => key + '=' + clinicParams[key])
+            .join('&');
+        const separator = url.includes('?') ? '&' : '?';
+        return axios.get(`${url}${separator}${queryString}`, { responseType: 'blob' });
     };
 
     getMultiple = (urls, params) => {
-        const reqs = [];
-        let queryString = '';
-        if (params) {
-            queryString = params
-                ? Object.keys(params)
-                    .map((key) => key + '=' + params[key])
-                    .join('&')
-                : '';
-        }
+        const subClinicLocation = decryptMessage(localStorage.getItem('subClinicLocation')) || '';
+        const clinicParams = { ...params, clinicId: subClinicLocation };
 
-        for (const url of urls) {
-            reqs.push(axios.get(`${url}?${queryString}`));
-        }
+        const queryString = Object.keys(clinicParams)
+            .map((key) => key + '=' + clinicParams[key])
+            .join('&');
+
+        const reqs = urls.map(url => {
+            const separator = url.includes('?') ? '&' : '?';
+            return axios.get(`${url}${separator}${queryString}`);
+        });
         return axios.all(reqs);
     };
 

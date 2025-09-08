@@ -21,9 +21,8 @@ export function getPractitionerScheduleApi(params: any): any {
 
 export function getAppointmentsApi(params: any): any {
     const { data } = params;
-    let query = `${URL.getAppointments}${data?.clinicId}?status=${data?.status}&doctorId=${data?.doctorId || ''}&page=${
-        data?.skip
-    }&limit=${data?.limit}&monthYear=${data?.monthYear || ''}`;
+    let query = `${URL.getAppointments}${decryptMessage(localStorage?.getItem('subClinicLocation')) || data?.clinicId}?status=${data?.status}&doctorId=${data?.doctorId || ''}&page=${data?.skip
+        }&limit=${data?.limit}&monthYear=${data?.monthYear || ''}`;
 
     if (data?.patientId) {
         query += `&patientId=${data.patientId}`;

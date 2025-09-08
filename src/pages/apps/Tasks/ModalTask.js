@@ -197,7 +197,16 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                                             value: t?.userId?._id,
                                                             label: (
                                                                 <span>
-                                                                    {t?.name?.[0]?.text || t?.name?.text || 'Unnamed'}
+                                                                    {(t?.name?.[0]?.prefix?.[0]
+                                                                        ? t?.name?.[0]?.prefix?.[0] + ' '
+                                                                        : '') +
+                                                                        (t?.name?.[0]?.family || '') +
+                                                                        (t?.name?.[0]?.given?.length > 0
+                                                                            ? ' ' + t?.name?.[0]?.given?.join(' ')
+                                                                            : '') + ' ' +
+                                                                        (t?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value ?
+                                                                            `(******${t?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value.slice(-4)})`
+                                                                            : '') || 'Unnamed'}
                                                                     <span
                                                                         style={{
                                                                             fontSize: 10,
@@ -326,7 +335,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                                     'failed', 'completed', 'entered-in-error'
                                                 ]
                                                 : ['draft', 'requested']
-                                            ).map((status, index) => (
+                                            )?.sort((a, b) => a.localeCompare(b))?.map((status, index) => (
                                                 <option
                                                     selected={status === 'requested'}
                                                     className="text-capitalize"
@@ -364,10 +373,15 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                                     options={
                                                         patientsData?.map((patient) => ({
                                                             value: patient._id,
-                                                            label:
-                                                                patient?.name?.[0]?.text ||
-                                                                patient?.name?.text ||
-                                                                'Unnamed',
+                                                            label: (patient?.name?.[0]?.prefix?.[0]
+                                                                ? patient?.name?.[0]?.prefix?.[0].charAt(0).toUpperCase() + patient?.name?.[0]?.prefix?.[0].slice(1) + ' '
+                                                                : '') +
+                                                                (patient?.name?.[0]?.family
+                                                                    ? patient?.name?.[0]?.family.charAt(0).toUpperCase() + patient?.name?.[0]?.family.slice(1)
+                                                                    : '') +
+                                                                (patient?.name?.[0]?.given?.length > 0
+                                                                    ? ' ' + patient?.name?.[0]?.given.map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' ')
+                                                                    : '') + " " + `(${patient?.chartNumber})` || 'N/A',
                                                         })) || []
                                                     }
                                                     placeholder="Select"
@@ -444,7 +458,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                         </Form.Label>
                                         <Form.Select className='text-capitalize' {...register('priority', { required: 'Priority is required.' })}>
                                             <option value="">Select Priority</option>
-                                            {['routine', 'urgent', 'asap', 'stat']?.map((priority, index) => (
+                                            {['asap', 'routine', 'stat', 'urgent',]?.map((priority, index) => (
                                                 <option selected={priority === 'routine'} className='text-capitalize' value={priority} key={index}>{priority === 'stat' ? 'Stat (Immediate action required)' : priority}</option>
                                             ))}
                                         </Form.Select>

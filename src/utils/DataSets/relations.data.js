@@ -1,4 +1,4 @@
-export const dataList = [
+export const dataLists = [
     {
         code: 'C',
         system: 'http://terminology.hl7.org/CodeSystem/v2-0131',
@@ -264,9 +264,18 @@ export const dataList = [
         system: 'http://terminology.hl7.org/CodeSystem/v3-RoleCode',
         display: 'Roommate',
     },
+    {
+        code: 'GUARDIAN',
+        system: 'http://terminology.hl7.org/CodeSystem/v3-RoleCode',
+        display: 'Guardian',
+    },
 ];
+export const dataList = dataLists.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);
 
-export const familyGenticList = [
+
+const familyGenticLists = [
     {
         code: 'FTH',
         system: 'http://terminology.hl7.org/CodeSystem/v3-RoleCode',
@@ -450,3 +459,6 @@ export const familyGenticList = [
         display: 'Step Sibling',
     },
 ];
+export const familyGenticList = familyGenticLists.sort((a, b) =>
+    a.display.localeCompare(b.display)
+);

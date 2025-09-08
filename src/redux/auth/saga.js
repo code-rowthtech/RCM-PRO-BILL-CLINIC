@@ -30,7 +30,6 @@ function* login({ payload }) {
         const response = yield call(loginApi, encryptedPayload);
 
         const user = JSON.parse(decryptMessage(response?.data?.data));
-        console.log(user, 'useruseruser')
         const userData = {
             name: user?.name,
             permission: user?.permission,
@@ -41,6 +40,7 @@ function* login({ payload }) {
             logo: user?.logo?.url,
             clinicId: user?.clinicId
         }
+        localStorage.setItem('subClinicLocation', encryptMessage(user?.clinicId))
         const encryptedUserData = encryptMessage(userData)
         localStorage.setItem('userData', JSON.stringify(user));
         localStorage.setItem('encryptedUserData', encryptedUserData)
@@ -65,6 +65,7 @@ function* logout() {
         api.setLoggedInUser(null);
         setAuthorization(null);
         sessionStorage.clear();
+        localStorage.clear();
         yield put(authApiResponseSuccess(AuthActionTypes.LOGOUT_USER, {}));
     } catch (error) {
         yield put(authApiResponseError(AuthActionTypes.LOGOUT_USER, error));

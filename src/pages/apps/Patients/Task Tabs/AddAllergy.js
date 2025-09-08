@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { encryptMessage } from '../../../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { clinicalStatus } from '../../../../utils/DataSets/Allergy/clinicalStatus';
 import { allergyType } from '../../../../utils/DataSets/Allergy/allergyType';
 import { category, criticality } from '../../../../utils/DataSets/Allergy/category';
@@ -41,7 +41,9 @@ const AddAllergy = ({ onCancel }) => {
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
     const appointments = store?.getPatientAppointmentReducer?.data?.appointments;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
+
     const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
     const createStatus = store?.createAllergyReducer?.data?.status;
 
@@ -128,23 +130,23 @@ const AddAllergy = ({ onCancel }) => {
             },
             ...(data?.note
                 ? {
-                      note: [
-                          {
-                              text: data.note,
-                              time: '',
-                              authorReference: {
-                                  reference: '',
-                                  type: '',
-                                  identifier: {
-                                      use: '',
-                                      system: '',
-                                      value: '',
-                                  },
-                                  display: '',
-                              },
-                          },
-                      ],
-                  }
+                    note: [
+                        {
+                            text: data.note,
+                            time: '',
+                            authorReference: {
+                                reference: '',
+                                type: '',
+                                identifier: {
+                                    use: '',
+                                    system: '',
+                                    value: '',
+                                },
+                                display: '',
+                            },
+                        },
+                    ],
+                }
                 : {}),
         };
         if (selectMode === 'appointment' && data.appointment) {
