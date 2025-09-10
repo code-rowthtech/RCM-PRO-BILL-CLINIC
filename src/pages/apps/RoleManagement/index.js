@@ -38,6 +38,7 @@ const RoleManagement = () => {
             })
         );
     }, [dispatch, status, searchQuery, skip]);
+
     useEffect(() => {
         dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: skip, search: '' }));
         dispatch(
