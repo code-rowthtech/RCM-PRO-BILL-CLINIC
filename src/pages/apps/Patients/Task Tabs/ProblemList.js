@@ -88,7 +88,7 @@ const ProblemList = () => {
                                             <td>{data?.code?.coding?.[0]?.code || 'N/A'}</td>
                                             <td>
                                                 {data?.onsetDateTime && !isNaN(new Date(data.onsetDateTime))
-                                                    ? new Date(data.onsetDateTime).toLocaleDateString('en-GB')
+                                                    ? new Date(data.onsetDateTime).toLocaleDateString('en-US')
                                                     : 'N/A'}
                                             </td>{' '}
                                             <td>{data.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>

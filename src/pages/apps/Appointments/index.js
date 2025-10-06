@@ -233,8 +233,9 @@ const AppointmentsList = ({
                                 <td>
                                     {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
                                 </td>
-                                <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
-                                <td className="text-capitalize">{data?.doctorId?.name?.[0]?.text + ' '}</td>
+
+                                <td>{new Date(data?.date).toLocaleDateString('en-US')}</td>
+                                <td>{data?.doctorId?.prefix?.[0] || '' + data?.doctorId?.name?.[0]?.text || 'N/A'}</td>
                                 <td
                                     className="text-capitalize cursor-pointer"
                                     data-toggle="tooltip"
@@ -260,7 +261,7 @@ const AppointmentsList = ({
                                 <td>
                                     <Link
                                         to={`/apps/appointments/newAppointment?updateid=${data?._id}`}
-                                        className="action-icon">
+                                        className="action-icon fs-5">
                                         <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
                                     </Link>
                                 </td>

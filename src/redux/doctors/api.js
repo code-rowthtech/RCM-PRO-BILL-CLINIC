@@ -6,7 +6,7 @@ const api = new APICore();
 
 export function getDoctorsApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getDoctor}?status=${data?.status}&search=${data?.search}&page=${data?.page}&limit=${data?.limit}`);
+    return api.get(`${URL.getDoctor}?status=${data?.status}&search=${data?.search}&page=${data?.page || 1}&limit=${data?.limit || 10}`);
     // &page=${data?.page}&limit=${data?.limit}
 }
 

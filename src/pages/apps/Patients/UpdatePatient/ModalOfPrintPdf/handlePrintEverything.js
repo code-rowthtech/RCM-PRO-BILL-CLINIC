@@ -36,7 +36,7 @@ export const handlePrintEverything = async (printData) => {
         if (!dateStr) return '';
         try {
             const date = new Date(dateStr);
-            return date.toLocaleDateString('en-GB', {
+            return date.toLocaleDateString('en-US', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
@@ -87,8 +87,8 @@ export const handlePrintEverything = async (printData) => {
 
     // Group by date and sort chronologically
     const groupedByDate = printData?.vitals?.reduce((acc, vitalGroup) => {
-        const date = new Date(vitalGroup?.effectiveDateTime).toLocaleDateString('en-GB');
-        const time = new Date(vitalGroup?.effectiveDateTime).toLocaleTimeString('en-GB', {
+        const date = new Date(vitalGroup?.effectiveDateTime).toLocaleDateString('en-US');
+        const time = new Date(vitalGroup?.effectiveDateTime).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit'
         });

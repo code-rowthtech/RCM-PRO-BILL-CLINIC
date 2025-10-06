@@ -150,8 +150,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         setTaskModal(false);
     };
 
-
-
     return (
         <>
             <div className={classNames('navbar-custom', navbarCssClasses)}>
@@ -168,13 +166,12 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             </span>
                         </Link>
                     )}
-
                     <ul className="list-unstyled topbar-menu float-end mb-0">
                         {location.pathname === '/apps/patients/update-patient' && (
-                            <li className="notification-list">
+                            <li className="notification-list ">
                                 <button
                                     onClick={() => navigate('/apps/patients/list')}
-                                    className="custom mt-2 text-muted border-0  px-2 bg-light fw-semibold">
+                                    className="custom mt-2 text-muted border-0 mx-2 px-2 bg-light fw-semibold">
                                     Back
                                 </button>
                             </li>
@@ -201,7 +198,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                                     const address = subClinics?.address?.[0]?.line?.[0];
                                     const displayText = `${subClinics?.name}${address ? ` - (${address})` : ''}`;
                                     const truncatedText = displayText.length > 35 ? displayText.substring(0, 35) + '...' : displayText;
-
                                     return (
                                         <option
                                             key={subClinics?._id}

@@ -41,6 +41,7 @@ const LockScreen2 = React.lazy(() => import('../pages/account2/LockScreen2'));
 const ProjectDashboard = React.lazy(() => import('../pages/dashboard/Project'));
 // const AllClinics = React.lazy(() => import('../pages/apps/Clinic/AllClinics'));
 const AddClinics = React.lazy(() => import('../pages/apps/Clinic/AddClinic/index'));
+const AddClinicsV2 = React.lazy(() => import('../pages/apps/Clinic/AddClinicV2/index'));
 
 // const UpdateClinic = React.lazy(() => import('../pages/apps/Clinic/AllClinics/updateClinic'));
 const AppointmentsList = React.lazy(() => import('../pages/apps/Appointments/index'));
@@ -272,6 +273,12 @@ const AllRoutes = () => {
                                     path: 'addPractice',
                                     element: hasPermission('view crm')
                                         ? <LoadComponent component={AddClinics} />
+                                        : <div className="disabled-content">You don't have permission to view this page.</div>,
+                                },
+                                {
+                                    path: 'addPracticeV2',
+                                    element: hasPermission('view crm')
+                                        ? <LoadComponent component={AddClinicsV2} />
                                         : <div className="disabled-content">You don't have permission to view this page.</div>,
                                 },
                             ],

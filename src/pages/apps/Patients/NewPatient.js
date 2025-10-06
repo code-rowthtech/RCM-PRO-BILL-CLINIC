@@ -112,7 +112,10 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
             (data?.name?.[0]?.family || '') +
             (data?.name?.[0]?.given?.length > 0
                 ? ' ' + data?.name?.[0]?.given?.join(' ')
-                : '') || 'N/A',
+                : '') + ' ' +
+            (data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value ?
+                `(******${data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value.slice(-4)})`
+                : '') || ''
     }));
 
 
@@ -367,13 +370,13 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
         ];
         if (data?.previousBirthName) {
             payload.name.push({
-                use: 'old', // Assuming 'old' or 'maiden' is appropriate for previous birth names
+                use: 'old',
                 text: data.previousBirthName,
-                family: data.lastName || '', // Assuming the last name remains unchanged
+                family: data.lastName || '',
                 given: [data.firstName || '', data.middleName || ''].filter(Boolean),
-                prefix: [], // Add any prefix if available
-                suffix: [], // Add any suffix if available
-                preferred: true, // Assuming this is the preferred name
+                prefix: [],
+                suffix: [],
+                preferred: true,
                 period: {
                     start: data?.previousBirthNameStartDate
                         ? new Date(data.previousBirthNameStartDate).toISOString()
@@ -427,12 +430,12 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                     <div className="d-flex justify-content-between">
                         <div>
                             <ul className="nav nav-underline">
-                                {tabs?.filter(tab => tab.show).map(tab => (
-                                    <li key={tab.key} className="nav-item">
+                                {tabs?.filter(tab => tab?.show)?.map(tab => (
+                                    <li key={tab?.key} className="nav-item">
                                         <button
-                                            className={`text-black nav-link fw-medium ${activeTab === tab.key ? 'active fw-bold' : ''}`}
+                                            className={`text-black nav-link fw-medium ${activeTab === tab?.key ? 'active fw-bold' : ''}`}
                                             onClick={() => handleTabChange(tab.key)}>
-                                            {tab.label}
+                                            {tab?.label}
                                         </button>
                                     </li>
                                 ))}
