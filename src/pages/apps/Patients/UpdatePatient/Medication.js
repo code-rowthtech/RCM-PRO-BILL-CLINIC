@@ -89,8 +89,8 @@ const Medication = ({ isAccordionOpen }) => {
                         </td>
                         <td>{data?.dosageInstruction?.[0]?.timing?.code?.text}</td>
                         <td title={data?.dosageInstruction?.[0]?.text}>{data?.dosageInstruction?.[0]?.text?.length > 30 ? data?.dosageInstruction?.[0]?.text?.slice(0, 29) + '...' : data?.dosageInstruction?.[0]?.text || 'N/A'}</td>
-                        <td>{data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-GB') : '-'}</td>
-                        <td>{data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-GB') : '-'}</td>
+                        <td>{data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-US') : '-'}</td>
+                        <td>{data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-US') : '-'}</td>
                         <td className={`${statusColorMap[data?.status] || 'text-body'} text-capitalize`}>{data?.status || 'N/A'}</td>
                         <td>
                           <i

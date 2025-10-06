@@ -67,8 +67,14 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                     <tr
                                         key={item?._id}>
                                         <td>{index + 1}</td>
-                                        <td>
-                                            {item?.providerId?.name?.[0]?.text}
+                                        <td className='text-capitalize'>
+                                            {(item?.providerId?.name?.[0]?.prefix?.[0]
+                                                ? item?.providerId?.name?.[0]?.prefix?.[0] + ' '
+                                                : '') +
+                                                (item?.providerId?.name?.[0]?.family || '') +
+                                                (item?.providerId?.name?.[0]?.given?.length > 0
+                                                    ? ' ' + item?.providerId?.name?.[0]?.given?.join(' ')
+                                                    : '') || 'N/A'}
                                         </td>
                                         <td>{item?.type?.[0]?.coding?.[0]?.display}</td>
                                         <td className={`text-capitalize fw-bold ${statusColorMap[item?.status] || ''}`}>

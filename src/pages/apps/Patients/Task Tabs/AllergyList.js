@@ -99,13 +99,13 @@ const AllergyList = () => {
                                                 <td
                                                     className="text-capitalize"
                                                     title={data?.code?.coding?.[0]?.display}>
-                                                    {data?.code?.coding?.[0]?.display?.length > 30
-                                                        ? data?.code?.coding?.[0]?.display?.slice(0, 29) + '...'
+                                                    {data?.code?.coding?.[0]?.display?.length > 50
+                                                        ? data?.code?.coding?.[0]?.display?.slice(0, 49) + '...'
                                                         : data?.code?.coding?.[0]?.display || 'N/A'}
                                                 </td>
                                                 <td className="text-capitalize">
                                                     {data?.onset?.onsetDateTime
-                                                        ? new Date(data.onset.onsetDateTime).toISOString().split('T')[0]
+                                                        ? new Date(data?.onset?.onsetDateTime).toLocaleDateString('en-US')
                                                         : 'N/A'}
                                                 </td>
                                                 <td>

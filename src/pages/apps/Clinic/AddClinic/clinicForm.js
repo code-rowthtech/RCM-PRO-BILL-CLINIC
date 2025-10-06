@@ -226,7 +226,9 @@ const ClinicForm = ({ clinicId }) => {
             });
             return;
         }
-        sessionStorage.setItem('logo', logo?.url?.split('?')[0] || clinicsDataGet?.logo?.url);
+        if (logo?.url) {
+            sessionStorage.setItem('logo', logo?.url?.split('?')[0] || clinicsDataGet?.logo?.url);
+        }
         const newPayload = {
             clinicId: clinic_id?.clinicId,
             userId: clinic_id?._id,
@@ -258,12 +260,15 @@ const ClinicForm = ({ clinicId }) => {
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
+
     const logoFileInputRef = useRef(null);
+
     const handleLogoClick = () => {
         logoFileInputRef.current.click();
     };
 
     const [logoUploading, setLogoUploading] = useState(false);
+
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return; // Exit if no file selected (cancelled)
@@ -284,8 +289,8 @@ const ClinicForm = ({ clinicId }) => {
 
     const getTableData = store?.getSubClinicsReducer?.data?.clinics;
     const [statesMenu, setStatesMenu] = useState(false);
-    const menuRef = useRef(null); // Reference for the menu
     const containerRef = useRef(null); // Reference for the container
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -297,7 +302,7 @@ const ClinicForm = ({ clinicId }) => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-    // new changes
+
     const defaultIdentifiers = ['NPI', 'CLIA', 'NAIC'];
     const defaultIssuingAuthority = [
         'NPPES',
@@ -309,6 +314,7 @@ const ClinicForm = ({ clinicId }) => {
         'Dun & Bradstreet',
         'Other',
     ];
+
     const contactDetails = ['phone', 'email'];
     const uses = ['usual', 'old', 'temp', 'secondary', 'official'];
     const identifierOptions = [
@@ -399,6 +405,7 @@ const ClinicForm = ({ clinicId }) => {
             telecom: [{ system: '', value: '', use: '' }],
         },
     ]);
+
     // Function to handle POC field changes
     const handlePocChange = (index, field, value) => {
         setPocs((prevPocs) => {

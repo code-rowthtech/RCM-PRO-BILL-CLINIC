@@ -20,12 +20,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
     const identifierOptions = [
-        // { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
-        // { label: 'State Medical License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MED-LIC' },
         { label: 'DEA Number (Controlled Substances)', value: 'http://www.nabp.pharmacy/DEA', code: 'DEA' },
         { label: 'Board Certification', value: 'http://www.abms.org/certification', code: 'BOARD-CERT' },
         { label: `Tax Identification Number (TIN)`, value: 'http://hl7.org/fhir/sid/us-tin', code: 'TIN' },
-        // { label: 'Medicare Provider Number', value: 'http://hl7.org/fhir/sid/us-medicare', code: 'Medicare' },
         { label: 'Medicaid Provider Number', value: 'http://hl7.org/fhir/sid/us-medicaid', code: 'Medicaid' },
         { label: 'Medical Record Number (MRN)', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' },
         { label: 'Social Security Number (SSN)', value: 'http://hl7.org/fhir/sid/us-ssn', code: 'SSN' },

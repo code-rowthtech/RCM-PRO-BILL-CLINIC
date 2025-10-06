@@ -498,8 +498,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 );
                 setValue('weekInterval', appointmentDetails?.recurrenceTemplate?.every);
             }
-            if (details?.date) {
-                setScheduledDate(new Date(details?.date).toISOString().split('T')[0]);
+            if (details?.start) {
+                setScheduledDate(new Date(details?.start).toISOString().split('T')[0]);
             }
         }
     }, [appointmentDetails, id, patientsData, doctorDetails, setValue, formatTime]);
@@ -786,11 +786,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const closeConsultationModal = () => {
         setConsultationModal(false);
     };
-    const sanitizeScheduledDate = (inputDate) => {
-        const today = new Date().setHours(0, 0, 0, 0);
-        const date = new Date(inputDate).setHours(0, 0, 0, 0);
-        return date < today ? new Date().toISOString().split('T')[0] : inputDate;
-    };
+
     return (
         <div>
             {isLoading ? (

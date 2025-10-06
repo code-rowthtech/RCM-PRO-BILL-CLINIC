@@ -49,7 +49,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const [isopen, setIsopen] = useState(false);
     const navigate = useNavigate();
     const store = useSelector((state) => state);
-    console.log(store?.Auth?.user, 'store?.Auth?.userstore?.Auth?.user')
     const subClinicLocations = store?.getSubClinicsReducer?.data?.clinics;
     const location = useLocation(); // Get the current location object
     const { pathname, search } = location;
@@ -169,10 +168,10 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     )}
                     <ul className="list-unstyled topbar-menu float-end mb-0">
                         {location.pathname === '/apps/patients/update-patient' && (
-                            <li className="notification-list">
+                            <li className="notification-list ">
                                 <button
                                     onClick={() => navigate('/apps/patients/list')}
-                                    className="custom mt-2 text-muted border-0  px-2 bg-light fw-semibold">
+                                    className="custom mt-2 text-muted border-0 mx-2 px-2 bg-light fw-semibold">
                                     Back
                                 </button>
                             </li>

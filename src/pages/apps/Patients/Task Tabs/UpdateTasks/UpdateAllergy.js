@@ -349,7 +349,7 @@ const UpdateAllergy = ({ onCancel }) => {
                                             {appointments?.map((item) => (
                                                 <option key={item?._id} value={JSON.stringify(item)}>
                                                     {item?.date
-                                                        ? new Date(item.date).toISOString().split('T')[0]
+                                                        ? new Date(item.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
                                                         : 'N/A'}
                                                 </option>
                                             ))}

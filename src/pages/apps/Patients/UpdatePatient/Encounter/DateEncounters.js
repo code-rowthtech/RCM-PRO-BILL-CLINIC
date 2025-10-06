@@ -124,7 +124,10 @@ const DateEncounters = ({
             (data?.name?.[0]?.family || '') +
             (data?.name?.[0]?.given?.length > 0
                 ? ' ' + data?.name?.[0]?.given?.join(' ')
-                : '') || 'N/A',
+                : '') + ' ' +
+            (data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value ?
+                `(******${data?.identifier?.find((tel) => tel?.type?.coding?.[0]?.code === 'NPI')?.value.slice(-4)})`
+                : '') || ''
     }));
     // Encounter data
     const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
@@ -340,18 +343,6 @@ const DateEncounters = ({
         setNoteType(selectedNoteType?.value);
         handleNotesTypeChange?.(selectedNoteType);
     };
-
-    const toggleSession = useCallback(() => {
-        if (isSessionRunning) {
-            clearInterval(intervalRef.current);
-        } else {
-            const startTime = Date.now() - stopwatchTime * 1000;
-            intervalRef.current = setInterval(() => {
-                setStopwatchTime(Math.floor((Date.now() - startTime) / 1000));
-            }, 1000);
-        }
-        setIsSessionRunning(!isSessionRunning);
-    }, [isSessionRunning, stopwatchTime]);
 
     // Apply template values to form
     useEffect(() => {

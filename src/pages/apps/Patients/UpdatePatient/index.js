@@ -1,19 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Accordion, Button, Card, Col, Dropdown, Form, Row, Table } from 'react-bootstrap';
+import { Accordion, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
 import profileDummy from '../../../../assets/images/profileDummy.png';
 import { IoClose, IoPrintSharp } from 'react-icons/io5';
 import { TbCapture } from 'react-icons/tb';
 import { LiaReceiptSolid } from 'react-icons/lia';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    getAlcoholHistoryAction,
-    getFamilyGeneticAction,
-    getMedicationAction,
     getPatientByIdAction,
-    getSurgicalHistoryAction,
-    getTemplateAction,
-    getTobaccooAction,
     updatePatientsAction,
 } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -29,8 +23,6 @@ import Subtabs from './Subtabsindex';
 import PatientSummary from './PatientSummary';
 import Subsocialtabindex from './Subsocialtabindex';
 import SubAllergytabs from './SubAllergytabs';
-import { getProblemListAction } from '../../../../redux/ProblemList/action';
-import { handlePrintPatientSummary } from '../../../../helpers/printPatientSummary';
 import Encounter from './Encounter/Encounter';
 import PatientDocs from './Patientdocs';
 import PatientAccess from './PatientAccess';
@@ -42,24 +34,20 @@ const UpdatePatientIndex = () => {
     // Imports initialization
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const {
-        handleSubmit,
-        formState: { errors },
-    } = useForm();
+    const { handleSubmit } = useForm();
     const [searchParams] = useSearchParams();
 
     // Refs and other variable declaration
     const menuRef = useRef(null);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
-    const id = searchParams.get('id');
+    const id = useMemo(() => searchParams.get('id'), [searchParams]);
 
     // STORE AND STATE VARIABLES DECLARATIONS
     const updateResponse = store?.updatePatientsReducer?.data?.status;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    const [profilePhoto, setProfilePhoto] = useState(profileDummy);
+    const loading = store?.getPatientByIdReducer?.loading;
     const [isCameraOpen, setIsCameraOpen] = useState(false);
-    const [printOptions, setPrintOptions] = useState([]);
     const [selectedMainTab, setSelectedMainTab] = useState('Patient Details');
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
     const [logoName, setLogoName] = useState('');
@@ -79,11 +67,124 @@ const UpdatePatientIndex = () => {
     ]);
     const [expanded, setExpanded] = useState(false);
     const [createEncounter, setCreateEncounter] = useState(false);
-    const isAccordionOpen = activeKey === '0'; // true or false
+    const isAccordionOpen = useMemo(() => activeKey === '0', [activeKey]);
 
-    const toggleSubmenu = (label) => {
+    // Memoized patient data computations
+    const patientPhone = useMemo(() =>
+        patientDetails?.telecom?.find(data => data?.system === 'phone')?.value,
+        [patientDetails?.telecom]
+    );
+
+    const patientEmail = useMemo(() =>
+        patientDetails?.telecom?.find(item => item?.system === 'email')?.value,
+        [patientDetails?.telecom]
+    );
+
+    const patientAddress = useMemo(() => {
+        const address = patientDetails?.address?.[0];
+        return address?.city && address?.state
+            ? `${address.city}, ${address.state}`
+            : null;
+    }, [patientDetails?.address]);
+
+    const patientName = useMemo(() => {
+        const name = patientDetails?.name?.[0];
+        if (!name) return 'N/A';
+
+        const prefix = name.prefix?.[0] ? name.prefix[0] + ' ' : '';
+        const family = name.family || '';
+        const given = name.given?.length > 0 ? ' ' + name.given.join(' ') : '';
+
+        return prefix + family + given;
+    }, [patientDetails?.name]);
+
+    const patientAge = useMemo(() => {
+        if (!patientDetails?.approxAge) return '';
+
+        const years = Math.floor(patientDetails.approxAge);
+        return `(${years} year${years !== 1 ? 's old)' : ''} `;
+    }, [patientDetails?.approxAge]);
+
+    const patientBirthDate = useMemo(() =>
+        patientDetails?.birthDate
+            ? new Date(patientDetails.birthDate).toLocaleDateString('en-GB')
+            : '',
+        [patientDetails?.birthDate]
+    );
+
+    const patientCreatedDate = useMemo(() =>
+        patientDetails?.createdAt
+            ? new Date(patientDetails.createdAt).toLocaleDateString('en-GB')
+            : '',
+        [patientDetails?.createdAt]
+    );
+
+    const profileImageSrc = useMemo(() => {
+        if (logo?.url) return logo.url.split('?')[0];
+        if (patientDetails?.photo?.[0]?.url) return patientDetails.photo[0].url;
+        return profileDummy;
+    }, [logo?.url, patientDetails?.photo]);
+
+    const toggleSubmenu = useCallback((label) => {
         setActiveSubmenu((prev) => (prev === label ? null : label));
-    };
+    }, []);
+
+
+    // Memoized handlers
+    const handleMenuItemClick = useCallback((item, e) => {
+        e?.stopPropagation();
+        if (item.subItems) {
+            toggleSubmenu(item.label);
+        } else {
+            setActiveKey('0');
+            setSelectedMainTab(item.tab);
+            sessionStorage.setItem('selectedMainTab', item.tab);
+            setActiveSubmenu(null);
+        }
+    }, [toggleSubmenu]);
+
+    const handleSubMenuClick = useCallback((subItem) => {
+        setSelectedMainTab(subItem.tab);
+        sessionStorage.setItem('selectedMainTab', subItem.tab);
+    }, []);
+
+    const handleMoreMenuClick = useCallback(() => {
+        setShowMoreMenu(prev => !prev);
+    }, []);
+
+    const handleMoreMenuItemClick = useCallback((data) => {
+        setSelectedMainTab(data.tab);
+        sessionStorage.setItem('selectedMainTab', data.tab);
+        setShowMoreMenu(false);
+    }, []);
+
+    const handleNewEncounter = useCallback(() => {
+        setSelectedMainTab('Encounter');
+        setCreateEncounter(true);
+        setExpanded(true);
+    }, []);
+
+    const handlePrintModal = useCallback(() => {
+        setShowPrintModal(true);
+    }, []);
+
+    const handleClosePrintModal = useCallback(() => {
+        setShowPrintModal(false);
+    }, []);
+
+    // Memoized card height calculation
+    const cardHeight = useMemo(() => {
+        if (selectedMainTab !== 'Encounter' && expanded && !isAccordionOpen) {
+            return '100vh'; // When expanded AND accordion closed
+        }
+        if (expanded) {
+            return '90vh'; // When expanded (accordion state doesn't matter)
+        }
+        if (isAccordionOpen) {
+            return '66.5vh'; // When accordion open (not expanded)
+        }
+        return '81.5vh'; // Default case (neither expanded nor accordion open)
+    }, [selectedMainTab, expanded, isAccordionOpen]);
 
     // USEEFFECTS TILL LINE 125
     useEffect(() => {
@@ -93,19 +194,19 @@ const UpdatePatientIndex = () => {
         }
     }, []);
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setActiveSubmenu(null);
-                setShowMoreMenu(false);
-            }
-        };
+    const handleClickOutside = useCallback((event) => {
+        if (menuRef.current && !menuRef.current.contains(event.target)) {
+            setActiveSubmenu(null);
+            setShowMoreMenu(false);
+        }
+    }, []);
 
+    useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);
+    }, [handleClickOutside]);
 
     useEffect(() => {
         dispatch(getPatientByIdAction({ id }));
@@ -115,22 +216,7 @@ const UpdatePatientIndex = () => {
         if (updateResponse === 200) {
             dispatch(getPatientByIdAction({ id }));
         }
-    }, [updateResponse]);
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         await dispatch(getProblemListAction({ patientId: id }));
-    //         await dispatch(getMedicationAction({ patientId: id }));
-    //         await dispatch(getSurgicalHistoryAction({ patientId: id }));
-    //         await dispatch(getTobaccooAction({ patientId: id }));
-    //         await dispatch(getFamilyGeneticAction({ patientId: id }));
-    //         await dispatch(getAlcoholHistoryAction({ patientId: id }));
-    //         await dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
-    //     };
-    //     if (patientDetails && patientDetails?._id === id) {
-    //         fetchData();
-    //     }
-    // }, [patientDetails, id]);
+    }, [updateResponse, dispatch, id]);
 
     useEffect(() => {
         const elements = document.getElementsByClassName('content-page');
@@ -143,8 +229,8 @@ const UpdatePatientIndex = () => {
         }
     }, [expanded]);
 
-    // Camera functionality to capture profile photos till line 168
-    const openCamera = async () => {
+    // Camera functionality to capture profile photos
+    const openCamera = useCallback(async () => {
         try {
             setIsCameraOpen(true);
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -156,9 +242,15 @@ const UpdatePatientIndex = () => {
         } catch (error) {
             console.error('Error accessing camera:', error);
         }
-    };
+    }, []);
 
-    const capturePhoto = () => {
+    const stopCamera = useCallback(() => {
+        const stream = videoRef.current?.srcObject;
+        stream?.getTracks().forEach((track) => track.stop());
+        setIsCameraOpen(false);
+    }, []);
+
+    const capturePhoto = useCallback(() => {
         const canvas = canvasRef.current;
         const video = videoRef.current;
         if (!canvas || !video) return;
@@ -185,15 +277,9 @@ const UpdatePatientIndex = () => {
         }, 'image/png');
 
         stopCamera();
-    };
+    }, [stopCamera]);
 
-    const stopCamera = () => {
-        const stream = videoRef.current?.srcObject;
-        stream?.getTracks().forEach((track) => track.stop());
-        setIsCameraOpen(false);
-    };
-
-    const onSubmit = (data) => {
+    const onSubmit = useCallback(() => {
         const photoUrl = logo?.url?.split('?')[0] || patientDetails?.photo?.url;
         const payload = {
             id,
@@ -205,13 +291,13 @@ const UpdatePatientIndex = () => {
         };
 
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-    };
+    }, [logo, patientDetails, id, logoName, dispatch]);
 
     return (
         <div className=" g-0  px-0 mx-0">
             <div className="page-height g-0 px-0 mx-0">
                 <div className="row mb-2">
-                    {store?.getPatientByIdReducer?.loading && id !== patientDetails?._id ? (
+                    {loading && id !== patientDetails?._id ? (
                         <div
                             style={{ height: '80vh' }}
                             className="col-12 d-flex align-items-center justify-content-center">
@@ -235,17 +321,7 @@ const UpdatePatientIndex = () => {
                                                         ? 'active-patient-chart-tab fw-medium'
                                                         : ''
                                                     }`}
-                                                onClick={(e) => {
-                                                    e?.stopPropagation();
-                                                    if (item.subItems) {
-                                                        toggleSubmenu(item.label);
-                                                    } else {
-                                                        setActiveKey('0');
-                                                        setSelectedMainTab(item.tab);
-                                                        sessionStorage.setItem('selectedMainTab', item.tab);
-                                                        setActiveSubmenu(null);
-                                                    }
-                                                }}>
+                                                onClick={(e) => handleMenuItemClick(item, e)}>
                                                 <div>
                                                     <span className="px-1 d-flex gap-2 align-items-center justify-content-center">
                                                         {item.label}
@@ -266,13 +342,7 @@ const UpdatePatientIndex = () => {
                                                         {item.subItems.map((subItem, subIndex) => (
                                                             <li
                                                                 key={subIndex}
-                                                                onClick={() => {
-                                                                    setSelectedMainTab(subItem.tab);
-                                                                    sessionStorage.setItem(
-                                                                        'selectedMainTab',
-                                                                        subItem.tab
-                                                                    );
-                                                                }}
+                                                                onClick={() => handleSubMenuClick(subItem)}
                                                                 className="list-group-item submenuItem py-1 text-start fs-6">
                                                                 {subItem.label}
                                                             </li>
@@ -284,18 +354,14 @@ const UpdatePatientIndex = () => {
 
                                         <li
                                             className="list-group-item py-1 text-center fs-6 position-relative cursor-pointer"
-                                            onClick={() => setShowMoreMenu((prev) => !prev)}>
+                                            onClick={handleMoreMenuClick}>
                                             <i className="bi bi-three-dots" />
                                             {showMoreMenu && (
                                                 <ul className="list-group position-absolute end-50 top-100 mt-1  shadow rounded w-auto z-3">
                                                     {patientMenuItems?.slice(9)?.map((data, index) => (
                                                         <li
                                                             key={index}
-                                                            onClick={() => {
-                                                                setSelectedMainTab(data.tab);
-                                                                sessionStorage.setItem('selectedMainTab', data.tab);
-                                                                setShowMoreMenu(false);
-                                                            }}
+                                                            onClick={() => handleMoreMenuItemClick(data)}
                                                             className="list-group-item  py-1 text-start fs-6">
                                                             {data.label}
                                                         </li>
@@ -318,13 +384,7 @@ const UpdatePatientIndex = () => {
                                                                 color: 'rgb(249, 139, 55)',
                                                                 borderRight: '1px solid gray',
                                                             }}>
-                                                            {(patientDetails?.name?.[0]?.prefix?.[0]
-                                                                ? patientDetails?.name?.[0]?.prefix?.[0] + ' '
-                                                                : '') +
-                                                                (patientDetails?.name?.[0]?.family || '') +
-                                                                (patientDetails?.name?.[0]?.given?.length > 0
-                                                                    ? ' ' + patientDetails?.name?.[0]?.given?.join(' ')
-                                                                    : '') || 'N/A'}
+                                                            {patientName}
                                                         </span>{' '}
                                                         <span
                                                             style={{ borderRight: patientDetails?.birthDate ? '1px solid gray' : '' }}
@@ -335,23 +395,8 @@ const UpdatePatientIndex = () => {
                                                             <span
                                                                 style={{ borderRight: '1px solid gray' }}
                                                                 className="fs-6 fw-bold text-capitalize px-1">
-                                                                {patientDetails?.birthDate
-                                                                    ? new Date(patientDetails.birthDate).toLocaleDateString(
-                                                                        'en-GB'
-                                                                    )
-                                                                    : ''}{' '}
-                                                                {patientDetails?.birthDate ?
-                                                                    patientDetails?.approxAge &&
-                                                                    (() => {
-                                                                        const years = Math.floor(patientDetails.approxAge);
-                                                                        const months = Math.round(
-                                                                            (patientDetails.approxAge - years) * 12
-                                                                        );
-                                                                        return `(${years} year${years !== 1 ? 's old)' : ''} `;
-                                                                    })()
-                                                                    :
-                                                                    ''
-                                                                }
+                                                                {patientBirthDate}{' '}
+                                                                {patientDetails?.birthDate ? patientAge : ''}
                                                             </span>
                                                             :
                                                             <></>}
@@ -385,13 +430,7 @@ const UpdatePatientIndex = () => {
                                                                         <Spinner />
                                                                     ) : (
                                                                         <img
-                                                                            src={
-                                                                                logo?.url
-                                                                                    ? logo.url.split('?')[0]
-                                                                                    : patientDetails?.photo[0]?.url
-                                                                                        ? patientDetails.photo[0]?.url
-                                                                                        : profilePhoto
-                                                                            }
+                                                                            src={profileImageSrc}
                                                                             alt="Patient Profile"
                                                                             className="img-fluid rounded object-fit-cover"
                                                                             style={{
@@ -436,7 +475,6 @@ const UpdatePatientIndex = () => {
                                                                     />
                                                                 </div>
 
-                                                                {/* Submit button that sends the form after upload */}
                                                                 <Button
                                                                     // onClick={onSubmit}
                                                                     type="submit"
@@ -456,22 +494,8 @@ const UpdatePatientIndex = () => {
                                                                                 Phone:
                                                                             </th>
                                                                             <td
-                                                                                className={`fs-6 text-nowrap ${patientDetails?.telecom?.find(
-                                                                                    (data) =>
-                                                                                        data?.system === 'phone'
-                                                                                )?.value
-                                                                                    ? 'text-black'
-                                                                                    : 'text-danger'
-                                                                                    }`}>
-                                                                                {patientDetails?.telecom?.find(
-                                                                                    (data) => data?.system === 'phone'
-                                                                                )?.value
-                                                                                    ? '+1-' +
-                                                                                    patientDetails?.telecom?.find(
-                                                                                        (data) =>
-                                                                                            data?.system === 'phone'
-                                                                                    )?.value
-                                                                                    : 'Missing'}
+                                                                                className={`fs-6 text-nowrap ${patientPhone ? 'text-black' : 'text-danger'}`}>
+                                                                                {patientPhone ? `+1-${patientPhone}` : 'Missing'}
                                                                             </td>
                                                                         </tr>
                                                                         <tr className="">
@@ -479,16 +503,8 @@ const UpdatePatientIndex = () => {
                                                                                 Email:
                                                                             </th>
                                                                             <td
-                                                                                className={`fs-6  text-nowrap text-black ${patientDetails?.telecom?.find(
-                                                                                    (item) =>
-                                                                                        item?.system === 'email'
-                                                                                )?.value
-                                                                                    ? 'text-black'
-                                                                                    : 'text-danger'
-                                                                                    }`}>
-                                                                                {patientDetails?.telecom?.find(
-                                                                                    (item) => item?.system === 'email'
-                                                                                )?.value || 'Missing'}
+                                                                                className={`fs-6 text-nowrap ${patientEmail ? 'text-black' : 'text-danger'}`}>
+                                                                                {patientEmail || 'Missing'}
                                                                             </td>
                                                                         </tr>
                                                                         <tr className="">
@@ -496,16 +512,8 @@ const UpdatePatientIndex = () => {
                                                                                 Address:
                                                                             </th>
                                                                             <td
-                                                                                className={`fs-6  text-nowrap ${patientDetails?.address?.[0]
-                                                                                    ?.city &&
-                                                                                    patientDetails?.address?.[0]?.state
-                                                                                    ? 'text-black'
-                                                                                    : 'text-danger'
-                                                                                    }`}>
-                                                                                {patientDetails?.address?.[0]?.city &&
-                                                                                    patientDetails?.address?.[0]?.state
-                                                                                    ? `${patientDetails.address[0].city}, ${patientDetails.address[0].state}`
-                                                                                    : 'Missing'}
+                                                                                className={`fs-6 text-nowrap ${patientAddress ? 'text-black' : 'text-danger'}`}>
+                                                                                {patientAddress || 'Missing'}
                                                                             </td>
                                                                         </tr>
                                                                     </Table>
@@ -543,10 +551,7 @@ const UpdatePatientIndex = () => {
                                                                                 Date Added:
                                                                             </th>
                                                                             <td className="fs-6 text-nowrap text-black">
-                                                                                {' '}
-                                                                                {new Date(
-                                                                                    patientDetails?.createdAt
-                                                                                )?.toLocaleDateString('en-GB')}
+                                                                                {patientCreatedDate}
                                                                             </td>
                                                                         </tr>
                                                                         <tr className="">
@@ -611,11 +616,7 @@ const UpdatePatientIndex = () => {
                                                                     New Appointment
                                                                 </Button>
                                                                 <Button
-                                                                    onClick={() => {
-                                                                        setSelectedMainTab('Encounter');
-                                                                        setCreateEncounter(true);
-                                                                        setExpanded(true);
-                                                                    }}
+                                                                    onClick={handleNewEncounter}
                                                                     className="shadow-none"
                                                                     style={{
                                                                         fontSize: '10px',
@@ -628,138 +629,11 @@ const UpdatePatientIndex = () => {
                                                                 </Button>
 
                                                                 <div className="mt-1 d-flex justify-content-center align-items-center gap-2 ps-2">
-                                                                    {/* <Dropdown>
-                                                                        <Dropdown.Toggle
-                                                                            variant="light"
-                                                                            className="p-0 border-0 bg-transparent hover-bg-light rounded-circle"
-                                                                            id="print-dropdown"
-                                                                            aria-label="Print options"> */}
                                                                     <IoPrintSharp
                                                                         className="fs-4 text-primary cursor-pointer "
                                                                         title="Print"
-                                                                        onClick={() => setShowPrintModal(true)}
+                                                                        onClick={handlePrintModal}
                                                                     />
-                                                                    {/* </Dropdown.Toggle> */}
-
-                                                                    {/* <Dropdown.Menu
-                                                                            className="px-3 py-2 shadow-sm"
-                                                                            style={{ minWidth: '220px' }}>
-                                                                            <div className="mb-2">
-                                                                                <h6 className="fw-semibold mb-2 text-muted">
-                                                                                    Select sections to print
-                                                                                </h6>
-                                                                                <div className="d-flex flex-column gap-2">
-                                                                                    {[
-                                                                                        'Vitals List',
-                                                                                        'Allergies',
-                                                                                        'Problems',
-                                                                                        'Medications',
-                                                                                    ].map((data) => (
-                                                                                        <div
-                                                                                            className="form-check form-check-inline  d-flex align-items-center"
-                                                                                            key={data}>
-                                                                                            <input
-                                                                                                className="form-check-input me-2"
-                                                                                                type="checkbox"
-                                                                                                id={`print-${data}`}
-                                                                                                checked={printOptions.includes(
-                                                                                                    data
-                                                                                                )}
-                                                                                                onChange={(e) => {
-                                                                                                    if (
-                                                                                                        e.target.checked
-                                                                                                    ) {
-                                                                                                        setPrintOptions(
-                                                                                                            (prev) => [
-                                                                                                                ...prev,
-                                                                                                                data,
-                                                                                                            ]
-                                                                                                        );
-                                                                                                    } else {
-                                                                                                        setPrintOptions(
-                                                                                                            (prev) =>
-                                                                                                                prev.filter(
-                                                                                                                    (
-                                                                                                                        item
-                                                                                                                    ) =>
-                                                                                                                        item !==
-                                                                                                                        data
-                                                                                                                )
-                                                                                                        );
-                                                                                                    }
-                                                                                                }}
-                                                                                            />
-                                                                                            <label
-                                                                                                className="form-check-label"
-                                                                                                htmlFor={`print-${data}`}>
-                                                                                                {data}
-                                                                                            </label>
-                                                                                        </div>
-                                                                                    ))}
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div className="d-flex justify-content-between align-items-center pt-2 border-top">
-                                                                                <small className="text-muted">
-                                                                                    {printOptions?.length} selected
-                                                                                </small>
-                                                                                <Button
-                                                                                    variant="primary"
-                                                                                    size="sm"
-                                                                                    className="custom-buttons"
-                                                                                    onClick={() =>
-                                                                                        handlePrintPatientSummary({
-                                                                                            toBePrinted: printOptions,
-                                                                                            patientDetails:
-                                                                                                patientDetails,
-                                                                                            vitals: store
-                                                                                                ?.getVitalsByPatientIdReducer
-                                                                                                ?.data?.data,
-                                                                                            medicationList:
-                                                                                                store
-                                                                                                    ?.getMedicationReducer
-                                                                                                    ?.data
-                                                                                                    ?.medicationRequests,
-                                                                                            allergyData:
-                                                                                                store
-                                                                                                    ?.getAllergiesOfAPatientReducer
-                                                                                                    ?.data?.allergies,
-                                                                                            problemData:
-                                                                                                store
-                                                                                                    ?.getProblemListReducer
-                                                                                                    ?.data?.problems,
-                                                                                        })
-                                                                                    }
-                                                                                    disabled={
-                                                                                        printOptions?.length < 1 ||
-                                                                                        store
-                                                                                            ?.getVitalsByPatientIdReducer
-                                                                                            ?.loading ||
-                                                                                        store?.getMedicationReducer
-                                                                                            ?.loading ||
-                                                                                        store
-                                                                                            ?.getAllergiesOfAPatientReducer
-                                                                                            ?.loading ||
-                                                                                        store?.getProblemListReducer
-                                                                                            ?.loading
-                                                                                    }>
-                                                                                    {store?.getVitalsByPatientIdReducer
-                                                                                        ?.loading ||
-                                                                                    store?.getMedicationReducer
-                                                                                        ?.loading ||
-                                                                                    store?.getAllergiesOfAPatientReducer
-                                                                                        ?.loading ||
-                                                                                    store?.getProblemListReducer
-                                                                                        ?.loading ? (
-                                                                                        <>Preparing...</>
-                                                                                    ) : (
-                                                                                        'Print Report'
-                                                                                    )}
-                                                                                </Button>
-                                                                            </div>
-                                                                        </Dropdown.Menu> */}
-                                                                    {/* </Dropdown> */}
-
                                                                     <LiaReceiptSolid className="fs-4  text-primary" />
                                                                 </div>
                                                             </div>
@@ -777,14 +651,7 @@ const UpdatePatientIndex = () => {
                                         <Card
                                             className="p-2 border-0"
                                             style={{
-                                                height:
-                                                    selectedMainTab !== 'Encounter' && expanded && !isAccordionOpen
-                                                        ? '100vh' // When expanded AND accordion closed...............
-                                                        : expanded
-                                                            ? '90vh' // When expanded (accordion state doesn't matter)....
-                                                            : isAccordionOpen
-                                                                ? '66.5vh' // When accordion open (not expanded).................
-                                                                : '81.5vh', // Default case (neither expanded nor accordion open)..
+                                                height: cardHeight,
                                                 maxHeight: '100%',
                                                 overflow: 'hidden',
                                             }}>
@@ -866,7 +733,7 @@ const UpdatePatientIndex = () => {
             </div>
             <ModalPrint
                 show={showPrintModal}
-                onHide={() => setShowPrintModal(false)}
+                onHide={handleClosePrintModal}
                 patientDetails={patientDetails}
                 store={store}
                 id={id}

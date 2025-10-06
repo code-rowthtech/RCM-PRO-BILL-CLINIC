@@ -58,13 +58,22 @@ const MENU_ITEMS = [
         icon: 'uil uil-users-alt',
     },
 
+    // {
+    //     key: 'apps-crm',
+    //     label: 'Practice',
+    //     url: '/apps/crm/addPractice',
+    //     isTitle: false,
+    //     // badge: { variant: 'danger', text: 'New' },
+    //     icon: 'uil-user',
+    // },
     {
-        key: 'apps-crm',
+        key: 'apps-crm-v2',
+        // label: 'Practice V2 (New)',
         label: 'Practice',
-        url: '/apps/crm/addPractice',
+        url: '/apps/crm/addPracticeV2',
         isTitle: false,
-        // badge: { variant: 'danger', text: 'New' },
-        icon: 'uil-user',
+        // badge: { variant: 'success', text: 'New' },
+        icon: 'uil-user-plus',
     },
     {
         key: 'tasks',
