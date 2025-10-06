@@ -130,6 +130,8 @@ const LeftSidebar = ({
                 clinicId: clinicId,
                 status: activeTab,
                 search: search,
+                todayStart: new Date(new Date().setHours(0, 0, 0, 0)),
+                todayEnd: new Date(new Date().setHours(23, 59, 59, 999))
             };
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }));
             if (!doctorDetails) {
@@ -151,27 +153,10 @@ const LeftSidebar = ({
     }, []);
     const SideBarContentDown = ({ hideUserProfile }: SideBarContentProps) => {
         const MENU_ITEMS_END = [
-            // {
-            //     label: 'Tasks',
-            //     icon: "mdi-sticker-plus-outline",
-            //     redirectTo: "#",
-            //     url: "/dashboard/account",
-            // },
-            // {
-            //     label: 'Help & Support',
-            //     icon: "mdi-help-circle-outline",
-            //     redirectTo: "#",
-            // },
-            // {
-            //     label: 'Billing',
-            //     icon: "mdi-cash-fast",
-            //     redirectTo: "#",
-            // },
             {
                 key: 'logout',
                 label: 'Logout',
                 icon: 'mdi-logout',
-                // url: '/apps/logout/logout-model',
             },
             {
                 key: 'build',
@@ -190,8 +175,6 @@ const LeftSidebar = ({
         const handleLogout = () => {
             dispatch(logoutUser());
             navigate('account/logout');
-            // api.setLoggedInUser(null);
-            // setAuthorization(null);
         };
         const closeModal = () => {
             setShow(false); // just close the modal, no reload
@@ -200,7 +183,6 @@ const LeftSidebar = ({
             <>
                 {MENU_ITEMS_END.map((ele, index) => {
                     const isLogout = ele.label === 'Logout';
-
                     return (
                         <div className="" key={index}>
                             {isCondensed ? (
@@ -252,7 +234,6 @@ const LeftSidebar = ({
             return (
                 <>
                     <div className="position-relative mb-2">
-                        {/* <BiSearch className="position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary" /> */}
                         <input
                             type="text"
                             placeholder="Search doctors..."
@@ -760,19 +741,6 @@ const LeftSidebar = ({
                         )}
                     </>
                 ) : (
-                    // <>
-                    //     {!isCondensed && (
-                    //         <SimpleBar style={{ maxHeight: '100%' }} timeout={500} scrollbarMaxSize={320}>
-                    //             <SideBarContent
-                    //                 menuClickHandler={() => { }}
-                    //                 isLight={isLight}
-                    //                 hideUserProfile={hideUserProfile}
-                    //                 isCondensed={isCondensed}
-                    //             />
-                    //         </SimpleBar>
-                    //     )}
-                    //     {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
-                    // </>
                     <div className="parentLeftSidebar mb-3">
                         <div className="media_mob ">
                             {!isCondensed && (
@@ -803,14 +771,6 @@ const LeftSidebar = ({
                                         isLight={isLight}
                                         hideUserProfile={hideUserProfile}
                                     />
-                                    {/* <span style={{ marginLeft: "33px", fontFamily: "Nunito", fontWeight: 700 }}>
-                                        {!isCondensed && (                              
-                                            <div className="sf-footer ms-3">                                           
-                                                &copy; {currentYear} - {metadata.buildMajor}.{metadata.buildMinor}    
-                                                .{metadata.buildRevision} {metadata.buildTag}asdkmasd                  
-                                            </div>                                                                    
-                                        )}                                                         
-                                    </span> */}
                                 </SimpleBar>
                             )}
                             {isCondensed && <SideBarContentDown isLight={isLight} hideUserProfile={hideUserProfile} />}
@@ -824,11 +784,6 @@ const LeftSidebar = ({
                         fontWeight: 700,
                         color: 'white',
                     }}>
-                    {/* {!isCondensed && (
-                        <div className="sf-footer ms-3">
-                          
-                        </div>
-                    )} */}
                 </span>
             </div>
         </>
