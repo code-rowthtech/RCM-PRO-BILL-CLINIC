@@ -9,7 +9,8 @@ import { configureFakeBackend } from './helpers';
 
 // For Saas import Saas.scss
 import './assets/scss/Saas.scss';
-
+import './components/timeZonePipe';
+import { formatDateByUserTimeZone } from './components/timeZonePipe';
 // For Modern demo import Modern.scss
 // import './assets/scss/Modern.scss';
 
@@ -34,7 +35,7 @@ function useSelectColorWatcher() {
         const value = select.value.trim();
         select.style.color = value === '' ? '#0908084f' : 'black';
       });
-      
+
       const dateInputs = document.querySelectorAll('input[type="date"]');
       dateInputs.forEach(input => {
         const value = input.value.trim();
@@ -73,7 +74,7 @@ function useSelectColorWatcher() {
       selects.forEach(select => {
         select.addEventListener('change', handleChange);
       });
-      
+
       const dateInputs = document.querySelectorAll('input[type="date"]');
       dateInputs.forEach(input => {
         input.addEventListener('change', handleChange);
@@ -85,7 +86,7 @@ function useSelectColorWatcher() {
       selects.forEach(select => {
         select.removeEventListener('change', handleChange);
       });
-      
+
       const dateInputs = document.querySelectorAll('input[type="date"]');
       dateInputs.forEach(input => {
         input.removeEventListener('change', handleChange);
@@ -109,7 +110,6 @@ function useSelectColorWatcher() {
 }
 
 const App = (props: AppProps): React$Element<any> => {
-
   useSelectColorWatcher();
 
   return <Routes></Routes>;

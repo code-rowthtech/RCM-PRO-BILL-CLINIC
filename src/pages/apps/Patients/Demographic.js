@@ -245,6 +245,7 @@ const Demographicdetails = ({
             address: demographicAddresses,
             ...(data?.notes && { notes: data.notes }),
         };
+
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
