@@ -15,6 +15,7 @@ import { IoMdClose } from 'react-icons/io';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 import Paginations from '../../../../helpers/Paginations';
+import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
 
 const Designation = () => {
     const store = useSelector((state) => state);
@@ -235,7 +236,7 @@ const Designation = () => {
                                                 {data?.name?.charAt(0).toUpperCase() + data?.name?.slice(1)}
                                             </td>
                                             <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                {formatDate(data.createdAt)}
+                                                {formatDateByUserTimeZone(data.createdAt, {}, 'date')}
                                             </td>
                                             <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                 <Form.Switch

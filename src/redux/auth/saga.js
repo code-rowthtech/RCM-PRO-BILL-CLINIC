@@ -38,7 +38,8 @@ function* login({ payload }) {
             role: user?.role,
             _id: user?.userId,
             logo: user?.logo?.url,
-            clinicId: user?.clinicId
+            clinicId: user?.clinicId,
+            timeZone: user?.timeZone
         }
         localStorage.setItem('subClinicLocation', encryptMessage(user?.clinicId))
         const encryptedUserData = encryptMessage(userData)

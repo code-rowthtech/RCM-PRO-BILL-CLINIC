@@ -106,6 +106,16 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         }
     }, [updateSuccess]);
 
+    const getUserTimeZone = () => {
+        try {
+            const encryptedData = localStorage.getItem('encryptedUserData');
+            const storedUser = JSON.parse(decryptMessage(encryptedData));
+            return storedUser?.timeZone || "UTC";
+        } catch {
+            return "UTC";
+        }
+    };
+
     useEffect(() => {
         if (appointmentsList?.length > 0) {
             const transformedEvents = appointmentsList
@@ -128,6 +138,7 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                             hour: '2-digit',
                             minute: '2-digit',
                             hour12: true,
+                            timeZone: getUserTimeZone()
                         }),
                         slotEnd: end.toLocaleString('en-US', {
                             year: 'numeric',
@@ -136,6 +147,7 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                             hour: '2-digit',
                             minute: '2-digit',
                             hour12: true,
+                            timeZone: getUserTimeZone()
                         }),
                         // patientName: data?.subject?.name?.find((d) => d?.use === 'official')?.text,
                         patientName: ((name = data?.subject?.name?.find((d) => d?.use === 'official')) =>

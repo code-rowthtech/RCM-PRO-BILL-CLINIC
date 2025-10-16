@@ -11,6 +11,7 @@ import Paginations from '../../../helpers/Paginations';
 import { getMastersDataAction } from '../../../redux/settings/action';
 import { IoSearchSharp } from 'react-icons/io5';
 import { IoMdClose } from 'react-icons/io';
+import { formatDateByUserTimeZone } from '../../../components/timeZonePipe';
 
 const RoleManagement = () => {
     const dispatch = useDispatch();
@@ -245,8 +246,8 @@ const RoleManagement = () => {
                                                     </td>
                                                     <td className=" " style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         {data?.joiningDate
-                                                            ? new Date(data.joiningDate).toLocaleDateString('en-GB')
-                                                            : ''}
+                                                            ? formatDateByUserTimeZone(data.joiningDate, {}, 'date')
+                                                            : '-'}
                                                     </td>
                                                     <td className=" " style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <Form.Switch

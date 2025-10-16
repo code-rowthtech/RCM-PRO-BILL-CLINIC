@@ -13,19 +13,19 @@ const AppointmentRow = ({ appointment, index, appointmentPeriod, skip, clinicId 
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const { handleSubmit } = useForm();
-  
+
   const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
   const [cancelationReason, setCancelationReason] = useState('');
-  
+
   const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
 
   useEffect(() => {
     if (updateSuccess === 200) {
-      dispatch(getAppointmentsAction({ 
-        clinicId: clinicId, 
-        status: appointmentPeriod, 
-        skip: skip, 
-        limit: 10 
+      dispatch(getAppointmentsAction({
+        clinicId: clinicId,
+        status: appointmentPeriod,
+        skip: skip,
+        limit: 10
       }));
       setCancelationPopupRow(null);
       setCancelationReason('');
@@ -74,7 +74,7 @@ const AppointmentRow = ({ appointment, index, appointmentPeriod, skip, clinicId 
 
   const handleStatusChange = (e) => {
     const newStatus = e.target.value;
-    
+
     if (newStatus === 'cancelled') {
       setCancelationPopupRow(appointment?._id);
     } else {
@@ -98,7 +98,7 @@ const AppointmentRow = ({ appointment, index, appointmentPeriod, skip, clinicId 
       }],
       status: 'cancelled',
     };
-    
+
     dispatch(rescheduleAppointmentAction({
       id: cancelationPopupRow,
       key: encryptMessage(payload),
@@ -136,7 +136,7 @@ const AppointmentRow = ({ appointment, index, appointmentPeriod, skip, clinicId 
             </option>
           ))}
         </Form.Select>
-        
+
         <CancellationPopup
           show={cancelationPopupRow === appointment?._id}
           onClose={() => setCancelationPopupRow(null)}
@@ -145,7 +145,7 @@ const AppointmentRow = ({ appointment, index, appointmentPeriod, skip, clinicId 
           onReasonChange={setCancelationReason}
         />
       </td>
-      
+
       <td className="text-capitalize">
         {formatPatientName(appointment?.subject)}
         <div className="d-flex gap-2">
@@ -157,17 +157,17 @@ const AppointmentRow = ({ appointment, index, appointmentPeriod, skip, clinicId 
           <span>{getPatientPhone(appointment?.subject)}</span>
         </div>
       </td>
-      
+
       <td>
         {formatTimeWithAmPm(appointment?.start)} - {formatTimeWithAmPm(appointment?.end)}
       </td>
-      
+
       <td>{new Date(appointment?.date).toLocaleDateString('en-GB')}</td>
-      
+
       <td className="text-capitalize">
         {appointment?.doctorId?.name?.[0]?.text + ' '}
       </td>
-      
+
       <td
         className="text-capitalize cursor-pointer"
         data-toggle="tooltip"
@@ -176,7 +176,7 @@ const AppointmentRow = ({ appointment, index, appointmentPeriod, skip, clinicId 
       >
         {truncateText(appointment?.appointmentType?.coding?.[0]?.display)}
       </td>
-      
+
       <td
         className="text-capitalize cursor-pointer"
         data-toggle="tooltip"
@@ -185,7 +185,7 @@ const AppointmentRow = ({ appointment, index, appointmentPeriod, skip, clinicId 
       >
         {truncateText(appointment?.reason?.[0]?.coding?.[0]?.display)}
       </td>
-      
+
       <td>
         <Link
           to={`/apps/appointments/newAppointment?updateid=${appointment?._id}`}

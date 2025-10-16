@@ -13,28 +13,10 @@ import { useSelector } from 'react-redux';
 
 const ProjectDashboardPage = (): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
-    // useEffect(() => {
-    //     dispatch(getAnalyticsAction())
-    // }, [dispatch])
     const analyticsResponse = store?.getAnalyticsReducer;
     return (
         <div className='' >
             <h4 className=''>IN-PROGRESS</h4>
-
-
-
-            {/* <Row>
-                <Col lg={12} className='mt-1'>
-                    <Tasks />
-                </Col>
-
-                <Col lg={6} className=''>
-                    <Statistics data={analyticsResponse} />
-                </Col>
-                <Col lg={6}>
-                    <Activity />
-                </Col>
-            </Row> */}
         </div>
     );
 };

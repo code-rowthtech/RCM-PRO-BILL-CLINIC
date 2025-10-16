@@ -10,11 +10,12 @@ import Paginations from '../../../helpers/Paginations';
 import { FormInput } from '../../../components';
 import { IoMdClose } from 'react-icons/io';
 import { IoSearchSharp } from 'react-icons/io5';
+import { formatDateByUserTimeZone } from '../../../components/timeZonePipe';
 
 const Task = () => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    
+
     const [search, setSearch] = useState('');
     const [show, setShow] = useState(false);
     const [priority, setPriority] = useState('');
@@ -231,7 +232,7 @@ const Task = () => {
                                                     </td>
                                                     <td>
                                                         {task?.dueDate
-                                                            ? new Date(task?.dueDate).toISOString()?.split('T')?.[0]
+                                                            ? formatDateByUserTimeZone(task?.dueDate, {}, 'date')
                                                             : '-'}
                                                     </td>
                                                     <td>

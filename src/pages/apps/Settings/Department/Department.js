@@ -16,6 +16,7 @@ import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 import Paginations from '../../../../helpers/Paginations';
 import DepartmentModal from './DepartmentModal';
+import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
 
 const Department = () => {
     const store = useSelector((state) => state);
@@ -106,18 +107,16 @@ const Department = () => {
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`active_inactive_buttons ${
-                                        status === true ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2`}>
+                                    className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2`}>
                                     Active
                                 </Button>
 
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={` active_inactive_buttons ${
-                                        status === false ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2`}>
+                                    className={` active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2`}>
                                     Inactive
                                 </Button>
                             </Col>
@@ -245,7 +244,7 @@ const Department = () => {
                                                 {data.description}...
                                             </td>
                                             <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                {formatDate(data.createdAt)}
+                                                {formatDateByUserTimeZone(data.createdAt, {}, 'date')}
                                             </td>
                                             <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                 <Form.Switch
@@ -284,10 +283,10 @@ const Department = () => {
                     </Card.Body>
                 </Card>
             </Col>
-            <DepartmentModal 
-                addDepartmentModal={addDepartmentModal} 
-                closeAddModal={() => setAddDepartmentModal(false)} 
-                edit={edit} 
+            <DepartmentModal
+                addDepartmentModal={addDepartmentModal}
+                closeAddModal={() => setAddDepartmentModal(false)}
+                edit={edit}
             />
         </Row>
     );

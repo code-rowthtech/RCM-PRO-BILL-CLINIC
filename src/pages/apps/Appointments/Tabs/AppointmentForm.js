@@ -5,17 +5,12 @@ import { useForm } from 'react-hook-form';
 import { debounce } from 'lodash';
 import { AiOutlinePlus } from 'react-icons/ai';
 import AsyncSelect from 'react-select/async';
-import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
-
 // Redux actions
 import { getPatientsAction } from '../../../../redux/patients/actions';
 import {
-    createAppointmentAction,
-    getAppointmentByIdAction,
-    getDoctorsAction,
-    getPractitionerScheduleAction,
-    rescheduleAppointmentAction,
+    createAppointmentAction, getAppointmentByIdAction, getDoctorsAction,
+    getPractitionerScheduleAction, rescheduleAppointmentAction,
 } from '../../../../redux/actions';
 import { getMastersDataAction, getMastersDataAction2 } from '../../../../redux/settings/action';
 
@@ -194,8 +189,8 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
     const oneYearLaterString = new Date(new Date().setFullYear(new Date().getFullYear() + 1))
         .toISOString()
         .split('T')[0];
-    const minEndDate = scheduledDate ? new Date(scheduledDate).toISOString().split('T')[0] : todayString;
 
+    const minEndDate = scheduledDate ? new Date(scheduledDate).toISOString().split('T')[0] : todayString;
     return (
         <>
             <Col sm={12}>
@@ -513,7 +508,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     useEffect(() => {
         if (scheduledDate && practitionerSchedule?.length) {
             const scheduledDateOnly = new Date(scheduledDate).toISOString().split('T')[0];
-
             const match = practitionerSchedule.some((item) => {
                 const itemDateOnly = new Date(item.date).toISOString().split('T')[0];
                 return itemDateOnly === scheduledDateOnly;
@@ -525,6 +519,13 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
         }
     }, [practitionerSchedule, scheduledDate]);
 
+    // Create a local Date object from a scheduled date string and time string
+    function createLocalDateTime(dateStr, timeStr) {
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        // month-1 because JS months are 0-based
+        return new Date(year, month - 1, day, hours, minutes);
+    }
     const onSubmit = (data) => {
         const selectedAppointmentType = appointmentTypeOptions.find((option) => option.show === data.appointmentType);
         const appointmentTypePayload = {
@@ -537,13 +538,15 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             ],
             text: selectedAppointmentType.label,
         };
-
         const selectedAppointmentRecurrence = appointmentRecurrence?.find((item) => item?.display === repeatType);
 
-        const startDateTime = new Date(`${formatDateToYYYYMMDD(scheduledDate)}T${data.startTime}:00`);
-        const endDateTime = new Date(startDateTime.getTime() + data.duration * 60000);
-        let recurrenceTemplate = {};
+        // const startDateTime = new Date(`${formatDateToYYYYMMDD(scheduledDate)}T${data.startTime}:00Z`);
+        // const endDateTime = new Date(startDateTime.getTime() + data.duration * 60000);
 
+        const startDateTime = createLocalDateTime(scheduledDate, data.startTime);
+        const endDateTime = new Date(startDateTime.getTime() + data.duration * 60000);
+
+        let recurrenceTemplate = {};
         if (!(appointmentDetails && id) && repeat && repeatType !== '') {
             recurrenceTemplate = {
                 recurrenceTemplate: {
@@ -578,17 +581,14 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 },
             };
         }
-
         const payload = {
             ...(id && appointmentDetails ? { id } : {}),
             subject: data.patient,
             clinicId,
             appointmentType: appointmentTypePayload,
             doctorId: data?.doctorName,
-            start: startDateTime.toISOString(),
-            timeZone: data?.timezone,
-            end: endDateTime.toISOString(),
-            created: new Date().toISOString(),
+            start: startDateTime,
+            end: endDateTime,
             minutesDuration: data.duration,
             examRoom: data?.consultationRoom,
             ...(appointmentReason?.text ||
@@ -597,7 +597,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 : {
                     reason: [
                         {
-                            coding: appointmentReason,
+                            coding: [appointmentReason],
                             text: appointmentReason?.display,
                         },
                     ],
@@ -606,6 +606,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             slot: data?.startTime,
             ...recurrenceTemplate,
         };
+
         if (id && appointmentDetails) {
             dispatch(rescheduleAppointmentAction({ id, key: encryptMessage(payload) }));
         } else {
@@ -922,27 +923,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         <span className="text-danger small">{errors.appointmentType.message}</span>
                                     )}
                                 </Form.Group>
-                            </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-1" controlId="timezone">
-                                    <Form.Label className="mb-0">
-                                        TimeZone <span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <div className='d-flex align-items-center gap-3'>
-                                        {timezoneOptions?.map((option) => (
-                                            <Form.Check
-                                                key={option?.value}
-                                                type="radio"
-                                                id={`timezone-${option?.value}`}
-                                                label={option?.show}
-                                                value={option?.value}
-                                                {...register('timezone', { required: 'TimeZone is required' })}
-                                            />
-                                        ))}
-                                    </div>
-                                    {errors.timezone && <span className="text-danger small">{errors.timezone.message}</span>}
-                                </Form.Group>
-
                             </Col>
                             <Toast
                                 show={showToast}

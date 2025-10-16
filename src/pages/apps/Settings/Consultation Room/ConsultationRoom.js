@@ -16,6 +16,7 @@ import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 import ConsultationModal from './ConsultationModal';
 import Paginations from '../../../../helpers/Paginations';
+import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
 
 const ConsultationRoom = () => {
     const store = useSelector((state) => state);
@@ -223,7 +224,9 @@ const ConsultationRoom = () => {
                                                 <td>{index + 1}</td>
                                                 <td>{data?.name?.charAt(0).toUpperCase() + data?.name?.slice(1)}</td>
                                                 <td>{data.description || 'N/A'}</td>
-                                                <td>{formatDate(data.createdAt)}</td>
+                                                <td>
+                                                    {formatDateByUserTimeZone(data.createdAt, {}, 'date')}
+                                                </td>
                                                 <td>
                                                     <Form.Switch
                                                         checked={data.isActive}

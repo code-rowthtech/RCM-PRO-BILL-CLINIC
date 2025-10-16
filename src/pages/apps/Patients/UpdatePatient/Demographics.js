@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 'react-bootstrap';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { Button, Col, Form, Row, InputGroup, Spinner, Alert } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import {
     getStatesByCountryAction,
     getCitiesAction,
@@ -26,13 +25,11 @@ import { sexAssignedAtBirthOptions } from '../../../../utils/DataSets/sex';
 import { maritalStatusOptions } from '../../../../utils/DataSets/maritalStatus';
 import AddressForm from '../../Common Pages/AddressForm';
 import Select from 'react-select';
-import { error } from 'jquery';
-import { use } from 'react';
 
 const Demographicdetails = ({ patientId, isAccordionOpen }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
+
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const {
@@ -45,10 +42,6 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
         reset,
         getValues,
     } = useForm();
-    const [longitude, setLongitude] = useState(null);
-    const [latitude, setLatitude] = useState(null);
-    const [mailingLongitude, setMailingLongitude] = useState(null);
-    const [mailingLatitude, setMailingLatitude] = useState(null);
     const [employerLongitude, setEmployerLongitude] = useState(null);
     const [employerLatitude, setEmployerLatitude] = useState(null);
     const [focused, setFocused] = useState(false);
@@ -59,7 +52,9 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
     const [searchedEmployerLocations, setSearchedEmployerLocations] = useState(null);
     const [sameAsPrimary, setSameAsPrimary] = useState(false);
     const [identifiers, setIdentifiers] = useState([]);
-
+    const [eth, setEth] = useState(null);
+    const [tri, setTri] = useState(null);
+    const [rela, setRela] = useState(null);
     const statesData = store?.getStatesReducer?.data;
     const cities4 = store?.getCitiesReducer?.cities4?.data?.cities;
     const employerState = watch('employerStateName');
@@ -104,21 +99,22 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
         if (patientDetails && id) {
             setValue('race', patientDetails?.race?.[0]?.display || '');
             setValue('raceSubcategories', patientDetails?.raceSubcategories);
-            setValue('sex', patientDetails?.birthSex?.[0]?.value || '');
+            setValue('gender', patientDetails?.gender || '');
             setValue('genderIdentity', patientDetails?.genderIdentity?.[0]?.code || '');
             setValue('sexParameter', patientDetails?.sexParameterForClinicalUse?.[0]?.code || '');
             setValue('personalPronouns', patientDetails?.personalPronouns?.[0]?.code || '');
             setValue('patientStudentStatus', patientDetails?.patientStudentStatus);
             setValue('nationalIdNumber', patientDetails?.nationalIdNumber);
-            setValue('preferredLanguage', patientDetails?.communication?.[0]?.language?.coding?.[0]?.code || '');
+            setValue('preferredLanguage', patientDetails?.preferredCommunication || '');
             // setValue('trible', patientDetails?.trible?.[0]?.code || '');
             // setValue('ethnicity', patientDetails?.ethnicity?.[0]?.value || '');
             setEth(patientDetails.ethnicity?.[0] ?? null);
             setTri(patientDetails.tribalAffiliation?.[0] ?? null);
             // setEth(patientDetails?.ethnicity);
             // setTri(patientDetails?.tribalAffiliation);
+            setValue('birthSex', patientDetails?.birthSex?.code || '');
             setValue('notes', patientDetails?.notes);
-            setValue('maritalStatus', patientDetails?.maritalStatus?.[0]?.display || '');
+            setValue('maritalStatus', patientDetails?.maritalStatus?.coding?.[0]?.display || '');
             setValue('epsdtServices', patientDetails?.epsdtServices);
             setValue('epsdtReferralCondition', patientDetails?.epsdtReferralCondition);
 
@@ -141,18 +137,10 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
             setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
             setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
             setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line[0] || '');
-            const defaultIdentifiers = patientDetails?.identifier?.map((data, index) => ({
-                expiry: data?.expiry,
-                file: data?.file?.[0],
-                issuingAuthority: data?.issuingAuthority,
-                number: data?.value,
-                system: '',
-                type: {
-                    label: data?.type?.coding?.[0]?.display,
-                    value: data?.type?.coding?.[0]?.system,
-                    code: data?.type?.coding?.[0]?.code,
-                },
-            }));
+            const defaultIdentifiers = patientDetails?.identifier?.map(identifier => ({
+                ...identifier,
+                file: identifier?.file?.[0] || identifier?.file
+            })) || [];
             setIdentifiers(defaultIdentifiers || []);
             // setDemographicAddresses(patientDetails?.address || []);
             const newAddresses = patientDetails?.address?.map((addr) => ({
@@ -202,7 +190,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
         }
     }, [patientDetails, statesData]);
 
-    const onSubmit = (data) => {
+    const onSubmit = useCallback((data) => {
         const selectedGenderIdentity = genderIdentityOptions.find((option) => option.value === data.genderIdentity);
         const selectedSexualOrientation = sexParameterOptions.find((option) => option.value === data.sexParameter);
         const selectedPersonalPronouns = personalPronounsOptions.find(
@@ -210,7 +198,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
         );
         const selectedMaritalStatus = maritalStatusOptions.find((option) => option.show === data.maritalStatus);
         const selectedRaceOption = raceOptions.find((option) => option.display === data.race);
-        const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
+        const selectedBirthSex = sexAssignedAtBirthOptions.find((option) => option.value === data.birthSex);
 
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
@@ -234,185 +222,185 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
             };
             finalIdentifiers.push(identifierData);
         });
-        const payload = {
-            id: id,
-            birthSex: [
-                {
-                    ...selectedSexOption,
-                    code: selectedSexOption?.value,
-                    display: selectedSexOption?.label,
-                    system: selectedSexOption?.system,
-                },
-            ],
 
-            genderIdentity: [
-                {
-                    ...selectedGenderIdentity,
-                    code: selectedGenderIdentity?.value,
-                    display: selectedGenderIdentity?.show,
-                    text: selectedGenderIdentity?.label,
-                },
-            ],
-            sexParameterForClinicalUse: [
-                {
-                    ...selectedSexualOrientation,
-                    code: selectedSexualOrientation?.value,
-                    display: selectedSexualOrientation?.show,
-                    text: selectedSexualOrientation?.label,
-                    system: selectedSexualOrientation?.system,
-                },
-            ],
-            personalPronouns: [
-                {
-                    ...selectedPersonalPronouns,
-                    code: selectedPersonalPronouns?.value,
-                    display: selectedPersonalPronouns?.show,
-                    text: selectedPersonalPronouns?.label,
-                    system: selectedPersonalPronouns?.system,
-                },
-            ],
-            // ✅ Fixing Race
-            race: [
-                {
-                    ...selectedRaceOption,
-                    code: selectedRaceOption?.code,
-                    display: selectedRaceOption?.display,
-                    text: selectedRaceOption?.display,
-                },
-            ],
-            // ✅ Fixing Ethnicity
-            ethnicity: [
-                {
-                    ...eth,
-                    text: eth?.display,
-                },
-            ],
-            // ✅ Fixing Tribal Entity
-            tribalAffiliation: [
-                {
-                    ...tri,
-                    text: tri?.display,
-                },
-            ],
-            // ✅ Fixing Marital Status Structure
-            maritalStatus: [
-                {
-                    ...selectedMaritalStatus,
-                    code: selectedMaritalStatus?.value,
-                    display: selectedMaritalStatus?.show,
-                    text: selectedMaritalStatus?.label,
-                    system: selectedMaritalStatus?.system,
-                },
-            ],
-            // ✅ Fixing Preferred Language Structure
-            ...(data?.preferredLanguage && {
-                communication: [
-                    {
-                        language: {
-                            coding: [
-                                {
-                                    system: 'urn:ietf:bcp:47',
-                                    code: data.preferredLanguage,
-                                    display: data.languageDisplay || '',
-                                },
-                            ],
-                        },
-                        preferred: true,
-                    },
-                ],
-            }),
-            ...(data?.notes && { notes: data.notes }),
+        const payload = { id };
 
-            contact: [
-                {
-                    relationship: [
-                        {
-                            coding: [rela], //code:'I" , system:url, display:'Ins Company
-                            text: data?.emergencyContactName,
-                        },
-                    ],
-                    telecom: [
-                        {
-                            system: 'phone',
-                            value: data?.emergencyContactPhone?.replace(/\D/g, ''),
-                            use: 'home',
-                        },
-                    ],
-                },
-            ],
-            // ✅ Fixing Employer Address (No latitude/longitude/timeZone)
-            employerDetails: {
-                employerName: data?.employerName,
-                employerPhone: data?.employerPhone?.replace(/\D/g, ''),
-                employmentStatus: data?.employmentStatus,
-                occupation: data?.occupation,
-                workLocation: data?.employerAddress
-                    ? {
-                        address: {
-                            line: [data?.employerAddress],
-                            city: data?.employerCity,
-                            state: data?.employerStateName,
-                            postalCode: data?.employerZip,
-                            country: 'United States',
-                        },
-                    }
-                    : {},
-            },
-            identifier: finalIdentifiers,
-            ...(demographicAddresses && { address: demographicAddresses }),
-            ...(data?.notes && { notes: data.notes }),
-        };
-        dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-    };
+        if (selectedBirthSex) {
+            payload.birthSex = {
+                ...selectedBirthSex,
+                code: selectedBirthSex?.value,
+                display: selectedBirthSex?.label,
+                system: selectedBirthSex?.system,
+            };
+        }
+        if (data.gender) {
+            payload.gender = data.gender
+        }
+        if (selectedGenderIdentity) {
+            payload.genderIdentity = [{
+                ...selectedGenderIdentity,
+                code: selectedGenderIdentity?.value,
+                display: selectedGenderIdentity?.show,
+                text: selectedGenderIdentity?.label,
+            }];
+        }
 
-    const getEmployerGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-                location
-            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+        if (selectedSexualOrientation) {
+            payload.sexParameterForClinicalUse = [{
+                ...selectedSexualOrientation,
+                code: selectedSexualOrientation?.value,
+                display: selectedSexualOrientation?.show,
+                text: selectedSexualOrientation?.label,
+                system: selectedSexualOrientation?.system,
+            }];
+        }
 
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Failed to fetch geocode data:', error);
-                return null;
+        if (selectedPersonalPronouns) {
+            payload.personalPronouns = [{
+                ...selectedPersonalPronouns,
+                code: selectedPersonalPronouns?.value,
+                display: selectedPersonalPronouns?.show,
+                text: selectedPersonalPronouns?.label,
+                system: selectedPersonalPronouns?.system,
+            }];
+        }
+
+        if (selectedRaceOption) {
+            payload.race = [{
+                ...selectedRaceOption,
+                code: selectedRaceOption?.code,
+                display: selectedRaceOption?.display,
+                text: selectedRaceOption?.display,
+            }];
+        }
+
+        if (eth) {
+            payload.ethnicity = [{
+                ...eth,
+                text: eth?.display,
+            }];
+        }
+
+        if (tri) {
+            payload.tribalAffiliation = [{
+                ...tri,
+                text: tri?.display,
+            }];
+        }
+
+        if (selectedMaritalStatus) {
+            payload.maritalStatus = {
+                coding: [{
+                    ...(selectedMaritalStatus.system && { system: selectedMaritalStatus.system }),
+                    ...(selectedMaritalStatus.value && { code: selectedMaritalStatus.value }),
+                    ...(selectedMaritalStatus.show && { display: selectedMaritalStatus.show })
+                }],
+                ...(selectedMaritalStatus.show && { text: selectedMaritalStatus.show })
             }
         }
-        fetchGeocodeData(addressToSearch).then((data) => {
-            if (data) {
-                setSearchedEmployerLocations(data?.results);
-            } else {
+
+        if (data?.preferredLanguage) {
+            payload.preferredCommunication = data?.preferredLanguage
+        }
+
+        if (data?.emergencyContactName || data?.emergencyContactPhone) {
+            payload.contact = [{
+                relationship: [{
+                    coding: [rela],
+                    text: data?.emergencyContactName,
+                }],
+                telecom: [{
+                    system: 'phone',
+                    value: data?.emergencyContactPhone?.replace(/\D/g, ''),
+                    use: 'home',
+                }],
+            }];
+        }
+
+        const employerDetails = {};
+        if (data?.employerName) employerDetails.employerName = data.employerName;
+        if (data?.employerPhone) employerDetails.employerPhone = data.employerPhone.replace(/\D/g, '');
+        if (data?.employmentStatus) employerDetails.employmentStatus = data.employmentStatus;
+        if (data?.occupation) employerDetails.occupation = data.occupation;
+        if (data?.employerAddress) {
+            employerDetails.workLocation = {
+                address: {
+                    line: [data.employerAddress],
+                    city: data?.employerCity,
+                    state: data?.employerStateName,
+                    postalCode: data?.employerZip,
+                    country: 'United States',
+                },
+            };
+        }
+        if (Object.keys(employerDetails).length > 0) {
+            payload.employerDetails = employerDetails;
+        }
+
+        if (finalIdentifiers.length > 0) {
+            payload.identifier = finalIdentifiers;
+        }
+
+        const validAddresses = demographicAddresses?.filter(addr =>
+            addr.line?.[0] || addr.city || addr.state || addr.postalCode
+        );
+        if (validAddresses?.length > 0) {
+            payload.address = validAddresses;
+        }
+
+        if (data?.notes) {
+            payload.notes = data.notes;
+        }
+        dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+    }, [dispatch, id, identifiers, demographicAddresses, eth, tri, rela]);
+
+    const getEmployerGeolocation = useCallback(async (addressToSearch) => {
+        if (!addressToSearch || addressToSearch.length < 3) return;
+
+        const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
+        const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+            addressToSearch
+        )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
             }
-        });
-    };
+            const data = await response.json();
+            setSearchedEmployerLocations(data?.results || []);
+        } catch (error) {
+            console.error('Failed to fetch geocode data:', error);
+            setSearchedEmployerLocations([]);
+        }
+    }, []);
 
-    const formattedEthnicityOptions = ethnicityOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((ethnicity) => ({
-        value: ethnicity, // Code as the value
-        label: ethnicity.display, // Display text as the label
-    }));
-    const formattedTribleOptions = tribalEntitiesOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((tribal) => ({
-        value: tribal, // Code as the value
-        label: tribal.display, // Display text as the label
-    }));
-    const relationshipOption = dataList?.sort((a, b) => a.display.localeCompare(b.display))?.map((relation) => ({
-        value: relation, // Code as the value
-        label: relation.display, // Display text as the label
-    }));
 
-    const [eth, setEth] = useState(null); // Store selected ethnicity
-    const [tri, setTri] = useState(null); // Store selected tribal entity
-    const [rela, setRela] = useState(null); // Store selected relationship
 
-    const handleEthnicityChange = (opt) => setEth(opt?.value ?? null);
-    const handleRelationChange = (opt) => setRela(opt?.value ?? null);
-    const handleTribalChange = (opt) => setTri(opt?.value ?? null);
+    const formattedEthnicityOptions = useMemo(() =>
+        ethnicityOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((ethnicity) => ({
+            value: ethnicity,
+            label: ethnicity.display,
+        })) || [], []
+    );
+
+    const formattedTribleOptions = useMemo(() =>
+        tribalEntitiesOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((tribal) => ({
+            value: tribal,
+            label: tribal.display,
+        })) || [], []
+    );
+
+    const relationshipOption = useMemo(() =>
+        dataList?.sort((a, b) => a.display.localeCompare(b.display))?.map((relation) => ({
+            value: relation,
+            label: relation.display,
+        })) || [], []
+    );
+
+    const handleEthnicityChange = useCallback((opt) => setEth(opt?.value ?? null), []);
+    const handleRelationChange = useCallback((opt) => setRela(opt?.value ?? null), []);
+    const handleTribalChange = useCallback((opt) => setTri(opt?.value ?? null), []);
 
     const selectedEthnicityOption = useMemo(
         () => formattedEthnicityOptions.find((o) => o.value.code === eth?.code) ?? null,
@@ -431,8 +419,13 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
     return (
         <Form className="" onSubmit={handleSubmit(onSubmit)}>
             <div
-                className=" scroll-container mt-1"
-                style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
+                className="scroll-container mt-1 p-3"
+                style={{
+                    overflowX: 'hidden',
+                    height: isAccordionOpen ? '54.7vh' : '70vh',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px'
+                }}>
                 <IdentifierForm
                     defaultIdentifiers={[
                         {
@@ -446,27 +439,47 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 />
 
                 <hr className="mt-0" />
+                {updateResponse === 'success' && (
+                    <Alert variant="success" className="mb-3">
+                        Patient demographics updated successfully!
+                    </Alert>
+                )}
+
                 <Row className="pb-2">
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Gender</Form.Label>
-                            <Form.Select {...register('sex')}>
+                            <Form.Label className="mb-0" htmlFor="sex">Gender <span className='text-danger'>*</span></Form.Label>
+                            <Form.Select
+                                id="gender"
+                                {...register('gender', { required: 'Gender is required' })}
+                                isInvalid={!!errors.gender}
+                                className='text-capitalize'
+                            >
                                 <option value="" hidden>
                                     Select Gender
                                 </option>
-                                {sexAssignedAtBirthOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
+                                {['female', 'male', 'other'].map((option, index) => (
+                                    <option className='text-capitalize' key={index} value={option}>
+                                        {option}
                                     </option>
                                 ))}
                             </Form.Select>
+                            {errors.gender && (
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.gender.message}
+                                </Form.Control.Feedback>
+                            )}
                         </Form.Group>
                     </Col>
 
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Gender Identity</Form.Label>
-                            <Form.Select {...register('genderIdentity')}>
+                            <Form.Label className="mb-0" htmlFor="genderIdentity">Gender Identity</Form.Label>
+                            <Form.Select
+                                id="genderIdentity"
+                                {...register('genderIdentity')}
+                                isInvalid={!!errors.genderIdentity}
+                            >
                                 <option value="" hidden>
                                     Select
                                 </option>
@@ -481,23 +494,32 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
 
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sex Assigned At Birth</Form.Label>
-                            <Form.Select {...register('sexParameter')}>
+                            <Form.Label className="mb-0" htmlFor="birthSex">Sex Assigned At Birth</Form.Label>
+                            <Form.Select
+                                id="birthSex"
+                                {...register('birthSex')}
+                                isInvalid={!!errors.birthSex}
+                            >
                                 <option value="" hidden>
                                     Select
                                 </option>
-                                {sexParameterOptions.map((option) => (
+                                {sexAssignedAtBirthOptions?.map((option) => (
                                     <option key={option.value} value={option.value}>
-                                        {option.show}
+                                        {option.label}
                                     </option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
+
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Preferred Pronouns</Form.Label>
-                            <Form.Select {...register('personalPronouns')}>
+                            <Form.Label className="mb-0" htmlFor="personalPronouns">Preferred Pronouns</Form.Label>
+                            <Form.Select
+                                id="personalPronouns"
+                                {...register('personalPronouns')}
+                                isInvalid={!!errors.personalPronouns}
+                            >
                                 <option value="" hidden>
                                     Select Pronouns
                                 </option>
@@ -509,10 +531,17 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
+                </Row>
+
+                <Row className="pb-2">
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Race</Form.Label>
-                            <Form.Select {...register('race')}>
+                            <Form.Label className="mb-0" htmlFor="race">Race</Form.Label>
+                            <Form.Select
+                                id="race"
+                                {...register('race')}
+                                isInvalid={!!errors.race}
+                            >
                                 <option value="">Select Race</option>
                                 {raceOptions?.sort((a, b) => a.display.localeCompare(b.display))?.map((race) => (
                                     <option key={race.code} value={race.display} className="text-capitalize">
@@ -523,84 +552,92 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
+
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Ethnicity</Form.Label>
+                            <Form.Label className="mb-0" htmlFor="ethnicity">Ethnicity</Form.Label>
                             <Select
+                                inputId="ethnicity"
                                 options={formattedEthnicityOptions}
                                 isSearchable
                                 className="basic-single"
                                 classNamePrefix="select"
-                                placeholder="&nbsp; Select"
-                                // value={
-                                // formattedEthnicityOptions.find((option) => option?.value?.display === eth||option?.value?.display === eth?.display) || null
-                                // } // Show selected value
+                                placeholder="Select Ethnicity"
                                 value={selectedEthnicityOption}
                                 onChange={handleEthnicityChange}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
+                                        minHeight: '38px',
+                                        border: '1px solid #ced4da',
                                     }),
                                     placeholder: (provided) => ({
                                         ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
+                                        fontSize: '14px',
                                     }),
                                 }}
                             />
                         </Form.Group>
                     </Col>
+
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Preferred Language</Form.Label>
-                            <Form.Select {...register('preferredLanguage')}>
-                                <option key={''} value={''}>{'Select Preferred Language'}</option>
+                            <Form.Label className="mb-0" htmlFor="preferredLanguage">Preferred Language</Form.Label>
+                            <Form.Select
+                                id="preferredLanguage"
+                                {...register('preferredLanguage')}
+                                isInvalid={!!errors.preferredLanguage}
+                            >
+                                <option value="">Select Preferred Language</option>
                                 {["English", "Chinese", "French", "Italian", "Japanese", "Spanish",
-                                    "Portugese", "Russian", "Castilian", "Other", "Unknown", "Declined to specify"]?.sort((a, b) => a.localeCompare(b))?.map(language => (
+                                    "Portuguese", "Russian", "Castilian", "Other", "Unknown", "Declined to specify"]
+                                    .sort((a, b) => a.localeCompare(b))
+                                    .map(language => (
                                         <option key={language} value={language}>{language}</option>
                                     ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
+
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Tribal Entity</Form.Label>
+                            <Form.Label className="mb-0" htmlFor="tribalEntity">Tribal Entity</Form.Label>
                             <Select
-                                options={formattedTribleOptions} // Use the formatted array
+                                inputId="tribalEntity"
+                                options={formattedTribleOptions}
                                 isSearchable
                                 className="basic-single"
                                 classNamePrefix="select"
-                                // value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
                                 value={selectedTribleOption}
-                                placeholder="&nbsp; Select "
+                                placeholder="Select Tribal Entity"
                                 onChange={handleTribalChange}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
+                                        minHeight: '38px',
+                                        border: '1px solid #ced4da',
                                     }),
                                     placeholder: (provided) => ({
                                         ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
+                                        fontSize: '14px',
                                     }),
                                 }}
                             />
                         </Form.Group>
                     </Col>
+                </Row>
+
+                <Row className="pb-2">
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label htmlFor="marital" className="mb-0">
+                            <Form.Label htmlFor="maritalStatus" className="mb-0">
                                 Marital Status
                             </Form.Label>
-                            <Form.Select id="marital" {...register('maritalStatus')}>
+                            <Form.Select
+                                id="maritalStatus"
+                                {...register('maritalStatus')}
+                                isInvalid={!!errors.maritalStatus}
+                            >
                                 <option value="">Select marital status</option>
                                 {maritalStatusOptions.map((option) => (
                                     <option key={option.value} value={option?.show}>
@@ -609,115 +646,108 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                 ))}
                             </Form.Select>
                             {errors.maritalStatus && (
-                                <span className="text-danger">{errors.maritalStatus.message}</span>
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.maritalStatus.message}
+                                </Form.Control.Feedback>
                             )}
                         </Form.Group>
                     </Col>
                 </Row>
+
                 <hr />
                 <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
                 <hr />
 
-                <Row className="mt-1 pb-2">
+                <Row className="mt-3 pb-2">
                     <Col sm={12}>
-                        <h5>Emergency Contact Details</h5>
+                        <h5 className="mb-3">Emergency Contact Details</h5>
                     </Col>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Emergency Contact Name</Form.Label>
+                            <Form.Label className="mb-0" htmlFor="emergencyContactName">Emergency Contact Name</Form.Label>
                             <Form.Control
-                                {...register('emergencyContactName')}
+                                id="emergencyContactName"
+                                {...register('emergencyContactName', {
+                                    minLength: {
+                                        value: 2,
+                                        message: 'Name must be at least 2 characters'
+                                    }
+                                })}
                                 type="text"
                                 placeholder="Enter Emergency Contact Name"
+                                isInvalid={!!errors.emergencyContactName}
                             />
                             {errors.emergencyContactName && (
-                                <span className="text-danger">{errors.emergencyContactName.message}</span>
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.emergencyContactName.message}
+                                </Form.Control.Feedback>
                             )}
                         </Form.Group>
                     </Col>
-                    <Col sm={3}>
-                        <Form.Group className="mb-0 position-relative">
-                            <Form.Label className="mb-0">Emergency Contact Phone </Form.Label>
-                            <Form.Group>
-                                <InputGroup>
-                                    <InputGroup.Text
-                                        className="ps-3 pe-1 fw-bold text-black"
-                                        style={{ height: '30px' }}>
-                                        &nbsp;+1
-                                    </InputGroup.Text>{' '}
-                                    {/* This is the prefix */}
-                                    <Form.Control
-                                        type="tel"
-                                        style={{ height: '30px' }}
-                                        {...register('emergencyContactPhone', {
-                                            pattern: {
-                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                            },
-                                            maxLength: {
-                                                value: 13, // Includes characters for (XXX)XXX-XXXX
-                                                message: 'Contact must not exceed 13 characters',
-                                            },
-                                            minLength: {
-                                                value: 13,
-                                                message: 'Contact must not be less than 13 characters',
-                                            },
-                                        })}
-                                        onChange={(e) => {
-                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                            const formattedValue = rawValue.replace(
-                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                (match, p1, p2, p3) => {
-                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                    if (p2) return `(${p1})${p2}`;
-                                                    return `(${p1}`;
-                                                }
-                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                            e.target.value = formattedValue; // Update input value
-                                            clearErrors('emergencyContactPhone'); // Clear validation errors
-                                        }}
-                                        placeholder="(XXX)XXX-XXXX"
-                                        maxLength={14}
-                                        onKeyPress={(event) => {
-                                            // Only allow numeric characters (0-9)
-                                            if (!/[0-9]/.test(event.key)) {
-                                                event.preventDefault();
+                    <Col sm={4}>
+                        <Form.Group className="position-relative">
+                            <Form.Label className="mb-0" htmlFor="emergencyContactPhone">Emergency Contact Phone</Form.Label>
+                            <InputGroup>
+                                <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">
+                                    <img src={us} alt="US flag" width={16} className="me-1" />
+                                    +1
+                                </InputGroup.Text>
+                                <Form.Control
+                                    id="emergencyContactPhone"
+                                    type="tel"
+                                    {...register('emergencyContactPhone', {
+                                        pattern: {
+                                            value: /^\(\d{3}\)\d{3}-\d{4}$/,
+                                            message: 'Phone must be in format (XXX)XXX-XXXX',
+                                        },
+                                    })}
+                                    onChange={(e) => {
+                                        let rawValue = e.target.value.replace(/\D/g, '');
+                                        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
+                                        const formattedValue = rawValue.replace(
+                                            /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                            (match, p1, p2, p3) => {
+                                                if (p3) return `(${p1})${p2}-${p3}`;
+                                                if (p2) return `(${p1})${p2}`;
+                                                return `(${p1}`;
                                             }
-                                        }}
-                                    />
-                                </InputGroup>
-                            </Form.Group>
-
-                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
-                                <img src={us} alt="country code flag" width={20} />
-                            </div>
+                                        );
+                                        e.target.value = formattedValue;
+                                        clearErrors('emergencyContactPhone');
+                                    }}
+                                    placeholder="(XXX)XXX-XXXX"
+                                    maxLength={14}
+                                    isInvalid={!!errors.emergencyContactPhone}
+                                />
+                            </InputGroup>
+                            {errors.emergencyContactPhone && (
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.emergencyContactPhone.message}
+                                </Form.Control.Feedback>
+                            )}
                         </Form.Group>
                     </Col>
-                    <Col sm={3}>
+                    <Col sm={4}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
+                            <Form.Label className="mb-0" htmlFor="emergencyContactRelation">Emergency Contact Relation</Form.Label>
                             <Select
-                                options={relationshipOption} // Use the formatted array
+                                inputId="emergencyContactRelation"
+                                options={relationshipOption}
                                 isSearchable
                                 className="basic-single"
                                 classNamePrefix="select"
-                                placeholder="&nbsp; Select "
-                                // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
+                                placeholder="Select Relation"
                                 value={selectedRelationOption}
                                 onChange={handleRelationChange}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
+                                        minHeight: '38px',
+                                        border: '1px solid #ced4da',
                                     }),
                                     placeholder: (provided) => ({
                                         ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
+                                        fontSize: '14px',
                                     }),
                                 }}
                             />
@@ -856,7 +886,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                                     type="text"
                                                     {...register('employerAddress', {})}
                                                     onChange={(e) => {
-                                                        getEmployerGeolocation(e);
+                                                        getEmployerGeolocation(e.target.value);
                                                         setEmployerFocused(true);
                                                         clearErrors('employerAddress');
                                                     }}
@@ -1028,26 +1058,60 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                     </Col>
                 </Row>
                 <hr />
-                <Row>
-                    <Col sm={6}>
+                <Row className="mt-3">
+                    <Col sm={12}>
+                        <h5 className="mb-3">Additional Information</h5>
+                    </Col>
+                    <Col sm={12}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Notes</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Notes" {...register('notes')} />
-                            {errors.notes && <span className="text-danger">{errors.notes.message}</span>}
+                            <Form.Label className="mb-0" htmlFor="notes">Notes</Form.Label>
+                            <Form.Control
+                                id="notes"
+                                as="textarea"
+                                rows={3}
+                                placeholder="Enter any additional notes or comments"
+                                {...register('notes', {
+                                    maxLength: {
+                                        value: 500,
+                                        message: 'Notes cannot exceed 500 characters'
+                                    }
+                                })}
+                                isInvalid={!!errors.notes}
+                            />
+                            {errors.notes && (
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.notes.message}
+                                </Form.Control.Feedback>
+                            )}
+                            <Form.Text className="text-muted">
+                                {watch('notes')?.length || 0}/500 characters
+                            </Form.Text>
                         </Form.Group>
                     </Col>
                 </Row>
             </div>
-            <div className="d-flex gap-2 align-items-end justify-content-end my-2">
+            <div className="d-flex gap-3 align-items-center justify-content-end mt-4 pt-3 border-top">
                 <Button
-                    className="custom-buttons btn-height"
+                    variant="outline-secondary"
+                    type="button"
+                    onClick={() => reset()}
                     disabled={store?.updatePatientsReducer?.loading}
-                    style={{ width: '70px' }}
-                    type="submit">
+                >
+                    Reset Form
+                </Button>
+                <Button
+                    variant="primary"
+                    className="px-4"
+                    disabled={store?.updatePatientsReducer?.loading}
+                    type="submit"
+                >
                     {store?.updatePatientsReducer?.loading ? (
-                        <Spinner animation="border" variant="primary" size="sm" />
+                        <>
+                            <Spinner animation="border" size="sm" className="me-2" />
+                            Updating...
+                        </>
                     ) : (
-                        'Update'
+                        'Update Demographics'
                     )}
                 </Button>
             </div>

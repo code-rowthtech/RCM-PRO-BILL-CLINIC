@@ -15,6 +15,7 @@ import { IoMdClose } from 'react-icons/io';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 import Paginations from '../../../../helpers/Paginations';
+import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
 
 const Office = () => {
     const store = useSelector((state) => state);
@@ -259,7 +260,7 @@ const Office = () => {
                                                 {data.description}...
                                             </td>
                                             <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                {formatDate(data.createdAt)}
+                                                {formatDateByUserTimeZone(data.createdAt, {}, 'date')}
                                             </td>
                                             <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                 <Form.Switch

@@ -29,6 +29,7 @@ import PatientAccess from './PatientAccess';
 import DrugInteraction from './DrugInteractions/DrugInteraction';
 import ModalPrint from './ModalOfPrintPdf/ModalPrint';
 import TaskListing from './TaskList/TaskListing';
+import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
 
 const UpdatePatientIndex = () => {
     // Imports initialization
@@ -107,15 +108,14 @@ const UpdatePatientIndex = () => {
 
     const patientBirthDate = useMemo(() =>
         patientDetails?.birthDate
-            ? new Date(patientDetails.birthDate).toLocaleDateString('en-GB')
+            ? formatDateByUserTimeZone(patientDetails.birthDate, {}, 'date')
             : '',
         [patientDetails?.birthDate]
     );
 
     const patientCreatedDate = useMemo(() =>
         patientDetails?.createdAt
-            ? new Date(patientDetails.createdAt).toLocaleDateString('en-GB')
-            : '',
+            ? formatDateByUserTimeZone(patientDetails.createdAt, {}, 'date') : '',
         [patientDetails?.createdAt]
     );
 
