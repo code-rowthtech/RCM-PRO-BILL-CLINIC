@@ -16,6 +16,7 @@ import { IoMdClose } from 'react-icons/io';
 import Paginations from '../../../../helpers/Paginations';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
+import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
 
 const POV = () => {
     const store = useSelector((state) => state);
@@ -243,7 +244,9 @@ const POV = () => {
                                                     ? data?.description?.slice(0, 50) + '...'
                                                     : data?.description}
                                             </td>
-                                            <td>{formatDate(data.createdAt)}</td>
+                                            <td>
+                                                {formatDateByUserTimeZone(data.createdAt, {}, 'date')}
+                                            </td>
                                             <td>
                                                 <Form.Switch
                                                     className={data.isActive ? 'custom-active' : ''}

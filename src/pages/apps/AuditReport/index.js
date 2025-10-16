@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap'
 import DatePicker from 'react-datepicker'
+import { formatDateByUserTimeZone } from '../../../components/timeZonePipe'
 
 const index = () => {
 
@@ -47,7 +48,7 @@ const index = () => {
                         isClearable
                         placeholderText="Select a date range"
                         className=" border-0"
-                        style={{width:'14rem!important'}}
+                        style={{ width: '14rem!important' }}
                       />
                     </Col>
                     <Col sm={2}>
@@ -103,7 +104,9 @@ const index = () => {
                             <td className="text-capitalize">{data.patientDataType}</td>
                             <td className="text-capitalize">{data.detail}</td>
                             <td className="text-capitalize">{data.user}</td>
-                            <td className="text-capitalize">{data.date}</td>
+                            <td className="text-capitalize">
+                              {formatDateByUserTimeZone(data.date, {}, 'date')}
+                            </td>
                           </tr>
                         ))}
                       </tbody>

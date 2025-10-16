@@ -10,7 +10,6 @@ import { configureFakeBackend } from './helpers';
 // For Saas import Saas.scss
 import './assets/scss/Saas.scss';
 import './components/timeZonePipe';
-import { formatDateByUserTimeZone } from './components/timeZonePipe';
 // For Modern demo import Modern.scss
 // import './assets/scss/Modern.scss';
 

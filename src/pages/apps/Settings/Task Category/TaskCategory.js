@@ -14,6 +14,7 @@ import {
 import { IoMdClose } from 'react-icons/io';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
+import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
 const TaskCategory = () => {
     const store = useSelector((state) => state);
     // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -280,7 +281,7 @@ const TaskCategory = () => {
                                                         : data.description}
                                                 </td>
                                                 <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                    {formatDate(data.createdAt)}
+                                                    {formatDateByUserTimeZone(data.createdAt, {}, 'date')}
                                                 </td>
                                                 <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                     <Form.Switch

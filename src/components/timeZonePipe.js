@@ -13,26 +13,54 @@ const getUserTimeZone = () => {
     }
 };
 
-// Format any date string or Date object to user's timezone
-export const formatDateByUserTimeZone = (date, options = {}) => {
+/**
+ * Format a date or time based on user's timezone.
+ * 
+ * @param {string|Date} date - The date or timestamp to format
+ * @param {Object} options - Optional Intl.DateTimeFormat options
+ * @param {'datetime'|'date'|'time'} displayMode - What to display (default: 'datetime')
+ * @returns {string} Formatted date/time string
+ */
+export const formatDateByUserTimeZone = (date, options = {}, displayMode = 'datetime') => {
     if (!date) return "";
 
     const tz = getUserTimeZone();
     const d = new Date(date);
 
-    // Default formatting options
-    const defaultOptions = {
-        timeZone: tz,
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-        ...options
-    };
+    let modeOptions = {};
 
-    return d.toLocaleString("en-US", defaultOptions);
+    switch (displayMode) {
+        case 'date':
+            modeOptions = {
+                timeZone: tz,
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+            };
+            break;
+        case 'time':
+            modeOptions = {
+                timeZone: tz,
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+            };
+            break;
+        case 'datetime':
+        default:
+            modeOptions = {
+                timeZone: tz,
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+            };
+    }
+
+    const formatOptions = { ...modeOptions, ...options };
+    return d.toLocaleString("en-US", formatOptions);
 };
 
 // Optional: Make it globally accessible (so no import needed)

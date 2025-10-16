@@ -22,6 +22,7 @@ import { FaCalendar, FaCalendarWeek, FaRegListAlt } from 'react-icons/fa';
 import { LucideCalendarDays } from 'lucide-react';
 import { CiCalendar } from 'react-icons/ci';
 import Paginations from '../../../helpers/Paginations';
+import { formatDateByUserTimeZone } from '../../../components/timeZonePipe';
 // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
@@ -220,7 +221,7 @@ const AppointmentsList = ({
                                     <div className="d-flex gap-2">
                                         <span>
                                             {data?.subject?.birthDate
-                                                ? new Date(data.subject.birthDate).toISOString().split('T')[0]
+                                                ? formatDateByUserTimeZone(data.subject.birthDate, {}, 'date')
                                                 : 'N/A'}
                                         </span>
                                         <span>
@@ -231,10 +232,10 @@ const AppointmentsList = ({
                                     </div>
                                 </td>
                                 <td>
-                                    {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
+                                    {formatDateByUserTimeZone(data?.start, {}, 'time')} - {formatDateByUserTimeZone(data?.end, {}, 'time')}
                                 </td>
 
-                                <td>{new Date(data?.date).toLocaleDateString('en-US')}</td>
+                                <td>{formatDateByUserTimeZone(data?.date, {}, 'date')}</td>
                                 <td>{data?.doctorId?.prefix?.[0] || '' + data?.doctorId?.name?.[0]?.text || 'N/A'}</td>
                                 <td
                                     className="text-capitalize cursor-pointer"

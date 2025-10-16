@@ -11,6 +11,7 @@ import { IoSearchSharp } from 'react-icons/io5';
 import dummyProfile from '../../../assets/images/dummyProfile.png';
 import { IoMdClose } from 'react-icons/io';
 import { decryptMessage } from '../../../cryptoUtils';
+import { formatDateByUserTimeZone } from '../../../components/timeZonePipe';
 const Patients = () => {
     const navigate = useNavigate('');
     const [smShow, setSmShow] = useState(false);
@@ -207,9 +208,7 @@ const Patients = () => {
                                                                         : 'text-danger fs-6 fw-semibold'
                                                                         }`}>
                                                                     {data?.birthDate
-                                                                        ? new Date(data?.birthDate)
-                                                                            .toISOString()
-                                                                            .split('T')[0]
+                                                                        ? formatDateByUserTimeZone(data?.birthDate, {}, 'date')
                                                                         : 'Missing'}
                                                                 </div>
                                                             </div>

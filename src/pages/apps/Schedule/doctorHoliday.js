@@ -4,6 +4,7 @@ import { RiDeleteBin5Line } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
 import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
+import { formatDateByUserTimeZone } from '../../../components/timeZonePipe';
 
 const DoctorHoliday = () => {
     const dispatch = useDispatch();
@@ -92,9 +93,9 @@ const DoctorHoliday = () => {
                                 </td>
                                 <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
                                     <div
-                                        className="  text-white text-center bg-secondary rounded-2"
+                                        className="text-white text-center bg-secondary rounded-2"
                                         style={{ width: '100px' }}>
-                                        {new Date(holiday?.date).toLocaleDateString('en-GB')}
+                                        {formatDateByUserTimeZone(holiday?.date, {}, 'date')}
                                     </div>
                                 </td>
                                 <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
