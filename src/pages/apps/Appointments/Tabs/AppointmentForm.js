@@ -170,7 +170,6 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                 });
                 currentDate.setDate(currentDate.getDate() + 7 * interval);
             }
-
             appointments.sort((a, b) => a.getTime() - b.getTime());
             setValue('weeklyOccurenceCount', appointments.length);
             onDatesCalculated(appointments);
