@@ -171,15 +171,15 @@ const Demographicdetails = ({
                 },
             ],
             // ✅ Fixing Marital Status Structure
-            maritalStatus: [
-                {
+            maritalStatus: {
+                coding: [{
                     ...selectedMaritalStatus,
                     code: selectedMaritalStatus?.value,
                     display: selectedMaritalStatus?.show,
-                    text: selectedMaritalStatus?.label,
                     system: selectedMaritalStatus?.system,
-                },
-            ],
+                }],
+                ...(selectedMaritalStatus?.show && { text: selectedMaritalStatus?.show }),
+            },
             // ✅ Fixing Preferred Language Structure
             ...(data?.preferredLanguage && {
                 communication: [
