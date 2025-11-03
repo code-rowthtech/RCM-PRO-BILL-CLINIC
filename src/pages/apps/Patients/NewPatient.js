@@ -24,6 +24,7 @@ import Select from 'react-select';
 import Insurance from './Insurance/Insurance';
 import Demographicdetails from './Demographic';
 import ReferringDoctor from './referringDoctor';
+import ConsentSection from './ConsentSection';
 import PreviewModal from './NewPatient/Modals/PreviewModal';
 import { calculateAge } from '../../../helpers/helperFunctions';
 
@@ -334,7 +335,16 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
             followupDate: data?.followupDate || '',
             gender: data?.gender || '',
             followupReason: data?.followupReason || '',
-            medicationHistoryConsent: true,
+            medicationHistoryConsent: data?.medicationHistoryConsent || 'yes',
+            immunizationRegistryStatus: data?.immunizationRegistryStatus || '',
+            immunizationEffectiveDate: data?.immunizationEffectiveDate || '',
+            immunizationNotificationPreference: data?.immunizationNotificationPreference || '',
+            stopImmunizationUploads: data?.stopImmunizationUploads || '',
+            prescriptionHistoryConsent: data?.prescriptionHistoryConsent || '',
+            emailReminders: data?.emailReminders || false,
+            textSmsReminders: data?.textSmsReminders || 'off',
+            voiceReminders: data?.voiceReminders || 'off',
+            turnOnAllReminders: data?.turnOnAllReminders || false,
             patientCopayAmount: data?.patientCopayAmount || '0',
             ...(selectedDoctor?.value && { doctorId: selectedDoctor.value }),
             responsibleParty: showResponsibleTab, // Convert string to boolean
@@ -419,6 +429,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const tabs = [
         { key: 'personalDetails', label: 'Personal Details', show: true },
         { key: 'demographicDetails', label: 'Demographic', show: true },
+        { key: 'consents', label: 'Consents', show: true },
         { key: 'responsible', label: 'Responsible Party', show: showResponsibleTab },
         { key: 'referringDoctor', label: 'Referring Source', show: showReferringTab }
     ];
@@ -455,7 +466,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                     </div>
 
                     <div
-                        className={`px-2 ${isModal ? 'page-modal-height' : 'page-height'} scroll-container `}
+                        className={`px-2 pb-4 ${isModal ? 'page-modal-height' : 'page-height'} scroll-container `}
                         style={{ scrollbarWidth: isModal ? 'thin' : '' }}>
                         {/* Form Section */}
                         {activeTab === 'personalDetails' && (
@@ -1044,6 +1055,12 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
                                 setShowReferringTab={setShowReferringTab}
                             />
                         )}
+                        {activeTab === 'consents' && (
+                            <ConsentSection
+                                activeTab={activeTab}
+
+                            />
+                        )}
                         {activeTab === 'referringDoctor' && (
                             <ReferringDoctor activeTab={activeTab} setActiveTab={setActiveTab} />
                         )}
@@ -1054,4 +1071,5 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
         </div>
     );
 };
+
 export default NewPatient;

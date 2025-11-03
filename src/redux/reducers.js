@@ -5,7 +5,7 @@ import Auth from './auth/reducers';
 import Layout from './layout/reducers';
 import { getPermissionsDataReducer, createPermissionsDataReducer, deletePermissionsDataReducer, updatePermissionsDataReducer } from './permissions/reducers';
 import { createRolesReducer, getRolesDataReducer, updateRolesReducer, getUserDataReducer, deleteRolesDataReducer, viewPasswordReducer } from './roles/reducers';
-import { createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer, getDepartmentDataReducer } from './settings/reducers';
+import { createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer, getDepartmentDataReducer, getConsentFormReducer, createConsentFormReducer, updateConsentFormReducer, deleteConsentFormReducer } from './settings/reducers';
 import {
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer,
     getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer, standardContractReducer, changeEmailReducer
@@ -86,5 +86,6 @@ export default (combineReducers({
     getPatientsAccessLogsReducer,
     // Audit Report
     getAuditReportReducer,
-
+    // CONSENT FORM
+    getConsentFormReducer, createConsentFormReducer, updateConsentFormReducer, deleteConsentFormReducer
 }): any);

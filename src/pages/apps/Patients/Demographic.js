@@ -944,19 +944,6 @@ const Demographicdetails = ({
                                             )}
                                         </Form.Group>
                                     </Col>
-                                    {/* <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">Time Zone</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('employerTimeZone')}
-                                                placeholder="Time Zone"
-                                            />
-                                            {errors.employerTimeZone && (
-                                                <span className="text-danger">{errors.employerTimeZone.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col> */}
                                 </Row>
                             </Col>
                         </Row>

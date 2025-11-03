@@ -48,6 +48,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
     const [additionalInstruction, setAdditionalInstruction] = useState();
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [showAddProblemModal, setShowAddProblemModal] = useState(false);
+    const [drugFieldModified, setDrugFieldModified] = useState(false);
 
     // VARIABLE DECLARATIONS
     const drugsData = store?.getDrugsReducer?.data?.ndcProducts || [];
@@ -158,17 +159,25 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
         const value = e.target.value;
         setShowDropdown(true);
         setSelectedDrug(null);
+        setDrugFieldModified(true);
         setValue('drugInfo', value);
         debouncedSearch(value);
     };
 
     const handleSelectDrug = (item) => {
         setSelectedDrug(item);
+        setDrugFieldModified(false);
         setValue('drugInfo', item?.proprietaryName + ' (' + item?.nonProprietaryName + ')');
         setShowDropdown(false);
     };
 
     const onSubmit = (data) => {
+        // Validate that a medication is selected from dropdown
+        if (!selectedDrug && (!selectedMedication || drugFieldModified)) {
+            ToastHandle('Please select a valid drug name from the list.', 'danger');
+            return;
+        }
+
         const medicationData = {
             ...(data.note && {
                 note: [

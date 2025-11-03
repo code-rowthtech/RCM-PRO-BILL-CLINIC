@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { SettingsActionTypes } from './constants';
-import { createMastersDataApi, getDepartmentDataApi, getMastersDataApi, updateMastersDataApi } from './api';
+import { createConsentFormApi, createMastersDataApi, deleteConsentFormApi, getConsentFormApi, getDepartmentDataApi, getMastersDataApi, updateConsentFormApi, updateMastersDataApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -169,6 +169,134 @@ function* updateMastersDataFunction(data) {
     }
 }
 
+// CONSENT FORM SAGAS
+function* createConsentFormFunction(data) {
+    try {
+        yield put({
+            type: SettingsActionTypes.CREATE_CONSENT_FORM_LOADING,
+            payload: {},
+        });
+        const response = yield call(createConsentFormApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: SettingsActionTypes.CREATE_CONSENT_FORM_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: SettingsActionTypes.CREATE_CONSENT_FORM_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: SettingsActionTypes.CREATE_CONSENT_FORM_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: SettingsActionTypes.CREATE_CONSENT_FORM_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* updateConsentFormFunction(data) {
+    try {
+        yield put({
+            type: SettingsActionTypes.UPDATE_CONSENT_FORM_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateConsentFormApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: SettingsActionTypes.UPDATE_CONSENT_FORM_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: SettingsActionTypes.UPDATE_CONSENT_FORM_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: SettingsActionTypes.UPDATE_CONSENT_FORM_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: SettingsActionTypes.UPDATE_CONSENT_FORM_ERROR,
+            payload: error,
+        });
+    }
+}
+function* deleteConsentFormFunction(data) {
+    try {
+        yield put({
+            type: SettingsActionTypes.DELETE_CONSENT_FORM_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteConsentFormApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: SettingsActionTypes.DELETE_CONSENT_FORM_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: SettingsActionTypes.DELETE_CONSENT_FORM_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: SettingsActionTypes.DELETE_CONSENT_FORM_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: SettingsActionTypes.DELETE_CONSENT_FORM_ERROR,
+            payload: error,
+        });
+    }
+}
+function* getConsentFormFunction(data) {
+    try {
+        yield put({
+            type: SettingsActionTypes.GET_CONSENT_FORM_LOADING,
+            payload: {},
+        });
+        const response = yield call(getConsentFormApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            yield put({
+                type: SettingsActionTypes.GET_CONSENT_FORM_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: SettingsActionTypes.GET_CONSENT_FORM_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: SettingsActionTypes.GET_CONSENT_FORM_ERROR,
+            payload: error,
+        });
+    }
+}
+
+
+
 export function* callStateEmpty() {
     yield put({
         type: SettingsActionTypes.STATE_EMPTY_INTIAL_STATE,
@@ -197,14 +325,25 @@ export function* watchresetState() {
     yield takeEvery(SettingsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
 }
 
+// CONSENT FORM WATCHERS
+export function* watchCreateConsentForm() {
+    yield takeEvery(SettingsActionTypes.CREATE_CONSENT_FORM, createConsentFormFunction);
+}
+export function* watchUpdateConsentForm() {
+    yield takeEvery(SettingsActionTypes.UPDATE_CONSENT_FORM, updateConsentFormFunction);
+}
+export function* watchDeleteConsentForm() {
+    yield takeEvery(SettingsActionTypes.DELETE_CONSENT_FORM, deleteConsentFormFunction);
+}
+export function* watchGetConsentForm() {
+    yield takeEvery(SettingsActionTypes.GET_CONSENT_FORM, getConsentFormFunction);
+}
+
 function* settingsSaga() {
     yield all([
-        fork(watchCreateMastersData),
-        fork(watchGetMastersData),
-        fork(watchGetDepartmentData),
-        fork(watchUpdateMastersData),
-        fork(watchresetState),
-        fork(watchGetMasters2Data),
+        fork(watchCreateMastersData), fork(watchGetMastersData), fork(watchGetDepartmentData),
+        fork(watchUpdateMastersData), fork(watchresetState), fork(watchGetMasters2Data),
+        fork(watchCreateConsentForm), fork(watchUpdateConsentForm), fork(watchDeleteConsentForm), fork(watchGetConsentForm),
     ]);
 }
 export default settingsSaga;

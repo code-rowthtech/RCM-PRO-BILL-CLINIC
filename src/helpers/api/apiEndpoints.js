@@ -45,7 +45,7 @@ export const updateMastersData = `${BaseRoute}/createOrUpdateMasterData`;
 export const addRoleData = `${BaseRoute}/roles/create`;
 export const getRoleData = `${BaseRoute}/getAllRoles`;
 export const updateRoleData = `${BaseRoute}/roles/edit`;
-
+export const consentFormEndpoints = `${BaseRoute}/consent-document`;
 // DOCTORS
 export const getDoctor = `${BaseRoute}/practitioner/list`;
 export const createDoctor = `${BaseRoute}/practitioner/create`;

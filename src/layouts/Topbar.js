@@ -71,6 +71,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/settings/department': 'Department',
         '/apps/settings/desigination': 'Desigination',
         '/apps/settings/consultationroom': 'Consultation Room',
+        '/apps/settings/consent': 'Consent',
         '/apps/settings/office': 'Office',
         '/apps/settings/role': 'Role',
         '/apps/settings/taskcategory': 'Task Category',

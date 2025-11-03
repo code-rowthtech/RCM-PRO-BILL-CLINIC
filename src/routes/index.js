@@ -69,13 +69,14 @@ const Department = React.lazy(() => import('../pages/apps/Settings/Department/De
 const Desigination = React.lazy(() => import('../pages/apps/Settings/Designation/Desigination'));
 const PurposeOfVisit = React.lazy(() => import('../pages/apps/Settings/Purpose/PurposeOfVisit'));
 const ConsultationRoom = React.lazy(() => import('../pages/apps/Settings/Consultation Room/ConsultationRoom'));
+const Consent = React.lazy(() => import('../pages/apps/Settings/Consent/Consent'));
 const Office = React.lazy(() => import('../pages/apps/Settings/Office/Office'));
 const NotesType = React.lazy(() => import('../pages/apps/Settings/NotesType/notesType'))
 const Templates = React.lazy(() => import('../pages/apps/Settings/Templates/templates'))
 const TaskCategory = React.lazy(() => import('../pages/apps/Settings/Task Category/TaskCategory'));
 // Notes Templates
-const ClinicalNotesType = React.lazy(()=> import ('../pages/apps/NotesAndTemplates/NotesTypes'));
-const NotesTemplates = React.lazy(()=>import('../pages/apps/NotesAndTemplates/NotesTemplates'));
+const ClinicalNotesType = React.lazy(() => import('../pages/apps/NotesAndTemplates/NotesTypes'));
+const NotesTemplates = React.lazy(() => import('../pages/apps/NotesAndTemplates/NotesTemplates'));
 const RoleManagement = React.lazy(() => import('../pages/apps/RoleManagement/index'));
 const RoleSetting = React.lazy(() => import('../pages/apps/Settings/Role/RoleSetting'));
 const AuditReport = React.lazy(() => import('../pages/apps/AuditReport/index'));
@@ -423,12 +424,12 @@ const AllRoutes = () => {
                                 },
                             ],
                         },
-                                {
-                                    path: 'tasks',
-                                    element: hasPermission('view Tasks') ? (
-                                        <LoadComponent component={Tasks} />
-                                    ) : null,
-                                },
+                        {
+                            path: 'tasks',
+                            element: hasPermission('view Tasks') ? (
+                                <LoadComponent component={Tasks} />
+                            ) : null,
+                        },
 
                         {
                             path: 'notes-and-templates',
@@ -437,24 +438,24 @@ const AllRoutes = () => {
                                     path: 'list',
                                     element: hasPermission('view notes and templates') ? (
                                         <LoadComponent component={NotesTemplates} />
-                                        ) : (
-                                             <div className="disabled-content">You don't have permission to view this page.</div>
-                                            )
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    )
                                 },
                                 {
                                     path: 'note-categories',
                                     element: hasPermission('view notes') ? (
-                                        <LoadComponent component={ClinicalNotesType}/>
-                                        ) : null,
+                                        <LoadComponent component={ClinicalNotesType} />
+                                    ) : null,
+                                },
+                                {
+                                    path: 'note-templates',
+                                    element: hasPermission('view templates') ? (
+                                        <LoadComponent component={NotesTemplates} />
+                                    ) : null,
+                                },
+                            ],
                         },
-                        {
-                            path: 'note-templates',
-                            element: hasPermission('view templates') ? (
-                                <LoadComponent component={NotesTemplates} />
-                                ) : null,
-                                },
-                                ],
-                                },
                         {
                             path: 'settings',
                             children: [
@@ -499,6 +500,14 @@ const AllRoutes = () => {
                                     ),
                                 },
                                 {
+                                    path: 'consent',
+                                    element: hasPermission('view consent settings') ? (
+                                        <LoadComponent component={Consent} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                },
+                                {
                                     path: 'notesType',
                                     element: hasPermission('view notestype settings') ? (
                                         <LoadComponent component={NotesType} />
@@ -530,7 +539,7 @@ const AllRoutes = () => {
                                         <div className="disabled-content">You don't have permission to view this page.</div>
                                     ),
                                 },
-                                  {
+                                {
                                     path: 'taskcategory',
                                     element: hasPermission('view taskcategory settings') ? (
                                         <LoadComponent component={TaskCategory} />
