@@ -12,7 +12,7 @@ import {
     createAppointmentAction, getAppointmentByIdAction, getDoctorsAction,
     getPractitionerScheduleAction, rescheduleAppointmentAction,
 } from '../../../../redux/actions';
-import { getMastersDataAction, getMastersDataAction2 } from '../../../../redux/settings/action';
+import { getConsentFormAction, getMastersDataAction, getMastersDataAction2 } from '../../../../redux/settings/action';
 
 // Components
 import Responsiblle from '../../Patients/Responsible';
@@ -299,11 +299,14 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
     const [selectedConsultationRoom, setSelectedConsultationRoom] = useState(null);
+    const [selectedConsentForm, setSelectedConsentForm] = useState([]);
     const [scheduledDate, setScheduledDate] = useState();
     const [showHolidayModal, setShowHolidayModal] = useState(false);
     const [consultationModal, setConsultationModal] = useState(false);
     const [showPastDateModal, setShowPastDateModal] = useState(false);
     const [pendingDate, setPendingDate] = useState('');
+    const [consentFormsLoaded, setConsentFormsLoaded] = useState(false);
+
 
     function formatDateToYYYYMMDD(date) {
         const d = new Date(date);
@@ -429,6 +432,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
 
     // Fetch consultation rooms
     useEffect(() => {
+        dispatch(getConsentFormAction());
         dispatch(getMastersDataAction({ status: true, category: 'Consultation Room', limit: 10, skip, search }));
     }, [dispatch, search, skip]);
 
@@ -458,6 +462,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             setValue('consultationRoom', details?.examRoom);
             const selectedConsultationRoomOption = formattedConsultationRoomOptions.find(option => option.value === details?.examRoom);
             setSelectedConsultationRoom(selectedConsultationRoomOption || null);
+
             setValue('duration', details?.minutesDuration);
             setValue('startTime', formatTime(details?.start));
             setValue('status', details?.status);
@@ -497,6 +502,29 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             }
         }
     }, [appointmentDetails, id, patientsData, doctorDetails, setValue, formatTime]);
+
+    // Handle consent forms separately to avoid conflicts
+    useEffect(() => {
+        if (appointmentDetails && id && store?.getConsentFormReducer?.data?.documents && !consentFormsLoaded) {
+            const details = appointmentDetails;
+            if (details?.consentForms && Array.isArray(details.consentForms)) {
+                const consentFormOptions = details.consentForms.map(formId => {
+                    const form = store?.getConsentFormReducer?.data?.documents?.find(doc => doc._id === formId);
+                    return form ? {
+                        value: form._id,
+                        label: form.title,
+                        data: form
+                    } : null;
+                }).filter(Boolean);
+                setSelectedConsentForm(consentFormOptions);
+                setValue('consentForm', details.consentForms);
+            } else {
+                setSelectedConsentForm([]);
+                setValue('consentForm', []);
+            }
+            setConsentFormsLoaded(true);
+        }
+    }, [appointmentDetails, id, store?.getConsentFormReducer?.data?.documents, consentFormsLoaded, setValue]);
 
     useEffect(() => {
         if (watchedDoctorName) {
@@ -583,6 +611,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
         const payload = {
             ...(id && appointmentDetails ? { id } : {}),
             subject: data.patient,
+            consentForms: data?.consentForm || [],
             clinicId,
             appointmentType: appointmentTypePayload,
             doctorId: data?.doctorName,
@@ -605,7 +634,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             slot: data?.startTime,
             ...recurrenceTemplate,
         };
-
         if (id && appointmentDetails) {
             dispatch(rescheduleAppointmentAction({ id, key: encryptMessage(payload) }));
         } else {
@@ -695,17 +723,21 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
         setValue('consultationRoom', selectedOption ? selectedOption.value : '');
     }, [setValue]);
 
+    // Consent form handling
+    const handleConsentFormChange = useCallback((selectedOptions) => {
+        setSelectedConsentForm(selectedOptions);
+        setValue('consentForm', selectedOptions ? selectedOptions.map(option => option.value) : []);
+    }, [setValue]);
+
     const loadPatientOptions = useCallback(
         (inputValue, callback) => {
             if (!inputValue) {
                 callback(formattedPatientOptions.slice(0, 10));
                 return;
             }
-
             const filteredOptions = formattedPatientOptions.filter((option) =>
                 option.label.toLowerCase().includes(inputValue.toLowerCase())
             );
-
             callback(filteredOptions.slice(0, 20));
         },
         [formattedPatientOptions]
@@ -717,7 +749,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 callback(formattedProviderOptions.slice(0, 10));
                 return;
             }
-
             const filteredOptions = formattedProviderOptions.filter((option) =>
                 option.label.toLowerCase().includes(inputValue.toLowerCase())
             );
@@ -733,11 +764,9 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 callback(formattedConsultationRoomOptions.slice(0, 10));
                 return;
             }
-
             const filteredOptions = formattedConsultationRoomOptions.filter((option) =>
                 option.label.toLowerCase().includes(inputValue.toLowerCase())
             );
-
             callback(filteredOptions.slice(0, 20));
         },
         [formattedConsultationRoomOptions]
@@ -770,19 +799,45 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 callback(formattedReasonOptions.slice(0, 30));
                 return;
             }
-
             const filteredOptions = formattedReasonOptions.filter((option) =>
                 option.label.toLowerCase().includes(inputValue.toLowerCase())
             );
-
             callback(filteredOptions.slice(0, 40));
         },
         [formattedReasonOptions]
     );
 
+    const loadConsentFormOptions = useCallback(
+        (inputValue, callback) => {
+            const options = store?.getConsentFormReducer?.data?.documents?.map((form) => ({
+                value: form?._id,
+                label: form?.title,
+                data: form
+            })) || [];
+
+            if (!inputValue) {
+                callback(options);
+                return;
+            }
+
+            const filteredOptions = options.filter((option) =>
+                option.label.toLowerCase().includes(inputValue.toLowerCase())
+            );
+            callback(filteredOptions);
+        },
+        [store?.getConsentFormReducer?.data?.documents]
+    );
+
+    const handleViewConsentForm = useCallback((consentForm) => {
+        if (consentForm?.consentDocument?.url) {
+            window.open(consentForm?.consentDocument?.url?.split('?')[0], '_blank');
+        }
+    }, []);
+
     const closeHolidayModal = () => {
         setShowHolidayModal(false);
     };
+
     const closeConsultationModal = () => {
         setConsultationModal(false);
     };
@@ -1126,6 +1181,99 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         ))}
                                     </Form.Control>
                                     {errors.status && <span className="text-danger mt-1 small">{errors.status.message}</span>}
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="mb-0">
+                                        Consent Form
+                                    </Form.Label>
+                                    <div className="position-relative">
+                                        <AsyncSelect
+                                            loadOptions={loadConsentFormOptions}
+                                            defaultOptions={store?.getConsentFormReducer?.data?.documents?.slice(0, 10)?.map((form) => ({
+                                                value: form?._id,
+                                                label: form?.title,
+                                                data: form
+                                            })) || []}
+                                            onInputChange={(inputValue) => dispatch(getConsentFormAction({ search: inputValue || '' }))}
+                                            isSearchable
+                                            isMulti
+                                            className="basic-multi-select"
+                                            classNamePrefix="select"
+                                            placeholder="Select Consent Forms"
+                                            value={selectedConsentForm}
+                                            onChange={handleConsentFormChange}
+                                            noOptionsMessage={() => 'No consent forms available'}
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    minHeight: '30px',
+                                                    border: 'none',
+                                                    outline: 'none',
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontSize: '12px',
+                                                }),
+                                                multiValue: (provided) => ({
+                                                    ...provided,
+                                                    backgroundColor: '#e9ecef',
+                                                    borderRadius: '3px',
+                                                }),
+                                                multiValueLabel: (provided) => ({
+                                                    ...provided,
+                                                    fontSize: '12px',
+                                                }),
+                                            }}
+                                            formatOptionLabel={(option, { context }) => (
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    <span>{option.label}</span>
+                                                    {context === 'menu' && option.data?.document?.url && (
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-outline-primary ms-2"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleViewConsentForm(option.data);
+                                                            }}
+                                                            style={{ fontSize: '10px', padding: '2px 6px' }}
+                                                        >
+                                                            View
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+                                        />
+                                        <input
+                                            type="hidden"
+                                            {...register('consentForm')}
+                                            value={JSON.stringify(selectedConsentForm?.map(option => option.value) || [])}
+                                        />
+                                    </div>
+                                    {selectedConsentForm?.length > 0 && (
+                                        <div className="mt-2">
+                                            <small className="text-muted">Selected forms:</small>
+                                            <div className="d-flex flex-wrap gap-1 mt-1">
+                                                {selectedConsentForm?.map((form, index) => (
+                                                    <span key={index} className="badge bg-light text-dark border d-flex align-items-center">
+                                                        {form?.label}
+                                                        {form?.data?.consentDocument?.url && (
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm p-0 ms-1"
+                                                                onClick={() => handleViewConsentForm(form.data)}
+                                                                style={{ fontSize: '10px', color: '#007bff' }}
+                                                                title="View consent form"
+                                                            >
+                                                                <i className="bi bi-eye"></i>
+                                                            </button>
+                                                        )}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </Form.Group>
                             </Col>
                         </Row>

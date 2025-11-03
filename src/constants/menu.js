@@ -108,6 +108,12 @@ const MENU_ITEMS = [
         url: '/apps/settings/list',
         children: [
             {
+                key: 'consent',
+                label: 'Consent',
+                url: '/apps/settings/consent',
+                parentKey: 'setting',
+            },
+            {
                 key: 'department',
                 label: 'Department',
                 url: '/apps/settings/department',

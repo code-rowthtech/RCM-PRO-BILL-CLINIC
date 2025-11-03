@@ -254,19 +254,15 @@ const UpdatePatientIndex = () => {
         const canvas = canvasRef.current;
         const video = videoRef.current;
         if (!canvas || !video) return;
-
         const context = canvas.getContext('2d');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
         canvas.toBlob(async (blob) => {
             if (!blob) return;
-
             const file = new File([blob], `profile-photo-${Date.now()}.png`, {
                 type: 'image/png',
             });
-
             try {
                 const url = await handleUpload(file, setUploading);
                 setLogo(url);
@@ -275,7 +271,6 @@ const UpdatePatientIndex = () => {
                 console.error('Error uploading photo:', error);
             }
         }, 'image/png');
-
         stopCamera();
     }, [stopCamera]);
 
@@ -289,12 +284,11 @@ const UpdatePatientIndex = () => {
                 }
                 : {}),
         };
-
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     }, [logo, patientDetails, id, logoName, dispatch]);
 
     return (
-        <div className=" g-0  px-0 mx-0">
+        <div className="g-0 px-0 mx-0">
             <div className="page-height g-0 px-0 mx-0">
                 <div className="row mb-2">
                     {loading && id !== patientDetails?._id ? (
@@ -304,7 +298,7 @@ const UpdatePatientIndex = () => {
                             <Spinner />
                         </div>
                     ) : (
-                        <Row className=" align-items-stretch  pe-0">
+                        <Row className="align-items-stretch  pe-0">
                             <Col xs={12} className={`mb-0 ${expanded ? 'd-none' : ''} pe-0 ps-0`}>
                                 <>
                                     <ul
@@ -324,7 +318,7 @@ const UpdatePatientIndex = () => {
                                                 onClick={(e) => handleMenuItemClick(item, e)}>
                                                 <div>
                                                     <span className="px-1 d-flex gap-2 align-items-center justify-content-center">
-                                                        {item.label}
+                                                        {item?.label}
                                                         {item?.subItems && (
                                                             <span>
                                                                 {activeSubmenu === item.label ? (

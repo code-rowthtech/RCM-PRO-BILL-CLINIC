@@ -196,7 +196,7 @@ const AddAllergy = ({ onCancel }) => {
     };
     const handleSuggestionSelect = (suggestionText) => {
         // Append suggestion to existing note
-        const current = getValues('note'); // from useFormContext or pass as prop
+        const current = getValues('note') || ''; // Handle undefined case
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
 

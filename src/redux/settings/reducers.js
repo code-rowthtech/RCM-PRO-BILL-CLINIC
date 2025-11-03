@@ -4,7 +4,6 @@ const CREATE_MASTERS_DATA_INITIAL_STATE = {
     data: [],
     loading: false,
 };
-
 const GET_MASTERS_DATA_INITIAL_STATE = {
     data1: {
         data: [],
@@ -20,6 +19,24 @@ const GET_DEPARTMENT_DATA_INITIAL_STATE = {
     loading: false,
 };
 const UPDATE_MASTERS_DATA_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
+// CONSENT FORM INITIAL STATES
+const CREATE_CONSENT_FORM_INITIAL = {
+    data: [],
+    loading: false,
+};
+const UPDATE_CONSENT_FORM_INITIAL = {
+    data: [],
+    loading: false,
+};
+const DELETE_CONSENT_FORM_INITIAL = {
+    data: [],
+    loading: false,
+};
+const GET_CONSENT_FORM_INITIAL = {
     data: [],
     loading: false,
 };
@@ -157,5 +174,109 @@ export const updateMastersDataReducer = (state = UPDATE_MASTERS_DATA_INITIAL_STA
             };
         default:
             return { ...state };
+    }
+};
+
+// CONSENT FORM REDUCERS
+export const createConsentFormReducer = (state = CREATE_CONSENT_FORM_INITIAL, action) => {
+    switch (action.type) {
+        case SettingsActionTypes.CREATE_CONSENT_FORM_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case SettingsActionTypes.CREATE_CONSENT_FORM_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case SettingsActionTypes.CREATE_CONSENT_FORM_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case SettingsActionTypes.CREATE_CONSENT_FORM_ERROR:
+            return {
+                data: action?.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const updateConsentFormReducer = (state = UPDATE_CONSENT_FORM_INITIAL, action) => {
+    switch (action.type) {
+        case SettingsActionTypes.UPDATE_CONSENT_FORM_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case SettingsActionTypes.UPDATE_CONSENT_FORM_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case SettingsActionTypes.UPDATE_CONSENT_FORM_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case SettingsActionTypes.UPDATE_CONSENT_FORM_ERROR:
+            return {
+                data: action?.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const deleteConsentFormReducer = (state = DELETE_CONSENT_FORM_INITIAL, action) => {
+    switch (action.type) {
+        case SettingsActionTypes.DELETE_CONSENT_FORM_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case SettingsActionTypes.DELETE_CONSENT_FORM_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case SettingsActionTypes.DELETE_CONSENT_FORM_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case SettingsActionTypes.DELETE_CONSENT_FORM_ERROR:
+            return {
+                data: action?.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const getConsentFormReducer = (state = GET_CONSENT_FORM_INITIAL, action) => {
+    switch (action.type) {
+        case SettingsActionTypes.GET_CONSENT_FORM_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case SettingsActionTypes.GET_CONSENT_FORM_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case SettingsActionTypes.GET_CONSENT_FORM_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
     }
 };
