@@ -1092,7 +1092,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
             </div>
             <div className="d-flex gap-3 align-items-center justify-content-end mt-4 pt-3 border-top">
                 <Button
-                    variant="outline-secondary"
+                    className="cancel-button"
                     type="button"
                     onClick={() => reset()}
                     disabled={store?.updatePatientsReducer?.loading}
@@ -1100,8 +1100,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                     Reset Form
                 </Button>
                 <Button
-                    variant="primary"
-                    className="px-4"
+                    className="custom-buttons"
                     disabled={store?.updatePatientsReducer?.loading}
                     type="submit"
                 >

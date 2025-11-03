@@ -115,14 +115,12 @@ const Demographicdetails = ({
         });
         const payload = {
             id: patientId,
-            birthSex: [
-                {
-                    ...selectedSexOption,
-                    code: selectedSexOption?.value,
-                    display: selectedSexOption?.label,
-                    system: selectedSexOption?.system,
-                },
-            ],
+            birthSex: {
+                ...selectedSexOption,
+                code: selectedSexOption?.value,
+                display: selectedSexOption?.label,
+                system: selectedSexOption?.system,
+            },
             genderIdentity: [
                 {
                     ...selectedGenderIdentity,
