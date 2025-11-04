@@ -86,3 +86,8 @@ export function getDocumentsByIdApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.documents}/${data?.docId}`);
 }
+
+export function getPatientConsentApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getPatientConsent}?subject=${data?.patientId || ''}`)
+}

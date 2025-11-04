@@ -77,6 +77,14 @@ const GET_DOCUMENTS_BY_ID_INITIAL_STATE = {
     data: [],
     loading: false
 }
+
+const GET_PATIENT_CONSENT_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
+
+
 export const getPatientsReducer = (state = GET_PATIENTS_INITIAL_STATE, action) => {
     switch (action.type) {
         case PatientsActionTypes.GET_PATIENTS_LOADING:
@@ -492,3 +500,25 @@ export const getDocumentsByIdReducer = (state = GET_DOCUMENTS_BY_ID_INITIAL_STAT
             return state;
     }
 };
+
+export const getPatientConsentReducer = (state = GET_PATIENT_CONSENT_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.GET_PATIENT_CONSENT_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case PatientsActionTypes.GET_PATIENT_CONSENT_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.GET_PATIENT_CONSENT_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+
+        default: return state
+    }
+}

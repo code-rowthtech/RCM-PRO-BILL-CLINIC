@@ -1337,3 +1337,17 @@ option {
     color: #727cf5 !important;
     font-size: 16px !important;
 }
+
+.consent-offcanvas .offcanvas-body {
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
+}
+
+/* .consent-offcanvas h6 {
+    color: #0d6efd;
+} */
+
+.consent-offcanvas a:hover {
+    transform: scale(1.1);
+    transition: all 0.2s ease-in-out;
+}

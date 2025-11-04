@@ -66,6 +66,7 @@ export const getResponsiblePartyById = `${BaseRoute}/responsible-party-getByPati
 export const createInsurance = `${BaseRoute}/createInsurances`;
 export const getInsuranceById = `${BaseRoute}/getInsuranceByPatientId`;
 export const updateInsurance = `${BaseRoute}/updateInsurances`;
+export const getPatientConsent = `${BaseRoute}/consent`
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/';
@@ -187,3 +188,4 @@ export const createnoteTypeSettings = `${BaseRoute}/notes-type-settings/`;
 export const templates = `${BaseRoute}/notes-templates`;
 // Documents
 export const documents = `${BaseRoute}/documents`;
+
