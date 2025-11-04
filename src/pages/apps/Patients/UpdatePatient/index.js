@@ -30,6 +30,8 @@ import DrugInteraction from './DrugInteractions/DrugInteraction';
 import ModalPrint from './ModalOfPrintPdf/ModalPrint';
 import TaskListing from './TaskList/TaskListing';
 import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
+import { FaFileSignature } from 'react-icons/fa6';
+import ConsentOffCanvas from './ConsentOffCanvas';
 
 const UpdatePatientIndex = () => {
     // Imports initialization
@@ -58,6 +60,7 @@ const UpdatePatientIndex = () => {
     const [activeKey, setActiveKey] = useState('0');
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [showPrintModal, setShowPrintModal] = useState(false);
+    const [showConsent, setShowConsent] = useState(false);
 
     const [encounterTabs, setEncounterTabs] = useState([
         {
@@ -623,6 +626,7 @@ const UpdatePatientIndex = () => {
                                                                 </Button>
 
                                                                 <div className="mt-1 d-flex justify-content-center align-items-center gap-2 ps-2">
+                                                                    <FaFileSignature className='cursor-pointer text-primary' onClick={() => setShowConsent(true)} />
                                                                     <IoPrintSharp
                                                                         className="fs-4 text-primary cursor-pointer "
                                                                         title="Print"
@@ -630,6 +634,7 @@ const UpdatePatientIndex = () => {
                                                                     />
                                                                     <LiaReceiptSolid className="fs-4  text-primary" />
                                                                 </div>
+                                                                <ConsentOffCanvas show={showConsent} handleClose={() => setShowConsent(false)} />
                                                             </div>
                                                         </Col>
                                                     </Row>

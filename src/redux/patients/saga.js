@@ -16,7 +16,7 @@ import {
     uploadDocumentsApi,
     updateDocumentsApi,
     deleteDocumentsApi,
-    getDocumentsByIdApi,
+    getDocumentsByIdApi, getPatientConsentApi
 } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
@@ -512,6 +512,32 @@ function* getDocumentsByIdFunction(data) {
     }
 }
 
+function* getPatientConsentFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.GET_PATIENT_CONSENT_LOADING,
+            payload: {},
+        });
+        const response = yield call(getPatientConsentApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: PatientsActionTypes.GET_PATIENT_CONSENT_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.GET_PATIENT_CONSENT_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: PatientsActionTypes.GET_PATIENT_CONSENT_ERROR,
+            payload: error,
+        });
+    }
+}
 // export function* callResetUpdate() {
 //     put({
 //         type: PatientsActionTypes.RESET_UPDATE_STATUS,
@@ -581,6 +607,10 @@ export function* watchGetDocumentById() {
     yield takeEvery(PatientsActionTypes.GET_DOCUMENTS_BY_ID, getDocumentsByIdFunction);
 }
 
+export function* watchGetPatientConsent() {
+    yield takeEvery(PatientsActionTypes.GET_PATIENT_CONSENT, getPatientConsentFunction);
+}
+
 // export function* watchresetState() {
 //     yield takeEvery(PatientsActionTypes.RESET_UPDATE_STATUS, callResetUpdate);
 // }
@@ -603,6 +633,7 @@ function* patientsSaga() {
         fork(watchGetDocuments),
         fork(watchDeleteDocuments),
         fork(watchGetDocumentById),
+        fork(watchGetPatientConsent)
         // fork(watchresetState),
     ]);
 }
