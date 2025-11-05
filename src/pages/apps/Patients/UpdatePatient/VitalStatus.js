@@ -43,12 +43,12 @@ const formatDate = (dateString) => {
 
 export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem, convertFromImperial, convertToImperial }) {
     const dispatch = useDispatch();
-    const store = useSelector((state) => state);
+    const patientVitals = useSelector((state) => state?.getVitalsByPatientIdReducer?.data?.data) || [];
+    const loading = useSelector((state) => state?.getVitalsByPatientIdReducer?.loading);
     const [vitals, setVitals] = useState(defaultVitals);
     // const [newVital, setNewVital] = useState('');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
-    const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
 
     const [editingDate, setEditingDate] = useState(null);
     const now = new Date();
@@ -611,7 +611,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
             overflowX: 'auto',
             overflowY: 'auto'
         }}>
-            <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >
+            <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${loading ? 'opacity-50' : ''}`} >
                 <thead>
                     <tr className='border'>
                         <th className='text-white'>
@@ -782,7 +782,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                         </tr>
                     ))}
                 </tbody>
-                {store?.getVitalsByPatientIdReducer?.loading &&
+                {loading &&
                     <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
                         <Spinner />
                     </div>

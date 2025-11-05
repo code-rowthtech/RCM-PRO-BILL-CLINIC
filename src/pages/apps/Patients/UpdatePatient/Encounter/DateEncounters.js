@@ -3,10 +3,10 @@
 // ============================================================================
 
 // React and Hooks
-import React, { useCallback, useEffect, useRef, useState, createRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState, createRef, useMemo } from 'react';
 
 // UI Components
-import { Col, Button, Row, Form } from 'react-bootstrap';
+import { Col, Button, Table, Row, Form, Accordion, Modal } from 'react-bootstrap';
 import Select from 'react-select';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -15,6 +15,7 @@ import 'react-quill/dist/quill.snow.css';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     createEncounterAction,
+    getAppointmentsAction,
     getDoctorsAction,
     getEncounterAction,
     getEncounterByIdAction,
@@ -40,7 +41,11 @@ import EncounterSummary from './EncounterSummary';
 import EncounterTemplates from './EncounterTemplates';
 import PastEncounters from './PastEncounters';
 import ChangeNoteTypeModal from './ChangeNoteTypeModal';
+import VitalsChart from './VitalsChart';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
+import VitalStatus from '../VitalStatus';
+import { getVitalsByPatientIdAction } from '../../../../../redux/actions';
+import { defaultVitals } from '../../../../../utils/DataSets/commonData2';
 
 // ============================================================================
 // CONSTANTS
@@ -68,7 +73,8 @@ const DateEncounters = ({
     encounterTabs,
     setEncounterTabs,
     setActiveTab,
-    setExpanded
+    setExpanded,
+    expandAllAccordions
 }) => {
     // ========================================================================
     // HOOKS AND STATE
@@ -93,6 +99,9 @@ const DateEncounters = ({
     const [selectedProvider, setSelectedProvider] = useState(null);
     const [updateClicked, setUpdateClicked] = useState(false);
     const [providerError, setProviderError] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [appointmentError, setAppointmentError] = useState(false);
+    const [consentDocuments, setConsentDocuments] = useState([]);
 
     // Modal state
     const [notesTypeModal, setNotesTypeModal] = useState(false);
@@ -106,6 +115,18 @@ const DateEncounters = ({
     // File upload state
     const [attachedRecords, setAttachedRecords] = useState([]);
     const [uploadLoading, setUploadLoading] = useState(false);
+
+    // Accordion state for individual sections
+    const [accordionState, setAccordionState] = useState({});
+
+    // Vitals state
+    const [vitalsModal, setVitalsModal] = useState(false);
+    const [unitSystem, setUnitSystem] = useState('imperial');
+    const [vitals] = useState(defaultVitals);
+    const [effectiveDateTime, setEffectiveDateTime] = useState('');
+
+    // Scroll position preservation
+    const scrollPositionRef = useRef(0);
 
     // ========================================================================
     // DERIVED STATE FROM STORE
@@ -134,6 +155,15 @@ const DateEncounters = ({
     const createEncounterData = store?.createEncounterReducer;
     const updateEncounterData = store?.updateEncounterReducer;
 
+
+    // APPOINTMENTS DATA
+    const appointmentsData = store?.getAppointmentsReducer?.data?.appointments;
+    const appointmentOptions = appointmentsData?.map((data) => ({
+        value: data?._id,
+        label: `${data?.appointmentType || 'Appointment'} - ${data?.start ? new Date(data.start).toLocaleDateString() : ''}`,
+        consentDocument: data?.consentDocument || []
+    }))
+
     // Notes and settings data
     const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
     const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
@@ -143,6 +173,23 @@ const DateEncounters = ({
     }));
     const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
+
+    // Vitals data
+    const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
+    const groupedVitals = useMemo(() => {
+        return patientVitals?.reduce((acc, vitalGroup) => {
+            const date = vitalGroup.effectiveDateTime;
+            if (!acc[date]) {
+                acc[date] = [];
+            }
+            acc[date].push(...vitalGroup.vitals);
+            return acc;
+        }, {}) || {};
+    }, [patientVitals]);
+
+    const sortedDates = useMemo(() => {
+        return Object.keys(groupedVitals).sort((a, b) => new Date(b) - new Date(a));
+    }, [groupedVitals]);
 
     // ========================================================================
     // FIELD POPULATION SYSTEM
@@ -245,6 +292,15 @@ const DateEncounters = ({
         reset
     ]);
 
+    useEffect(() => {
+        dispatch(getAppointmentsAction({
+            patientId: id,
+            status: '',
+            limit: 10,
+            skip: 1,
+        }))
+    }, [dispatch])
+
     // Load encounter data for update
     useEffect(() => {
         if (encounterAction === 'updateEncounter') {
@@ -254,7 +310,6 @@ const DateEncounters = ({
 
     // Set default note type and populate form for update 
     useEffect(() => {
-        // Set default note type
         if (!noteType && defaultNoteTypeOption) {
             setNoteType(defaultNoteTypeOption.value);
             dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption.value }));
@@ -269,7 +324,6 @@ const DateEncounters = ({
             if (encounterData?.noteType) {
                 setNoteType(encounterData?.noteType);
             }
-
             // Set basic form values
             if (encounterData?.type?.[0]?.coding?.[0]) {
                 setValue('type', encounterData?.type?.[0]?.coding?.[0]?.code);
@@ -283,8 +337,6 @@ const DateEncounters = ({
             if (encounterData?.period?.start) {
                 setValue('startDate', encounterData?.period?.start?.split('T')[0]);
             }
-
-            // Set note fields
             if (encounterData?.data && Array.isArray(encounterData?.data)) {
                 encounterData?.data?.forEach(field => {
                     if (field?.type && field?.content?.value) {
@@ -312,6 +364,100 @@ const DateEncounters = ({
     // ========================================================================
     // UTILITY FUNCTIONS
     // ========================================================================
+
+    // Vitals utility functions
+    const formatDate = (dateString) => {
+        const options = { day: 'numeric', month: 'short' };
+        return new Date(dateString).toLocaleDateString('en-GB', options);
+    };
+
+    const imperialUnits = {
+        Temperature: '°F',
+        Height: 'in',
+        Weight: 'lbs',
+        'Head Circumference': 'in',
+    };
+
+    const metricUnits = {
+        Temperature: '°C',
+        Height: 'cm',
+        Weight: 'kg',
+        'Head Circumference': 'cm',
+    };
+
+    const convertFromImperial = (value, vitalName) => {
+        if (vitalName === 'Height') return (value * 2.54).toFixed(2);
+        if (vitalName === 'Weight') return (value / 2.20462).toFixed(2);
+        if (vitalName === 'Temperature') return (((value - 32) * 5) / 9).toFixed(2);
+        if (vitalName === 'Head Circumference') return (value * 2.54).toFixed(2);
+        return value;
+    };
+
+    const getDisplayUnit = (vital) => {
+        if (vital.unitKey) {
+            return unitSystem === 'imperial' ? imperialUnits[vital.unitKey] : metricUnits[vital.unitKey];
+        }
+        return vital.unit || '';
+    };
+
+    const findVitalValue = (vitalName, date) => {
+        if (!groupedVitals[date]) return null;
+
+        const vital = groupedVitals[date].find(v =>
+            v.code?.coding?.[0]?.display === vitalName ||
+            v.code?.text === vitalName
+        );
+
+        if (!vital) return null;
+
+        if (vital.component && vital.component.length > 0) {
+            const systolic = vital.component.find(c =>
+                c.code?.coding?.[0]?.code === "8480-6"
+            )?.valueQuantity?.value;
+
+            const diastolic = vital.component.find(c =>
+                c.code?.coding?.[0]?.code === "8462-4"
+            )?.valueQuantity?.value;
+
+            return { systolic: systolic || '', diastolic: diastolic || '' };
+        }
+
+        let value = vital.valueQuantity?.value || vital.valueString || '';
+
+        if (unitSystem === 'metric') {
+            if (vitalName === 'Height') {
+                value = convertFromImperial(value, 'Height');
+            }
+            else if (vitalName === 'Weight') {
+                value = convertFromImperial(value, 'Weight');
+            }
+            else if (vitalName === 'Temperature') {
+                value = convertFromImperial(value, 'Temperature');
+            }
+        }
+
+        return value;
+    };
+
+    const renderVitalCell = (vital, date) => {
+        const value = findVitalValue(vital.name, date);
+
+        if (vital.type === 'bp') {
+            const bpValue = value || { systolic: '', diastolic: '' };
+            return (
+                <div className="d-flex">
+                    <span>{bpValue.systolic || '-'}</span>
+                    <span>/</span>
+                    <span>{bpValue.diastolic || '-'}</span>
+                </div>
+            );
+        }
+        return value || '-';
+    };
+
+    const closeVitalsModal = () => {
+        setVitalsModal(false);
+    };
 
     const handleFileUpload = async (files) => {
         const fileArray = Array.from(files);
@@ -359,9 +505,36 @@ const DateEncounters = ({
         }, 0);
     }, [selectedFromList, setValue]);
 
+    // Save scroll position before loading state changes
+    useEffect(() => {
+        const handleScroll = () => {
+            scrollPositionRef.current = window.scrollY;
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Restore scroll position after loading completes
+    useEffect(() => {
+        if (!store?.getEncounterNotesFieldsReducer?.loading && scrollPositionRef.current) {
+            window.scrollTo(0, scrollPositionRef.current);
+        }
+    }, [store?.getEncounterNotesFieldsReducer?.loading]);
+
     // ========================================================================
     // COMPONENTS
     // ========================================================================
+
+    // Initialize accordion state when fields load
+    useEffect(() => {
+        if (notesFields) {
+            const initialState = {};
+            notesFields.forEach((field, index) => {
+                initialState[index] = expandAllAccordions;
+            });
+            setAccordionState(initialState);
+        }
+    }, [notesFields, expandAllAccordions]);
 
     // Note Form Fields Component
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
@@ -375,7 +548,6 @@ const DateEncounters = ({
             Notes: createRef(),
         });
 
-
         // Word limit validation for ReactQuill editors
         useEffect(() => {
             SOAP_SECTIONS.forEach(section => {
@@ -386,7 +558,6 @@ const DateEncounters = ({
 
                 editor.on('text-change', (delta, oldDelta, source) => {
                     if (source !== 'user') return;
-
                     setTimeout(() => {
                         const contents = editor.getContents();
                         const text = editor.getText().trim();
@@ -515,21 +686,23 @@ const DateEncounters = ({
                                 {populatedFields[section] && populatedFields[section].length > 0 && (
                                     <div className="mb-2">
                                         <small className="text-muted">{`Auto-populated data:`}</small>
-                                        {populatedFields[section].map((data, index) => (
-                                            <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
-                                                <small className="text-truncate" title={data}>{data}</small>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    className="p-0 ms-2"
-                                                    style={{ width: '20px', height: '20px', fontSize: '10px' }}
-                                                    onClick={() => removePopulatedData(section, data)}
-                                                    title="Remove this data"
-                                                >
-                                                    ×
-                                                </Button>
-                                            </div>
-                                        ))}
+                                        <div style={{ maxHeight: '15vh', overflowY: 'auto', scrollbarWidth: 'thin' }}>
+                                            {populatedFields[section].map((data, index) => (
+                                                <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
+                                                    <small className="text-truncate" title={data}>{data}</small>
+                                                    <Button
+                                                        variant="outline-danger"
+                                                        size="sm"
+                                                        className="p-0 ms-2"
+                                                        style={{ width: '20px', height: '20px', fontSize: '10px' }}
+                                                        onClick={() => removePopulatedData(section, data)}
+                                                        title="Remove this data"
+                                                    >
+                                                        ×
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                                 <Controller
@@ -554,6 +727,15 @@ const DateEncounters = ({
                                 />
                             </Form.Group>
                         ))}
+                    </div>
+                );
+            }
+
+            // Render Vitals field with chart/table
+            if (name === 'Vitals' || name.toLowerCase().includes('vital')) {
+                return (
+                    <div key={name}>
+                        <VitalsChart />
                     </div>
                 );
             }
@@ -613,7 +795,7 @@ const DateEncounters = ({
             return (
                 <Form.Group key={name}>
                     <Form.Label className="mb-0 d-flex align-items-center justify-content-between">
-                        <p className='mb-0'>{name}</p>
+                        <p className='mb-0'></p>
                         <Controller
                             name={name}
                             control={control}
@@ -627,83 +809,88 @@ const DateEncounters = ({
                             }}
                         />
                     </Form.Label>
-                    {/* Show populated data with remove options */}
-                    {populatedFields[name] && populatedFields[name].length > 0 && (
-                        <div className="mb-2">
-                            <small className="text-muted">{`Auto-populated data:`}</small>
-                            {populatedFields[name].map((data, index) => (
-                                <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
-                                    <small className="text-truncate" title={data}>{data}</small>
-                                    <Button
-                                        variant="outline-danger"
-                                        size="sm"
-                                        className="p-0 ms-2"
-                                        style={{ width: '20px', height: '20px', fontSize: '10px' }}
-                                        onClick={() => removePopulatedData(name, data)}
-                                        title="Remove this data"
-                                    >
-                                        ×
-                                    </Button>
+                    <Row>
+                        <Col sm={populatedFields[name] && populatedFields[name].length > 0 ? 6 : 12}>
+                            {inputType === 'text-editor' ? (
+                                <Controller
+                                    name={name}
+                                    control={control}
+                                    render={({ field: { onChange, value } }) => (
+                                        <ReactQuill
+                                            theme="snow"
+                                            value={value || ''}
+                                            onChange={onChange}
+                                            modules={{
+                                                toolbar: [
+                                                    ['bold', 'italic', 'underline'],
+                                                    [{ list: 'ordered' }, { list: 'bullet' }],
+                                                    ['link'],
+                                                    ['clean'],
+                                                ],
+                                            }}
+                                        />
+                                    )}
+                                />
+                            ) : (
+                                <Controller
+                                    name={name}
+                                    control={control}
+                                    render={({ field: { value = '', onChange } }) => (
+                                        <Form.Control
+                                            as={inputType === 'text' ? 'input' : 'textarea'}
+                                            rows={inputType === 'text' ? undefined : populatedFields[name]?.length > 3 ? 8 : 3}
+                                            value={value}
+                                            onChange={(e) => {
+                                                const input = e.target.value;
+                                                const words = input.match(/\S+/g) || [];
+                                                const wordCount = words.length;
+                                                const lastWordMatch = input.match(/(\S+)$/);
+                                                const lastWord = lastWordMatch ? lastWordMatch[0] : '';
+
+                                                if (wordCount < MAX_WORDS) {
+                                                    onChange(input);
+                                                    return;
+                                                }
+
+                                                if (wordCount === MAX_WORDS) {
+                                                    if (lastWord.length <= MAX_WORD_LENGTH && /\S$/.test(input)) {
+                                                        onChange(input);
+                                                    } else if (lastWord.length > MAX_WORD_LENGTH) {
+                                                        ToastHandle(`Word "${lastWord}" exceeds max ${MAX_WORD_LENGTH} characters`, 'warning');
+                                                    }
+                                                } else {
+                                                    ToastHandle(`Maximum word limit of ${MAX_WORDS} exceeded`, 'warning');
+                                                }
+                                            }}
+                                        />
+                                    )}
+                                />
+                            )}
+                        </Col>
+                        {populatedFields[name] && populatedFields[name].length > 0 && (
+                            <Col sm={6}>
+                                <div className="mb-2">
+                                    <div style={{ maxHeight: '15vh', overflowY: 'auto', scrollbarWidth: 'thin' }}>
+                                        {populatedFields[name].map((data, index) => (
+                                            <div key={index} className="d-flex align-items-center justify-content-between bg-light p-1 mt-1 rounded">
+                                                <small className="text-truncate" title={data}>{data}</small>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    className="p-0 ms-2"
+                                                    style={{ width: '20px', height: '20px', fontSize: '10px' }}
+                                                    onClick={() => removePopulatedData(name, data)}
+                                                    title="Remove this data"
+                                                >
+                                                    ×
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                    {inputType === 'text-editor' ? (
-                        <Controller
-                            name={name}
-                            control={control}
-                            render={({ field: { onChange, value } }) => (
-                                <ReactQuill
-                                    theme="snow"
-                                    value={value || ''}
-                                    onChange={onChange}
-                                    modules={{
-                                        toolbar: [
-                                            ['bold', 'italic', 'underline'],
-                                            [{ list: 'ordered' }, { list: 'bullet' }],
-                                            ['link'],
-                                            ['clean'],
-                                            ['undo', 'redo'],
-                                        ],
-                                    }}
-                                />
-                            )}
-                        />
-                    ) : (
-                        <Controller
-                            name={name}
-                            control={control}
-                            render={({ field: { value = '', onChange } }) => (
-                                <Form.Control
-                                    as={inputType === 'text' ? 'input' : 'textarea'}
-                                    rows={inputType === 'text' ? undefined : 10}
-                                    value={value}
-                                    onChange={(e) => {
-                                        const input = e.target.value;
-                                        const words = input.match(/\S+/g) || [];
-                                        const wordCount = words.length;
-                                        const lastWordMatch = input.match(/(\S+)$/);
-                                        const lastWord = lastWordMatch ? lastWordMatch[0] : '';
-
-                                        if (wordCount < MAX_WORDS) {
-                                            onChange(input);
-                                            return;
-                                        }
-
-                                        if (wordCount === MAX_WORDS) {
-                                            if (lastWord.length <= MAX_WORD_LENGTH && /\S$/.test(input)) {
-                                                onChange(input);
-                                            } else if (lastWord.length > MAX_WORD_LENGTH) {
-                                                ToastHandle(`Word "${lastWord}" exceeds max ${MAX_WORD_LENGTH} characters`, 'warning');
-                                            }
-                                        } else {
-                                            ToastHandle(`Maximum word limit of ${MAX_WORDS} exceeded`, 'warning');
-                                        }
-                                    }}
-                                />
-                            )}
-                        />
-                    )}
+                            </Col>
+                        )}
+                    </Row>
                 </Form.Group>
             );
         };
@@ -716,7 +903,24 @@ const DateEncounters = ({
                     overflowY: 'auto',
                 }}
             >
-                {getFieldsToRender().map(field => renderField(field))}
+                <Accordion activeKey={Object.keys(accordionState).filter(key => accordionState[key])} alwaysOpen>
+                    {getFieldsToRender().map((field, index) => (
+                        <Accordion.Item className='mb-3' eventKey={index.toString()} key={index}>
+                            <Accordion.Header
+                                style={{ background: '#EEF2F7' }}
+                                className='encounter-accordion-header'
+                                onClick={() => setAccordionState(prev => ({ ...prev, [index]: !prev[index] }))}
+                            >
+                                <span className='text-capitalize p-2'>
+                                    {field.name}
+                                </span>
+                            </Accordion.Header>
+                            <Accordion.Body>
+                                {renderField(field)}
+                            </Accordion.Body>
+                        </Accordion.Item>
+                    ))}
+                </Accordion>
             </Row>
         );
     };
@@ -889,11 +1093,11 @@ const DateEncounters = ({
                             </Col>
                         </Row>
                         :
-                        <Form onSubmit={handleSubmit(onSubmit)}>
+                        <Form id="encounter-form" onSubmit={handleSubmit(onSubmit)}>
                             <Row
                                 style={{ height: '16.5vh' }}
                                 className="g-2 mt-0 bg-light rounded-top p-1">
-                                <Col sm={4} className='mt-0'>
+                                <Col sm={3} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
                                         <Form.Label className='mb-0 fw-bold small'>{`Encounter Type`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <div className="position-relative">
@@ -931,7 +1135,7 @@ const DateEncounters = ({
                                         )}
                                     </Form.Group>
                                 </Col>
-                                <Col sm={4} className='mt-0'>
+                                <Col sm={3} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
                                         <Form.Label className='mb-0 fw-bold small'>{`Encounter Class`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <div className="position-relative">
@@ -969,7 +1173,7 @@ const DateEncounters = ({
                                         )}
                                     </Form.Group>
                                 </Col>
-                                <Col sm={4} className='mt-0'>
+                                <Col sm={3} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
                                         <Form.Label className='mb-0 fw-bold small'>{`Note Type`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <Select
@@ -1010,7 +1214,7 @@ const DateEncounters = ({
                                     </Form.Group>
                                     <ChangeNoteTypeModal showModal={notesTypeModal} closeModal={closeNoteTypeModal} onConfirm={confirmSelection} />
                                 </Col>
-                                <Col sm={4} className='mt-0'>
+                                <Col sm={3} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
                                         <Form.Label className='mb-0 fw-bold small'>{`Start Date`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <div className="position-relative">
@@ -1038,7 +1242,7 @@ const DateEncounters = ({
                                         )}
                                     </Form.Group>
                                 </Col>
-                                <Col sm={4} className='mt-0'>
+                                <Col sm={3} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
                                         <Form.Label className='mb-0 fw-bold small'>{`Status`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <div className="position-relative">
@@ -1073,7 +1277,7 @@ const DateEncounters = ({
                                         )}
                                     </Form.Group>
                                 </Col>
-                                <Col sm={4} className='mt-0'>
+                                <Col sm={3} className='mt-0'>
                                     <Form.Group className='encounterHeaderGroup'>
                                         <Form.Label className='mb-0 fw-bold small'>{`Provider`} <span className='text-danger'>{`*`}</span></Form.Label>
                                         <Select
@@ -1124,6 +1328,62 @@ const DateEncounters = ({
                                         )}
                                     </Form.Group>
                                 </Col>
+                                <Col sm={3} className='mt-0'>
+                                    <Form.Group className='encounterHeaderGroup'>
+                                        <Form.Label className='mb-0 fw-bold small'>{`Related Appointment`} <span className='text-danger'>{`*`}</span></Form.Label>
+                                        <Select
+                                            options={appointmentOptions}
+                                            isSearchable
+                                            isClearable
+                                            isLoading={store?.getAppointmentsReducer?.loading}
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            placeholder="Select Appointment"
+                                            value={appointmentOptions?.find(option => option?.value === selectedAppointment) || null}
+                                            onChange={(selectedValue) => {
+                                                setSelectedAppointment(selectedValue?.value);
+                                                setAppointmentError(false);
+                                                if (selectedValue?.consentDocument) {
+                                                    setConsentDocuments(selectedValue.consentDocument);
+                                                } else {
+                                                    setConsentDocuments([]);
+                                                }
+                                                if (encounterAction === 'updateEncounter') {
+                                                    const payload = {
+                                                        id: encounterId,
+                                                        appointmentId: selectedValue?.value
+                                                    };
+                                                    dispatch(updateEncounterAction({ key: encryptMessage(payload), fieldUpdating: 'appointment' }));
+                                                }
+                                            }}
+                                            onInputChange={(value, { action }) => {
+                                                if (action === 'input-change') {
+                                                    dispatch(getAppointmentsAction({ status: true, search: value, page: 1, limit: 10 }));
+                                                }
+                                            }}
+                                            filterOption={null}
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    height: '30px',
+                                                    minHeight: '30px',
+                                                    border: '1px solid rgba(186, 185, 185, 0.762)',
+                                                    background: "white !important",
+                                                    textTransform: 'capitalize'
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontWeight: 'bold',
+                                                    fontSize: '12px',
+                                                    paddingBottom: '5px',
+                                                }),
+                                            }}
+                                        />
+                                        {appointmentError && (
+                                            <div className="text-danger small mt-0">{`This field is required`}</div>
+                                        )}
+                                    </Form.Group>
+                                </Col>
                             </Row>
                             {store?.getEncounterNotesFieldsReducer?.loading ?
                                 <div className="row">
@@ -1139,7 +1399,7 @@ const DateEncounters = ({
                                 />
                             }
                             {/* Form Actions */}
-                            <div className="row">
+                            {/* <div className="row">
                                 <div className="col-12 d-flex justify-content-end gap-2 py-2">
                                     <Button
                                         type='Submit'
@@ -1149,7 +1409,7 @@ const DateEncounters = ({
                                         {encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
                                     </Button>
                                 </div>
-                            </div>
+                            </div> */}
                         </Form>
                     }
                 </div>

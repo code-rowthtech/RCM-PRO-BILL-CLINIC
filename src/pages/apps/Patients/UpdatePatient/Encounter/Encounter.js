@@ -9,6 +9,8 @@ import { HiMiniBars3BottomLeft } from 'react-icons/hi2';
 import { CiSettings } from "react-icons/ci";
 import EncounterSettingsForm from './EncounterSettings';
 import { BiCollapse, BiExpand } from 'react-icons/bi';
+import { MdExpandMore, MdExpandLess, MdPrint, MdSave } from 'react-icons/md';
+import { FaFileInvoiceDollar } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { getDoctorsAction, getEncounterByIdAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
@@ -118,9 +120,22 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
     }, [dispatch, searchNoteType, store?.getEncounterNotesTypeReducer?.data?.data])
 
     const [showSettings, setShowSettings] = useState(false)
+    const [expandAllAccordions, setExpandAllAccordions] = useState(false);
     const closeSettings = () => {
         setShowSettings(false)
     }
+
+    const handlePrint = () => {
+        window.print();
+    };
+
+    const handleReadyForBilling = () => {
+        // Implement billing logic
+        console.log('Ready for billing');
+    };
+
+    const activeTabData = encounterTabs.find(tab => tab.id === activeTab);
+    const isFormTab = activeTabData?.type !== 'default';
 
     return (
         <div className="row">
@@ -168,11 +183,66 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                         </div>
                     ))}
                 </div>
-                {expanded ?
-                    <BiCollapse className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
-                    :
-                    <BiExpand className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
-                }
+                <div className="d-flex align-items-center gap-2">
+                    {isFormTab && (
+                        <>
+                            <Button
+                                size="sm"
+                                variant="outline-secondary"
+                                className="d-flex align-items-center gap-1 px-2 py-1"
+                                onClick={() => {
+                                    setExpandAllAccordions(!expandAllAccordions)
+                                    if (expandAllAccordions) {
+                                        setExpanded(true);
+                                        setIsCollapsed(true);
+                                    } else {
+                                        // setExpanded(false);
+                                        setIsCollapsed(false);
+                                    }
+                                }}
+                                title={expandAllAccordions ? 'Minimize All' : 'Expand All'}
+                            >
+                                <span className="small">{expandAllAccordions ? 'Minimize All' : 'Expand All'}</span>
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline-primary"
+                                className="d-flex align-items-center gap-1 px-2 py-1"
+                                onClick={handlePrint}
+                                title="Print"
+                            >
+                                <MdPrint size={18} />
+                                <span className="small">Print</span>
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline-success"
+                                className="d-flex align-items-center gap-1 px-2 py-1"
+                                form="encounter-form"
+                                type="submit"
+                                title="Save"
+                            >
+                                <MdSave size={18} />
+                                <span className="small">Save</span>
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline-info"
+                                className="d-flex align-items-center gap-1 px-2 py-1"
+                                onClick={handleReadyForBilling}
+                                title="Ready for Billing"
+                            >
+                                <FaFileInvoiceDollar size={16} />
+                                <span className="small">Billing</span>
+                            </Button>
+                        </>
+                    )}
+                    {expanded ?
+                        <BiCollapse className='text-primary fw-bold fs-4 cursor-pointer' onClick={() => setExpanded(!expanded)} />
+                        :
+                        <BiExpand className='text-primary fw-bold fs-4 cursor-pointer' onClick={() => setExpanded(!expanded)} />
+                    }
+                </div>
             </div>
 
             {/* Tab content */}
@@ -204,6 +274,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 setEncounterTabs={setEncounterTabs}
                                 setActiveTab={setActiveTab}
                                 setExpanded={setExpanded}
+                                expandAllAccordions={expandAllAccordions}
                             />
                         )}
                     </div>

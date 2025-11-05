@@ -179,7 +179,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                         )}
                         <li className="notification-list">
                             <select
-                                className="form-select mt-2 text-capitalize"
+                                className="form-select mt-1 text-capitalize"
                                 style={{
                                     minWidth: '15rem',
                                     maxWidth: '20rem',

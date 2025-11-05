@@ -1351,3 +1351,7 @@ option {
     transform: scale(1.1);
     transition: all 0.2s ease-in-out;
 }
+
+/* .encounter-accordion-header .accordion-button {
+    background: #f5f7fa;
+} */

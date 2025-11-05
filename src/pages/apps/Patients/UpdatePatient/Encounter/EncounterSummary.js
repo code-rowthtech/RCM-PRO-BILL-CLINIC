@@ -63,7 +63,6 @@ const EncounterSummary = () => {
         problems: true,
         medications: true,
     });
-    const [activeKey, setActiveKey] = useState("1");
 
     // CONSTANT DECLARATIONS
     const patientId = searchParams.get('id');
@@ -113,6 +112,7 @@ const EncounterSummary = () => {
         draft: 'text-muted',
         unknown: 'text-dark'
     };
+
     // Get sorted dates (newest first)
     const sortedDates = Object.keys(groupedVitals).sort((a, b) =>
         new Date(b) - new Date(a)
@@ -158,9 +158,7 @@ const EncounterSummary = () => {
         setMedicationModal(false);
     };
 
-    const handleToggle = (key) => {
-        setActiveKey(prev => (prev === key ? null : key)); // toggle open/close
-    };
+
 
     const closeVitalsModal = () => {
         setVitalsModal(false);
@@ -247,14 +245,13 @@ const EncounterSummary = () => {
                 </div>
             );
         }
-
         return value || '-';
     };
 
     return (
         <Row className='position-relative'>
             <Col sm={12} className='mt-1' >
-                <Accordion activeKey={activeKey} onSelect={handleToggle}>
+                <Accordion alwaysOpen>
                     {sortedSubMenuItems.map((menuItem) => {
                         if (!menuItem?.hide) return null; // Skip hidden items
                         const sectionKey = menuItem?.name.toLowerCase().replace(/\s+/g, '');
@@ -284,12 +281,12 @@ const EncounterSummary = () => {
                                                         const latestDate = sortedDates[0];
                                                         const value = findVitalValue(vital.name, latestDate);
                                                         if (value) {
-                                                            const formattedValue = vital.type === 'bp' ? `${value.systolic}/${value.diastolic}` : value;
+                                                            const formattedValue = vital?.type === 'bp' ? `${value?.systolic}/${value?.diastolic}` : value;
                                                             window.populateEncounterField?.('Monitoring Chart (Vitals)', `${vital.name}: ${formattedValue} ${getDisplayUnit(vital)}`);
                                                         }
                                                     }}>
                                                         <td className='p-0 vitalsTableBorder'>
-                                                            {vital.name} {getDisplayUnit(vital) && (
+                                                            {vital?.name} {getDisplayUnit(vital) && (
                                                                 <small className="text-muted">({getDisplayUnit(vital)})</small>
                                                             )}
                                                         </td>
@@ -335,7 +332,6 @@ const EncounterSummary = () => {
                                                         <Spinner className="spinner-border-sm" />
                                                     </div>
                                                 ) : (
-
                                                     <ul className="list-unstyled pb-0 mb-0">
                                                         {allergyData.slice(0, 4).map((allergy, index) => (
                                                             <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`)}>                                                                <div className="fs-6">
