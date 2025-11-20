@@ -45,9 +45,7 @@ const Doctors = () => {
             dispatch(getDoctorsAction(payload));
         }
     }, [updateStatus]);
-    const handleNewDoctor = () => {
-        navigate('/apps/providers/new-doctor');
-    };
+
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
@@ -55,6 +53,7 @@ const Doctors = () => {
         setStatus(isActive);
         dispatch(getDoctorsAction({ status: isActive, search: search, page: skip, limit: 10 }));
     };
+
     return (
         <>
             <Row className="mt-2">
@@ -76,7 +75,8 @@ const Doctors = () => {
                                             }`}>
                                         Inactive
                                         <span className={`fw-semibold p-1 fs-6 position-absolute fs-5 text-white  rounded-circle bg-primary `} style={{ right: '-14%', top: '-34%' }}>{store?.getDoctorsReducer?.data?.inactiveDoctors}</span>
-                                    </Button>                                </Col>
+                                    </Button>
+                                </Col>
 
                                 <Col sm={6} xs={6} className="text-end">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end ">
@@ -153,15 +153,11 @@ const Doctors = () => {
                                                 )}
                                             </div>
                                             <Button
-                                                onClick={handleNewDoctor}
+                                                onClick={() => navigate(`/apps/providers/new-doctor`)}
                                                 className="custom-buttons py- d-none d-md-block">
-                                                {`Add Provider`}
+                                                Add Provider
                                             </Button>
-                                            <Button
-                                                onClick={handleNewDoctor}
-                                                className="custom-buttons py d-block d-md-none">
-                                                {`+`}
-                                            </Button>
+
                                         </Col>
                                     </Row>
                                 </Col>

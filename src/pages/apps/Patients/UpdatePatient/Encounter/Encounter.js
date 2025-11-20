@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { IoClose } from 'react-icons/io5';
 import './Encounter.css';
@@ -16,6 +16,8 @@ import { getDoctorsAction, getEncounterByIdAction, getEncounterNotesTypeAction, 
 import { useSelector } from 'react-redux';
 import { decryptMessage } from '../../../../../cryptoUtils';
 import { formatDate } from '../../../../../helpers/dateFormat';
+import { handlePrintEncounters } from './handlePrintEncounter';
+import { useSearchParams } from 'react-router-dom';
 
 let decryptedUser = null;
 
@@ -35,6 +37,7 @@ if (encryptedData) {
 
 const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, createEncounter, setCreateEncounter, updateEncounter, setUpdateEncounter, isAccordionOpen }) => {
     const dispatch = useDispatch()
+    const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState(encounterTabs[0]?.id || '');
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [newEncounterModal, setNewEncounterModal] = useState(false);
@@ -42,6 +45,8 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
     const toggleCollapse = () => setIsCollapsed(!isCollapsed);
     const store = useSelector((state) => state);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    const id = searchParams.get('id');
+    const printRef = useRef();
     const closeNewEncounterModal = () => {
         setNewEncounterModal(false);
     }
@@ -126,7 +131,27 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
     }
 
     const handlePrint = () => {
-        window.print();
+        const activeTabData = encounterTabs.find(tab => tab.id === activeTab);
+
+        if (activeTabData?.type === 'updateEncounter') {
+            const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
+            const patientDetails = store?.getPatientByIdReducer?.data?.data;
+
+            if (encounterData && patientDetails) {
+                handlePrintEncounters(encounterData, patientDetails);
+            } else {
+                console.warn('Cannot print: Missing encounter data or patient details');
+            }
+        } else if (activeTabData?.type === 'createEncounter') {
+            // For create encounter, use the form print function
+            if (printRef.current) {
+                printRef.current();
+            } else {
+                console.warn('Cannot print: Print function not available');
+            }
+        } else {
+            console.warn('Cannot print: No active encounter selected');
+        }
     };
 
     const handleReadyForBilling = () => {
@@ -275,6 +300,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 setActiveTab={setActiveTab}
                                 setExpanded={setExpanded}
                                 expandAllAccordions={expandAllAccordions}
+                                onPrintRef={printRef}
                             />
                         )}
                     </div>

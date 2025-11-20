@@ -367,10 +367,15 @@ const Demographicdetails = ({
                 <IdentifierForm
                     defaultIdentifiers={[
                         {
-                            label: 'Social Security Number (SSN)',
-                            value: 'http://hl7.org/fhir/sid/us-ssn',
-                            code: 'SSN',
+                            label: '',
+                            value: '',
+                            code: '',
                         },
+                        // {
+                        //     label: 'Social Security Number (SSN)',
+                        //     value: 'http://hl7.org/fhir/sid/us-ssn',
+                        //     code: 'SSN',
+                        // },
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}

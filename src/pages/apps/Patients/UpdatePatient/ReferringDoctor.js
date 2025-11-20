@@ -2,23 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Row, InputGroup, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    // getStatesByCountryAction,
-    // getCitiesAction,
-    addReferringDoctorAction,
-    getPatientByIdAction,
-} from '../../../../redux/actions';
+import { addReferringDoctorAction, getPatientByIdAction } from '../../../../redux/actions';
 import us from '../../../../assets/images/flags/us.jpg';
 import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import AddressForm from '../../Common Pages/AddressForm';
 import { useSearchParams } from 'react-router-dom';
 
-const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
+const ReferringDoctor = ({ isAccordionOpen }) => {
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     const {
@@ -26,19 +20,16 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
         handleSubmit,
         formState: { errors },
         setValue,
-        reset,
         clearErrors,
-        watch,
     } = useForm();
+
     const [referringDoctorAddress, setReferringDoctorAddress] = useState([
         { type: '', line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
-    const [submissionType, setSubmissionType] = useState(null);
+
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
 
-    const primaryState = watch('primaryStateName');
-    const primaryCitySearch = watch('primaryCity');
     useEffect(() => {
         if (patientDetails) {
             setValue('firstName', patientDetails?.referringDocId?.name?.[0]?.given?.[0]);

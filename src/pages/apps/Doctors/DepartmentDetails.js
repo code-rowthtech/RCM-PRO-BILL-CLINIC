@@ -10,7 +10,7 @@ import { CiCircleMinus } from 'react-icons/ci';
 import DoctorIdentifierForm from './DoctorIdentifier';
 import { taxonomyOptions as taxonomy } from '../../../utils/DataSets/commonData';
 import AsyncSelect from 'react-select/async';
-const DepartmentDetails = ({ setActiveTab, docId }) => {
+const DepartmentDetails = ({ setActiveTab, docId, setSwitchTabs }) => {
     // const defaultIdentifiers = ['NPI'];
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -27,16 +27,44 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
         label: option.code + ' - ' + option.displayName,
     }));
 
-    const [identifiers, setIdentifiers] = useState([]);
-    const [licensure, setLicensure] = useState([]);
+    const [identifiers, setIdentifiers] = useState([
+        {
+            type: { label: '', value: '', code: '' },
+            number: '',
+            file: null,
+            expiry: '',
+            issuingAuthority: '',
+            status: '',
+            ennumerationDate: ''
+        }
+    ]);
+    const [licensure, setLicensure] = useState([
+        {
+            type: { label: '', value: '', code: '' },
+            number: '',
+            file: null,
+            expiry: '',
+            issuingAuthority: '',
+            status: '',
+            ennumerationDate: '',
+            licenseState: ''
+        }
+    ]);
 
     const defaultIdentifiers = [
         {
-            label: 'National Provider Identifier (NPI)',
-            value: 'http://hl7.org/fhir/sid/us-npi',
-            code: 'NPI',
+            label: '',
+            value: '',
+            code: '',
         },
     ];
+    // const defaultIdentifiers = [
+    //     {
+    //         label: 'National Provider Identifier (NPI)',
+    //         value: 'http://hl7.org/fhir/sid/us-npi',
+    //         code: 'NPI',
+    //     },
+    // ];
 
     const defaultLicensure = [
         {
@@ -48,7 +76,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
 
     // Load data from API when doctorDetails is available
     useEffect(() => {
-        if (doctorDetails?.identifier) {
+        if (doctorDetails?.identifier && doctorDetails.identifier.length > 0) {
             const identifierData = [];
             const licensureData = [];
 
@@ -74,87 +102,94 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                     identifierData.push(formattedItem);
                 }
             });
-
-            setIdentifiers(identifierData);
-            setLicensure(licensureData);
+            if (identifierData.length > 0) setIdentifiers(identifierData);
+            if (licensureData.length > 0) setLicensure(licensureData);
         }
     }, [doctorDetails]);
 
     const onsubmit = (data) => {
         let finalIdentifiersData = [];
         if (identifiers) {
-            identifiers.forEach((element) => {
-                let data = {
-                    expiry: element?.expiry,
-                    file: element?.file,
-                    value: element?.number,
-                    use: 'official',
-                    system: element?.type?.value,
-                    type: {
-                        coding: [
-                            {
-                                system: element?.type?.value,
-                                code: element?.type?.code,
-                                display: element?.type?.label,
-                            },
-                        ],
-                        text: element?.type?.label,
-                    },
-                    issuingAuthority: element?.issuingAuthority,
-                    status: element?.status,
-                    ennumerationDate: element?.ennumerationDate,
-                };
-                finalIdentifiersData.push(data);
-            });
+            identifiers
+                .filter(element => element?.type?.value && element?.number)
+                .forEach((element) => {
+                    let data = {
+                        expiry: element?.expiry,
+                        file: element?.file,
+                        value: element?.number,
+                        use: 'official',
+                        system: element?.type?.value,
+                        type: {
+                            coding: [
+                                {
+                                    system: element?.type?.value,
+                                    code: element?.type?.code,
+                                    display: element?.type?.label,
+                                },
+                            ],
+                            text: element?.type?.label,
+                        },
+                        issuingAuthority: element?.issuingAuthority,
+                        status: element?.status,
+                        ennumerationDate: element?.ennumerationDate,
+                    };
+                    finalIdentifiersData.push(data);
+                });
         }
         let finalLicensureData = [];
         if (licensure) {
-            licensure.forEach((element) => {
-                let licensureData = {
-                    expiry: element?.expiry,
-                    file: element?.file,
-                    value: element?.number,
-                    use: 'official',
-                    system: element?.type?.value,
-                    type: {
-                        coding: [
-                            {
-                                system: element?.type?.value,
-                                code: element?.type?.code,
-                                display: element?.type?.label,
-                            },
-                        ],
-                        text: element?.type?.label,
-                    },
-                    issuingAuthority: element?.issuingAuthority,
-                    licenseState: element?.licenseState,
-                    status: element?.status,
-                    ennumerationDate: element?.ennumerationDate,
-                };
-                finalLicensureData.push(licensureData);
-            });
+            licensure
+                .filter(element => element?.type?.value && element?.number)
+                .forEach((element) => {
+                    let licensureData = {
+                        expiry: element?.expiry,
+                        file: element?.file,
+                        value: element?.number,
+                        use: 'official',
+                        system: element?.type?.value,
+                        type: {
+                            coding: [
+                                {
+                                    system: element?.type?.value,
+                                    code: element?.type?.code,
+                                    display: element?.type?.label,
+                                },
+                            ],
+                            text: element?.type?.label,
+                        },
+                        issuingAuthority: element?.issuingAuthority,
+                        licenseState: element?.licenseState,
+                        status: element?.status,
+                        ennumerationDate: element?.ennumerationDate,
+                    };
+                    finalLicensureData.push(licensureData);
+                });
         }
-        const taxonomyCodes = taxonomyCodesList?.map((item) => ({
-            type: item?.type,
-            code: item?.code?.code,
-            Grouping: item?.code?.grouping,
-            Classification: item?.code?.classification,
-            Specialization: item?.code?.specialization,
-            Definition: item?.code?.definition,
-            Notes: item?.code?.notes,
-            displayName: item?.code?.displayName,
-            section: item?.code?.section,
-            state: item?.state,
-            licenseNumber: item?.licenseNumber,
-            status: item?.status === 'active' ? true : false,
-        }));
+        const taxonomyCodes = taxonomyCodesList
+            ?.filter(item => item?.code && item?.type && item?.status)
+            ?.map((item) => ({
+                type: item?.type,
+                code: item?.code?.code,
+                Grouping: item?.code?.grouping,
+                Classification: item?.code?.classification,
+                Specialization: item?.code?.specialization,
+                Definition: item?.code?.definition,
+                Notes: item?.code?.notes,
+                displayName: item?.code?.displayName,
+                section: item?.code?.section,
+                state: item?.state,
+                licenseNumber: item?.licenseNumber,
+                status: item?.status === 'active' ? true : false,
+            })) || [];
         const payload = {
             ...(updateId ? { doctorId: id } : { doctorId: docId }),
-            identifier: [...finalIdentifiersData, ...finalLicensureData],
-            taxonomy: taxonomyCodes,
+            ...(finalIdentifiersData.length > 0 || finalLicensureData.length > 0 ? { identifier: [...finalIdentifiersData, ...finalLicensureData] } : {}),
+            ...(taxonomyCodes.length > 0 ? { taxonomy: taxonomyCodes } : {}),
         };
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
     };
+
+    const [shouldSwitchTabs, setShouldSwitchTabs] = useState(false);
 
     useEffect(() => {
         if (createResponse === 200) {
@@ -165,40 +200,38 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                 const payload = { id: docId };
                 dispatch(getDoctorDetailsAction(payload));
             }
-            setActiveTab('qualifications');
+            if (shouldSwitchTabs) {
+                setActiveTab('qualifications');
+                setShouldSwitchTabs(false);
+            }
         }
-    }, [createResponse, setActiveTab, updateId, docId, dispatch])
+    }, [createResponse, setActiveTab, updateId, docId, dispatch, shouldSwitchTabs])
 
     useEffect(() => {
-        if (doctorDetails) {
-            // Load taxonomy codes
-            if (doctorDetails?.taxonomy?.length > 0) {
-                const updatedTaxonomyCodes = doctorDetails.taxonomy.map((item) => ({
-                    type: item?.type || '',
-                    displayName: item?.displayName || '',
-                    code: {
-                        code: item?.code,
-                        grouping: item?.Grouping,
-                        classification: item?.Classification,
-                        specialization: item?.Specialization,
-                        definition: item?.Definition,
-                        notes: item?.Notes,
-                        displayName: item?.displayName,
-                        section: item?.section
-                    },
-                    state: item?.state || '',
-                    licenseNumber: item?.licenseNumber || '',
-                    status: item?.status === true ? 'active' : 'inactive',
-                }));
-                setTaxonomyCodesList(updatedTaxonomyCodes);
-            }
+        if (doctorDetails?.taxonomy && doctorDetails.taxonomy.length > 0) {
+            const updatedTaxonomyCodes = doctorDetails.taxonomy.map((item) => ({
+                type: item?.type || '',
+                displayName: item?.displayName || '',
+                code: {
+                    code: item?.code,
+                    grouping: item?.Grouping,
+                    classification: item?.Classification,
+                    specialization: item?.Specialization,
+                    definition: item?.Definition,
+                    notes: item?.Notes,
+                    displayName: item?.displayName,
+                    section: item?.section
+                },
+                state: item?.state || '',
+                licenseNumber: item?.licenseNumber || '',
+                status: item?.status === true ? 'active' : 'inactive',
+            }));
+            setTaxonomyCodesList(updatedTaxonomyCodes);
         }
     }, [doctorDetails]);
 
     useEffect(() => {
-        dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }));
-
-        // Load doctor details when component mounts
+        dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: 1, limit: 50 }));
         if (updateId || docId) {
             const payload = { id: updateId || docId };
             dispatch(getDoctorDetailsAction(payload));
@@ -207,12 +240,12 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
 
     const [taxonomyCodesList, setTaxonomyCodesList] = useState([
         {
-            type: 'primary',
+            type: '',
             code: '',
-            //   state: '', licenseNumber: '',
             status: ''
         },
     ]);
+
     const addTaxonomyCode = () => {
         setTaxonomyCodesList([
             ...taxonomyCodesList,
@@ -254,7 +287,10 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
     };
 
     const removeTaxonomyItem = (index) => {
-        setTaxonomyCodesList((prev) => prev.filter((_, i) => i !== index));
+        setTaxonomyCodesList((prev) => {
+            const filtered = prev.filter((_, i) => i !== index);
+            return filtered.length > 0 ? filtered : [{ type: '', code: '', status: '' }];
+        });
     };
 
     return (
@@ -325,65 +361,34 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                                     fontSize: '12px',
                                                                     paddingBottom: '5px',
                                                                 }),
-                                                                menuPortal: (base) => ({ ...base, zIndex: 9999 }), // ensures it's on top
+                                                                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                                                             }}
-                                                            menuPortalTarget={document.body} // renders menu to body
-                                                            menuPosition="fixed" // avoids clipping
+                                                            menuPortalTarget={document.body}
+                                                            menuPosition="fixed"
                                                         />
-
                                                     </Form.Group>
                                                 </Col>
-
-                                                {/* <Col sm={3}>
-                                                    <Form.Label className="mb-0">License Number</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        placeholder="License Number"
-                                                        value={data.licenseNumber}
-                                                        onChange={(e) => {
-                                                            const updatedList = [...taxonomyCodesList];
-                                                            updatedList[index].licenseNumber =
-                                                                e.target.value.toUpperCase();
-                                                            setTaxonomyCodesList(updatedList);
-                                                        }}
-                                                        maxLength={10}
-                                                    />
-                                                </Col> */}
                                                 <Col sm={3} style={{ paddingRight: '3px' }}>
                                                     <Form.Label className="mb-0">Type</Form.Label>
                                                     <Form.Select
                                                         value={data.type || 'primary'}
+                                                        className='text-capitalize'
                                                         onChange={(e) => {
                                                             const updatedList = [...taxonomyCodesList];
                                                             updatedList[index].type = e.target.value;
                                                             setTaxonomyCodesList(updatedList);
                                                         }}>
                                                         <option value="">Select</option>
-                                                        <option value="primary">Primary</option>
-                                                        <option value="secondary">Secondary</option>
-                                                    </Form.Select>
-                                                </Col>
-                                                {/* <Col sm={3} className="pe-0" style={{ paddingLeft: '20px ' }}>
-                                                    <Form.Label className="mb-0">State</Form.Label>
-                                                    <Form.Select
-                                                        value={data.state}
-                                                        onChange={(e) => {
-                                                            const updatedList = [...taxonomyCodesList];
-                                                            updatedList[index].state = e.target.value;
-                                                            setTaxonomyCodesList(updatedList);
-                                                        }}>
-                                                        <option value="">Select State</option>
-                                                        {statesData?.map((state, idx) => (
-                                                            <option key={idx} value={state?.name}>
-                                                                {state?.name}
-                                                            </option>
+                                                        {['primary', 'secondary']?.map((type, i) => (
+                                                            <option className='text-capitalize' value={type} key={i}>{type}</option>
                                                         ))}
                                                     </Form.Select>
-                                                </Col> */}
+                                                </Col>
                                                 <Col sm={3} className="position-relative">
                                                     <Form.Label className="mb-0">Status</Form.Label>
                                                     <Form.Select
                                                         value={data.status}
+                                                        className='text-capitalize'
                                                         onChange={(e) => {
                                                             const updatedList = [...taxonomyCodesList];
                                                             updatedList[index].status = e.target.value;
@@ -392,10 +397,13 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                         <option value="" hidden>
                                                             Select Status
                                                         </option>
+                                                        {['active', 'inactive']?.map((status, i) => (
+                                                            <option value={status} key={i} className='text-capitalize'>{status}</option>
+                                                        ))}
                                                         <option value="active">Active</option>
                                                         <option value="inactive">Inactive</option>
                                                     </Form.Select>
-                                                    {index > 0 && (
+                                                    {taxonomyCodesList.length > 1 && (
                                                         <span
                                                             className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
                                                             style={{ right: '-2%', top: '49%' }}
@@ -420,16 +428,21 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                     Previous
                                 </Button>
                                 <Button
+                                    variant="secondary"
+                                    type="submit"
+                                    className="custom-buttons"
+                                    disabled={store?.createtDoctorsDetailReducer?.loading}
+                                    style={{ width: '100px' }}>
+                                    Update
+                                </Button>
+                                <Button
                                     variant="primary"
                                     type="submit"
                                     className="custom-buttons"
                                     disabled={store?.createtDoctorsDetailReducer?.loading}
-                                    style={{ width: '120px' }}>
-                                    {store?.createtDoctorsDetailReducer?.loading ? (
-                                        <Spinner color="white" className="spinner-border-sm" />
-                                    ) : (
-                                        'Update & Next'
-                                    )}
+                                    style={{ width: '120px' }}
+                                    onClick={() => setShouldSwitchTabs(true)}>
+                                    Update & Next
                                 </Button>
                             </div>
                         </>

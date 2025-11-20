@@ -73,7 +73,6 @@ export const handlePrintVitals = ({ vitals, patientDetails }) => {
     if (vital.valueQuantity) {
       return `${vital.valueQuantity.value} ${vital.valueQuantity.unit || ''}`.trim();
     }
-
     return '';
   };
 
@@ -99,127 +98,241 @@ export const handlePrintVitals = ({ vitals, patientDetails }) => {
   <meta charset="UTF-8">
   <title>Vitals Flowsheet</title>
   <style>
+    @media print {
+      @page {
+        margin: 0.5in;
+        size: A4;
+      }
+      body {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      font-size: 12px;
-    }
-    h2, h4 {
-      margin-bottom: 5px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.4;
       color: #333;
+      background: white;
     }
+
     .header {
+      background: linear-gradient(135deg, rgb(249, 139, 55) 0%,rgba(97, 104, 208, 0.79) 100%);
+      color: white;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .header-info {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+      font-size: 14px;
+    }
+
+    .patient-info {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+
+    .patient-info h2 {
+      color: #6169D0;
+      font-size: 18px;
       margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 2px solid #6169D0;
+      padding-bottom: 8px;
     }
-    .patient-info, .facility-info {
-      width: 48%;
+
+    .patient-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
     }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: #374151;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      color: #1f2937;
+    }
+
+    .encounter-section {
+      margin-bottom: 25px;
+      break-inside: avoid;
+    }
+
+    .section-header {
+      background: #6169D0;
+      color: white;
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 16px;
+      border-radius: 6px 6px 0 0;
+      margin-bottom: 0;
+    }
+
+    .section-content {
+      background: white;
+      border: 2px solid #6169D0;
+      border-top: none;
+      padding: 20px;
+      border-radius: 0 0 6px 6px;
+      min-height: 60px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
-      page-break-inside: avoid;
+      font-size: 12px;
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
     th, td {
-      border: 1px solid #ddd;
-      padding: 6px;
+      border: 1px solid #e2e8f0;
+      padding: 12px 8px;
       text-align: center;
     }
+
     th {
-      background-color: #f2f2f2;
-      font-weight: bold;
+      background: #6169D0;
+      color: white;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .logo {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      width: 80px;
-      height: auto;
+
+    .provider-signature {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      text-align: right;
     }
-    @page {
-      size: auto;
-      margin: 10mm;
+
+    .signature-line {
+      width: 300px;
+      margin: 20px 0 10px 0;
     }
+
     @media print {
-      body {
-        padding: 0;
-        font-size: 10pt;
-      }
       .no-print {
         display: none;
+      }
+      
+      .encounter-section {
+        page-break-inside: avoid;
+      }
+      
+      .header {
+        page-break-after: avoid;
       }
     }
   </style>
 </head>
 <body>
-  <img src='https://bitplatypus.s3.eu-north-1.amazonaws.com/logo_sm.png' alt="Logo" height="50" />
-  
   <div class="header">
-    <div class="patient-info">
-      <h4>PATIENT INFORMATION</h4>
-      <strong>Name:</strong> ${capitalize(patientDetails?.name?.[0]?.prefix) ? capitalize(patientDetails?.name?.[0]?.prefix) + ' ' : ''}${patientDetails?.name?.[0]?.given?.map(name => capitalize(name)).join(' ') || ''}${patientDetails?.name?.[0]?.given?.length ? ' ' : ''}${capitalize(patientDetails?.name?.[0]?.family) || 'N/A'}<br>
-      <strong>DOB:</strong> ${patientDetails?.birthDate ? new Date(patientDetails.birthDate).toLocaleDateString('en-US') : 'N/A'}<br>
-      <strong>Age:</strong> ${patientDetails?.approxAge ? Math.floor(patientDetails.approxAge) + ' years' : 'N/A'}<br>
-      <strong>Gender:</strong> ${patientDetails?.gender ? patientDetails.gender.charAt(0).toUpperCase() + patientDetails.gender.slice(1) : 'N/A'}<br>
-      <strong>MRN:</strong> ${patientDetails?.chartNumber || 'N/A'}
-    </div>
-    
-    <div class="facility-info">
-      <h4>FACILITY INFORMATION</h4>
-      <strong>Provider:</strong> ${loggedInUser?.name || 'N/A'}<br>
-      <strong>Email:</strong> ${loggedInUser?.email || 'N/A'}<br>
-      <strong>Date Printed:</strong> ${new Date().toLocaleDateString('en-US')}<br>
+    <img src=${loggedInUser?.logo?.split('?')[0]}/>
+    <h1>Vitals Flowsheet Report</h1>
+    <div class="header-info">
+      <div>
+        <strong>Generated:</strong> ${new Date().toLocaleString()}
+      </div>
+      <div>
+        <strong>Clinic:</strong> ${loggedInUser?.name || 'Not available'}
+      </div>
     </div>
   </div>
 
-  <h4>VITALS FLOWSHEET</h4>
+  <div class="patient-info">
+    <h2>Patient Information</h2>
+    <div class="patient-details">
+      <div class="detail-item">
+        <span class="detail-label">Name</span>
+        <span class="detail-value">${capitalize(patientDetails?.name?.[0]?.prefix) ? capitalize(patientDetails?.name?.[0]?.prefix) + ' ' : ''}${patientDetails?.name?.[0]?.given?.map(name => capitalize(name)).join(' ') || ''}${patientDetails?.name?.[0]?.given?.length ? ' ' : ''}${capitalize(patientDetails?.name?.[0]?.family) || 'N/A'}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">DOB</span>
+        <span class="detail-value">${patientDetails?.birthDate ? new Date(patientDetails.birthDate).toLocaleDateString('en-US') : 'N/A'}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Age</span>
+        <span class="detail-value">${patientDetails?.approxAge ? Math.floor(patientDetails.approxAge) + ' years' : 'N/A'}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Gender</span>
+        <span class="detail-value">${patientDetails?.gender ? patientDetails.gender.charAt(0).toUpperCase() + patientDetails.gender.slice(1) : 'N/A'}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">MRN</span>
+        <span class="detail-value">${patientDetails?.chartNumber || 'N/A'}</span>
+      </div>
+    </div>
+  </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Vital Sign</th>
-        ${sortedDates.map((date) => `<th>${date}</th>`).join('')}
-      </tr>
-    </thead>
-    <tbody>
-      ${rows.join('')}
-    </tbody>
-  </table>
+  <div class="encounter-section">
+    <h3 class="section-header">Vitals Flowsheet</h3>
+    <div class="section-content">
+      <table>
+        <thead>
+          <tr>
+            <th>Vital Sign</th>
+            ${sortedDates.map((date) => `<th>${date}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-  <div class="no-print" style="margin-top: 20px; text-align: center;">
-    <button onclick="window.print()" style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
-      Print Vitals
-    </button>
-    <button onclick="window.close()" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
-      Close
-    </button>
+  <div class="provider-signature">
+    <div class="signature-line"></div>
+    <strong>Provider Signature</strong>
+    <br/>
+    <span>${new Date()?.toISOString()?.split('T')?.[0]}</span>
   </div>
 </body>
 </html>
 `;
 
-  // document.body.innerHTML = printContent;
-  // window.print();
-  // document.body.innerHTML = originalContent;
-  // window.location.reload();
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    alert('Popup blocked. Please allow popups for this site.');
-    return;
-  }
-
-  printWindow.document.open();
-  printWindow.document.write(printContent);
-  printWindow.document.close();
-
-  // Wait for window to finish loading styles and layout
-  printWindow.onload = () => {
-    printWindow.focus();
-    printWindow.print();
-    // printWindow.close(); // optional
-  };
+  document.body.innerHTML = printContent;
+  window.print();
+  document.body.innerHTML = originalContent;
+  window.location.reload();
 };

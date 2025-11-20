@@ -144,9 +144,6 @@ const EncounterSummary = () => {
         if (patientVitals?.length === 0) {
             dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 3 }));
         }
-        // if(tobaccoHistory?.length===0){
-        //     dispatch(getTobaccooActio({ patientId: patientId }));
-        // }
     }, [allergyData, problemData, medicationList])
 
     // FUNCTIONS
@@ -260,67 +257,67 @@ const EncounterSummary = () => {
 
                         let content;
                         switch (menuItem.name) {
-                            case 'Vitals':
-                                content = (
-                                    <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
-                                        <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >                                            <thead>
-                                            <tr className='border'>
-                                                <th className='text-white'>
-                                                    {'Vital Name'}
-                                                </th>
-                                                {sortedDates?.slice(0, 3)?.map(date => (
-                                                    <th className='text-white' key={date}>
-                                                        {formatDate(date)}
-                                                    </th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                            <tbody>
-                                                {vitals.map((vital, index) => (
-                                                    <tr className='cursor-pointer' key={vital.name} onClick={() => {
-                                                        const latestDate = sortedDates[0];
-                                                        const value = findVitalValue(vital.name, latestDate);
-                                                        if (value) {
-                                                            const formattedValue = vital?.type === 'bp' ? `${value?.systolic}/${value?.diastolic}` : value;
-                                                            window.populateEncounterField?.('Monitoring Chart (Vitals)', `${vital.name}: ${formattedValue} ${getDisplayUnit(vital)}`);
-                                                        }
-                                                    }}>
-                                                        <td className='p-0 vitalsTableBorder'>
-                                                            {vital?.name} {getDisplayUnit(vital) && (
-                                                                <small className="text-muted">({getDisplayUnit(vital)})</small>
-                                                            )}
-                                                        </td>
+                            // case 'Vitals':
+                            //     content = (
+                            //         <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
+                            //             <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >                                            <thead>
+                            //                 <tr className='border'>
+                            //                     <th className='text-white'>
+                            //                         {'Vital Name'}
+                            //                     </th>
+                            //                     {sortedDates?.slice(0, 3)?.map(date => (
+                            //                         <th className='text-white' key={date}>
+                            //                             {formatDate(date)}
+                            //                         </th>
+                            //                     ))}
+                            //                 </tr>
+                            //             </thead>
+                            //                 <tbody>
+                            //                     {vitals.map((vital, index) => (
+                            //                         <tr className='cursor-pointer' key={vital.name} onClick={() => {
+                            //                             const latestDate = sortedDates[0];
+                            //                             const value = findVitalValue(vital.name, latestDate);
+                            //                             if (value) {
+                            //                                 const formattedValue = vital?.type === 'bp' ? `${value?.systolic}/${value?.diastolic}` : value;
+                            //                                 window.populateEncounterField?.('Monitoring Chart (Vitals)', `${vital.name}: ${formattedValue} ${getDisplayUnit(vital)}`);
+                            //                             }
+                            //                         }}>
+                            //                             <td className='p-0 vitalsTableBorder'>
+                            //                                 {vital?.name} {getDisplayUnit(vital) && (
+                            //                                     <small className="text-muted">({getDisplayUnit(vital)})</small>
+                            //                                 )}
+                            //                             </td>
 
-                                                        {sortedDates.slice(0, 3).map(date => (
-                                                            <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
-                                                                {renderVitalCell(vital, date)}
-                                                            </td>
-                                                        ))}
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                            {store?.getVitalsByPatientIdReducer?.loading &&
-                                                <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
-                                                    <Spinner />
-                                                </div>
-                                            }
-                                        </Table>
-                                        <div className="row">
-                                            <div className="col-12 text-end">
-                                                <small onClick={() => setVitalsModal(true)} className='text-info cursor-pointer'>{`Add vitals`}</small>
-                                            </div>
-                                        </div>
-                                        <Modal show={vitalsModal} onHide={closeVitalsModal} size="lg" centered>
-                                            <Modal.Header closeButton className="px-2 py-0">
-                                                <Modal.Title className="">{`Add Vitals`}</Modal.Title>
-                                            </Modal.Header>
-                                            <Modal.Body>
-                                                <VitalStatus />
-                                            </Modal.Body>
-                                        </Modal>
-                                    </Accordion.Body>
-                                );
-                                break;
+                            //                             {sortedDates.slice(0, 3).map(date => (
+                            //                                 <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
+                            //                                     {renderVitalCell(vital, date)}
+                            //                                 </td>
+                            //                             ))}
+                            //                         </tr>
+                            //                     ))}
+                            //                 </tbody>
+                            //                 {store?.getVitalsByPatientIdReducer?.loading &&
+                            //                     <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
+                            //                         <Spinner />
+                            //                     </div>
+                            //                 }
+                            //             </Table>
+                            //             <div className="row">
+                            //                 <div className="col-12 text-end">
+                            //                     <small onClick={() => setVitalsModal(true)} className='text-info cursor-pointer'>{`Add vitals`}</small>
+                            //                 </div>
+                            //             </div>
+                            //             <Modal show={vitalsModal} onHide={closeVitalsModal} size="lg" centered>
+                            //                 <Modal.Header closeButton className="px-2 py-0">
+                            //                     <Modal.Title className="">{`Add Vitals`}</Modal.Title>
+                            //                 </Modal.Header>
+                            //                 <Modal.Body>
+                            //                     <VitalStatus />
+                            //                 </Modal.Body>
+                            //             </Modal>
+                            //         </Accordion.Body>
+                            //     );
+                            //     break;
 
                             case 'Allergy':
                                 content = (

@@ -354,10 +354,10 @@ table {
     align-items: center;
     border: none !important;
     border-radius: 4px;
-    padding: 6px 8px;
+    padding: 6px;
     width: 100%;
     background-color: #e8f0fe !important;
-    font-weight: 500 !important;
+    font-weight: 400 !important;
     font-size: 12px !important;
 }
 
@@ -1289,9 +1289,9 @@ option {
 .small-col {
     flex-basis: 10%;
 }
-.text-danger {
-    color: red !important;
-}
+/* .text-danger { */
+/* color: red !important; */
+/* } */
 .minusIcons {
     color: red !important;
 }

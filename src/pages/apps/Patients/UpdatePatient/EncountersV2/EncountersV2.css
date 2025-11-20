@@ -1,0 +1,11 @@
+/* Import original encounter styles */
+@import '../Encounter/Encounter.css';
+
+/* Additional styles for EncountersV2 if needed */
+.encountersv2-container {
+    /* Add any specific styles for V2 here */
+}
+
+.encounter-accordion-header .accordion-button {
+    background-color: rgba(238, 242, 247, 1) !important;
+}

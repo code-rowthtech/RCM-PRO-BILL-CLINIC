@@ -76,13 +76,11 @@ export default function VitalsChart({ isAccordionOpen }) {
         setVisitDateTime((prev) => ({ ...prev, date: newDate }));
     };
 
-    const handleTimeChange = (e) =>
-        setVisitDateTime((prev) => ({ ...prev, time: e.target.value }));
+    const handleTimeChange = (e) => setVisitDateTime((prev) => ({ ...prev, time: e.target.value }));
 
     const handleSubmit = () => {
         const errors = {};
         const observations = [];
-
         vitals.forEach((vital) => {
             if (!vital.value || (vital.type === 'bp' && (!vital.value.systolic || !vital.value.diastolic))) {
                 return;
@@ -284,7 +282,6 @@ export default function VitalsChart({ isAccordionOpen }) {
                                                 onChange={(e) => handleVitalChange(index, null, e.target.value)}
                                             />
                                         )
-
                                     )}
                                     {validationErrors[vital.name] && (
                                         <div className="text-danger small mt-1">

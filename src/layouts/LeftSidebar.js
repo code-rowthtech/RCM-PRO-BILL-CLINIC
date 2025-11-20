@@ -523,11 +523,15 @@ const LeftSidebar = ({
                                                         <p
                                                             className="mb-0 text-capitalize"
                                                             style={{ fontSize: '12px' }}>
-                                                            {
+                                                            {/* {
                                                                 data?.subject?.name?.find(
                                                                     (ele) => ele?.use === 'official'
                                                                 )?.text
-                                                            }
+                                                            } */}
+                                                            {(data?.subject?.name?.[0]?.family || '') +
+                                                                (data?.subject?.name?.[0]?.given?.length > 0 ?
+                                                                    ' ' + data?.subject?.name?.[0]?.given?.join(' ')
+                                                                    : '') || 'N/A'}
                                                         </p>
                                                         <p className="mb-0 fw-semibold" style={{ fontSize: '10px' }}>
                                                             Dr.{' '}

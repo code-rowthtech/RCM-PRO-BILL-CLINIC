@@ -194,7 +194,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                                 }}
                                 value={selectedSubClinic}
                             >
-                                <option value={store?.Auth?.user?.clinicId} selected>{store?.getSubClinicsReducer?.loading ? 'Loading...' : store?.Auth?.user?.name}</option>
+                                <option value={store?.Auth?.user?.clinicId}>{store?.getSubClinicsReducer?.loading ? 'Loading...' : store?.Auth?.user?.name}</option>
                                 {subClinicLocations?.map((subClinics) => {
                                     const address = subClinics?.address?.[0]?.line?.[0];
                                     const displayText = `${subClinics?.name}${address ? ` - (${address})` : ''}`;

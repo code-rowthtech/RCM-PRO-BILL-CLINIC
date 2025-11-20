@@ -1,4 +1,3 @@
-import { decryptMessage } from '../../cryptoUtils';
 import { APICore } from '../../helpers/api/apiCore';
 import * as URL from '../../helpers/api/apiEndpoints';
 const api = new APICore();
@@ -43,6 +42,7 @@ export function createSettingsTabsApi(params: any): any {
     const { data } = params;
     return api.create(URL.createnoteTypeSettings, data);
 }
+
 export function getSettingsTabsApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.createnoteTypeSettings}?noteId=${data?.noteId}`);

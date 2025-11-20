@@ -429,7 +429,7 @@ const NewPatient = ({ isModal, handleClosePatientModal }) => {
     const tabs = [
         { key: 'personalDetails', label: 'Personal Details', show: true },
         { key: 'demographicDetails', label: 'Demographic', show: true },
-        { key: 'consents', label: 'Consents', show: true },
+        // { key: 'consents', label: 'Consents', show: true },
         { key: 'responsible', label: 'Responsible Party', show: showResponsibleTab },
         { key: 'referringDoctor', label: 'Referring Source', show: showReferringTab }
     ];

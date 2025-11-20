@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     createDoctorAction,
     createDoctorDetailAction,
-    getCities2Action,
     getCitiesAction,
     getDoctorDetailsAction,
     getDoctorsAction,
@@ -27,7 +26,9 @@ import { FiUploadCloud, FiDownloadCloud } from 'react-icons/fi';
 import DoctorAddress from './DoctorAddressForm';
 import DoctorQualifications from './Qualifications';
 import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 import DepartmentModal from '../Settings/Department/DepartmentModal';
+import { specialitiesData } from '../../../utils/DataSets/specialitiesData';
 
 const NewDoctor = () => {
     const {
@@ -59,6 +60,7 @@ const NewDoctor = () => {
     const [imageLoading, setImageLoading] = useState(true);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
     const [addDepartmentModal, setAddDepartmentModal] = useState(false);
+    const [switchTabs, setSwitchTabs] = useState(false);
 
     const handleShowModal = (url) => {
         setModalFileUrl(url);
@@ -94,25 +96,26 @@ const NewDoctor = () => {
     const updateId = id?.replace(/^check/, '');
 
     useEffect(() => {
-        dispatch(
-            getRoleDataAction({
-                search: 'Doctor',
-                clinicId: clinicId,
-                status: true,
-                page: 1,
-                limit: 10,
-                createdById: '',
-            })
-        );
-    }, [dispatch]);
+        const fetchInitialData = async () => {
+            dispatch(
+                getRoleDataAction({
+                    search: 'Doctor',
+                    clinicId: clinicId,
+                    status: true,
+                    page: 1,
+                    limit: 10,
+                    createdById: '',
+                })
+            );
 
-    useEffect(() => {
-        const payload = {
-            id: updateId,
+            if (updateId) {
+                dispatch(getDoctorDetailsAction({ id: updateId }));
+            }
+            dispatch(getStatesByCountryAction());
         };
-        dispatch(getDoctorDetailsAction(payload));
-        dispatch(getStatesByCountryAction());
-    }, [dispatch]);
+
+        fetchInitialData();
+    }, [dispatch, updateId]);
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const createResponse = store?.createtDoctorsReducer?.data?.status;
@@ -123,20 +126,27 @@ const NewDoctor = () => {
     const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     const createDepartmentResponse = store?.createMastersDataReducer?.data?.status;
-    const departmentOptions = store?.getDepartmentDataReducer?.data?.result?.map((department) => ({
-        value: department?.name,
-        label: department?.name,
-    }));
+    const departmentOptions = React.useMemo(() =>
+        store?.getDepartmentDataReducer?.data?.result?.map((department) => ({
+            value: department?.name,
+            label: department?.name,
+        })) || [],
+        [store?.getDepartmentDataReducer?.data?.result]
+    );
     useEffect(() => {
         dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 50, skip: 1, search: '' }));
-    }, [dispatch]);
+    }, []);
 
     useEffect(() => {
         if (createResponse === 200) {
             setDocId(newDoctorId);
-            setActiveTab('departmentDetails');
+            navigate(`/apps/providers/new-doctor?id=${newDoctorId}`);
+            if (switchTabs && activeTab === 'personalDetails') {
+                setActiveTab('departmentDetails');
+                setSwitchTabs(false);
+            }
         }
-    }, [createResponse]);
+    }, [createResponse, switchTabs, activeTab, newDoctorId, navigate]);
 
     useEffect(() => {
         if (updateResponse === 200) {
@@ -145,16 +155,19 @@ const NewDoctor = () => {
             };
             setSelectedDepartment(null);
             dispatch(getDoctorDetailsAction(payload));
-            if (activeTab === 'personalDetails') {
-                setActiveTab('departmentDetails');
-                dispatch(getDoctorsAction({ status: true, search: '', page: 1, limit: 10 }));
-            } else if (activeTab === 'departmentDetails') {
-                setActiveTab('qualifications');
-            } else if (activeTab === 'qualifications') {
-                navigate('/apps/providers/list');
+            if (switchTabs) {
+                if (activeTab === 'personalDetails') {
+                    setActiveTab('departmentDetails');
+                    dispatch(getDoctorsAction({ status: true, search: '', page: 1, limit: 10 }));
+                } else if (activeTab === 'departmentDetails') {
+                    setActiveTab('qualifications');
+                } else if (activeTab === 'qualifications') {
+                    navigate('/apps/providers/list');
+                }
+                setSwitchTabs(false);
             }
         }
-    }, [updateResponse]);
+    }, [updateResponse, switchTabs, activeTab, updateId, dispatch, navigate]);
 
     const closeModal = () => {
         setShow(false);
@@ -196,40 +209,42 @@ const NewDoctor = () => {
 
     useEffect(() => {
         if (doctorDetails && updateId) {
-            // setValue('stateName', statesData?.states && statesData?.states?.find((data) => data?.id === doctorDetails?.userId?.address?.state?.id))
-            setValue('firstName', doctorDetails?.name?.[0]?.given);
-            setValue('lastName', doctorDetails?.name?.[0]?.family);
-            setValue('email', doctorDetails?.userId?.email);
-            setValue('phone', doctorDetails?.telecom?.[0]?.value);
-            setValue('gender', doctorDetails?.userId?.gender);
-            if (doctorDetails?.department) {
-                setSelectedDepartment(departmentOptions?.find((data) => data?.value === doctorDetails?.department));
-            } else {
-                setSelectedDepartment(null);
+            const formData = {
+                firstName: doctorDetails?.name?.[0]?.given || '',
+                lastName: doctorDetails?.name?.[0]?.family || '',
+                email: doctorDetails?.userId?.email || '',
+                phone: doctorDetails?.telecom?.[0]?.value || '',
+                gender: doctorDetails?.userId?.gender || '',
+                specialist: doctorDetails?.specialties?.[0] || '',
+                dateOfBirth: doctorDetails?.userId?.dob
+                    ? new Date(doctorDetails.userId.dob).toISOString().split('T')[0]
+                    : ''
+            };
+            Object.entries(formData).forEach(([key, value]) => {
+                if (value) setValue(key, value);
+            });
+            if (doctorDetails?.department && departmentOptions.length > 0) {
+                setSelectedDepartment(departmentOptions.find(data => data?.value === doctorDetails.department) || null);
             }
-            setValue('specialist', doctorDetails?.specialties?.[0]);
             if (doctorDetails?.address) {
                 setDemographicAddresses(doctorDetails.address);
             }
-            if (doctorDetails?.photo) {
-                setLogoName(doctorDetails.photo?.[0]?.title);
+            if (doctorDetails?.photo?.[0]?.title) {
+                setLogoName(doctorDetails.photo[0].title);
             }
-            const formattedDateOfBirth = doctorDetails?.userId?.dob
-                ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
-                : '';
-            // data?.joiningDate ? new Date(data.joiningDate).toISOString().split('T')[0] : ''
-            setValue('dateOfBirth', formattedDateOfBirth);
         }
-    }, [doctorDetails, setValue]);
+    }, [doctorDetails, updateId, setValue, departmentOptions]);
 
     useEffect(() => {
-        if (doctorDetails && updateId && statesData) {
-            const state = statesData?.states?.find((data) => data?.name === doctorDetails?.address?.[0]?.state)?.id;
-            dispatch(
-                getCitiesAction({ state_code: state, name: doctorDetails?.address?.[0]?.city, limit: 10, skip: 1 })
-            );
+        if (doctorDetails && updateId && statesData?.states) {
+            const state = statesData.states.find((data) => data?.name === doctorDetails?.address?.[0]?.state)?.id;
+            if (state && doctorDetails?.address?.[0]?.city) {
+                dispatch(
+                    getCitiesAction({ state_code: state, name: doctorDetails.address[0].city, limit: 10, skip: 1 })
+                );
+            }
         }
-    }, [statesData, doctorDetails]);
+    }, [statesData, doctorDetails, updateId, dispatch]);
 
     const handleNewDoctor = () => {
         navigate('/apps/providers/list');
@@ -250,17 +265,15 @@ const NewDoctor = () => {
                 text: `${data?.firstName || ''} ${data?.lastName || ''}`.trim(),
                 family: data?.lastName,
                 given: data?.firstName,
-                // prefix: [''],
-                // suffix: [],
             },
             photo: [
                 {
                     contentType: logo?.type || 'image/jpeg',
                     url: logo?.url?.split('?')[0] || logo,
-                    data: logo?.data || null, // Assuming `data` contains base64 or buffer
-                    hash: logo?.hash || null, // You may need to generate or pass the hash
-                    title: logoName || null, // Use `logoName` as the title
-                    creation: new Date(), // Automatically sets the creation date
+                    data: logo?.data || null,
+                    hash: logo?.hash || null,
+                    title: logoName || null,
+                    creation: new Date(),
                 },
             ],
             telecom: [
@@ -291,10 +304,6 @@ const NewDoctor = () => {
         setActiveTab(tab);
     };
 
-    const [addresses, setAddresses] = useState(
-        doctorDetails?.address || [{ use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]
-    );
-
     const [formData, setFormData] = useState({
         role: doctorRoleId,
         email: '',
@@ -317,7 +326,6 @@ const NewDoctor = () => {
             setFormData((prev) => {
                 const firstName = name === 'firstName' ? value : prev.name.given;
                 const lastName = name === 'lastName' ? value : prev.name.family;
-
                 return {
                     ...prev,
                     name: {
@@ -337,50 +345,40 @@ const NewDoctor = () => {
     };
 
     useEffect(() => {
-        if (logo) {
-            setFormData({ ...formData, profileImage: logo?.url?.split('?')[0] });
+        if (logo?.url) {
+            setFormData(prev => ({ ...prev, profileImage: logo.url.split('?')[0] }));
         }
-    }, [logo]);
+    }, [logo?.url]);
     const passwordValue = watch('password', '');
 
     React.useEffect(() => {
-        setFormData((prev) => ({ ...prev, password: passwordValue }));
-        if (doctorRoleId) {
-            setFormData((prev) => ({ ...prev, role: doctorRoleId }));
-        }
+        setFormData((prev) => ({
+            ...prev,
+            password: passwordValue,
+            ...(doctorRoleId && { role: doctorRoleId })
+        }));
+
         if (id) {
             setValue('password', '********');
             setValue('confirmPassword', '********');
         }
-    }, [passwordValue, doctorRoleId, id]);
+    }, [passwordValue, doctorRoleId, id, setValue]);
 
-    useEffect(() => {
+    const validateForm = React.useCallback(() => {
         const isFirstNameValid = formData.name.given?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.name.given);
-        const isLastNameValid =
-            formData.name.family?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.name.family);
+        const isLastNameValid = formData.name.family?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.name.family);
         const isPhoneValid = formData?.phone?.trim()?.length === 13 && /^\(\d{3}\)\d{3}-\d{4}$/.test(formData.phone);
-        const isDOBValid =
-            formData?.dateOfBirth &&
-            new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+        const isDOBValid = formData?.dateOfBirth && new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18));
         const isEmailValid = formData?.email?.trim()?.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
         const isGenderValid = !!formData?.gender;
+        const isPasswordValid = updateId || (formData?.password?.trim()?.length >= 8 && /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password) && formData?.confirmPassword === formData?.password);
 
-        const isPasswordValid =
-            id ||
-            (formData?.password?.trim()?.length >= 8 &&
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password) &&
-                formData?.confirmPassword === formData?.password);
+        return isFirstNameValid && isLastNameValid && isDOBValid && isEmailValid && isGenderValid && isPasswordValid && isPhoneValid;
+    }, [formData, updateId]);
 
-        const isFormValid =
-            isFirstNameValid &&
-            isLastNameValid &&
-            isDOBValid &&
-            isEmailValid &&
-            isGenderValid &&
-            isPasswordValid &&
-            isPhoneValid;
-        setIsButtonDisabled(!isFormValid);
-    }, [formData, id]);
+    useEffect(() => {
+        setIsButtonDisabled(!validateForm());
+    }, [validateForm]);
 
     const requiredFieldTooltip = <Tooltip id="button-tooltip">Please fill all required fields.</Tooltip>;
     useEffect(() => {
@@ -758,118 +756,107 @@ const NewDoctor = () => {
                                                                     )}
                                                                 </Form.Group>
                                                             </div>
-                                                            <div className="col-md-6 col-lg-3 col-sm-6 col-12">
-                                                                <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">
-                                                                        {`Password`}{' '}
-                                                                        <span className="text-danger">{`*`}</span>
-                                                                    </Form.Label>
-                                                                    <div className="position-relative">
-                                                                        <Form.Control
-                                                                            type={showPassword ? 'text' : 'password'}
-                                                                            onKeyDown={(e) => {
-                                                                                if (e.key === ' ') {
-                                                                                    e.preventDefault();
-                                                                                }
-                                                                            }}
-                                                                            value={formData.password} // Use value instead of defaultValue
-                                                                            onCopy={(e) => e.preventDefault()}
-                                                                            onCut={(e) => e.preventDefault()}
-                                                                            placeholder={'Password'}
-                                                                            readOnly={updateId}
-                                                                            onChange={(e) => {
-                                                                                clearErrors('password');
-                                                                                setFormData({
-                                                                                    ...formData,
-                                                                                    password: e.target.value,
-                                                                                });
-                                                                            }}
-                                                                            {...register('password', {
-                                                                                required: !updateId
-                                                                                    ? 'Password is required'
-                                                                                    : false,
-                                                                                ...(updateId
-                                                                                    ? {} // Don't apply pattern if updating
-                                                                                    : {
-                                                                                        pattern: {
-                                                                                            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                            message:
-                                                                                                'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
-                                                                                        },
-                                                                                    }),
-                                                                            })}
-                                                                        />
+                                                            {!updateId && (
+                                                                <div className="col-md-6 col-lg-3 col-sm-6 col-12">
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">
+                                                                            {`Password`}{' '}
+                                                                            <span className="text-danger">{`*`}</span>
+                                                                        </Form.Label>
+                                                                        <div className="position-relative">
+                                                                            <Form.Control
+                                                                                type={showPassword ? 'text' : 'password'}
+                                                                                onKeyDown={(e) => {
+                                                                                    if (e.key === ' ') {
+                                                                                        e.preventDefault();
+                                                                                    }
+                                                                                }}
+                                                                                value={formData.password}
+                                                                                onCopy={(e) => e.preventDefault()}
+                                                                                onCut={(e) => e.preventDefault()}
+                                                                                placeholder="Password"
+                                                                                onChange={(e) => {
+                                                                                    clearErrors('password');
+                                                                                    setFormData({
+                                                                                        ...formData,
+                                                                                        password: e.target.value,
+                                                                                    });
+                                                                                }}
+                                                                                {...register('password', {
+                                                                                    required: 'Password is required',
+                                                                                    pattern: {
+                                                                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                        message: 'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
+                                                                                    },
+                                                                                })}
+                                                                            />
 
-                                                                        <span
-                                                                            className="position-absolute end-0 top-0 me-2 cursor-pointer"
-                                                                            style={{ marginTop: '3px' }}
-                                                                            onClick={() =>
-                                                                                setShowPassword(!showPassword)
-                                                                            }>
-                                                                            {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                                                        </span>
-                                                                        {errors.password && (
-                                                                            <span className="text-danger err_font">
-                                                                                {errors.password.message}
+                                                                            <span
+                                                                                className="position-absolute end-0 top-0 me-2 cursor-pointer"
+                                                                                style={{ marginTop: '3px' }}
+                                                                                onClick={() =>
+                                                                                    setShowPassword(!showPassword)
+                                                                                }>
+                                                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
                                                                             </span>
-                                                                        )}
-                                                                    </div>
-                                                                </Form.Group>
-                                                            </div>
-                                                            <div className="col-md-6 col-lg-3 col-sm-6 col-12">
-                                                                <Form.Group className="mb-1 ">
-                                                                    <Form.Label className="mb-0">
-                                                                        {`Confirm Password`}{' '}
-                                                                        <span className="text-danger">{`*`}</span>
-                                                                    </Form.Label>
-                                                                    <div className="position-relative">
-                                                                        <Form.Control
-                                                                            type={
-                                                                                showConfirmPassword
-                                                                                    ? 'text'
-                                                                                    : 'password'
-                                                                            }
-                                                                            placeholder="Confirm Password"
-                                                                            {...register('confirmPassword', {
-                                                                                required: !id
-                                                                                    ? 'Please confirm your password'
-                                                                                    : false,
-                                                                                validate: (value) =>
-                                                                                    value === watch('password') ||
-                                                                                    'Passwords do not match',
-                                                                                onChange: (e) => {
+                                                                            {errors.password && (
+                                                                                <span className="text-danger err_font">
+                                                                                    {errors.password.message}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </Form.Group>
+                                                                </div>
+                                                            )}
+                                                            {!updateId && (
+                                                                <div className="col-md-6 col-lg-3 col-sm-6 col-12">
+                                                                    <Form.Group className="mb-1 ">
+                                                                        <Form.Label className="mb-0">
+                                                                            {`Confirm Password`}{' '}
+                                                                            <span className="text-danger">{`*`}</span>
+                                                                        </Form.Label>
+                                                                        <div className="position-relative">
+                                                                            <Form.Control
+                                                                                type={showConfirmPassword ? 'text' : 'password'}
+                                                                                value={formData.confirmPassword || ''}
+                                                                                placeholder="Confirm Password"
+                                                                                {...register('confirmPassword', {
+                                                                                    required: 'Please confirm your password',
+                                                                                    validate: (value) => value === watch('password') || 'Passwords do not match',
+                                                                                })}
+                                                                                onChange={(e) => {
                                                                                     clearErrors('confirmPassword');
                                                                                     setFormData((prev) => ({
                                                                                         ...prev,
                                                                                         confirmPassword: e.target.value,
                                                                                     }));
-                                                                                },
-                                                                            })}
-                                                                        />
-                                                                        <span
-                                                                            className="position-absolute end-0 top-0 me-2 cursor-pointer"
-                                                                            style={{ marginTop: '3px' }}
-                                                                            onClick={() =>
-                                                                                setShowConfirmPassword(
-                                                                                    !showConfirmPassword
-                                                                                )
-                                                                            }>
-                                                                            {showConfirmPassword ? (
-                                                                                <FaEyeSlash />
-                                                                            ) : (
-                                                                                <FaEye />
-                                                                            )}
-                                                                        </span>
-                                                                        {errors.confirmPassword && (
-                                                                            <span className="text-danger err_font">
-                                                                                {errors.confirmPassword.message}
+                                                                                }}
+                                                                            />
+                                                                            <span
+                                                                                className="position-absolute end-0 top-0 me-2 cursor-pointer"
+                                                                                style={{ marginTop: '3px' }}
+                                                                                onClick={() =>
+                                                                                    setShowConfirmPassword(
+                                                                                        !showConfirmPassword
+                                                                                    )
+                                                                                }>
+                                                                                {showConfirmPassword ? (
+                                                                                    <FaEyeSlash />
+                                                                                ) : (
+                                                                                    <FaEye />
+                                                                                )}
                                                                             </span>
-                                                                        )}
-                                                                    </div>
-                                                                </Form.Group>
-                                                            </div>
+                                                                            {errors.confirmPassword && (
+                                                                                <span className="text-danger err_font">
+                                                                                    {errors.confirmPassword.message}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </Form.Group>
+                                                                </div>
+                                                            )}
                                                             <div className="col-md-3 col-12 ">
-                                                                <div className="mb-1 d-flex flex-column position-relative">
+                                                                <Form.Group className="mb-1 d-flex flex-column position-relative">
                                                                     <Form.Label className="mb-0">
                                                                         {`Profile Image`}
                                                                     </Form.Label>
@@ -937,20 +924,58 @@ const NewDoctor = () => {
                                                                             {errors.profileImage.message}
                                                                         </p>
                                                                     )}
-                                                                </div>
+                                                                </Form.Group>
                                                             </div>
                                                             <div className="col-md-3 col-12">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
                                                                         {`Speciality`}{' '}
                                                                     </Form.Label>
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        {...register('specialist')}
-                                                                        onChange={(e) => {
+                                                                    <AsyncSelect
+                                                                        cacheOptions
+                                                                        defaultOptions
+                                                                        loadOptions={(inputValue) => {
+                                                                            return new Promise((resolve) => {
+                                                                                const filteredOptions = specialitiesData
+                                                                                    .filter(specialty =>
+                                                                                        specialty.display.toLowerCase().includes(inputValue.toLowerCase())
+                                                                                    )
+                                                                                    .map(specialty => ({
+                                                                                        value: specialty.display,
+                                                                                        label: specialty.display
+                                                                                    }))
+                                                                                    .slice(0, 50);
+                                                                                resolve(filteredOptions);
+                                                                            });
+                                                                        }}
+                                                                        className="basic-single"
+                                                                        classNamePrefix="select"
+                                                                        placeholder="Search and select speciality"
+                                                                        isClearable
+                                                                        menuPlacement="auto"
+                                                                        menuPosition="fixed"
+                                                                        onChange={(selectedOption) => {
+                                                                            setValue('specialist', selectedOption?.value || '');
                                                                             clearErrors('specialist');
                                                                         }}
-                                                                        placeholder="Enter Speciality Name"
+                                                                        defaultValue={doctorDetails?.specialties?.[0] ? {
+                                                                            value: doctorDetails.specialties[0],
+                                                                            label: doctorDetails.specialties[0]
+                                                                        } : null}
+                                                                        styles={{
+                                                                            control: (provided) => ({
+                                                                                ...provided,
+                                                                                height: '30px',
+                                                                                minHeight: '30px',
+                                                                                border: '0px',
+                                                                            }),
+                                                                            placeholder: (provided) => ({
+                                                                                ...provided,
+                                                                                fontWeight: 'bold',
+                                                                                fontSize: '12px',
+                                                                                paddingBottom: '5px',
+                                                                            }),
+                                                                        }}
                                                                     />
                                                                 </Form.Group>
                                                             </div>
@@ -1028,16 +1053,19 @@ const NewDoctor = () => {
                                                         className="col-12 d-flex justify-content-end gap-2 mt-1"
                                                         style={{ height: '6vh', overflow: 'hidden' }}>
                                                         {/* <Button className="cancel-button" onClick={() => reset()}>Cancel</Button> */}
+                                                        <Button className='custom-buttons' disabled={store?.createtDoctorsReducer?.loading ||
+                                                            store?.createtDoctorsDetailReducer?.loading} type='submit' onClick={() => setSwitchTabs(false)}>
+                                                            {id ? 'Update' : 'Save'}
+                                                        </Button>
                                                         <Button
                                                             variant="primary"
                                                             type="submit"
                                                             className="custom-buttons"
-                                                            disabled={store?.createtDoctorsReducer?.loading}
+                                                            onClick={() => setSwitchTabs(true)}
+                                                            disabled={store?.createtDoctorsReducer?.loading ||
+                                                                store?.createtDoctorsDetailReducer?.loading}
                                                             style={{ width: '120px' }}>
-                                                            {store?.createtDoctorsReducer?.loading ||
-                                                                store?.createtDoctorsDetailReducer?.loading ? (
-                                                                <Spinner color="white" className="spinner-border-sm" />
-                                                            ) : id ? (
+                                                            {id ? (
                                                                 'Update & Next'
                                                             ) : (
                                                                 'Save & Next'
@@ -1049,10 +1077,10 @@ const NewDoctor = () => {
                                         </Form>
                                     )}
                                     {activeTab === 'departmentDetails' && (
-                                        <DepartmentDetails docId={docId} setActiveTab={setActiveTab} />
+                                        <DepartmentDetails docId={docId} setActiveTab={setActiveTab} setSwitchTabs={setSwitchTabs} />
                                     )}
                                     {activeTab === 'qualifications' && (
-                                        <DoctorQualifications docId={docId} setActiveTab={setActiveTab} />
+                                        <DoctorQualifications docId={docId} setActiveTab={setActiveTab} setSwitchTabs={setSwitchTabs} />
                                     )}
                                     {activeTab === 'documents' && <Documents />}
                                 </div>
