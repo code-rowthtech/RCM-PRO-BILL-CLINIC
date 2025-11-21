@@ -632,6 +632,10 @@ const DateEncountersV2 = ({
                                                     fontSize: '12px',
                                                     paddingBottom: '5px',
                                                 }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,  // 👈 ensure it's above sticky headers
+                                                }),
                                             }}
                                         />
                                     </Form.Group>
@@ -729,6 +733,7 @@ const DateEncountersV2 = ({
                                                 }
                                             }}
                                             filterOption={null}
+                                            menuPortalTarget={document.body}
                                             styles={{
                                                 control: (provided) => ({
                                                     ...provided,
@@ -743,6 +748,10 @@ const DateEncountersV2 = ({
                                                     fontWeight: 'bold',
                                                     fontSize: '12px',
                                                     paddingBottom: '5px',
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
                                                 }),
                                             }}
                                         />
@@ -799,6 +808,10 @@ const DateEncountersV2 = ({
                                                     fontWeight: 'bold',
                                                     fontSize: '12px',
                                                     paddingBottom: '5px',
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
                                                 }),
                                             }}
                                         />
