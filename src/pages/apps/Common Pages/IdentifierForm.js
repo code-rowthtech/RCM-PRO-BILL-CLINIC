@@ -69,7 +69,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     };
 
     const removeIdentifier = (index) => {
-        if (index < defaultIdentifiers.length) return; // Prevent removing default identifiers
         setIdentifiers(identifiers.filter((_, i) => i !== index));
     };
 
@@ -200,16 +199,14 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                                 handleChange(index, 'type', selectedType);
                             }}
                         >
-                            <option value="" disabled>Select Identifier Type</option>
+                            <option value="">Select Identifier Type</option>
                             {identifierOptions?.sort((a, b) => a.label.localeCompare(b.label))?.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
                             ))}
                         </Form.Select>
-
                     </Col>
-
                     <Col>
                         <Form.Control
                             type="text"
@@ -219,7 +216,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             data-has-value={!!(item?.number || item?.value)}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
-
                     </Col>
                     <Col className="mb-2 position-relative">
                         <div
@@ -295,7 +291,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             min={new Date().toISOString().split('T')[0]}
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
-                        {index >= defaultIdentifiers?.length && (
+                        {identifiers.length > 1 && (
                             <span
                                 className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
                                 style={{ marginTop: '-29px', right: '12px' }}

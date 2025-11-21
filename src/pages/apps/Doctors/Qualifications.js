@@ -4,20 +4,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createDoctorDetailAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useForm } from 'react-hook-form';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { FiEye, FiInfo, FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import Select from 'react-select';
 import { qualificationsData } from '../../../utils/DataSets/qualification.data';
 
-const DoctorQualifications = ({ setActiveTab, docId }) => {
+const DoctorQualifications = ({ setActiveTab, docId, setSwitchTabs }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const id = doctorDetails?._id;
     const { register, handleSubmit, setValue, clearErrors } = useForm();
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const [showDocPreview, setShowDocPreview] = useState(false);
     const [docPreviewUrl, setDocPreviewUrl] = useState('');
     const updateId = searchParams.get('id');
@@ -36,11 +37,8 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     };
 
     const removeQualification = (index) => {
-        if (qualifications.length > 1) {
-            // Ensure at least one row remains
-            const updatedQualifications = qualifications.filter((_, i) => i !== index);
-            setQualifications(updatedQualifications);
-        }
+        const updatedQualifications = qualifications.filter((_, i) => i !== index);
+        setQualifications(updatedQualifications);
     };
 
     // Handle changes in qualification fields
@@ -89,37 +87,44 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     }));
 
     const onsubmit = (data) => {
-        const qualificationData = qualifications?.map((item) => {
-            const qualification = {};
-            if (item?.degreeName?.data || item?.degreeName) qualification.code = item?.degreeName?.data || item?.degreeName;
-            if (item?.degreeFile) qualification.documents = item?.degreeFile;
-            if (item?.issuerOrganisation) qualification.issuer = item?.issuerOrganisation;
-            return qualification;
-        });
+        const qualificationData = qualifications
+            ?.filter(item => item?.degreeName?.data || item?.degreeName)
+            ?.map((item) => {
+                const qualification = {};
+                if (item?.degreeName?.data || item?.degreeName) qualification.code = item?.degreeName?.data || item?.degreeName;
+                if (item?.degreeFile) qualification.documents = item?.degreeFile;
+                if (item?.issuerOrganisation) qualification.issuer = item?.issuerOrganisation;
+                return qualification;
+            }) || [];
 
-        const filteredDocuments = documents.map(doc => {
-            const filtered = {};
-            if (doc.name) filtered.name = doc.name;
-            if (doc.number) filtered.number = doc.number;
-            if (doc.issuingAuthority) filtered.issuingAuthority = doc.issuingAuthority;
-            if (doc.document) filtered.document = doc.document;
-            if (doc.note) filtered.note = doc.note;
-            return filtered;
-        });
+        const filteredDocuments = documents
+            ?.filter(doc => doc.name || doc.number || doc.issuingAuthority || doc.document || doc.note)
+            ?.map(doc => {
+                const filtered = {};
+                if (doc.name) filtered.name = doc.name;
+                if (doc.number) filtered.number = doc.number;
+                if (doc.issuingAuthority) filtered.issuingAuthority = doc.issuingAuthority;
+                if (doc.document) filtered.document = doc.document;
+                if (doc.note) filtered.note = doc.note;
+                return filtered;
+            }) || [];
 
         const payload = {
             ...(updateId ? { doctorId: id } : { doctorId: docId }),
-            qualification: qualificationData,
-            otherDocuments: filteredDocuments
+            ...(qualificationData.length > 0 ? { qualification: qualificationData } : {}),
+            ...(filteredDocuments.length > 0 ? { otherDocuments: filteredDocuments } : {})
         };
+        if (setSwitchTabs) {
+            setSwitchTabs(true);
+        }
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
     };
 
     useEffect(() => {
         if (doctorDetails && updateId) {
-            // Set qualifications data
-            const updatedQualifications = doctorDetails?.qualification?.length > 0
-                ? doctorDetails.qualification.map((item, index) => ({
+            // Set qualifications data only if there's actual data
+            if (doctorDetails?.qualification?.length > 0) {
+                const updatedQualifications = doctorDetails.qualification.map((item, index) => ({
                     degreeName: {
                         code: item?.code?.code,
                         display: item?.code?.display,
@@ -129,21 +134,20 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                     specialties: item?.specialties?.[0] || 'N/A',
                     degreeFile: item?.documents?.[0] || null,
                     issuerOrganisation: item?.issuer || '',
-                }))
-                : [{ degreeName: '', degreeFile: null, issuerOrganisation: '' }];
+                }));
+                setQualifications(updatedQualifications);
+            }
 
-            const updateDocuments = doctorDetails?.otherDocuments?.length > 0
-                ? doctorDetails.otherDocuments.map((item, index) => ({
+            if (doctorDetails?.otherDocuments?.length > 0) {
+                const updateDocuments = doctorDetails.otherDocuments.map((item, index) => ({
                     name: item?.name || '',
                     number: item?.number || '',
                     issuingAuthority: item?.issuingAuthority || '',
                     document: item?.document || null,
                     note: item?.note || '',
-                }))
-                : [{ name: '', number: '', issuingAuthority: '', document: null, note: '' }];
-
-            setQualifications(updatedQualifications);
-            setDocuments(updateDocuments);
+                }));
+                setDocuments(updateDocuments);
+            }
         }
     }, [doctorDetails, setValue, updateId]);
 
@@ -183,7 +187,10 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
         setDocumentUploading((prev) => ({ ...prev, [index]: false }));
     };
     const removeDocument = (index) => {
-        setDocuments((prev) => prev.filter((_, i) => i !== index));
+        setDocuments((prev) => {
+            const filtered = prev.filter((_, i) => i !== index);
+            return filtered;
+        });
     };
     useEffect(() => {
         return () => {
@@ -385,7 +392,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                 placeholder="Enter Issuing Authority"
                                                                 className="flex-grow-1"
                                                             />
-                                                            {index > 0 && (
+                                                            {qualifications.length > 1 && (
                                                                 <CiCircleMinus
                                                                     className="text-danger cursor-pointer fs-4"
                                                                     onClick={() => removeQualification(index)}
@@ -563,7 +570,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                 />
                                                             </Form.Group>
                                                         </div>
-                                                        {index > 0 && (
+                                                        {documents.length > 1 && (
                                                             <div className="col-3 d-flex align-items-center">
                                                                 <span
                                                                     className="text-danger cursor-pointer fs-5 fw-bold"
@@ -588,16 +595,24 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                     Previous
                                 </Button>
                                 <Button
+                                    variant="secondary"
+                                    type="submit"
+                                    className="custom-buttons"
+                                    disabled={store?.createtDoctorsDetailReducer?.loading}
+                                    style={{ width: '100px' }}>
+                                    Update
+                                </Button>
+                                <Button
                                     variant="primary"
                                     type="submit"
                                     className="custom-buttons"
                                     disabled={store?.createtDoctorsDetailReducer?.loading}
-                                    style={{ width: '120px' }}>
-                                    {store?.createtDoctorsDetailReducer?.loading ? (
-                                        <Spinner color="white" className="spinner-border-sm" />
-                                    ) : (
-                                        'Update & Exit'
-                                    )}
+                                    style={{ width: '120px' }}
+                                    onClick={() => {
+                                        handleSubmit(onsubmit)();
+                                        navigate('/apps/providers/list');
+                                    }}>
+                                    Update & Exit
                                 </Button>
                             </div>
                         </>

@@ -7,7 +7,12 @@ const identifierOptionsList = [
     { label: 'Health Plan Beneficiary Number', value: 'http://hl7.org/fhir/sid/us-medicare', code: 'HPI' },
     { label: 'Passport Number', value: 'urn:oid:2.16.840.1.113883.4.3.2', code: 'PPN' },
     { label: 'Veterans Affairs ID (VA ID)', value: 'http://va.gov/fhir/sid/va', code: 'VA' },
+    { label: 'Diploma', value: '', code: '' },
+    { label: 'Certification', value: '', code: '' },
+    { label: 'Other', value: '', code: '' },
 ];
+
+
 export const identifierOptions = identifierOptionsList.sort((a, b) =>
     a.label.localeCompare(b.label)
 );
@@ -16,7 +21,7 @@ export const identifierOptions = identifierOptionsList.sort((a, b) =>
 export const licensureOptions = [
     { label: 'Board Certification', value: 'http://www.abms.org/certification', code: 'BOARD-CERT' },
     { label: 'DEA Number (Controlled Substances)', value: 'http://www.nabp.pharmacy/DEA', code: 'DEA' },
-    { label: 'State controlled Substance License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'SL' },
+    { label: 'State Controlled Substance License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'SL' },
     { label: 'Other', value: '', code: '' },
 ]
 

@@ -229,7 +229,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
     };
 
     return (
-        <Form>
+        <>
             <Row>
                 <Col sm={12}>
                     <h5>
@@ -547,7 +547,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                     {addresses?.length > 1 && index < addresses.length - 1 && <hr className="mt-2" />}
                 </Row>
             ))}
-        </Form>
+        </>
     );
 };
 

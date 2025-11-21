@@ -55,6 +55,8 @@ const Doctors = React.lazy(() => import('../pages/apps/Doctors/index'));
 const NewDoctor = React.lazy(() => import('../pages/apps/Doctors/NewDoctor'));
 const DepartmentDetails = React.lazy(() => import('../pages/apps/Doctors/DepartmentDetails'));
 
+// V2 Doctor Onboarding Components
+
 const Patients = React.lazy(() => import('../pages/apps/Patients/index'));
 const NewPatient = React.lazy(() => import('../pages/apps/Patients/NewPatient'));
 const UpdatePatient = React.lazy(() => import('../pages/apps/Patients/UpdatePatient/index'));
@@ -155,11 +157,7 @@ const LogoutModel = React.lazy(() => import('../components/LogoutModel'));
 
 const loading = () => <div className=""></div>;
 
-type LoadComponentProps = {
-    component: React.LazyExoticComponent<() => JSX.Element>,
-};
-
-const LoadComponent = ({ component: Component }: LoadComponentProps) => (
+const LoadComponent = ({ component: Component }) => (
     <Suspense fallback={loading()}>
         <Component />
     </Suspense>

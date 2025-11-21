@@ -58,3 +58,7 @@
     padding: 0px; /* Optional for spacing */
     font-size: 14px; /* Optional for consistency */
 }
+
+.encounter-accordion-header {
+    background: red !important;
+}

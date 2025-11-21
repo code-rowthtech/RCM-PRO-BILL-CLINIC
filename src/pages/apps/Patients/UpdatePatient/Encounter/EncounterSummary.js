@@ -63,7 +63,6 @@ const EncounterSummary = () => {
         problems: true,
         medications: true,
     });
-    const [activeKey, setActiveKey] = useState("1");
 
     // CONSTANT DECLARATIONS
     const patientId = searchParams.get('id');
@@ -113,6 +112,7 @@ const EncounterSummary = () => {
         draft: 'text-muted',
         unknown: 'text-dark'
     };
+
     // Get sorted dates (newest first)
     const sortedDates = Object.keys(groupedVitals).sort((a, b) =>
         new Date(b) - new Date(a)
@@ -144,9 +144,6 @@ const EncounterSummary = () => {
         if (patientVitals?.length === 0) {
             dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 3 }));
         }
-        // if(tobaccoHistory?.length===0){
-        //     dispatch(getTobaccooActio({ patientId: patientId }));
-        // }
     }, [allergyData, problemData, medicationList])
 
     // FUNCTIONS
@@ -158,9 +155,7 @@ const EncounterSummary = () => {
         setMedicationModal(false);
     };
 
-    const handleToggle = (key) => {
-        setActiveKey(prev => (prev === key ? null : key)); // toggle open/close
-    };
+
 
     const closeVitalsModal = () => {
         setVitalsModal(false);
@@ -247,14 +242,13 @@ const EncounterSummary = () => {
                 </div>
             );
         }
-
         return value || '-';
     };
 
     return (
         <Row className='position-relative'>
             <Col sm={12} className='mt-1' >
-                <Accordion activeKey={activeKey} onSelect={handleToggle}>
+                <Accordion alwaysOpen>
                     {sortedSubMenuItems.map((menuItem) => {
                         if (!menuItem?.hide) return null; // Skip hidden items
                         const sectionKey = menuItem?.name.toLowerCase().replace(/\s+/g, '');
@@ -263,67 +257,67 @@ const EncounterSummary = () => {
 
                         let content;
                         switch (menuItem.name) {
-                            case 'Vitals':
-                                content = (
-                                    <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
-                                        <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >                                            <thead>
-                                            <tr className='border'>
-                                                <th className='text-white'>
-                                                    {'Vital Name'}
-                                                </th>
-                                                {sortedDates?.slice(0, 3)?.map(date => (
-                                                    <th className='text-white' key={date}>
-                                                        {formatDate(date)}
-                                                    </th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                            <tbody>
-                                                {vitals.map((vital, index) => (
-                                                    <tr className='cursor-pointer' key={vital.name} onClick={() => {
-                                                        const latestDate = sortedDates[0];
-                                                        const value = findVitalValue(vital.name, latestDate);
-                                                        if (value) {
-                                                            const formattedValue = vital.type === 'bp' ? `${value.systolic}/${value.diastolic}` : value;
-                                                            window.populateEncounterField?.('Monitoring Chart (Vitals)', `${vital.name}: ${formattedValue} ${getDisplayUnit(vital)}`);
-                                                        }
-                                                    }}>
-                                                        <td className='p-0 vitalsTableBorder'>
-                                                            {vital.name} {getDisplayUnit(vital) && (
-                                                                <small className="text-muted">({getDisplayUnit(vital)})</small>
-                                                            )}
-                                                        </td>
+                            // case 'Vitals':
+                            //     content = (
+                            //         <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
+                            //             <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >                                            <thead>
+                            //                 <tr className='border'>
+                            //                     <th className='text-white'>
+                            //                         {'Vital Name'}
+                            //                     </th>
+                            //                     {sortedDates?.slice(0, 3)?.map(date => (
+                            //                         <th className='text-white' key={date}>
+                            //                             {formatDate(date)}
+                            //                         </th>
+                            //                     ))}
+                            //                 </tr>
+                            //             </thead>
+                            //                 <tbody>
+                            //                     {vitals.map((vital, index) => (
+                            //                         <tr className='cursor-pointer' key={vital.name} onClick={() => {
+                            //                             const latestDate = sortedDates[0];
+                            //                             const value = findVitalValue(vital.name, latestDate);
+                            //                             if (value) {
+                            //                                 const formattedValue = vital?.type === 'bp' ? `${value?.systolic}/${value?.diastolic}` : value;
+                            //                                 window.populateEncounterField?.('Monitoring Chart (Vitals)', `${vital.name}: ${formattedValue} ${getDisplayUnit(vital)}`);
+                            //                             }
+                            //                         }}>
+                            //                             <td className='p-0 vitalsTableBorder'>
+                            //                                 {vital?.name} {getDisplayUnit(vital) && (
+                            //                                     <small className="text-muted">({getDisplayUnit(vital)})</small>
+                            //                                 )}
+                            //                             </td>
 
-                                                        {sortedDates.slice(0, 3).map(date => (
-                                                            <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
-                                                                {renderVitalCell(vital, date)}
-                                                            </td>
-                                                        ))}
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                            {store?.getVitalsByPatientIdReducer?.loading &&
-                                                <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
-                                                    <Spinner />
-                                                </div>
-                                            }
-                                        </Table>
-                                        <div className="row">
-                                            <div className="col-12 text-end">
-                                                <small onClick={() => setVitalsModal(true)} className='text-info cursor-pointer'>{`Add vitals`}</small>
-                                            </div>
-                                        </div>
-                                        <Modal show={vitalsModal} onHide={closeVitalsModal} size="lg" centered>
-                                            <Modal.Header closeButton className="px-2 py-0">
-                                                <Modal.Title className="">{`Add Vitals`}</Modal.Title>
-                                            </Modal.Header>
-                                            <Modal.Body>
-                                                <VitalStatus />
-                                            </Modal.Body>
-                                        </Modal>
-                                    </Accordion.Body>
-                                );
-                                break;
+                            //                             {sortedDates.slice(0, 3).map(date => (
+                            //                                 <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
+                            //                                     {renderVitalCell(vital, date)}
+                            //                                 </td>
+                            //                             ))}
+                            //                         </tr>
+                            //                     ))}
+                            //                 </tbody>
+                            //                 {store?.getVitalsByPatientIdReducer?.loading &&
+                            //                     <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
+                            //                         <Spinner />
+                            //                     </div>
+                            //                 }
+                            //             </Table>
+                            //             <div className="row">
+                            //                 <div className="col-12 text-end">
+                            //                     <small onClick={() => setVitalsModal(true)} className='text-info cursor-pointer'>{`Add vitals`}</small>
+                            //                 </div>
+                            //             </div>
+                            //             <Modal show={vitalsModal} onHide={closeVitalsModal} size="lg" centered>
+                            //                 <Modal.Header closeButton className="px-2 py-0">
+                            //                     <Modal.Title className="">{`Add Vitals`}</Modal.Title>
+                            //                 </Modal.Header>
+                            //                 <Modal.Body>
+                            //                     <VitalStatus />
+                            //                 </Modal.Body>
+                            //             </Modal>
+                            //         </Accordion.Body>
+                            //     );
+                            //     break;
 
                             case 'Allergy':
                                 content = (
@@ -335,7 +329,6 @@ const EncounterSummary = () => {
                                                         <Spinner className="spinner-border-sm" />
                                                     </div>
                                                 ) : (
-
                                                     <ul className="list-unstyled pb-0 mb-0">
                                                         {allergyData.slice(0, 4).map((allergy, index) => (
                                                             <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`)}>                                                                <div className="fs-6">

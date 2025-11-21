@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Form, OverlayTrigger, Tooltip, Modal } from 'react-bootstrap';
 import { FiDownloadCloud, FiEye, FiInfo } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
@@ -11,7 +11,6 @@ import { useSearchParams } from 'react-router-dom';
 const DoctorIdentifierForm = ({
     defaultIdentifiers = [],
     defaultLicensure = [],
-    onChange,
     setIdentifiers,
     identifiers,
     licensure,
@@ -19,8 +18,6 @@ const DoctorIdentifierForm = ({
 }) => {
     const {
         formState: { errors },
-        setValue,
-        watch,
     } = useForm();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
@@ -42,8 +39,9 @@ const DoctorIdentifierForm = ({
         'The Joint Commission',
         'Other',
     ];
+
     useEffect(() => {
-        if (identifiers.length === 0) {
+        if (identifiers.length === 0 && defaultIdentifiers.length > 0) {
             setIdentifiers(
                 defaultIdentifiers.map((type) => ({
                     type,
@@ -57,9 +55,10 @@ const DoctorIdentifierForm = ({
                 }))
             );
         }
-    }, [defaultIdentifiers, setIdentifiers, identifiers.length]);
+    }, []);
+
     useEffect(() => {
-        if (licensure.length === 0) {
+        if (licensure.length === 0 && defaultLicensure.length > 0) {
             setLicensure(
                 defaultLicensure.map((type) => ({
                     type: '',
@@ -74,7 +73,7 @@ const DoctorIdentifierForm = ({
                 }))
             );
         }
-    }, [defaultLicensure, setLicensure, licensure.length]);
+    }, []);
 
     const addIdentifier = () => {
         setIdentifiers([
@@ -92,16 +91,17 @@ const DoctorIdentifierForm = ({
         ]);
     };
 
-    const removeIdentifier = (index) => {
-        if (index < defaultIdentifiers.length) return; // Prevent removing default identifiers
-        setIdentifiers(identifiers.filter((_, i) => i !== index));
-    };
+    const removeIdentifier = useCallback((index) => {
+        setIdentifiers(prev => prev.filter((_, i) => i !== index));
+    }, [setIdentifiers]);
 
-    const handleChange = (index, field, value) => {
-        const updatedIdentifiers = [...identifiers];
-        updatedIdentifiers[index][field] = value;
-        setIdentifiers(updatedIdentifiers);
-    };
+    const handleChange = useCallback((index, field, value) => {
+        setIdentifiers(prev => {
+            const updated = [...prev];
+            updated[index][field] = value;
+            return updated;
+        });
+    }, [setIdentifiers]);
 
     const handleIdentifierFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
@@ -147,16 +147,17 @@ const DoctorIdentifierForm = ({
         ]);
     };
 
-    const removeLicensure = (index) => {
-        if (index < defaultLicensure.length) return; // Prevent removing default identifiers
-        setLicensure(licensure.filter((_, i) => i !== index));
-    };
+    const removeLicensure = useCallback((index) => {
+        setLicensure(prev => prev.filter((_, i) => i !== index));
+    }, [setLicensure]);
 
-    const handleLicensureChange = (index, field, value) => {
-        const updatedLicensure = [...licensure];
-        updatedLicensure[index][field] = value;
-        setLicensure(updatedLicensure);
-    };
+    const handleLicensureChange = useCallback((index, field, value) => {
+        setLicensure(prev => {
+            const updated = [...prev];
+            updated[index][field] = value;
+            return updated;
+        });
+    }, [setLicensure]);
 
     const handleLicensureFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
@@ -224,44 +225,27 @@ const DoctorIdentifierForm = ({
             </Row>
             {/* Dynamic Identifier Fields */}
             {identifiers.map((item, index) => (
-                <Row key={index} className={`mb-0 position-relative ${identifiers?.length > 1 ? 'px-2 ' : ''}`}>
-                    {identifiers?.length > 1 ?
-                        <strong className='position-absolute fw-semibold fs-6' style={{ top: '28%', left: '-0.4%' }}>{index + 1}.</strong>
-                        :
-                        <></>}
+                <Row key={`identifier-${index}-${item.type?.value || 'new'}`} className={`mb-0 position-relative ${identifiers?.length > 1 ? 'px-2 ' : ''}`}>
+                    {identifiers?.length > 1 && (
+                        <strong className='position-absolute fw-semibold fs-6' style={{ top: '28%', left: '-0.4%', zIndex: 1, pointerEvents: 'none' }}>{index + 1}.</strong>
+                    )}
                     <Col sm={3}>
                         <Form.Label className="mb-0 mt-2">Identifier Type</Form.Label>
-                        {index === 0 && defaultIdentifiers.length > 0 ? (
-                            <Form.Control
-                                type="text"
-                                value={item?.type?.label || defaultIdentifiers[0].label}
-                                readOnly
-                                style={{
-                                    background: '#e9ecef', // Bootstrap's disabled bg
-                                    color: '#212529', // Bootstrap's default text color
-                                    cursor: 'not-allowed',
-                                }}
-                                className="fw-semibold"
-                                tabIndex={-1}
-                            />
-                        ) : (
-                            <Form.Select
-                                value={item?.system || item?.type?.value || ''}
-                                onChange={(e) => {
-                                    const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
-                                    handleChange(index, 'type', selectedType);
-                                }}
-                                disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
-                                <option value="" disabled>
-                                    Select Identifier Type
+                        <Form.Select
+                            value={item?.system || item?.type?.value || ''}
+                            onChange={(e) => {
+                                const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
+                                handleChange(index, 'type', selectedType);
+                            }}>
+                            <option value="" disabled>
+                                Select Identifier Type
+                            </option>
+                            {identifierOptions?.sort((a, b) => a.label.localeCompare(b.label))?.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
                                 </option>
-                                {identifierOptions?.sort((a, b) => a.label.localeCompare(b.label))?.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        )}
+                            ))}
+                        </Form.Select>
                     </Col>
                     <Col sm={3}>
                         <Form.Label className="mb-0 mt-2">Identifier Number</Form.Label>
@@ -291,6 +275,7 @@ const DoctorIdentifierForm = ({
                                 </span>
                             )}
                     </Col>
+
                     <Col sm={3}>
                         <Form.Label className="mb-0 mt-2">Issuing Authority</Form.Label>
                         <Form.Select
@@ -335,13 +320,13 @@ const DoctorIdentifierForm = ({
                     <Col sm={3}>
                         <Form.Label className="mb-0 mt-2">Status</Form.Label>
                         <Form.Select
+                            className='text-capitalize'
                             value={item?.status || 'active'}
                             onChange={(e) => handleChange(index, 'status', e.target.value)}>
-                            <option value="">Select</option>
-                            <option value="active">Active</option>
-                            <option value="hold">Hold</option>
-                            <option value="restricted">Restricted</option>
-                            <option value="unrestricted">Unrestricted</option>
+                            <option value="" key=''>Select</option>
+                            {['active', 'hold', 'restricted', 'unrestricted']?.map((statuses, index) => (
+                                <option value={statuses} key={index} className='text-capitalize'>{statuses}</option>
+                            ))}
                         </Form.Select>
                     </Col>
                     <Col sm={3} className="mb-2 position-relative">
@@ -407,16 +392,19 @@ const DoctorIdentifierForm = ({
                             onChange={(e) => handleIdentifierFileChange(e, index)}
                         />
                         {errors?.[index]?.file && <span className="text-danger">Please upload a document</span>}
-                        {index >= defaultIdentifiers?.length && (
+                        {identifiers.length > 1 && (
                             <span
                                 className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                                style={{ marginTop: '-29px', right: '-5px' }}
-                                onClick={() => removeIdentifier(index)}>
+                                style={{ marginTop: '-29px', right: '-5px', zIndex: 10 }}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    removeIdentifier(index);
+                                }}>
                                 <CiCircleMinus />
                             </span>
                         )}
                     </Col>
-                    {identifiers?.length > 1 && index < identifiers.length - 1}
                 </Row>
             ))}
             <Row>
@@ -431,12 +419,10 @@ const DoctorIdentifierForm = ({
             </Row>
 
             {licensure?.map((item, index) => (
-                <Row key={index} className={`position-relative mb-0 ${licensure?.length > 1 ? 'px-2 ' : ''}`}>
-                    {licensure?.length > 1 ?
-                        <strong className='position-absolute fw-semibold fs-6' style={{ top: '28%', left: '-0.4%' }}>{index + 1}.</strong>
-                        :
-                        <></>
-                    }
+                <Row key={`licensure-${index}-${item.type?.value || 'new'}`} className={`position-relative mb-0 ${licensure?.length > 1 ? 'px-2 ' : ''}`}>
+                    {licensure?.length > 1 && (
+                        <strong className='position-absolute fw-semibold fs-6' style={{ top: '28%', left: '-0.4%', zIndex: 1, pointerEvents: 'none' }}>{index + 1}.</strong>
+                    )}
                     <Col sm={3}>
                         <Form.Label className="mb-0 mt-2">License Type</Form.Label>
                         <Form.Select
@@ -445,9 +431,10 @@ const DoctorIdentifierForm = ({
                                 const selectedType = licensureOptions.find((opt) => opt.value === e.target.value);
                                 handleLicensureChange(index, 'type', selectedType);
                             }}
-                            disabled={defaultLicensure.some((d) => d.value === item.type?.value)}>
-                            <option value="" disabled>
-                                Select License Type
+                        // disabled={defaultLicensure.some((d) => d.value === item.type?.value)}
+                        >
+                            <option value="" key="" disabled>
+                                {`Select License Type`}
                             </option>
                             {licensureOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -461,7 +448,7 @@ const DoctorIdentifierForm = ({
                         <Form.Select
                             value={item?.licenseState || ''}
                             onChange={(e) => handleLicensureChange(index, 'licenseState', e.target.value)}>
-                            <option value="">Select state</option>
+                            <option value="" key="">Select state</option>
                             {statesData?.map((data) => (
                                 <option key={data?._id} value={data?.name}>
                                     {data?.name}
@@ -484,7 +471,7 @@ const DoctorIdentifierForm = ({
                         <Form.Select
                             value={item?.issuingAuthority || ''}
                             onChange={(e) => handleLicensureChange(index, 'issuingAuthority', e.target.value)}>
-                            <option value="" disabled>
+                            <option value="" key="" disabled>
                                 Select Issuing Authority
                             </option>
                             {defaultIssuingAuthority.map((option) => (
@@ -501,7 +488,6 @@ const DoctorIdentifierForm = ({
                             value={item?.ennumerationDate || ''}
                             onChange={(e) => handleLicensureChange(index, 'ennumerationDate', e.target.value)}
                             maxLength={10}
-                        // onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
                     </Col>
                     <Col sm={3}>
@@ -519,10 +505,9 @@ const DoctorIdentifierForm = ({
                             value={item?.status || 'active'}
                             onChange={(e) => handleLicensureChange(index, 'status', e.target.value)}>
                             <option value="">Select</option>
-                            <option value="active">Active</option>
-                            <option value="hold">Hold</option>
-                            <option value="restricted">Restricted</option>
-                            <option value="unrestricted">Unrestricted</option>
+                            {['active', 'hold', 'restricted', 'unrestricted']?.map((data, i) => (
+                                <option value={data} key={i}>{data}</option>
+                            ))}
                         </Form.Select>
                     </Col>
                     <Col sm={3} className=" position-relative">
@@ -587,17 +572,20 @@ const DoctorIdentifierForm = ({
                             onChange={(e) => handleLicensureFileChange(e, index)}
                         />
                         {errors?.[index]?.file && <span className="text-danger">Please upload a document</span>}
-                        {index >= defaultIdentifiers?.length && (
+                        {licensure.length > 1 && (
                             <span
                                 className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                                style={{ marginTop: '-29px', right: '-5px' }}
-                                onClick={() => removeLicensure(index)}>
+                                style={{ marginTop: '-29px', right: '-5px', zIndex: 10 }}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    removeLicensure(index);
+                                }}>
                                 <CiCircleMinus />
                             </span>
                         )}
                     </Col>
-                    {licensure?.length > 1 && index < licensure.length - 1}
-                </Row >
+                </Row>
             ))}
 
 

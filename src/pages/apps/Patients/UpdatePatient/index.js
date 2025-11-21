@@ -23,7 +23,8 @@ import Subtabs from './Subtabsindex';
 import PatientSummary from './PatientSummary';
 import Subsocialtabindex from './Subsocialtabindex';
 import SubAllergytabs from './SubAllergytabs';
-import Encounter from './Encounter/Encounter';
+// import Encounter from './Encounter/Encounter';
+import EncountersV2 from './EncountersV2/EncountersV2';
 import PatientDocs from './Patientdocs';
 import PatientAccess from './PatientAccess';
 import DrugInteraction from './DrugInteractions/DrugInteraction';
@@ -32,6 +33,7 @@ import TaskListing from './TaskList/TaskListing';
 import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
 import { FaFileSignature } from 'react-icons/fa6';
 import ConsentOffCanvas from './ConsentOffCanvas';
+import LabRequest from './LabRequest/LabRequest';
 
 const UpdatePatientIndex = () => {
     // Imports initialization
@@ -71,6 +73,8 @@ const UpdatePatientIndex = () => {
     ]);
     const [expanded, setExpanded] = useState(false);
     const [createEncounter, setCreateEncounter] = useState(false);
+    const [updateEncounter, setUpdateEncounter] = useState(null);
+    const [scrollToAccordion, setScrollToAccordion] = useState(null);
     const isAccordionOpen = useMemo(() => activeKey === '0', [activeKey]);
 
     // Memoized patient data computations
@@ -678,7 +682,7 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Documents' && (
                                                 <PatientDocs isAccordionOpen={isAccordionOpen} />
                                             )}
-                                            {selectedMainTab === 'Encounter' && (
+                                            {/* {selectedMainTab === 'Encounter' && (
                                                 <Encounter
                                                     expanded={expanded}
                                                     setExpanded={setExpanded}
@@ -688,6 +692,21 @@ const UpdatePatientIndex = () => {
                                                     setCreateEncounter={setCreateEncounter}
                                                     setEncounterTabs={setEncounterTabs}
                                                     setSelectedMainTab={setSelectedMainTab}
+                                                />
+                                            )} */}
+                                            {selectedMainTab === 'Encounter' && (
+                                                <EncountersV2
+                                                    expanded={expanded}
+                                                    setExpanded={setExpanded}
+                                                    isAccordionOpen={isAccordionOpen}
+                                                    encounterTabs={encounterTabs}
+                                                    createEncounter={createEncounter}
+                                                    setCreateEncounter={setCreateEncounter}
+                                                    setEncounterTabs={setEncounterTabs}
+                                                    updateEncounter={updateEncounter}
+                                                    setUpdateEncounter={setUpdateEncounter}
+                                                    scrollToAccordion={scrollToAccordion}
+                                                    setScrollToAccordion={setScrollToAccordion}
                                                 />
                                             )}
                                             {[
@@ -707,7 +726,7 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Task' && <TaskListing />}
                                             {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
                                             {selectedMainTab === 'Patient Access' && <PatientAccess />}
-                                            {selectedMainTab === 'Lab Request' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Lab Request' && <LabRequest />}
                                             {selectedMainTab === 'Drug Interactions' && <DrugInteraction />}
                                             {selectedMainTab === 'Balance' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Payment' && <p>In Progress...</p>}

@@ -46,9 +46,7 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
             setValue('dailyOccurenceCount', 0);
             return;
         }
-
         if (!startDate || !scheduledDate || !dailyOccurrenceDate) return;
-
         try {
             const dates = DateUtils.calculateDailyAppointments({
                 daysNumber: daysNumberDaily,
@@ -63,14 +61,11 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
             setValue('dailyOccurenceCount', 0);
         }
     }, [daysNumberDaily, dailyOccurrenceDate, scheduledDate, DateUtils]);
-
     const todayString = DateUtils.formatDate(new Date());
     const oneMonthLaterString = DateUtils.formatDate(new Date(new Date().setMonth(new Date().getMonth() + 1)));
     const minEndDate = scheduledDate ? DateUtils.formatDate(new Date(scheduledDate)) : todayString;
-
     // const oneYearLaterString = DateUtils.formatDate(new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
     const isReadOnly = appointmentDetails?.repeat && id;
-
     return (
         <>
             <Col sm={6}>
@@ -103,7 +98,6 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
                     {errors.dailyOccurrenceDate && <span className="text-danger small">{errors.dailyOccurrenceDate.message}</span>}
                 </Form.Group>
             </Col>
-
             <Col sm={2}>
                 <Form.Group className="mb-1">
                     <Form.Label className="mb-0"></Form.Label>
@@ -128,7 +122,6 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
     const appointmentDays = watch('appointmentDay');
     const weekInterval = watch('weekInterval');
     const weeklyOccurrenceDate = watch('weeklyOccurrenceDate');
-
     const calculateAppointments = useCallback(
         debounce(() => {
             if (!appointmentDays || !weeklyOccurrenceDate) {
@@ -151,13 +144,11 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                 onDatesCalculated([]);
                 return;
             }
-
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
             const appointments = [];
             let currentDate = new Date(today);
-
             while (currentDate <= endDate) {
                 selectedDays.forEach((dayIndex) => {
                     const weekStartDate = new Date(currentDate);
@@ -210,7 +201,6 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                     </div>
                 </Form.Group>
             </Col>
-
             <Col sm={6}>
                 <Form.Group className="mb-1">
                     <Form.Label className="mb-0">Every</Form.Label>
@@ -227,7 +217,6 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                     </span>
                 </Form.Group>
             </Col>
-
             <Col sm={4}>
                 <Form.Group className="mb-1" controlId="weeklyOccurrenceDate">
                     <Form.Label className="mb-0">Ends On <span className="text-danger">*</span></Form.Label>
@@ -353,10 +342,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
         }
     }, [watch('timezone'), setValue]); // Refs for frequently accessed values
     const watchedDoctorName = watch('doctorName');
-    const watchedPatient = watch('patient');
     const watchedAppointmentType = watch('appointmentType');
-    const watchedtimezone = watch('timezone');
-    const watchedScheduled = watch('scheduled');
     const watchedStartTime = watch('startTime');
     const watchedDuration = watch('duration');
     const watchedStatus = watch('status');
@@ -401,14 +387,11 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     useEffect(() => {
         if (selectedSlot) {
             const rawDate = new Date(calendarView === 'month' ? selectedSlot?.slots?.[0] : selectedSlot?.start);
-            // Use local date string to avoid timezone issues
             const year = rawDate.getFullYear();
             const month = String(rawDate.getMonth() + 1).padStart(2, '0');
             const day = String(rawDate.getDate()).padStart(2, '0');
             const localDateString = `${year}-${month}-${day}`;
-
             setScheduledDate(localDateString);
-
             if (calendarView !== 'month') {
                 setValue('startTime', formatTime(selectedSlot?.start));
             }
@@ -1367,12 +1350,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     <Modal.Title className="px-1 py-2">{`Add Patient`}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body
-                    // style={{
-                    //     overflowY: 'scroll',
-                    //     height: '70vh',
-                    //     scrollbarWidth: 'none',
-                    //     msOverflowStyle: 'none',
-                    // }}
                     className="px-0 py-0">
                     <div className="p-0">
                         {activeTab === 'personalDetails' && <NewPatient isModal={true} patientId={patientId} handleClosePatientModal={handleClosePatientModal} />}
