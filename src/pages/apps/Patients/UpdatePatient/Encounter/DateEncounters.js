@@ -1289,6 +1289,10 @@ const DateEncounters = ({
                                                     fontSize: '12px',
                                                     paddingBottom: '5px',
                                                 }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,  // 👈 ensure it's above sticky headers
+                                                }),
                                             }}
                                         />
                                     </Form.Group>
@@ -1401,6 +1405,10 @@ const DateEncounters = ({
                                                     fontSize: '12px',
                                                     paddingBottom: '5px',
                                                 }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,  // 👈 ensure it's above sticky headers
+                                                }),
                                             }}
                                         />
                                         {providerError && (
@@ -1456,6 +1464,10 @@ const DateEncounters = ({
                                                     fontWeight: 'bold',
                                                     fontSize: '12px',
                                                     paddingBottom: '5px',
+                                                }),
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,  // 👈 ensure it's above sticky headers
                                                 }),
                                             }}
                                         />
