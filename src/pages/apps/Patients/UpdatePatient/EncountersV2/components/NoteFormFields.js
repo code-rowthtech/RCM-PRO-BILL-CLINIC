@@ -1,10 +1,13 @@
-import React, { useRef, useEffect, useMemo, memo, createRef } from 'react';
+import React, { useRef, useEffect, useMemo, memo, createRef, useState } from 'react';
 import { Form, Row, Col, Accordion, Table, Button } from 'react-bootstrap';
 import { Controller } from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import { Trash } from 'lucide-react';
 import { FaCloudUploadAlt, FaEye } from 'react-icons/fa';
 import { MdPrint } from 'react-icons/md';
+import AsyncSelect from 'react-select/async';
+import { useSelector, useDispatch } from 'react-redux';
+import { getConsentFormAction } from '../../../../../../redux/settings/action';
 import ToastHandle from '../../../../../../helpers/ToastMessage';
 import VitalsChart from '../../Encounter/VitalsChart';
 import { handlePrintVitals } from '../../../../../../helpers/printVitals';
@@ -34,6 +37,52 @@ export const NoteFormFields = memo(({
     encounterData,
     patientVitals
 }) => {
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state);
+    const [selectedConsentForms, setSelectedConsentForms] = useState([]);
+
+    const consentDocuments = store?.getConsentFormReducer?.data?.documents;
+    // Load consent forms
+    useEffect(() => {
+        const clinicId = store?.Auth?.user?.clinicId;
+        if (clinicId && !consentDocuments?.length) {
+            dispatch(getConsentFormAction({ clinicId }));
+        }
+    }, [dispatch, store?.Auth?.user?.clinicId, consentDocuments?.length]);
+
+    // Expose selected consent forms globally for form submission
+    useEffect(() => {
+        window.getSelectedConsentForms = () => {
+            return selectedConsentForms?.map((form) => form.value) || [];
+        };
+        return () => {
+            delete window.getSelectedConsentForms;
+        };
+    }, [selectedConsentForms]);
+
+    // Load consent forms for encounter updates
+    useEffect(() => {
+        if (encounterData?.data && consentDocuments?.length > 0) {
+            const consentField = encounterData.data.find(field => field.type === 'Consent Forms');
+            if (consentField?.populatedData?.length > 0) {
+                const selectedForms = consentField.populatedData
+                    .map((consentId) => {
+                        const consentDoc = consentDocuments.find((doc) => doc._id === consentId);
+                        if (consentDoc) {
+                            return {
+                                value: consentDoc._id,
+                                label: consentDoc.title,
+                                data: consentDoc,
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(Boolean);
+                setSelectedConsentForms(selectedForms);
+            }
+        }
+    }, [encounterData, consentDocuments]);
+
     // Refs for ReactQuill editors
     const quillRefs = useRef({
         Subjective: createRef(),
@@ -264,6 +313,105 @@ export const NoteFormFields = memo(({
                 <div key={name}>
                     <VitalsChart />
                 </div>
+            );
+        }
+
+        // Render Consent Forms field with card structure
+        if (name === 'Consent Forms') {
+            return (
+                <Form.Group key={name} className='row'>
+                    <div className="col-12">
+                        <Form.Label className="mb-2 d-flex align-items-center">{name}</Form.Label>
+                        <AsyncSelect
+                            loadOptions={(inputValue, callback) => {
+                                try {
+                                    const selectedIds = selectedConsentForms.map(form => form.value);
+                                    const filteredOptions = (consentDocuments || [])
+                                        .filter(form =>
+                                            !selectedIds.includes(form._id) &&
+                                            form?.title?.toLowerCase().includes((inputValue || '').toLowerCase())
+                                        )
+                                        .map(form => ({
+                                            value: form?._id,
+                                            label: form?.title,
+                                            data: form
+                                        }));
+                                    callback(filteredOptions.slice(0, 20));
+                                } catch (error) {
+                                    console.error('Error loading consent forms:', error);
+                                    callback([]);
+                                }
+                            }}
+                            defaultOptions={(() => {
+                                const selectedIds = selectedConsentForms.map(form => form.value);
+                                return (consentDocuments || [])
+                                    .filter(form => !selectedIds.includes(form._id))
+                                    .slice(0, 10)
+                                    .map(form => ({
+                                        value: form?._id,
+                                        label: form?.title || 'Untitled Form',
+                                        data: form
+                                    })).filter(option => option.value);
+                            })()}
+                            isSearchable
+                            className="basic-single mb-2"
+                            classNamePrefix="select"
+                            placeholder="Search and select consent forms"
+                            value={null}
+                            onChange={(selectedOption) => {
+                                if (selectedOption && !selectedConsentForms.find(form => form.value === selectedOption.value)) {
+                                    setSelectedConsentForms(prev => [...prev, selectedOption]);
+                                }
+                            }}
+                            noOptionsMessage={() => 'No consent forms available'}
+                            styles={{
+                                control: (provided) => ({
+                                    ...provided,
+                                    minHeight: '35px',
+                                    border: '1px solid #dee2e6'
+                                })
+                            }}
+                        />
+                    </div>
+                    {selectedConsentForms?.length > 0 && (
+                        selectedConsentForms?.map((form, index) => (
+                            <div key={index} className="col-4 mt-2 p-1">
+                                <div className='d-flex align-items-center justify-content-between p-2 rounded bg-light border'>
+                                    <div className="flex-grow-1">
+                                        <small className="fw-bold text-truncate d-block" title={form?.label}>
+                                            {form?.label}
+                                        </small>
+                                        <small className="text-muted">Consent Form</small>
+                                    </div>
+                                    <div className="d-flex align-items-center gap-1">
+                                        {form?.data?.consentDocument?.url && (
+                                            <Button
+                                                variant="outline-primary"
+                                                size="sm"
+                                                className="p-0"
+                                                style={{ width: '24px', height: '24px', fontSize: '10px' }}
+                                                onClick={() => window.open(form.data.consentDocument.url.split('?')[0], '_blank')}
+                                                title="View consent form"
+                                            >
+                                                <FaEye size={12} />
+                                            </Button>
+                                        )}
+                                        <Button
+                                            variant="outline-danger"
+                                            size="sm"
+                                            className="p-0"
+                                            style={{ width: '24px', height: '24px', fontSize: '10px' }}
+                                            onClick={() => setSelectedConsentForms(prev => prev.filter((_, i) => i !== index))}
+                                            title="Remove consent form"
+                                        >
+                                            <Trash size={12} />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </Form.Group>
             );
         }
 
