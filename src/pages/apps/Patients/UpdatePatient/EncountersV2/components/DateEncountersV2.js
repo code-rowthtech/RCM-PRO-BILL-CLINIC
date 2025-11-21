@@ -36,6 +36,7 @@ import { FaCloudUploadAlt, FaEye } from 'react-icons/fa';
 import { useEncounterData } from '../hooks/useEncounterData';
 import { useFieldPopulation } from '../hooks/useFieldPopulation';
 import { NoteFormFields } from './NoteFormFields';
+import { getConsentFormAction } from '../../../../../../redux/settings/action';
 
 const ENCOUNTER_STATUSES = ['arrived', 'planned', 'triaged', 'in-progress', 'onleave', 'finished', 'cancelled', 'save', 'ready for billing'];
 const DEFAULT_TABS = ['Summary', 'Templates', 'Past Encounters'];
@@ -72,7 +73,7 @@ const DateEncountersV2 = ({
     const [providerError, setProviderError] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [appointmentError, setAppointmentError] = useState(false);
-    const [consentDocuments, setConsentDocuments] = useState([]);
+    const [selectedConsentForms, setSelectedConsentForms] = useState([]);
     const [notesTypeModal, setNotesTypeModal] = useState(false);
     const [selectedNoteType, setSelectedNoteType] = useState(null);
     const [attachedRecords, setAttachedRecords] = useState([]);
@@ -102,6 +103,9 @@ const DateEncountersV2 = ({
         appointmentsData,
         appointmentOptions
     } = useEncounterData(id, encounterId, encounterAction);
+
+    const consentDocuments = store?.getConsentFormReducer?.data || [];
+    console.log('Consent documents:', consentDocuments, 'Store consent reducer:', store?.getConsentFormReducer);
 
     const {
         populatedFields,
@@ -209,7 +213,12 @@ const DateEncountersV2 = ({
             limit: 10,
             skip: 1,
         }))
-    }, [dispatch])
+        const clinicId = store?.Auth?.user?.clinicId;
+        if (clinicId) {
+            console.log('Calling consent form API with clinicId:', clinicId);
+            dispatch(getConsentFormAction({ clinicId }));
+        }
+    }, [dispatch, store?.Auth?.user?.clinicId])
 
     // Load encounter data for update
     useEffect(() => {
@@ -435,6 +444,18 @@ const DateEncountersV2 = ({
                     }
                     fieldsData.push(fieldData);
                 });
+            } else if (name === 'Consent Forms') {
+                // Handle Consent Forms specially - get data from NoteFormFields component
+                const consentFormsData = window.getSelectedConsentForms?.() || [];
+                const fieldData = {
+                    type: name,
+                    content: {
+                        type: 'text',
+                        value: ''
+                    },
+                    populatedData: consentFormsData
+                };
+                fieldsData.push(fieldData);
             } else if (name !== 'Attached Records') {
                 // Handle regular fields, exclude Attached Records
                 const value = getValues(name) || '';
@@ -479,6 +500,7 @@ const DateEncountersV2 = ({
             setUpdateClicked(true);
             dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
         } else {
+            // console.log(payload, 'payloadpayloadpayload')
             dispatch(createEncounterAction({ key: encryptMessage(payload) }));
         }
     };
@@ -775,11 +797,6 @@ const DateEncountersV2 = ({
                                             onChange={(selectedValue) => {
                                                 setSelectedAppointment(selectedValue?.value);
                                                 setAppointmentError(false);
-                                                if (selectedValue?.consentDocument) {
-                                                    setConsentDocuments(selectedValue.consentDocument);
-                                                } else {
-                                                    setConsentDocuments([]);
-                                                }
                                                 if (encounterAction === 'updateEncounter') {
                                                     const payload = {
                                                         id: encounterId,
