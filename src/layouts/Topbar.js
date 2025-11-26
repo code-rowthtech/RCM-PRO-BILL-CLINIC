@@ -112,7 +112,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const pageTitle = getPageTitle(pathToTitleMap, pathname, search);
 
     const navbarCssClasses = navCssClasses || '';
-    const containerCssClasses = !hideLogo ? 'container-fluid' : '';
+    const containerCssClasses = !hideLogo ? 'container-fluid ' : 'h-100';
 
     const { layoutType, leftSideBarType } = useSelector((state) => ({
         layoutType: state.Layout.layoutType,
@@ -167,25 +167,17 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             </span>
                         </Link>
                     )}
-                    <ul className="list-unstyled topbar-menu float-end mb-0">
-                        {location.pathname === '/apps/patients/update-patient' && (
-                            <li className="notification-list ">
-                                <button
-                                    onClick={() => navigate('/apps/patients/list')}
-                                    className="custom mt-2 text-muted border-0 mx-2 px-2 bg-light fw-semibold">
-                                    Back
-                                </button>
-                            </li>
-                        )}
+                    <ul className="list-unstyled h-100 d-flex align-items-center topbar-menu float-end mb-0">
                         <li className="notification-list">
                             <select
-                                className="form-select mt-1 text-capitalize"
+                                className="form-select text-capitalize"
                                 style={{
                                     minWidth: '15rem',
                                     maxWidth: '20rem',
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
-                                    textOverflow: 'ellipsis'
+                                    textOverflow: 'ellipsis',
+                                    height: '28px'
                                 }}
                                 onChange={(e) => {
                                     localStorage.setItem('subClinicLocation', encryptMessage(e.target.value));
@@ -215,21 +207,21 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                         <li className="notification-list">
                             <button
                                 onClick={() => setTaskModal(true)}
-                                className="custom mt-2 mx-2 text-muted border-0  px-2 bg-light fw-semibold">
+                                className="custom topbar-action-buttons text-muted border-0 ms-2 mx-1 px-2 bg-light fw-semibold"
+                                style={{ height: '28px' }}>
                                 Add Task
                             </button>
                         </li>
-                        {/* <li
-                            onClick={() => setTaskModal(true)}
-                            className="custom-buttons fw-bolder fs-3 cursor-pointer ms-2"
-                            title="Add New Task">
-                            <MdAddCircleOutline /> Add Task
-                        </li> */}
-                        {/* <li className="notification-list">
-                            <Button className="custom-buttons mt-1" onClick={() => setTaskModal(true)}>
-                                Add Task
-                            </Button>
-                        </li> */}
+                        {location.pathname === '/apps/patients/update-patient' && (
+                            <li className="notification-list">
+                                <button
+                                    onClick={() => navigate('/apps/patients/list')}
+                                    className="custom topbar-action-buttons text-muted border-0 mx-1 px-2 bg-light fw-semibold"
+                                    style={{ height: '28px' }}>
+                                    Back
+                                </button>
+                            </li>
+                        )}
                         <ModalTask show={taskModal} handleClose={handleCloseTaskModal} />
                         <li className="dropdown notification-list">
                             <ProfileDropdown
@@ -249,7 +241,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             <h5 className="mt-2">{pageTitle}</h5>
                         </div>
                     )}
-
                     {layoutType === layoutConstants.LAYOUT_HORIZONTAL && (
                         <Link
                             to="#"
@@ -262,7 +253,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             </div>
                         </Link>
                     )}
-
                     {layoutType === layoutConstants.LAYOUT_DETACHED && (
                         <Link to="#" className="button-menu-mobile disable-btn" onClick={handleLeftMenuCallBack}>
                             <div className="lines">

@@ -1355,3 +1355,12 @@ option {
 /* .encounter-accordion-header .accordion-button {
     background: #f5f7fa;
 } */
+
+.topbar-action-buttons {
+    background-color: #6169d0 !important;
+    color: white !important;
+    border-radius: 3px !important;
+    border: none !important;
+    font-weight: 400 !important;
+    font-size: 10px !important;
+}

@@ -101,10 +101,9 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
             setSelectedEncounter([]);
         }} size="lg" className="print_documents_modal">
             <Modal.Header closeButton className="px-2 py-0">
-                <Modal.Title>Print Patient Summary</Modal.Title>
+                <Modal.Title className='py-2'>Print Patient Summary</Modal.Title>
             </Modal.Header>
-
-            <Modal.Body className="px-2 py-1 scroll-container   " style={{ maxHeight: 'calc(50vh - 120px)' }}>
+            <Modal.Body className="px-2 py-2 scroll-container" style={{ maxHeight: 'calc(50vh - 120px)' }}>
                 <div className="d-flex gap-4 mb-2">
                     {[['Patient Information', patientInfoOptions],
                     ['Clinical Review', clinicalReviewOptions],
@@ -131,46 +130,15 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                         </div>
                     ))}
                 </div>
-
                 <div className="border-top pt-0 scroll-container" style={{ maxHeight: '200px' }}>
                     <h5 className="fw-bold mb-2 mt-0 sticky-top bg-white py-2">Select Encounter</h5>
                     <div className="d-flex flex-wrap gap-4 pb-2">
-                        {/* {encounters?.map((encounter) => {
-                            const encounterId = encounter?._id;
-                            const encounterDate = encounter?.period?.start
-                                ? new Date(encounter.period.start).toISOString().split('T')[0]
-                                : 'No Date Available';
-
-                            return (
-                                <div className="form-check d-flex align-items-center" key={encounterId}>
-                                    <input
-                                        className="form-check-input me-2"
-                                        type="checkbox"
-                                        name="encounter-radio"
-                                        id={`encounter-${encounterId}`}
-                                        checked={selectedEncounter?._id === encounterId}
-                                        onChange={(e) => {
-                                            setSelectedEncounter(encounter);
-                                            setPrintOptions((prev) =>
-                                                prev.includes('Encounter') ? prev : [...prev, 'Encounter']
-                                            );
-                                        }}
-                                    />
-                                    <label className="form-check-label" htmlFor={`encounter-${encounterId}`}>
-                                        {encounterDate}
-                                    </label>
-                                </div>
-                            );
-                        })} */}
-
                         {encounters?.map((encounter) => {
                             const encounterId = encounter?._id;
                             const encounterDate = encounter?.period?.start
                                 ? new Date(encounter.period.start).toISOString().split('T')[0]
                                 : 'No Date Available';
-
                             const isSelected = selectedEncounter.some(e => e._id === encounterId);
-
                             return (
                                 <div className="form-check d-flex align-items-center" key={encounterId}>
                                     <input
@@ -181,13 +149,11 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                                         checked={isSelected}
                                         onChange={(e) => {
                                             if (e.target.checked) {
-                                                // Add to selectedEncounter if not already there
                                                 setSelectedEncounter(prev => [...prev, encounter]);
                                                 setPrintOptions(prev =>
                                                     prev.includes('Encounter') ? prev : [...prev, 'Encounter']
                                                 );
                                             } else {
-                                                // Remove from selectedEncounter
                                                 setSelectedEncounter(prev =>
                                                     prev.filter(e => e._id !== encounterId)
                                                 );
@@ -200,7 +166,6 @@ const ModalPrint = ({ show, onHide, patientDetails, store, id }) => {
                                 </div>
                             );
                         })}
-
                     </div>
                 </div>
             </Modal.Body>

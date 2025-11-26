@@ -318,7 +318,6 @@ const NewDoctor = () => {
         confirmPassword: '',
     });
 
-    // Example of updating the state when data changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
@@ -384,7 +383,6 @@ const NewDoctor = () => {
     useEffect(() => {
         if (createDepartmentResponse === 201) {
             setAddDepartmentModal(false);
-            // Refresh department list after creating new department
             dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 50, skip: 1, search: '' }));
         }
     }, [createDepartmentResponse, dispatch]);
@@ -397,7 +395,6 @@ const NewDoctor = () => {
                             <div className="row">
                                 <div className="col-12">
                                     <div className="row d-flex justify-content-between align-items-center">
-                                        {/* Tabs Section */}
                                         <div className="col-9 col-md-8 mb-md-1 mb-1 mb-md-0">
                                             <ul className="nav nav-underline">
                                                 <li className="nav-item">
@@ -442,8 +439,8 @@ const NewDoctor = () => {
                                                                         isButtonDisabled
                                                                             ? {
                                                                                 pointerEvents: 'none',
-                                                                                opacity: 0.6, // Visual indication that the button is disabled
-                                                                                cursor: 'not-allowed', // Shows the "not allowed" cursor
+                                                                                opacity: 0.6,
+                                                                                cursor: 'not-allowed',
                                                                             }
                                                                             : {}
                                                                     }
@@ -581,7 +578,7 @@ const NewDoctor = () => {
                                                                                         required:
                                                                                             'Phone number is required',
                                                                                         pattern: {
-                                                                                            value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                                            value: /^\(\d{3}\)\d{3}-\d{4}$/,
                                                                                             message:
                                                                                                 'Contact must be in the format (XXX)XXX-XXXX',
                                                                                         },
@@ -602,12 +599,12 @@ const NewDoctor = () => {
                                                                                             e.target.value.replace(
                                                                                                 /\D/g,
                                                                                                 ''
-                                                                                            ); // Remove all non-numeric characters
+                                                                                            );
                                                                                         if (rawValue.length > 10)
                                                                                             rawValue = rawValue.slice(
                                                                                                 0,
                                                                                                 10
-                                                                                            ); // Limit to 10 digits
+                                                                                            );
                                                                                         const formattedValue =
                                                                                             rawValue.replace(
                                                                                                 /(\d{1,3})(\d{0,3})(\d{0,4})/,
@@ -618,7 +615,7 @@ const NewDoctor = () => {
                                                                                                         return `(${p1})${p2}`;
                                                                                                     return `(${p1}`;
                                                                                                 }
-                                                                                            ); // Format dynamically as (XXX)XXX-XXXX
+                                                                                            );
                                                                                         e.target.value = formattedValue;
                                                                                         setFormData({
                                                                                             ...formData,
@@ -635,12 +632,6 @@ const NewDoctor = () => {
                                                                                 </span>
                                                                             )}
                                                                         </Form.Group>
-                                                                        {/* <div
-                                                                        className="position-absolute"
-                                                                        style={{ top: '52%', left: '1%' }}
-                                                                    >
-                                                                        <img src={us} alt="country code flag" width={20} />
-                                                                    </div> */}
                                                                     </Form.Group>
                                                                 </div>
                                                             </div>

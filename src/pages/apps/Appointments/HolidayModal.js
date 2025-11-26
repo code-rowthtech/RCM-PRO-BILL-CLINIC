@@ -42,7 +42,6 @@ const HolidayModal = ({
             ToastHandle('This date is already a holiday for the provider.', 'danger');
             return;
         }
-
         setScheduledDate(selectedDate);
         handleCloseModal();
     };

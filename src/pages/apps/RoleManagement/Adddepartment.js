@@ -59,7 +59,7 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
   return (
     <>
 
-      <Modal centered show={addDepartmentModal} onHide={closeAddModal}>
+      <Modal centered show={addDepartmentModal} >
         <Modal.Body>
           <Row className="border-bottom mb-2 pb-2">
             <Col sm={11} className='text-center'><h4>New Department</h4></Col>
@@ -134,18 +134,15 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                     }}
                   />
                 </Form.Group>
-
-
               </Col>
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              <Button onClick={closeAddModal} type="button" className="cancel-button">Close</Button>
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading ? (
                   <div class="spinner-border spinner-border-sm" role="status">
                     <span class="visually-hidden">Loading...</span>
                   </div>
-
                 ) : (
                   'Submit'
                 )}
@@ -155,9 +152,6 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
 
         </Modal.Body>
       </Modal>
-
-
-
 
       <Modal centered show={addDesiginationModal} onHide={closeAddModal}>
         <Modal.Body className='' style={{ border: '1px solid lightgray' }}>
@@ -225,7 +219,7 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                             </Col> */}
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              <Button onClick={closeAddModal} type="button" className="cancel-button">Close</Button>
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading ? (
                   <div class="spinner-border spinner-border-sm" role="status">

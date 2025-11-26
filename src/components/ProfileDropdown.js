@@ -94,7 +94,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
             document.getElementById(`otp-${index - 1}`).focus();
         }
     };
-    const onSubmit = () => {};
+    const onSubmit = () => { };
     return (
         <>
             <Dropdown align="end">
@@ -102,9 +102,11 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                     variant="link"
                     id="dropdown-profile"
                     className="nav-link border-0 dropdown-toggle nav-user arrow-none me-0">
-                    <span className="account-user-avatar">
+                    <span
+                    //  className="account-user-avatar"
+                    >
                         {logo ? (
-                            <img src={logo} className="rounded-circle object-fit-cover" alt="user" />
+                            <img src={logo} className="rounded-circle" style={{ height: '30px' }} alt="user" />
                         ) : (
                             <FaUserCircle className="rounded-circle fs-1 text-dark" />
                         )}

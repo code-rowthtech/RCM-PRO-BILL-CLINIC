@@ -239,7 +239,6 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
     };
 
     // react quill word limit
-
     const handleLimitExceed = ({ type, message }) => {
         ToastHandle(message, 'danger');
     };

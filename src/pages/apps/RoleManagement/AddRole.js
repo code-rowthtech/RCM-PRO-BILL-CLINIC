@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Modal, Form, Row, Col, Spinner, Dropdown, InputGroup } from 'react-bootstrap';
-import { IoMdClose } from 'react-icons/io';
+import { useEffect, useState } from 'react';
+import { Button, Modal, Form, Row, Col, Spinner, InputGroup } from 'react-bootstrap';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
-import { createRolesAction, getRoleDataAction, getRolesAction, updateRolesAction } from '../../../redux/actions';
+import { createRolesAction, updateRolesAction } from '../../../redux/actions';
 import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
 import CreateRoleSetting from '../Settings/Role/CreateRoleSetting';
 import Adddepartment from './Adddepartment';
 import us from '../../../assets/images/flags/us.jpg';
 import { useSearchParams } from 'react-router-dom';
-import { updateRolesReducer } from '../../../redux/roles/reducers';
-import ToastHandle from '../../../helpers/ToastMessage';
 
 const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => {
     const dispatch = useDispatch();
@@ -21,9 +17,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
     const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
 
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
-    const [isDropdownClicked, setIsDropdownClicked] = useState(false);
-    const [isDropdownDesignation, setIsDropdownDesignation] = useState(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const createLoading = store?.createRolesReducer?.loading;
@@ -38,7 +31,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
     const [addDepartmentalModal, setAddDepartmentalModal] = useState(false);
     const designationData = store?.getMastersDataReducer?.data1?.data?.result;
     const designationDataLoading = store?.getMastersDataReducer?.data?.loading;
-    const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
 
     const {
         register,
@@ -48,13 +40,12 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
         watch,
         setValue,
         formState: { errors },
-        getValues,
     } = useForm();
 
     const closeAddModal = () => {
         setAddDepartmentalModal(false);
         setAddDesiginationModal(false);
-        reset();
+        // reset();
     };
 
     useEffect(() => {
@@ -189,7 +180,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
     };
     const joiningDate = watch('joiningDate');
     const desigination = watch('designation');
-    const department = watch('department');
     const role = watch('roleId');
 
     const handleContactChange = (value, field) => {
@@ -211,16 +201,13 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
 
     return (
         <>
-            <Modal centered show={show} size="lg" onHide={close}>
+            <Modal centered show={show} size="lg" className={`${addDepartmentalModal ? 'd-none' : ''}`}>
                 <Modal.Body>
                     <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
                         <Col sm={1}></Col>
                         <Col sm={10}>
                             <h4 className="mb-0 text-center">{dataToEdit ? 'Update User' : 'Add New User'}</h4>
                         </Col>
-                        {/* <Col sm={1}>
-                            <IoMdClose className="fs-4 cursor-pointer" onClick={close} />
-                        </Col> */}
                     </Row>
                     {/* Form with handleSubmit to trigger onSubmit */}
                     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -598,7 +585,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                             <Button type="button" className="cancel-button" onClick={close}>
                                 Cancel
                             </Button>
-
                             {dataToEdit ? (
                                 <Button
                                     type="submit"

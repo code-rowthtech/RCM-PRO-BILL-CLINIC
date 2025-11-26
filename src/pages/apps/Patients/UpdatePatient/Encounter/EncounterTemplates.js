@@ -10,9 +10,8 @@ import { getTemplateAction } from '../../../../../redux/actions';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import TemplateModal from '../../../NotesAndTemplates/Modals/TemplateModal';
-import { Link } from 'react-router-dom';
 
-const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
+const EncounterTemplates = ({ selectedFromList, setSelectedFromList, setScrollToAccordion, getValues }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const templatesData = store?.getTemplateReducer?.data?.data;
@@ -26,11 +25,13 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
         setShowModal(false);
         setTemplateToEdit(null);
     }
+
     useEffect(() => {
         if (!templatesData?.length) {
             dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
         }
     }, []);
+
     return (
         <Row className=' position-relative'>
             {selectedTemplate ?
@@ -53,19 +54,22 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                                     <Col sm={12}>
                                         <ul className='list-unstyled fs-6 px-2'>
                                             {item?.list?.map((itemList, index) => {
-                                                const alreadySelected = selectedFromList?.[item?.label]?.includes(itemList?.text);
+                                                const fieldName = item?.label === 'Care Plan' ? 'CarePlan' : item?.label;
+                                                const currentFieldValue = getValues?.(fieldName) || '';
+                                                const alreadyInForm = currentFieldValue.includes(itemList?.text);
+                                                const alreadySelected = selectedFromList?.[item?.label]?.includes(itemList?.text) || alreadyInForm;
                                                 return (
                                                     <li
                                                         style={{ backgroundColor: alreadySelected ? 'rgb(232 240 254 / 61%)' : '' }}
                                                         onClick={() => {
-                                                            // if (!alreadySelected) {
+                                                            if (alreadySelected) return;
                                                             setSelectedFromList(prev => ({
                                                                 ...prev,
                                                                 [item?.label]: prev[item?.label]
                                                                     ? `${prev[item?.label]}\n${itemList?.text}`
                                                                     : itemList?.text
                                                             }));
-                                                            // }
+                                                            setScrollToAccordion?.(item?.label);
                                                         }}
                                                         className={`border-bottom py-1 cursor-pointer list-hover ${alreadySelected ? 'text-muted' : ''}`}
                                                         key={index}
@@ -160,7 +164,6 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                                 setEditIcon(true)
                             }} className='fs-6 fw-semibold  cursor-pointer'><i className="mdi mdi-square-edit-outline cursor-pointer"></i>&nbsp;{`Edit template`}</span>
                         }
-
                         <TemplateModal
                             show={showModal}
                             onHide={closeModal}
