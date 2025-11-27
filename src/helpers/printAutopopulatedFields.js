@@ -261,6 +261,24 @@ export const handlePrintAutopopulatedFields = ({ populatedFields, patientDetails
             </style>
         </head>
         <body>
+         <div class="header">
+            <img src=${loggedInUser?.logo?.split('?')[0]}/>
+                <h1>Medical Encounter Report</h1>
+                <div class="header-info">
+                    <div>
+                        <strong>Provider:</strong> ${encounterData?.providerId?.name?.find((data) => data?.use === 'official')?.text || 'Not available'}
+                    </div>
+                    <div>
+                        <strong>Date:</strong> ${encounterData?.period?.start ? new Date(encounterData?.period?.start)?.toISOString()?.split('T')?.[0] : 'Not specified'}
+                    </div>
+                    <div>
+                        <strong>Status:</strong> ${encounterData?.status?.charAt(0).toUpperCase() + encounterData?.status.slice(1) || 'UNKNOWN'}
+                    </div>
+                    <div>
+                        <strong>Encounter Type:</strong> ${encounterData?.type?.[0]?.coding?.[0]?.display || 'Standard Visit'}
+                    </div>
+                </div>
+            </div>
             <div class="header">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
@@ -419,7 +437,6 @@ export const handlePrintAutopopulatedFields = ({ populatedFields, patientDetails
                         groupedData[type].push(data);
                     }
                 });
-
                 Object.entries(groupedData).forEach(([type, items]) => {
                     const firstItem = items[0];
                     const lines = firstItem.split('\n');
@@ -431,7 +448,6 @@ export const handlePrintAutopopulatedFields = ({ populatedFields, patientDetails
                         printContent += `<th>${header}</th>`;
                     });
                     printContent += `</tr></thead><tbody>`;
-
                     items.forEach((data, index) => {
                         const lines = data.split('\n');
                         const parsedData = {};

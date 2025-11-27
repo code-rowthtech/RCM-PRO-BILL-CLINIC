@@ -49,6 +49,7 @@ function* createScheduleFunction(data) {
         });
     }
 }
+
 function* createTimingsFunction(data) {
     try {
         yield put({
@@ -81,6 +82,7 @@ function* createTimingsFunction(data) {
         });
     }
 }
+
 function* updateTimingsFunction(data) {
     try {
         yield put({

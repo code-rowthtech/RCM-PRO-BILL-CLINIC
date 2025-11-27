@@ -59,7 +59,7 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
   return (
     <>
 
-      <Modal centered show={addDepartmentModal} onHide={closeAddModal}>
+      <Modal centered show={addDepartmentModal} >
         <Modal.Body>
           <Row className="border-bottom mb-2 pb-2">
             <Col sm={11} className='text-center'><h4>New Department</h4></Col>
@@ -127,25 +127,21 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                     placeholder="Enter description"
                     onInput={(e) => {
                       const value = e.target.value;
-                      // Prevent spaces when input is empty
                       if (value.trim() === "") {
                         e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                       }
                     }}
                   />
                 </Form.Group>
-
-
               </Col>
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              <Button onClick={closeAddModal} type="button" className="cancel-button">Close</Button>
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading ? (
                   <div class="spinner-border spinner-border-sm" role="status">
                     <span class="visually-hidden">Loading...</span>
                   </div>
-
                 ) : (
                   'Submit'
                 )}
@@ -155,9 +151,6 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
 
         </Modal.Body>
       </Modal>
-
-
-
 
       <Modal centered show={addDesiginationModal} onHide={closeAddModal}>
         <Modal.Body className='' style={{ border: '1px solid lightgray' }}>
@@ -183,7 +176,6 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                     placeholder="Enter Desigination Name"
                     onInput={(e) => {
                       const value = e.target.value;
-                      // Prevent spaces when input is empty
                       if (value.trim() === "") {
                         e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                       }
@@ -208,7 +200,6 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                     placeholder="Re-enter Desigination Name"
                     onInput={(e) => {
                       const value = e.target.value;
-                      // Prevent spaces when input is empty
                       if (value.trim() === "") {
                         e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                       }
@@ -217,15 +208,9 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                   {errors.reEnterName && <p className="text-danger">{errors.reEnterName.message}</p>}
                 </Form.Group>
               </Col>
-              {/* <Col md={12}>
-                              <Form.Group className="mb-2">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control as="textarea" rows={3} {...register("description")} placeholder="Enter description" />
-                              </Form.Group>
-                            </Col> */}
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              <Button onClick={closeAddModal} type="button" className="cancel-button">Close</Button>
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading ? (
                   <div class="spinner-border spinner-border-sm" role="status">

@@ -32,6 +32,7 @@ const DELETE_SCHEDULE_INITIAL_STATE = {
     data: [],
     loading: false,
 };
+
 export const createScheduleReducer = (state = CREATE_SCHEDULE_INITIAL_STATE, action) => {
     switch (action.type) {
         case ScheduleActionTypes.CREATE_SCHEDULE_LOADING:

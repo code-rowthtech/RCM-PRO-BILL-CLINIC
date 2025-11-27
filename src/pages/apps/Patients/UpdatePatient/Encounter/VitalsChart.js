@@ -85,13 +85,11 @@ export default function VitalsChart({ isAccordionOpen }) {
             if (!vital.value || (vital.type === 'bp' && (!vital.value.systolic || !vital.value.diastolic))) {
                 return;
             }
-
             const error = validateVital(vital);
             if (error) {
                 errors[vital.name] = error;
                 return;
             }
-
             const effectiveDateTime = `${visitDateTime.date}T${visitDateTime.time}:00`;
             const observation = {
                 code: {
@@ -101,7 +99,6 @@ export default function VitalsChart({ isAccordionOpen }) {
                 subject: patientId,
                 createdBy: loggedInUser?._id,
             };
-
             if (vital.type === 'bp') {
                 observation.component = [
                     {
@@ -120,23 +117,18 @@ export default function VitalsChart({ isAccordionOpen }) {
             }
             observations.push(observation);
         });
-
         setValidationErrors(errors);
-
         if (Object.keys(errors).length > 0) {
             ToastHandle('Please fix validation errors', 'danger');
             return;
         }
-
         if (observations.length === 0) {
             ToastHandle('Please enter at least one vital', 'warning');
             return;
         }
-
         observations.forEach((obs) => {
             dispatch(createVitalsAction({ key: encryptMessage(obs) }));
         });
-
         setVitals(defaultVitals);
     };
 

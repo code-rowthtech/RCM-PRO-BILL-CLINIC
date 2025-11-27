@@ -3,26 +3,26 @@ import { Col, Row, Table, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { getEncounterAction, getEncounterByIdAction } from '../../../../../../redux/actions';
 import { useSearchParams } from 'react-router-dom';
-import dummyProfile from '../../../../../../assets/images/dummyProfile.png';
 import Spinner from '../../../../../../constants/Spinner';
 import { FiFileText } from 'react-icons/fi';
 import Paginations from '../../../../../../helpers/Paginations';
 import { handlePrintEncounters } from '../../Encounter/handlePrintEncounter';
+import { handlePrintEncounterList } from '../../../../../../helpers/printEncounterList';
 import { IoPrintSharp } from 'react-icons/io5';
 
-const EncounterListV2 = ({ 
-    encounterTabs, 
-    setEncounterTabs, 
-    setActiveTab, 
-    setCreateEncounter, 
-    setExpanded 
+const EncounterListV2 = ({
+    encounterTabs,
+    setEncounterTabs,
+    setActiveTab,
+    setCreateEncounter,
+    setExpanded
 }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const [skip, setSkip] = useState(1);
     const id = searchParams.get('id');
     const store = useSelector((state) => state);
-    
+
     const encounters = store?.getEncounterReducer?.data?.encounters;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
@@ -66,9 +66,26 @@ const EncounterListV2 = ({
         setExpanded(true);
     };
 
+    const handlePrintList = () => {
+        handlePrintEncounterList(encounters, patientDetails);
+    };
+
     return (
         <Row className='my-1'>
             <Col sm={12}>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                    <h5 className="mb-0">Encounter List</h5>
+                    {encounters?.length > 0 && (
+                        <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={handlePrintList}
+                            className="d-flex align-items-center gap-1"
+                        >
+                            <IoPrintSharp /> Print List
+                        </Button>
+                    )}
+                </div>
                 <Table
                     responsive
                     className="table-centered table-nowrap mb-0 rounded">
@@ -110,9 +127,9 @@ const EncounterListV2 = ({
                                         {item?.period?.end ? new Date(item?.period?.end)?.toISOString().split('T')?.[0] : '-'}
                                     </td>
                                     <td>
-                                        <IoPrintSharp 
-                                            className="fs-4 mb-1 me-1 cursor-pointer" 
-                                            onClick={() => handlePrintEncounters(item, patientDetails)} 
+                                        <IoPrintSharp
+                                            className="fs-4 mb-1 me-1 cursor-pointer"
+                                            onClick={() => handlePrintEncounters(item, patientDetails)}
                                         />
                                         <i
                                             className="mdi mdi-square-edit-outline fs-4 cursor-pointer"
@@ -130,8 +147,8 @@ const EncounterListV2 = ({
                                         <p className="text-muted">
                                             Create your first encounter to get started
                                         </p>
-                                        <Button 
-                                            className='custom-buttons' 
+                                        <Button
+                                            className='custom-buttons'
                                             onClick={handleCreateNewEncounter}
                                         >
                                             Create New Encounter

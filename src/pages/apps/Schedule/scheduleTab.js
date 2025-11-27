@@ -275,9 +275,7 @@ const ScheduleTab = () => {
                         defaultValue={time}
                         onChange={(e) => {
                             let value = e.target.value;
-                            // Remove any non-digit and non-decimal characters
                             value = value.replace(/[^\d.]/g, '');
-                            // Ensure only one decimal point
                             const parts = value.split('.');
                             if (parts.length > 2) {
                                 value = parts[0] + '.' + parts.slice(1).join('');
@@ -344,11 +342,6 @@ const ScheduleTab = () => {
                                                 {day?.slots?.map((slot, slotIndex) => (
                                                     <tr key={slotIndex}>
                                                         <td style={{ width: '40%' }} className="text-black pe-1">
-                                                            {/* <input
-                              className="form-control"
-                              type="time"
-                              defaultValue={slot?.startTime}
-                            /> */}
                                                             <input
                                                                 className="form-control"
                                                                 type="time"
@@ -366,12 +359,6 @@ const ScheduleTab = () => {
                                                             />
                                                         </td>
                                                         <td style={{ width: '40%' }} className="ps-1">
-                                                            {/* <input
-                              className="form-control"
-                              type="time"
-                              defaultValue={slot?.endTime}
-                            // value={slot?.endTime}
-                            /> */}
                                                             <input
                                                                 className="form-control"
                                                                 type="time"

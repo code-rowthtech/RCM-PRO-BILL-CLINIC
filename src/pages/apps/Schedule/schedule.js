@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Card, Col, Row } from 'react-bootstrap';
-import { FormInput } from '../../../components';
 import classNames from 'classnames';
 import DoctorHoliday from './doctorHoliday';
 import Breaks from './breaks';
 import ScheduleTab from './scheduleTab';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiSearch } from 'react-icons/fi';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { decryptMessage, encryptMessage } from '../../../cryptoUtils';

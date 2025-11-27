@@ -7,12 +7,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import {
-    createMastersDataAction,
     getMastersDataAction,
     updateMastersDataAction,
 } from '../../../../redux/settings/action';
 import { IoMdClose } from 'react-icons/io';
-import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 import ConsultationModal from './ConsultationModal';
 import Paginations from '../../../../helpers/Paginations';
@@ -43,26 +41,7 @@ const ConsultationRoom = () => {
         setConsultationModal(true);
     };
 
-    const createResponse = store?.createMastersDataReducer?.data?.status;
     const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
-    const updateResponse = store?.updateMastersDataReducer?.data?.status;
-
-    // useEffect(() => {
-    //     if (createResponse === 200 || updateResponse === 200) {
-    //         setConsultationModal(false)
-    //         reset();
-    //         setEdit(null);
-    //         dispatch(
-    //             getMastersDataAction({
-    //                 status: status,
-    //                 category: 'Consultation Room',
-    //                 search: search,
-    //                 limit: 10,
-    //                 skip: skip,
-    //             })
-    //         );
-    //     }
-    // }, [createResponse, updateResponse]);
 
     useEffect(() => {
         dispatch(

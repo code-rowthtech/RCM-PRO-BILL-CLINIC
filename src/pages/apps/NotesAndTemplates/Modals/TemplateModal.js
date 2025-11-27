@@ -316,7 +316,6 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
                                         <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
                                             <div>
                                                 {`Description`}
-
                                             </div>
                                             <small className="text-muted">
                                                 {(() => {

@@ -40,7 +40,6 @@ export const NoteFormFields = memo(({
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [selectedConsentForms, setSelectedConsentForms] = useState([]);
-
     const consentDocuments = store?.getConsentFormReducer?.data?.documents;
     // Load consent forms
     useEffect(() => {
@@ -50,7 +49,6 @@ export const NoteFormFields = memo(({
         }
     }, [dispatch, store?.Auth?.user?.clinicId, consentDocuments?.length]);
 
-    // Expose selected consent forms globally for form submission
     useEffect(() => {
         window.getSelectedConsentForms = () => {
             return selectedConsentForms?.map((form) => form.value) || [];
@@ -60,7 +58,6 @@ export const NoteFormFields = memo(({
         };
     }, [selectedConsentForms]);
 
-    // Load consent forms for encounter updates
     useEffect(() => {
         if (encounterData?.data && consentDocuments?.length > 0) {
             const consentField = encounterData.data.find(field => field.type === 'Consent Forms');
@@ -83,7 +80,6 @@ export const NoteFormFields = memo(({
         }
     }, [encounterData, consentDocuments]);
 
-    // Refs for ReactQuill editors
     const quillRefs = useRef({
         Subjective: createRef(),
         Objective: createRef(),
@@ -93,7 +89,6 @@ export const NoteFormFields = memo(({
         Notes: createRef(),
     });
 
-    // Word limit validation for ReactQuill editors
     useEffect(() => {
         SOAP_SECTIONS.forEach(section => {
             const editor = quillRefs.current[section]?.current?.getEditor?.();
@@ -177,7 +172,6 @@ export const NoteFormFields = memo(({
 
     const renderField = (field) => {
         const { name, inputType = 'textarea' } = field;
-
         // Render SOAP Notes section
         if (name === 'Notes (SOAP)') {
             return (
@@ -222,7 +216,6 @@ export const NoteFormFields = memo(({
                                                         return '';
                                                 }
                                             };
-
                                             return (
                                                 <option key={index} value={getValue()}>
                                                     {label}
@@ -244,7 +237,7 @@ export const NoteFormFields = memo(({
                                     }}
                                 />
                             </Form.Label>
-                            {/* Show populated data with remove options for SOAP sections */}
+
                             {populatedFields[section] && populatedFields[section].length > 0 && (
                                 <div className="mb-2">
                                     <small className="text-muted">{`Auto-populated data:`}</small>
@@ -534,12 +527,10 @@ export const NoteFormFields = memo(({
                                             const wordCount = words.length;
                                             const lastWordMatch = input.match(/(\S+)$/);
                                             const lastWord = lastWordMatch ? lastWordMatch[0] : '';
-
                                             if (wordCount < MAX_WORDS) {
                                                 onChange(input);
                                                 return;
                                             }
-
                                             if (wordCount === MAX_WORDS) {
                                                 if (lastWord.length <= MAX_WORD_LENGTH && /\S$/.test(input)) {
                                                     onChange(input);
@@ -613,7 +604,6 @@ export const NoteFormFields = memo(({
                                                                             if (label && value) parsedData[label] = value;
                                                                         });
                                                                         const values = Object.entries(parsedData).slice(1).map(([_, v]) => v);
-
                                                                         return (
                                                                             <tr key={index} className="border-bottom">
                                                                                 <td className="py-1" style={{ fontSize: '13px', fontWeight: '400', width: '8%' }}>{index + 1}</td>
@@ -689,7 +679,7 @@ export const NoteFormFields = memo(({
             }}
         >
             <Accordion className='encounter-accordion' activeKey={Object.keys(accordionState).filter(key => accordionState[key])} alwaysOpen>
-                {getFieldsToRender.map((field, index) => (
+                {getFieldsToRender?.map((field, index) => (
                     <Accordion.Item
                         className='mb-3'
                         eventKey={index.toString()}

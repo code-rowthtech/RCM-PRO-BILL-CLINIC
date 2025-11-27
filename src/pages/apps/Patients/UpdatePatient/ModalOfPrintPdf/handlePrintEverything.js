@@ -1,7 +1,5 @@
 
 export const handlePrintEverything = async (printData) => {
-
-    const originalContent = document?.body?.innerHTML;
     const addressData = printData?.patientDetails?.address;
     const relatedAddressData = printData?.patientDetails?.relatedPerson?.address;
     const referringAddressData = printData?.patientDetails?.referringDocId?.address;
@@ -93,7 +91,6 @@ export const handlePrintEverything = async (printData) => {
             minute: '2-digit'
         });
         const key = `${date} (${time})`;
-
         if (!acc[key]) {
             acc[key] = [];
         }
@@ -109,14 +106,12 @@ export const handlePrintEverything = async (printData) => {
         })
         : [];
 
-
     // Function to get vital value with proper formatting
     const getVitalValue = (entries, type) => {
         const vital = entries.find(v =>
             v.code?.text === type.key ||
             v.code?.coding?.[0]?.display === type.key
         );
-
         if (!vital) return '';
 
         // Handle blood pressure specially
@@ -138,12 +133,10 @@ export const handlePrintEverything = async (printData) => {
         if (vital?.valueString) {
             return vital?.valueString;
         }
-
         // Handle quantity values
         if (vital?.valueQuantity) {
             return `${vital?.valueQuantity.value} ${vital?.valueQuantity.unit || ''}`.trim();
         }
-
         return '';
     };
 
@@ -152,7 +145,6 @@ export const handlePrintEverything = async (printData) => {
         const rowData = sortedDates.map(date => {
             return getVitalValue(groupedByDate[date], type);
         });
-
         const tds = rowData.map(val => `<td>${val || '-'}</td>`).join('');
         return `<tr><td>${type?.display} (${type?.unit})</td>${tds}</tr>`;
     });
@@ -570,8 +562,6 @@ width: 100%;
             :
             ''
         }
-           
-       
         ${printData?.toBePrinted?.some((data) => data === "Allergies") ?
             ` <div class="patient-info">
                    <h2>Allergies</h2>
@@ -749,7 +739,6 @@ width: 100%;
          ${printData?.toBePrinted?.some((data) => data === "Alcohol History") ?
             ` <div class="patient-info">
                    <h2>Alcohol History</h2>
-
         ${printData?.alcoholHistory?.map((alcohol, index) => (
                 `<div class="summary-headers">
                     <b class="detail-label">
@@ -834,11 +823,9 @@ width: 100%;
         }
        
         ${printData?.toBePrinted?.some((data) => data === "Encounter") ?
-            `
-            ${printData?.encounterData?.map((dataEncounter, index) => (
+            `${printData?.encounterData?.map((dataEncounter, index) => (
                 ` <div class="patient-info">
                    <h2>Encounter ${index + 1}.</h2>
-
                 <div class="summary-headers">
                     <b class="detail-label">
                      ${dataEncounter?.class?.coding?.[0]?.display || dataEncounter?.class?.text}
@@ -855,26 +842,20 @@ width: 100%;
              <p>Type: ${dataEncounter?.type?.[0]?.coding?.[0]?.display || dataEncounter?.type?.[0]?.text}</p>
              <br/>
              ${dataEncounter?.data?.map((encData, index) => (
-                    `
-                  <div class='patient-info'>
+                    `<div class='patient-info'>
              <h2>${index + 1}. ${encData?.type}</h2>
              <div>
              ${encData?.content?.value}
              </div>
-             </div>
-                `
-                ))}
+             </div>`))}
             </div > `
-            ))}
-            `
+            ))}`
             :
             ''
         }
-
         </body >
         </html >
     `;
-
 
     // document.body.innerHTML = printContent;
     // window.print();

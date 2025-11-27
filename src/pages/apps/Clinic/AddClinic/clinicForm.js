@@ -64,9 +64,6 @@ const ClinicForm = ({ clinicId }) => {
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
-    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-    const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [practiceAddresses, setPracticeAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
@@ -280,7 +277,6 @@ const ClinicForm = ({ clinicId }) => {
             console.error('Error during file upload:', error);
         }
     };
-
     useEffect(() => {
         if (clinicsDataGet?.clinicType) {
             setValue('clinicType', clinicsDataGet.clinicType);
@@ -398,7 +394,6 @@ const ClinicForm = ({ clinicId }) => {
                 given: [''],
                 prefix: [''],
                 suffix: [],
-                // period: { start: '', end: '' },
             },
             email: '',
             role: '',

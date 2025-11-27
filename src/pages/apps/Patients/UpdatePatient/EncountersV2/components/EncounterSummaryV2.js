@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 import VitalStatus from '../../VitalStatus';
 import { getAllergiesOfPatientAction } from '../../../../../../redux/allergyList/action';
 import { getProblemListAction } from '../../../../../../redux/ProblemList/action';
+import ToastHandle from '../../../../../../helpers/ToastMessage';
 
 const convertFromImperial = (value, vitalName) => {
     if (vitalName === 'Height') return (value * 2.54).toFixed(2); // in to cm
@@ -41,7 +42,7 @@ const metricUnits = {
     'Head Circumference': 'cm',
 };
 
-const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
+const EncounterSummaryV2 = ({ setScrollToAccordion, populatedFields = {} }) => {
     // VARIABLE INITIALIZATIONS
     const now = new Date();
     const dispatch = useDispatch()
@@ -126,13 +127,13 @@ const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
 
     useEffect(() => {
         if (!allergyData) {
-            dispatch(getAllergiesOfPatientAction({ patientId: patientId, limit: 3 }));
+            dispatch(getAllergiesOfPatientAction({ patientId: patientId, limit: 100 }));
         }
         if (!problemData) {
-            dispatch(getProblemListAction({ patientId: patientId }))
+            dispatch(getProblemListAction({ patientId: patientId, limit: 100 }))
         }
         if (!medicationList) {
-            dispatch(getMedicationAction({ patientId: patientId, limit: 3 }))
+            dispatch(getMedicationAction({ patientId: patientId, limit: 100 }))
         }
         if (patientVitals?.length === 0) {
             dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 3 }));
@@ -171,14 +172,11 @@ const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
 
     const findVitalValue = (vitalName, date) => {
         if (!groupedVitals[date]) return null;
-
         const vital = groupedVitals[date].find(v =>
             v.code?.coding?.[0]?.display === vitalName ||
             v.code?.text === vitalName
         );
-
         if (!vital) return null;
-
         if (vital.component && vital.component.length > 0) {
             // Handle blood pressure case (no conversion needed)
             const systolic = vital.component.find(c =>
@@ -191,10 +189,8 @@ const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
 
             return { systolic: systolic || '', diastolic: diastolic || '' };
         }
-
         // Get the stored value (always in imperial units)
         let value = vital.valueQuantity?.value || vital.valueString || '';
-
         // Convert to metric if needed for display
         if (unitSystem === 'metric') {
             if (vitalName === 'Height') {
@@ -207,33 +203,60 @@ const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
                 value = convertFromImperial(value, 'Temperature');
             }
         }
-
         return value;
+    };
+
+    // Helper function to check if item is already added
+    const isItemAdded = (fieldName, itemText) => {
+        const fieldData = populatedFields[fieldName] || [];
+        return fieldData.includes(itemText);
     };
 
     // Enhanced click handlers with scroll functionality
     const handleAllergyClick = (allergy) => {
-        window.populateEncounterField?.('Social History', `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`);
+        const allergyText = `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`;
+        if (isItemAdded('Social History', allergyText)) {
+            ToastHandle('This allergy has already been added to Social History.', 'warning');
+            return;
+        }
+        window.populateEncounterField?.('Social History', allergyText);
         setScrollToAccordion?.('Social History');
     };
 
     const handleProblemClick = (problem) => {
-        window.populateEncounterField?.('Reason for Visit', problem?.code?.text || '');
+        const problemText = problem?.code?.text || '';
+        if (isItemAdded('Reason for Visit', problemText)) {
+            ToastHandle('This problem has already been added to Reason for Visit.', 'warning');
+            return;
+        }
+        window.populateEncounterField?.('Reason for Visit', problemText);
         setScrollToAccordion?.('Reason for Visit');
     };
 
     const handleMedicationClick = (medication) => {
         const medicationInfo = `${medication?.drugId?.proprietaryName || ''} ${medication?.drugId?.nonProprietaryName ? '(' + medication?.drugId?.nonProprietaryName + ')' : ''} - ${medication?.dosageInstruction?.[0]?.text || ''} [Status: ${medication?.status || 'Unknown'}]`;
+        if (isItemAdded('Prescriptions (Medications)', medicationInfo)) {
+            ToastHandle('This medication has already been added to Prescriptions.', 'warning');
+            return;
+        }
         window.populateEncounterField?.('Prescriptions (Medications)', medicationInfo);
         setScrollToAccordion?.('Prescriptions (Medications)');
     };
 
     const handleSocialHistoryClick = (data, type) => {
+        let socialHistoryText = '';
         if (type === 'tobacco') {
-            window.populateEncounterField?.('Social History', `Tobacco: ${data?.tobaccoUse || ''}`);
+            socialHistoryText = `Tobacco: ${data?.tobaccoUse || ''}`;
         } else if (type === 'family') {
-            window.populateEncounterField?.('Social History', `Family History: ${data?.name || ''} (${data?.relationship?.coding?.[0]?.display || ''})`);
+            socialHistoryText = `Family History: ${data?.name || ''} (${data?.relationship?.coding?.[0]?.display || ''})`;
         }
+
+        if (isItemAdded('Social History', socialHistoryText)) {
+            ToastHandle('This social history item has already been added.', 'warning');
+            return;
+        }
+
+        window.populateEncounterField?.('Social History', socialHistoryText);
         setScrollToAccordion?.('Social History');
     };
 
@@ -260,23 +283,28 @@ const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
                                                     </div>
                                                 ) : (
                                                     <ul className="list-unstyled pb-0 mb-0">
-                                                        {allergyData.slice(0, 4).map((allergy, index) => (
-                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => handleAllergyClick(allergy)}>
-                                                                <div className="fs-6">
-                                                                    <strong title={allergy.code?.text}>
-                                                                        {allergy.code?.text?.length > 30
-                                                                            ? allergy.code?.text.slice(0, 29) + '...'
-                                                                            : allergy.code?.text || 'Unknown Allergy'}
-                                                                    </strong>
-                                                                    <div className="text-muted small">
-                                                                        {allergy.clinicalStatus?.text || 'Status not available'}
+                                                        {allergyData.slice(0, 4).map((allergy, index) => {
+                                                            const allergyText = `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`;
+                                                            const isAdded = isItemAdded('Social History', allergyText);
+                                                            return (
+                                                                <li key={index} className={`mb-2 d-flex justify-content-between align-items-start cursor-pointer ${isAdded ? 'opacity-50' : ''}`} onClick={() => handleAllergyClick(allergy)}>
+                                                                    <div className="fs-6">
+                                                                        <strong title={allergy.code?.text}>
+                                                                            {allergy.code?.text?.length > 30
+                                                                                ? allergy.code?.text.slice(0, 29) + '...'
+                                                                                : allergy.code?.text || 'Unknown Allergy'}
+                                                                            {isAdded && <span className="ms-2 badge bg-success">Added</span>}
+                                                                        </strong>
+                                                                        <div className="text-muted small">
+                                                                            {allergy.clinicalStatus?.text || 'Status not available'}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <span className="fs-6 fw-semibold text-nowrap">
-                                                                    {getSeverityBadge(allergy.criticality)}
-                                                                </span>
-                                                            </li>
-                                                        ))}
+                                                                    <span className="fs-6 fw-semibold text-nowrap">
+                                                                        {getSeverityBadge(allergy.criticality)}
+                                                                    </span>
+                                                                </li>
+                                                            );
+                                                        })}
                                                     </ul>
                                                 )}
                                             </div>
@@ -299,7 +327,6 @@ const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
                                     </Accordion.Body>
                                 );
                                 break;
-
                             case 'Problems':
                                 content = (
                                     <Accordion.Body className='p-2'>
@@ -313,30 +340,35 @@ const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
                                                     </div>
                                                 ) : problemData && problemData.length > 0 ? (
                                                     <ul className="list-unstyled pb-0 mb-0">
-                                                        {problemData?.slice(0, 4)?.map((problem, index) => (
-                                                            <li
-                                                                key={index}
-                                                                className="mb-2 d-flex justify-content-between align-items-start cursor-pointer"
-                                                                onClick={() => handleProblemClick(problem)}>
-                                                                <div className="fs-6">
-                                                                    <strong title={problem?.code?.text}>
-                                                                        {problem?.code?.text?.length > 30
-                                                                            ? problem.code.text.slice(0, 30) + '...'
-                                                                            : problem?.code?.text || 'Unknown Problem'}
-                                                                    </strong>
-                                                                    <div className="text-muted small">
-                                                                        {problem?.clinicalStatus?.text || 'Status not available'}
+                                                        {problemData?.slice(0, 4)?.map((problem, index) => {
+                                                            const problemText = problem?.code?.text || '';
+                                                            const isAdded = isItemAdded('Reason for Visit', problemText);
+                                                            return (
+                                                                <li
+                                                                    key={index}
+                                                                    className={`mb-2 d-flex justify-content-between align-items-start cursor-pointer ${isAdded ? 'opacity-50' : ''}`}
+                                                                    onClick={() => handleProblemClick(problem)}>
+                                                                    <div className="fs-6">
+                                                                        <strong title={problem?.code?.text}>
+                                                                            {problem?.code?.text?.length > 30
+                                                                                ? problem.code.text.slice(0, 30) + '...'
+                                                                                : problem?.code?.text || 'Unknown Problem'}
+                                                                            {isAdded && <span className="ms-2 badge bg-success">Added</span>}
+                                                                        </strong>
+                                                                        <div className="text-muted small">
+                                                                            {problem?.clinicalStatus?.text || 'Status not available'}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <span className="fs-6 fw-semibold text-success">
-                                                                    {new Date(problem?.onsetDateTime).toLocaleDateString('en-US', {
-                                                                        year: 'numeric',
-                                                                        month: 'long',
-                                                                        day: 'numeric',
-                                                                    })}
-                                                                </span>
-                                                            </li>
-                                                        ))}
+                                                                    <span className="fs-6 fw-semibold text-success">
+                                                                        {new Date(problem?.onsetDateTime).toLocaleDateString('en-US', {
+                                                                            year: 'numeric',
+                                                                            month: 'long',
+                                                                            day: 'numeric',
+                                                                        })}
+                                                                    </span>
+                                                                </li>
+                                                            );
+                                                        })}
                                                     </ul>
                                                 ) : (
                                                     <ul className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
@@ -385,22 +417,29 @@ const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
                                                                     <strong>{`No Medications Found`}</strong>
                                                                 </div>
                                                             </li>
-                                                        ) : medicationList?.slice(0, 4)?.map((medication, index) => (
-                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => handleMedicationClick(medication)}>
-                                                                <div className="fs-6">
-                                                                    <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>{medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}</strong>
-                                                                    <div className="text-muted" title={medication?.drugId?.nonProprietaryName}>
-                                                                        {medication?.drugId?.nonProprietaryName?.length > 40 ? medication?.drugId?.nonProprietaryName?.slice(0, 39) + '...' : medication?.drugId?.nonProprietaryName}
+                                                        ) : medicationList?.slice(0, 4)?.map((medication, index) => {
+                                                            const medicationInfo = `${medication?.drugId?.proprietaryName || ''} ${medication?.drugId?.nonProprietaryName ? '(' + medication?.drugId?.nonProprietaryName + ')' : ''} - ${medication?.dosageInstruction?.[0]?.text || ''} [Status: ${medication?.status || 'Unknown'}]`;
+                                                            const isAdded = isItemAdded('Prescriptions (Medications)', medicationInfo);
+                                                            return (
+                                                                <li key={index} className={`mb-2 d-flex justify-content-between align-items-start cursor-pointer ${isAdded ? 'opacity-50' : ''}`} onClick={() => handleMedicationClick(medication)}>
+                                                                    <div className="fs-6">
+                                                                        <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>
+                                                                            {medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}
+                                                                            {isAdded && <span className="ms-2 badge bg-success">Added</span>}
+                                                                        </strong>
+                                                                        <div className="text-muted" title={medication?.drugId?.nonProprietaryName}>
+                                                                            {medication?.drugId?.nonProprietaryName?.length > 40 ? medication?.drugId?.nonProprietaryName?.slice(0, 39) + '...' : medication?.drugId?.nonProprietaryName}
+                                                                        </div>
+                                                                        <div className="text-muted " title={medication?.dosageInstruction?.[0]?.text}>
+                                                                            {medication?.dosageInstruction?.[0]?.text?.length > 40 ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) + '...' : medication?.dosageInstruction?.[0]?.text || ''}
+                                                                        </div>
                                                                     </div>
-                                                                    <div className="text-muted " title={medication?.dosageInstruction?.[0]?.text}>
-                                                                        {medication?.dosageInstruction?.[0]?.text?.length > 40 ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) + '...' : medication?.dosageInstruction?.[0]?.text || ''}
+                                                                    <div className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
+                                                                        <p>{medication?.status}</p>
                                                                     </div>
-                                                                </div>
-                                                                <div className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
-                                                                    <p>{medication?.status}</p>
-                                                                </div>
-                                                            </li>
-                                                        ))}
+                                                                </li>
+                                                            );
+                                                        })}
                                                     </ul>
                                                 }
                                             </div>
@@ -431,35 +470,48 @@ const EncounterSummaryV2 = ({ setScrollToAccordion }) => {
                                                 ) : (
                                                     <>
                                                         {socialHistoryData?.tobaccoHistory?.length > 0 && (
-                                                            socialHistoryData?.tobaccoHistory?.map((data, index) => (
-                                                                <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => handleSocialHistoryClick(data, 'tobacco')}>
-                                                                    <div className="fs-6">
-                                                                        <strong className="text-capitalize" title={data?.tobaccoUse}>{data?.tobaccoUse?.length > 40 ? data?.tobaccoUse?.slice(0, 39) + '...' : data?.tobaccoUse}</strong>
-                                                                        <div className="text-muted fs-6" >
-                                                                            {data?.effectiveDateTime ? new Date(data?.effectiveDateTime)?.toISOString().split('T')[0] : ''}
+                                                            socialHistoryData?.tobaccoHistory?.map((data, index) => {
+                                                                const tobaccoText = `Tobacco: ${data?.tobaccoUse || ''}`;
+                                                                const isAdded = isItemAdded('Social History', tobaccoText);
+                                                                return (
+                                                                    <li key={index} className={`mb-2 d-flex justify-content-between align-items-start cursor-pointer ${isAdded ? 'opacity-50' : ''}`} onClick={() => handleSocialHistoryClick(data, 'tobacco')}>
+                                                                        <div className="fs-6">
+                                                                            <strong className="text-capitalize" title={data?.tobaccoUse}>
+                                                                                {data?.tobaccoUse?.length > 40 ? data?.tobaccoUse?.slice(0, 39) + '...' : data?.tobaccoUse}
+                                                                                {isAdded && <span className="ms-2 badge bg-success">Added</span>}
+                                                                            </strong>
+                                                                            <div className="text-muted fs-6" >
+                                                                                {data?.effectiveDateTime ? new Date(data?.effectiveDateTime)?.toISOString().split('T')[0] : ''}
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                </li>
-                                                            ))
+                                                                    </li>
+                                                                );
+                                                            })
                                                         )}
                                                         {socialHistoryData?.familyGeneticHistory?.length > 0 && (
-                                                            socialHistoryData?.familyGeneticHistory?.map((data, index) => (
-                                                                <li title='Family Genetics' key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => handleSocialHistoryClick(data, 'family')}>
-                                                                    <div className="fs-6">
-                                                                        <strong className="text-capitalize" title={data?.name}>{data?.name?.length > 40 ? data?.name?.slice(0, 39) + '...' : data?.name}
-                                                                            <span className='ms-1'>
-                                                                                {data?.relationship?.coding?.[0]?.display && '(' + data?.relationship?.coding?.[0]?.display + ')'}
-                                                                            </span>
-                                                                        </strong>
-                                                                        <div className="text-muted fs-6" title={data?.condition?.[0]?.code?.text} >
-                                                                            {data?.condition?.[0]?.code?.text?.length > 30 ? data?.condition?.[0]?.code?.text?.slice(0, 29) + '...' : data?.condition?.[0]?.code?.text}
+                                                            socialHistoryData?.familyGeneticHistory?.map((data, index) => {
+                                                                const familyText = `Family History: ${data?.name || ''} (${data?.relationship?.coding?.[0]?.display || ''})`;
+                                                                const isAdded = isItemAdded('Social History', familyText);
+                                                                return (
+                                                                    <li title='Family Genetics' key={index} className={`mb-2 d-flex justify-content-between align-items-start cursor-pointer ${isAdded ? 'opacity-50' : ''}`} onClick={() => handleSocialHistoryClick(data, 'family')}>
+                                                                        <div className="fs-6">
+                                                                            <strong className="text-capitalize" title={data?.name}>
+                                                                                {data?.name?.length > 40 ? data?.name?.slice(0, 39) + '...' : data?.name}
+                                                                                <span className='ms-1'>
+                                                                                    {data?.relationship?.coding?.[0]?.display && '(' + data?.relationship?.coding?.[0]?.display + ')'}
+                                                                                </span>
+                                                                                {isAdded && <span className="ms-2 badge bg-success">Added</span>}
+                                                                            </strong>
+                                                                            <div className="text-muted fs-6" title={data?.condition?.[0]?.code?.text} >
+                                                                                {data?.condition?.[0]?.code?.text?.length > 30 ? data?.condition?.[0]?.code?.text?.slice(0, 29) + '...' : data?.condition?.[0]?.code?.text}
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                    <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[data.status] || 'text-body'}`}>
-                                                                        {data?.status}
-                                                                    </span>
-                                                                </li>
-                                                            ))
+                                                                        <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[data.status] || 'text-body'}`}>
+                                                                            {data?.status}
+                                                                        </span>
+                                                                    </li>
+                                                                );
+                                                            })
                                                         )}
                                                     </>
                                                 )}

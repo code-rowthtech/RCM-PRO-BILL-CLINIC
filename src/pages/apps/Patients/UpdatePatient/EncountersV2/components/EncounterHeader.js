@@ -7,15 +7,14 @@ import { BiCollapse, BiExpand } from 'react-icons/bi';
 import { MdPrint, MdSave } from 'react-icons/md';
 import { FaFileInvoiceDollar } from 'react-icons/fa';
 import { formatDate } from '../../../../../../helpers/dateFormat';
+import { useSelector } from 'react-redux';
 
 const EncounterHeader = memo(({
     encounterTabs,
     activeTab,
-    setActiveTab,
     removeEncounterTab,
     expanded,
     setExpanded,
-    isCollapsed,
     toggleCollapse,
     showSettings,
     setShowSettings,
@@ -28,7 +27,7 @@ const EncounterHeader = memo(({
 }) => {
     const activeTabData = encounterTabs.find(tab => tab.id === activeTab);
     const isFormTab = activeTabData?.type !== 'default';
-
+    const store = useSelector((state) => state);
     return (
         <div className="col-12 d-flex align-items-center justify-content-between px-2" style={{ height: 'fit-content' }}>
             <div className="d-flex align-items-center">
@@ -55,9 +54,7 @@ const EncounterHeader = memo(({
                             <span
                                 className="p-0 ms-2 m-0"
                                 onClick={(e) => removeEncounterTab(tab?.id, e)}
-                            >
-                                <IoClose />
-                            </span>
+                            ><IoClose /></span>
                         )}
                     </div>
                 ))}
@@ -99,6 +96,7 @@ const EncounterHeader = memo(({
                             form="encounter-form"
                             type="submit"
                             title="Save"
+                            disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                         >
                             <MdSave size={18} />
                             <span className="small">Save</span>

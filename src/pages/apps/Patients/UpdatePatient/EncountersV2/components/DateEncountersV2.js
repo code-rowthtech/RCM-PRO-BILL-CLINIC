@@ -105,7 +105,6 @@ const DateEncountersV2 = ({
     } = useEncounterData(id, encounterId, encounterAction);
 
     const consentDocuments = store?.getConsentFormReducer?.data || [];
-    console.log('Consent documents:', consentDocuments, 'Store consent reducer:', store?.getConsentFormReducer);
 
     const {
         populatedFields,
@@ -117,8 +116,11 @@ const DateEncountersV2 = ({
     // Scroll to accordion functionality
     useEffect(() => {
         if (scrollToAccordion && notesFields) {
+            const soapSections = ['Subjective', 'Objective', 'Assessment', 'Plan'];
+            const targetField = soapSections.includes(scrollToAccordion) ? 'Notes (SOAP)' : scrollToAccordion;
+
             const accordionIndex = notesFields.findIndex(field =>
-                field.name.toLowerCase().includes(scrollToAccordion.toLowerCase())
+                field.name.toLowerCase().includes(targetField.toLowerCase())
             );
 
             if (accordionIndex !== -1) {
@@ -215,7 +217,6 @@ const DateEncountersV2 = ({
         }))
         const clinicId = store?.Auth?.user?.clinicId;
         if (clinicId) {
-            console.log('Calling consent form API with clinicId:', clinicId);
             dispatch(getConsentFormAction({ clinicId }));
         }
     }, [dispatch, store?.Auth?.user?.clinicId])
@@ -346,18 +347,28 @@ const DateEncountersV2 = ({
 
     // Apply template values to form
     useEffect(() => {
-        if (!selectedFromList) return;
+        if (!selectedFromList || Object.keys(selectedFromList).length === 0) return;
 
         setTimeout(() => {
             ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach((section) => {
                 const fieldName = section === 'Care Plan' ? 'CarePlan' : section;
                 if (selectedFromList?.[section]) {
                     document.getElementById(fieldName)?.scrollIntoView({ behavior: 'smooth' });
-                    setValue(fieldName, selectedFromList[section]);
+                    const currentValue = getValues(fieldName) || '';
+                    const templateText = selectedFromList[section];
+                    // Check if template text already exists in current content
+                    if (currentValue.includes(templateText)) {
+                        ToastHandle('This template content has already been added to this field.', 'danger');
+                        return;
+                    }
+                    const newValue = currentValue ? `${currentValue}\n${templateText}` : templateText;
+                    setValue(fieldName, newValue);
                 }
             });
+            // Clear selectedFromList after applying templates
+            setTimeout(() => setSelectedFromList({}), 100);
         }, 0);
-    }, [selectedFromList, setValue]);
+    }, [selectedFromList, setValue, getValues, setSelectedFromList]);
 
     // Save scroll position before loading state changes
     useEffect(() => {
@@ -393,7 +404,6 @@ const DateEncountersV2 = ({
             setProviderError(true);
             return;
         }
-
         // Build encounter type and class objects
         const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type);
         const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class);
@@ -415,7 +425,6 @@ const DateEncountersV2 = ({
             }],
             text: encounterClassSelected.display,
         };
-
         // Process form fields data
         const fieldsData = [];
         const fieldsToRender = (notesFields || [])
@@ -476,7 +485,6 @@ const DateEncountersV2 = ({
             }
         });
 
-        // Create or update encounter
         const payload = {
             type,
             class: encounterClass,
@@ -500,7 +508,6 @@ const DateEncountersV2 = ({
             setUpdateClicked(true);
             dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
         } else {
-            // console.log(payload, 'payloadpayloadpayload')
             dispatch(createEncounterAction({ key: encryptMessage(payload) }));
         }
     };
@@ -520,11 +527,10 @@ const DateEncountersV2 = ({
                         </li>
                     ))}
                 </ul>
-
                 <Row className='mx-auto'>
                     <Col sm={12} className='px-md-1 scroll-container ' style={{ height: !expanded ? (isAccordionOpen ? '55vh' : '70vh') : '78vh', overflowX: 'hidden' }}>
-                        {leftTab === 'Summary' && <EncounterSummaryV2 setScrollToAccordion={setScrollToAccordion} />}
-                        {leftTab === 'Templates' && <EncounterTemplates selectedFromList={selectedFromList} setSelectedFromList={setSelectedFromList} />}
+                        {leftTab === 'Summary' && <EncounterSummaryV2 setScrollToAccordion={setScrollToAccordion} populatedFields={populatedFields} />}
+                        {leftTab === 'Templates' && <EncounterTemplates selectedFromList={selectedFromList} setSelectedFromList={setSelectedFromList} setScrollToAccordion={setScrollToAccordion} getValues={getValues} />}
                         {leftTab === 'Past Encounters' && <PastEncounters encounterTabs={encounterTabs} setEncounterTabs={setEncounterTabs} setActiveTab={setActiveTab} setExpanded={setExpanded} />}
                     </Col>
                 </Row>
@@ -656,7 +662,7 @@ const DateEncountersV2 = ({
                                                 }),
                                                 menuPortal: (base) => ({
                                                     ...base,
-                                                    zIndex: 9999,  // 👈 ensure it's above sticky headers
+                                                    zIndex: 9999,
                                                 }),
                                             }}
                                         />
@@ -686,9 +692,7 @@ const DateEncountersV2 = ({
                                                 }}
                                             />
                                         </div>
-                                        {errors.startDate && (
-                                            <div className="text-danger small mt-0">{errors.startDate.message}</div>
-                                        )}
+                                        {errors.startDate && (<div className="text-danger small mt-0">{errors.startDate.message}</div>)}
                                     </Form.Group>
                                 </Col>
                                 <Col sm={3} className='mt-0'>
@@ -832,9 +836,7 @@ const DateEncountersV2 = ({
                                                 }),
                                             }}
                                         />
-                                        {appointmentError && (
-                                            <div className="text-danger small mt-0">{`This field is required`}</div>
-                                        )}
+                                        {appointmentError && (<div className="text-danger small mt-0">{`This field is required`}</div>)}
                                     </Form.Group>
                                 </Col>
                             </Row>

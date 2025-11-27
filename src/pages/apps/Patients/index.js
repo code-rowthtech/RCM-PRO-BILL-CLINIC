@@ -175,7 +175,7 @@ const Patients = () => {
                                                             navigate(`/apps/patients/update-patient?id=${data?._id}`)
                                                         }
                                                         key={data?._id}>
-                                                        <td className="text-capitalize">
+                                                        <td className="text-capitalize cursor-pointer">
                                                             <div className="d-flex align-items-center">
                                                                 <img
                                                                     height={35}
@@ -199,7 +199,7 @@ const Patients = () => {
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td>
+                                                        <td className='cursor-pointer'>
                                                             <div className="text-capitalize">
                                                                 {data?.gender || 'N/A'}
                                                                 <div
@@ -213,7 +213,7 @@ const Patients = () => {
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td>
+                                                        <td className='cursor-pointer'>
                                                             <div>
                                                                 {'+1-' +
                                                                     (data?.telecom?.find(
@@ -221,7 +221,6 @@ const Patients = () => {
                                                                             item?.system === 'phone' &&
                                                                             item?.use === 'home'
                                                                     )?.value || 'N/A')}
-
                                                                 <div
                                                                     className={`${data?.telecom?.find(
                                                                         (item) => item?.system === 'email'
@@ -236,6 +235,7 @@ const Patients = () => {
                                                             </div>
                                                         </td>
                                                         <td
+                                                            className='cursor-pointer'
                                                             data-toggle="tooltip"
                                                             data-placement="left"
                                                             title={data?.address?.[0]?.line?.[0]}>
@@ -261,8 +261,6 @@ const Patients = () => {
                                                                     )}
                                                             </div>
                                                         </td>
-                                                        {/*  <td>{data?.lastVisit || 'N/A'}</td>
-                                                            <td>{data?.nextVisit || 'N/A'}</td> */}
                                                         <td>
                                                             <Link
                                                                 to={`/apps/patients/update-patient?id=${data?._id}`}
@@ -288,35 +286,6 @@ const Patients = () => {
                     </Card>
                 </Col>
             </Row>
-            <Modal
-                size="sm"
-                show={smShow}
-                centered
-                onHide={() => setSmShow(false)}
-                aria-labelledby="example-modal-sizes-title-sm">
-                {/* <Modal.Body className="rounded-4 p-3">
-                    <Form onSubmit={handlePasswordSubmit}>
-                        <Form.Group controlId="password" className="text-center my-2">
-                            <Form.Label className='mb-2'>View Phone Number</Form.Label>
-                            <Form.Control
-                                type="password"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
-                        <Row className="mt-2">
-                            <Col sm={12} className="text-center mt-2">
-                                <Button variant="primary" type="submit">
-                                    Submit
-                                </Button>
-                                <p className='fw-bold mt-2'>Show the number for 5 min only</p>
-                            </Col>
-                        </Row>
-                    </Form>
-                </Modal.Body> */}
-            </Modal>
         </>
     );
 };
