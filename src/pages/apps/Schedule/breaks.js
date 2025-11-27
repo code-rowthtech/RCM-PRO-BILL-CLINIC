@@ -36,12 +36,9 @@ const Breaks = () => {
             <Table responsive className="table-centered table-nowrap mb-0">
                 <thead className="text-white">
                     <tr>
-                        <th className="text-white">Sr.No.</th>
-                        <th className="text-white">Provider Name</th>
-                        <th className="text-white">Break From</th>
-                        <th className="text-white">Break To</th>
-                        <th className="text-white">Day</th>
-                        <th className="text-white">Action</th>
+                        {["Sr. No.", "Provider Name", "Break From", "Break To", "Day", "Action"]?.map((header, index) => (
+                            <th className='text-white' key={index}>{header}</th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>

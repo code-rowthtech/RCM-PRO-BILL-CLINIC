@@ -127,7 +127,6 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                     placeholder="Enter description"
                     onInput={(e) => {
                       const value = e.target.value;
-                      // Prevent spaces when input is empty
                       if (value.trim() === "") {
                         e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                       }
@@ -177,7 +176,6 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                     placeholder="Enter Desigination Name"
                     onInput={(e) => {
                       const value = e.target.value;
-                      // Prevent spaces when input is empty
                       if (value.trim() === "") {
                         e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                       }
@@ -202,7 +200,6 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                     placeholder="Re-enter Desigination Name"
                     onInput={(e) => {
                       const value = e.target.value;
-                      // Prevent spaces when input is empty
                       if (value.trim() === "") {
                         e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                       }
@@ -211,12 +208,6 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                   {errors.reEnterName && <p className="text-danger">{errors.reEnterName.message}</p>}
                 </Form.Group>
               </Col>
-              {/* <Col md={12}>
-                              <Form.Group className="mb-2">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control as="textarea" rows={3} {...register("description")} placeholder="Enter description" />
-                              </Form.Group>
-                            </Col> */}
             </Row>
             <Modal.Footer>
               <Button onClick={closeAddModal} type="button" className="cancel-button">Close</Button>

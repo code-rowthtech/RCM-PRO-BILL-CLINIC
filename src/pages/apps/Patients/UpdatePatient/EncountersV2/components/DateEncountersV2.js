@@ -692,9 +692,7 @@ const DateEncountersV2 = ({
                                                 }}
                                             />
                                         </div>
-                                        {errors.startDate && (
-                                            <div className="text-danger small mt-0">{errors.startDate.message}</div>
-                                        )}
+                                        {errors.startDate && (<div className="text-danger small mt-0">{errors.startDate.message}</div>)}
                                     </Form.Group>
                                 </Col>
                                 <Col sm={3} className='mt-0'>
@@ -838,9 +836,7 @@ const DateEncountersV2 = ({
                                                 }),
                                             }}
                                         />
-                                        {appointmentError && (
-                                            <div className="text-danger small mt-0">{`This field is required`}</div>
-                                        )}
+                                        {appointmentError && (<div className="text-danger small mt-0">{`This field is required`}</div>)}
                                     </Form.Group>
                                 </Col>
                             </Row>
