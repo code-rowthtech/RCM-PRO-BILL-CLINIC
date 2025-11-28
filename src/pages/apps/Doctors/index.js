@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FormInput } from '../../../components';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiEdit } from 'react-icons/fi';
 import { RxCross2 } from 'react-icons/rx';
 import { createDoctorDetailAction, getDoctorsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
@@ -15,7 +14,7 @@ import Paginations from '../../../helpers/Paginations';
 import { IoMdClose } from 'react-icons/io';
 
 const Doctors = () => {
-    const [statusModal, setStatusModal] = useState(false); // Modal to confirm status change
+    const [statusModal, setStatusModal] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const store = useSelector((state) => state);
     const [status, setStatus] = useState(true);
@@ -25,12 +24,14 @@ const Doctors = () => {
     const dispatch = useDispatch();
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const updateStatus = store?.createtDoctorsDetailReducer?.data?.status || [];
+
     useEffect(() => {
         dispatch(getDoctorsAction({ status: status, search: search, page: skip, limit: 10 }));
     }, [dispatch, skip, status, search]);
 
-    const closeStatusModal = () => setStatusModal(false); // Close status change modal
+    const closeStatusModal = () => setStatusModal(false);
     const filteredDoctors = doctorDetails;
+
     const handleStatusChange = () => {
         const payload = {
             doctorId: selectedDoctor?._id,
@@ -39,6 +40,7 @@ const Doctors = () => {
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
         closeStatusModal();
     };
+
     useEffect(() => {
         if (updateStatus === 200) {
             const payload = { status: status, search: search, page: skip, limit: 10 };
@@ -49,6 +51,7 @@ const Doctors = () => {
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
+
     const handleActiveTab = (isActive) => {
         setStatus(isActive);
         dispatch(getDoctorsAction({ status: isActive, search: search, page: skip, limit: 10 }));
@@ -157,12 +160,10 @@ const Doctors = () => {
                                                 className="custom-buttons py- d-none d-md-block">
                                                 Add Provider
                                             </Button>
-
                                         </Col>
                                     </Row>
                                 </Col>
                             </Row>
-
                             <Row>
                                 <Col xs={12}>
                                     <Table
@@ -171,29 +172,11 @@ const Doctors = () => {
                                         style={{ height: filteredDoctors?.length === 0 ? '75vh' : 'auto' }}>
                                         <thead className="text-white">
                                             <tr>
-                                                {/* <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                                    S.No.
-                                                </th> */}
-                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                                    Provider
-                                                </th>
-                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                                    Primary Address
-                                                </th>
-                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                                    Primary Email
-                                                </th>
-
-                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                                    Speciality
-                                                </th>
-                                                {/* <th className='text-white py-2' style={{ fontSize: '13px' }}>Contact No.</th> */}
-                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                                    Status
-                                                </th>
-                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                                    Action
-                                                </th>
+                                                {['Provider', 'Primary Address', 'Primary Email', 'Speciality', 'Status', 'Action']?.map((data, i) => (
+                                                    <th key={i} className="text-white py-2" style={{ fontSize: '13px' }}>
+                                                        {data}
+                                                    </th>
+                                                ))}
                                             </tr>
                                         </thead>
                                         {store?.getDoctorsReducer?.loading ? (
@@ -218,11 +201,6 @@ const Doctors = () => {
                                                 ) : (
                                                     filteredDoctors?.map((data, index) => (
                                                         <tr key={index}>
-                                                            {/* <td
-                                                                className="py1"
-                                                                style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                {index + 1}
-                                                            </td> */}
                                                             <td
                                                                 className="text-capitalize py-1"
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
@@ -262,7 +240,6 @@ const Doctors = () => {
                                                                     </div>
                                                                 </div>
                                                             </td>
-
                                                             <td
                                                                 className="py-1"
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
@@ -280,7 +257,7 @@ const Doctors = () => {
                                                                                 <span
                                                                                     title={data?.address?.[0]?.line.join(
                                                                                         ''
-                                                                                    )} // Full address in the tooltip
+                                                                                    )}
                                                                                 >
                                                                                     {data?.address?.[0]?.line
                                                                                         .join('')
@@ -342,11 +319,6 @@ const Doctors = () => {
                                                                         overlay={
                                                                             <Tooltip id={`tooltip-${data?._id}`}>
                                                                                 <ul className="m-0 p-0">
-                                                                                    {/* {data?.specialities?.slice(0).map((specialty, index) => (
-                                                                                        <li key={index} style={{ listStyleType: "disc", marginLeft: "10px" }}>
-                                                                                            {specialty}
-                                                                                        </li>
-                                                                                    ))} */}
                                                                                     <li>{data?.specialties[0]}</li>
                                                                                 </ul>
                                                                             </Tooltip>
@@ -357,10 +329,6 @@ const Doctors = () => {
                                                                     </OverlayTrigger>
                                                                 )}
                                                             </td>
-
-                                                            {/* <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                {data?.telecom?.[0]?.value || 'N/A'}
-                                                            </td> */}
                                                             <td
                                                                 className="py-1 "
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
@@ -376,7 +344,7 @@ const Doctors = () => {
                                                                 />
                                                             </td>
                                                             <td
-                                                                className="py-1 "
+                                                                className="py-1"
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <div className="d-flex gap-2">
                                                                     <Link

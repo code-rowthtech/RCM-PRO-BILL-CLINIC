@@ -24,7 +24,6 @@ const RoleManagement = () => {
     const [status, setStatus] = useState(true);
     const [skip, setSkip] = useState(1);
     const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
-    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchQuery, setSearchQuery] = useState('');
     const [dataToEdit, setDataToEdit] = useState(null);
 

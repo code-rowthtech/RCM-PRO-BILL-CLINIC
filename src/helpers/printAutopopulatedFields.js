@@ -40,7 +40,7 @@ export const handlePrintAutopopulatedFields = ({ populatedFields, patientDetails
                 }
 
                 .header {
-                    background: #6168d0;
+                    background: linear-gradient(135deg, rgb(249, 139, 55) 0%,rgba(97, 104, 208, 0.79) 100%);
                     color: white;
                     padding: 12px 15px;
                     margin-bottom: 15px;
@@ -276,20 +276,6 @@ export const handlePrintAutopopulatedFields = ({ populatedFields, patientDetails
                     </div>
                     <div>
                         <strong>Encounter Type:</strong> ${encounterData?.type?.[0]?.coding?.[0]?.display || 'Standard Visit'}
-                    </div>
-                </div>
-            </div>
-            <div class="header">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        ${loggedInUser?.logo ? `<img src="${loggedInUser.logo.split('?')[0]}" style="max-height: 40px; margin-bottom: 5px;" />` : ''}
-                        <div style="font-weight: 600; font-size: 11pt;">${loggedInUser?.name || 'Medical Facility'}</div>
-                        <div style="font-size: 7pt; margin-top: 2px; opacity: 0.9;">${loggedInUser?.address || ''}</div>
-                        <div style="font-size: 7pt; opacity: 0.9;">${loggedInUser?.phone || ''}</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 7pt; opacity: 0.9;"><strong>Date:</strong> ${new Date().toLocaleDateString('en-US')}</div>
-                        <div style="font-size: 7pt; opacity: 0.9;"><strong>Time:</strong> ${new Date().toLocaleTimeString('en-US')}</div>
                     </div>
                 </div>
             </div>

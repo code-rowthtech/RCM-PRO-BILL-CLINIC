@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FiMinusCircle } from "react-icons/fi";
@@ -9,11 +9,7 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
     const contactDetails = ['phone', 'email'];
     const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
     const {
-        control,
         register,
-        setValue,
-        getValues,
-        handleSubmit,
         formState: { errors },
         watch,
     } = useForm();
@@ -37,24 +33,20 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
         const updatedContacts = [...constantContact];
 
         if (field === 'value' && updatedContacts[index].system === 'phone') {
-            // Remove non-numeric characters
             let rawValue = value.replace(/\D/g, '');
             if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
-
-            // Format as (XXX)XXX-XXXX
             const formattedValue = rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
                 if (p3) return `(${p1})${p2}-${p3}`;
                 if (p2) return `(${p1})${p2}`;
                 return `(${p1}`;
             });
-
-            updatedContacts[index][field] = formattedValue; // Store formatted phone number
+            updatedContacts[index][field] = formattedValue;
         } else {
-            updatedContacts[index][field] = value; // Store other fields as they are
+            updatedContacts[index][field] = value;
         }
-
         setConstantContact(updatedContacts);
     };
+
     const formatDisplayValue = (value) => {
         if (!value) return '';
         const rawValue = value.replace(/\D/g, '');
@@ -120,7 +112,6 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                             {`+1`}
                                         </InputGroup.Text>
 
-                                        {/* Phone Input */}
                                         <Form.Control
                                             type="tel"
                                             placeholder="(123)456-7890"
@@ -132,7 +123,6 @@ const TelecomFrom = ({ constantContact, setConstantContact }) => {
                                             }}
                                             style={{ paddingLeft: '40px' }}
                                         />
-                                        {/* Flag Icon */}
                                         <div
                                             className="position-absolute"
                                             style={{

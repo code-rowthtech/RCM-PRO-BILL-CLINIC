@@ -64,7 +64,7 @@ const EncounterHeader = memo(({
                     <>
                         <Button
                             size="sm"
-                            variant="outline-secondary"
+                            variant="secondary"
                             className="d-flex align-items-center gap-1 px-2 py-1"
                             onClick={() => {
                                 setExpandAllAccordions(!expandAllAccordions);
@@ -81,7 +81,7 @@ const EncounterHeader = memo(({
                         </Button>
                         <Button
                             size="sm"
-                            variant="outline-primary"
+                            variant="primary"
                             className="d-flex align-items-center gap-1 px-2 py-1"
                             onClick={handlePrint}
                             title="Print"
@@ -91,7 +91,7 @@ const EncounterHeader = memo(({
                         </Button>
                         <Button
                             size="sm"
-                            variant="outline-success"
+                            variant="success"
                             className="d-flex align-items-center gap-1 px-2 py-1"
                             form="encounter-form"
                             type="submit"
@@ -103,7 +103,8 @@ const EncounterHeader = memo(({
                         </Button>
                         <Button
                             size="sm"
-                            variant="outline-info"
+                            variant="info"
+                            disabled
                             className="d-flex align-items-center gap-1 px-2 py-1"
                             onClick={handleReadyForBilling}
                             title="Ready for Billing"

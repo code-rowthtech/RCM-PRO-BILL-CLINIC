@@ -5,13 +5,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     createTimingsAction,
     getPractitionerTimingsAction,
-    getScheduleAction,
     updateTimingsAction,
 } from '../../../redux/schedule/action';
 import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
 import { getDoctorsAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
+
 const formatTimeTo12Hour = (time) => {
     if (!time) return null;
 
@@ -43,9 +43,9 @@ const formatTo24Hour = (time) => {
     } else if (period === 'AM' && hour === 12) {
         hour = 0; // Midnight case
     }
-
     return `${String(hour).padStart(2, '0')}:${minutePart}`;
 };
+
 const ScheduleTab = () => {
     const [selectedDoctor, setSelectedDoctor] = useState('');
     const dispatch = useDispatch();
@@ -64,7 +64,7 @@ const ScheduleTab = () => {
         { day: 'Saturday', slots: [{ startTime: '', endTime: '' }] },
         { day: 'Sunday', slots: [{ startTime: '', endTime: '' }] },
     ]);
-    // const [selectedDoctor, setSelectedDoctor] = useState(null);
+
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
@@ -80,7 +80,6 @@ const ScheduleTab = () => {
                 : '') || ''
     }));
 
-    // const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinicId = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
     const practitionerTimings = store?.getPractitionerTimingsReducer?.data?.schedule;
     useEffect(() => {
@@ -122,25 +121,15 @@ const ScheduleTab = () => {
                     })) || [{ startTime: '', endTime: '' }],
                 };
             });
-
-            // Only update state if `updatedDays` is different from current `days`
             if (JSON.stringify(updatedDays) !== JSON.stringify(days)) {
                 setDays(updatedDays);
             }
         } else {
             reset();
         }
-        // Removed `days` from dependency array
     }, [selectedDoctor, practitionerTimings, reset]);
 
-    const formatTime = (time) => {
-        if (!time) return null;
-        const [hours, minutes] = time.split(':');
-        return `${hours}:${minutes}:00`;
-    };
-
     const onSubmit = (data) => {
-        // Filter out days with empty start and end times
         const filteredDays = days.filter((day) => day.slots.some((slot) => slot.startTime && slot.endTime));
         const formattedDays = filteredDays.map((day) => ({
             day: day.day,
@@ -180,8 +169,6 @@ const ScheduleTab = () => {
         setDays((prevDays) => {
             const updatedDays = [...prevDays];
             const daySlots = updatedDays[dayIndex].slots;
-
-            // Check for overlapping slots
             const hasOverlap = daySlots.some((slot, idx1) =>
                 daySlots.some((slotToCompare, idx2) => {
                     if (idx1 !== idx2) {
@@ -199,14 +186,10 @@ const ScheduleTab = () => {
                 ToastHandle(`Overlapping time ranges detected for day ${updatedDays[dayIndex].day}.`, 'danger');
                 return prevDays;
             }
-
-            // Limit slots to 10
             if (daySlots.length >= 5) {
                 ToastHandle('You have reached the maximum limit of 5 slots.', 'danger');
                 return prevDays;
             }
-
-            // Add new slot if no overlaps and the limit is not reached
             updatedDays[dayIndex].slots = [...daySlots, { startTime: '', endTime: '' }];
             return updatedDays;
         });
@@ -221,9 +204,9 @@ const ScheduleTab = () => {
             return updatedDays;
         });
     };
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            {/* <p className="mt-0 form_heading">Edit Schedule</p> */}
             <div className="row">
                 <Col sm={3}>
                     <Form.Group>
@@ -231,11 +214,11 @@ const ScheduleTab = () => {
                             Provider Name <span className="text-danger ">*</span>
                         </Form.Label>
                         <Select
-                            options={doctorOptions || []} // Use the formatted array
+                            options={doctorOptions || []}
                             isLoading={store?.getDoctorsReducer?.loading}
                             isSearchable={true}
                             isClearable={true}
-                            onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
+                            onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
                             onChange={(data) => handleSearchInputChange(data, 'doctor')}
                             className="basic-single"
                             classNamePrefix="select"
@@ -262,7 +245,6 @@ const ScheduleTab = () => {
                         />
                     </Form.Group>
                 </Col>
-
                 <div className="col-md-3 col-sm-6 col-12 mb-1">
                     <label htmlFor="perPatientTime" className="form-label mb-0" style={{ fontWeight: 'bold' }}>
                         Per Patient Time (in minutes) <span className="text-danger">*</span>
@@ -280,12 +262,10 @@ const ScheduleTab = () => {
                             if (parts.length > 2) {
                                 value = parts[0] + '.' + parts.slice(1).join('');
                             }
-                            // Limit to 3 digits before decimal
                             if (parts[0].length > 3) {
                                 parts[0] = parts[0].slice(0, 3);
                                 value = parts.join('.');
                             }
-                            // Limit to 2 digits after decimal
                             if (parts[1] && parts[1].length > 2) {
                                 parts[1] = parts[1].slice(0, 2);
                                 value = parts.join('.');
@@ -321,7 +301,6 @@ const ScheduleTab = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {/* Loading State */}
                         {store?.getPractitionerTimingsReducer?.loading ? (
                             <tr>
                                 <td className="text-center" colSpan={2}>
@@ -332,11 +311,9 @@ const ScheduleTab = () => {
                             days?.map((day, dayIndex) => (
                                 <tr key={dayIndex}>
                                     <td>
-                                        {/* Day Name */}
                                         <input className="form-control" type="text" value={day?.day} readOnly />
                                     </td>
                                     <td>
-                                        {/* Slot Table for Each Day */}
                                         <table className="schedule-table" style={{ width: '100%' }}>
                                             <tbody>
                                                 {day?.slots?.map((slot, slotIndex) => (

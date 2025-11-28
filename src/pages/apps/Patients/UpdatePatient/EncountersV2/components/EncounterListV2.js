@@ -8,6 +8,7 @@ import { FiFileText } from 'react-icons/fi';
 import Paginations from '../../../../../../helpers/Paginations';
 import { handlePrintEncounters } from '../../Encounter/handlePrintEncounter';
 import { handlePrintEncounterList } from '../../../../../../helpers/printEncounterList';
+import { handlePrintAutopopulatedFields } from '../../../../../../helpers/printAutopopulatedFields';
 import { IoPrintSharp } from 'react-icons/io5';
 
 const EncounterListV2 = ({
@@ -66,26 +67,10 @@ const EncounterListV2 = ({
         setExpanded(true);
     };
 
-    const handlePrintList = () => {
-        handlePrintEncounterList(encounters, patientDetails);
-    };
-
     return (
         <Row className='my-1'>
             <Col sm={12}>
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                    <h5 className="mb-0">Encounter List</h5>
-                    {encounters?.length > 0 && (
-                        <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={handlePrintList}
-                            className="d-flex align-items-center gap-1"
-                        >
-                            <IoPrintSharp /> Print List
-                        </Button>
-                    )}
-                </div>
+
                 <Table
                     responsive
                     className="table-centered table-nowrap mb-0 rounded">
@@ -129,7 +114,32 @@ const EncounterListV2 = ({
                                     <td>
                                         <IoPrintSharp
                                             className="fs-4 mb-1 me-1 cursor-pointer"
-                                            onClick={() => handlePrintEncounters(item, patientDetails)}
+                                            onClick={() => {
+                                                const fieldLabels = {};
+                                                const fieldContent = {};
+                                                const populatedFields = {};
+
+                                                if (item?.data && Array.isArray(item.data)) {
+                                                    item.data.forEach(field => {
+                                                        if (field?.type) {
+                                                            fieldLabels[field.type] = field.type;
+                                                            fieldContent[field.type] = field?.content?.value || '';
+                                                            if (field?.populatedData?.length > 0) {
+                                                                populatedFields[field.type] = field.populatedData;
+                                                            }
+                                                        }
+                                                    });
+                                                }
+
+                                                handlePrintAutopopulatedFields({
+                                                    populatedFields,
+                                                    patientDetails,
+                                                    encounterData: item,
+                                                    fieldLabels,
+                                                    fieldContent,
+                                                    vitals: []
+                                                });
+                                            }}
                                         />
                                         <i
                                             className="mdi mdi-square-edit-outline fs-4 cursor-pointer"

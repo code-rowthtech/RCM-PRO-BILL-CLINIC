@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Card, Col, Form, InputGroup, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
+import { Button, Card, Form, InputGroup, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -21,8 +21,8 @@ import us from '../../../assets/images/flags/us.jpg';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons for eye visibility toggle
 import { getDepartmentDataAction } from '../../../redux/settings/action';
-import AddressForm from '../Common Pages/AddressForm';
-import { FiUploadCloud, FiDownloadCloud } from 'react-icons/fi';
+// import AddressForm from '../Common Pages/AddressForm';
+import { FiDownloadCloud } from 'react-icons/fi';
 import DoctorAddress from './DoctorAddressForm';
 import DoctorQualifications from './Qualifications';
 import Select from 'react-select';
@@ -781,7 +781,6 @@ const NewDoctor = () => {
                                                                                     },
                                                                                 })}
                                                                             />
-
                                                                             <span
                                                                                 className="position-absolute end-0 top-0 me-2 cursor-pointer"
                                                                                 style={{ marginTop: '3px' }}
@@ -866,9 +865,7 @@ const NewDoctor = () => {
                                                                                         : logoName
                                                                                     : 'Upload Profile Image'}
                                                                         </span>
-                                                                        {!logoName && <i className="bi bi-cloud-arrow-up position-absolute fs-5" style={{ right: '2.5%' }}></i>}
-
-
+                                                                        {!logoName && <i className="bi bi-cloud-arrow-up position-absolute fs-5" style={{ right: '2.5%' }} />}
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {(logo?.url?.split('?')[0] ||
                                                                                 doctorDetails?.photo?.[0]?.url) && (
@@ -1043,7 +1040,6 @@ const NewDoctor = () => {
                                                     <div
                                                         className="col-12 d-flex justify-content-end gap-2 mt-1"
                                                         style={{ height: '6vh', overflow: 'hidden' }}>
-                                                        {/* <Button className="cancel-button" onClick={() => reset()}>Cancel</Button> */}
                                                         <Button className='custom-buttons' disabled={store?.createtDoctorsReducer?.loading ||
                                                             store?.createtDoctorsDetailReducer?.loading} type='submit' onClick={() => setSwitchTabs(false)}>
                                                             {id ? 'Update' : 'Save'}

@@ -13,7 +13,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
-    const [selectedState, setSelectedState] = useState(null);
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const statesData = store?.getStatesReducer?.data;
@@ -121,14 +120,11 @@ const AddressForm = ({ addresses, setAddresses }) => {
         } else {
             updatedAddresses[index][field] = value;
 
-            // Auto-populate state and city when ZIP code is entered
             if (field === 'postalCode') {
                 const locationData = await fetchLocationByZip(value);
                 if (locationData) {
                     updatedAddresses[index].state = locationData.state;
                     updatedAddresses[index].city = locationData.city;
-                    
-                    // Find state object and dispatch cities action
                     const stateObj = statesData?.states?.find((s) => s.name === locationData.state);
                     if (stateObj) {
                         const cityPayload = {
@@ -137,7 +133,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             limit: 25,
                             skip: '',
                         };
-
                         if (updatedAddresses[index].type === 'physical') {
                             dispatch(getCitiesAction(cityPayload));
                         } else if (updatedAddresses[index].type === 'mailing') {
@@ -148,8 +143,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                     }
                 }
             }
-
-            // If type is changed and state is already selected, reload cities
             if (field === 'type' && updatedAddresses[index].state) {
                 updatedAddresses[index].city = ''; // Clear city selection
                 const stateObj = statesData?.states?.find((s) => s.name === updatedAddresses[index].state);
@@ -206,6 +199,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
             }
         }
     };
+
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
     useEffect(() => {
@@ -237,6 +231,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
             });
         }
     }, [patientDetails, statesData]);
+
     const addAddressLine = (index) => {
         if (addresses[index]?.line?.length === 3) {
             ToastHandle('Maximum 3 address lines are allowed.', 'danger');
@@ -267,7 +262,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
             <Row>
                 <Col sm={12}>
                     <h5>
-                        Address Details
+                        {`Address Details`}
                         <span
                             className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
                             onClick={addAddress}></span>
@@ -284,7 +279,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             {...register(`address[${index}].type`)}
                             onChange={(e) => handleAddressChange(index, 'type', e.target.value)}>
                             <option value="" hidden>
-                                Select
+                                {`Select`}
                             </option>
                             {addressTypes?.sort((a, b) => a.localeCompare(b))?.map((type) => (
                                 <option key={type} className="text-capitalize" value={type}>
@@ -301,7 +296,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             {...register(`address[${index}].use`)}
                             onChange={(e) => handleAddressChange(index, 'use', e.target.value)}>
                             <option value="" hidden>
-                                Select
+                                {`Select`}
                             </option>
                             {addressUses?.sort((a, b) => a.localeCompare(b))?.map((use) => (
                                 <option key={use} className="text-capitalize" value={use}>
@@ -323,12 +318,9 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             value={item.line[0]}
                             onChange={(e) => {
                                 handleAddressChange(index, 'line', e.target.value);
-                                // Set active index so suggestions appear for this address
                                 setActiveAddressIndex(index);
                                 setAddressFocused(true);
-                                // Call your geolocation API with the current input value
                                 getGeolocation(e)?.then((data) => {
-                                    // Expecting your getGeolocation to return an object with results
                                     if (data && data.results) {
                                         setSearchedLocations(data.results);
                                     }
@@ -370,8 +362,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                                 data.components?.village ||
                                                 data.components?.normalize_city ||
                                                 '';
-
-                                            // Dispatch city load based on address type
                                             if (item?.type === 'physical') {
                                                 dispatch(
                                                     getCitiesAction({
@@ -400,8 +390,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                                     })
                                                 );
                                             }
-
-                                            // Update address
                                             const newAddress = {
                                                 ...item,
                                                 line: [data.formatted || '', ...(item.line?.slice(1) || [])], // keep existing lines after the first
@@ -410,12 +398,9 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                                 postalCode: data.components?.postcode || '',
                                                 country: data.components?.country || '',
                                             };
-
                                             const updatedAddresses = [...addresses];
                                             updatedAddresses[index] = newAddress;
                                             setAddresses(updatedAddresses);
-
-                                            // Clear suggestions
                                             setSearchedLocations([]);
                                             setAddressFocused(false);
                                         }}
@@ -447,7 +432,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             />
                         </Col>
                     ))}
-
                     <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
                         <Form.Label className="mb-0">State</Form.Label>
                         <Form.Select
@@ -467,7 +451,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         <Form.Select
                             value={item?.city}
                             {...register(`address[${index}].city`)}
-                            // disabled={!selectedState || store?.getCitiesReducer?.loading}
                             onChange={(e) => {
                                 handleAddressChange(index, 'city', e.target.value);
                             }}
@@ -554,7 +537,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             </span>
                         )}
                     </Col>
-
                 </Row>
             ))}
         </Form>

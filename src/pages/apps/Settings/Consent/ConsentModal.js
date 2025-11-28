@@ -144,7 +144,6 @@ const ConsentModal = ({ show, onClose, defaultValues, isEdit }) => {
                                 />
                             </Form.Group>
                         </Col>
-
                         {/* Assign by default on new appointments */}
                         <Col md={12}>
                             <Form.Group className="mb-2 d-flex align-items-center">

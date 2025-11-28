@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { getEncounterAction, getEncounterByIdAction } from '../../../../../redux/actions'
 import { useSearchParams } from 'react-router-dom'
-import dummyProfile from '../../../../../assets/images/dummyProfile.png'
 import Spinner from '../../../../../constants/Spinner'
 import { FiFileText } from 'react-icons/fi'
 import Paginations from '../../../../../helpers/Paginations'
@@ -36,10 +35,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
-        // dispatch(getEncounterAction({ patientId: id, skip: pageNumber }))
     };
-
-    // const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
 
     return (
         <Row className='my-1'>

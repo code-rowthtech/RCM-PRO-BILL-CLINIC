@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Accordion, Col, Modal, Row, Table } from 'react-bootstrap';
+import { Accordion, Col, Modal, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import '../../Encounter/Encounter.css'
 import Spinner from '../../../../../../constants/Spinner';
@@ -10,7 +10,6 @@ import AddMedication from '../../AddMedication';
 import { getMedicationAction, getVitalsByPatientIdAction } from '../../../../../../redux/actions';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import VitalStatus from '../../VitalStatus';
 import { getAllergiesOfPatientAction } from '../../../../../../redux/allergyList/action';
 import { getProblemListAction } from '../../../../../../redux/ProblemList/action';
 import ToastHandle from '../../../../../../helpers/ToastMessage';
@@ -21,11 +20,6 @@ const convertFromImperial = (value, vitalName) => {
     if (vitalName === 'Temperature') return (((value - 32) * 5) / 9).toFixed(2); // F to C
     if (vitalName === 'Head Circumference') return (value * 2.54).toFixed(2)
     return value;
-};
-
-const formatDate = (dateString) => {
-    const options = { day: 'numeric', month: 'short' };
-    return new Date(dateString).toLocaleDateString('en-GB', options);
 };
 
 const imperialUnits = {
@@ -51,7 +45,6 @@ const EncounterSummaryV2 = ({ setScrollToAccordion, populatedFields = {} }) => {
 
     // STATE VARIABLES
     const [unitSystem, setUnitSystem] = useState('imperial')
-    const [vitals, setVitals] = useState(defaultVitals);
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
     const [showAddAllergyModal, setShowAddAllergyModal] = useState(false);
     const [showAddProblemModal, setShowAddProblemModal] = useState(false);
@@ -161,49 +154,6 @@ const EncounterSummaryV2 = ({ setScrollToAccordion, populatedFields = {} }) => {
         const variant = variantMap[code] || 'secondary';
 
         return <span className={`ms-2 text-${variant}`}>{severity.display}</span>;
-    };
-
-    const getDisplayUnit = (vital) => {
-        if (vital.unitKey) {
-            return unitSystem === 'imperial' ? imperialUnits[vital.unitKey] : metricUnits[vital.unitKey];
-        }
-        return vital.unit || '';
-    };
-
-    const findVitalValue = (vitalName, date) => {
-        if (!groupedVitals[date]) return null;
-        const vital = groupedVitals[date].find(v =>
-            v.code?.coding?.[0]?.display === vitalName ||
-            v.code?.text === vitalName
-        );
-        if (!vital) return null;
-        if (vital.component && vital.component.length > 0) {
-            // Handle blood pressure case (no conversion needed)
-            const systolic = vital.component.find(c =>
-                c.code?.coding?.[0]?.code === "8480-6"
-            )?.valueQuantity?.value;
-
-            const diastolic = vital.component.find(c =>
-                c.code?.coding?.[0]?.code === "8462-4"
-            )?.valueQuantity?.value;
-
-            return { systolic: systolic || '', diastolic: diastolic || '' };
-        }
-        // Get the stored value (always in imperial units)
-        let value = vital.valueQuantity?.value || vital.valueString || '';
-        // Convert to metric if needed for display
-        if (unitSystem === 'metric') {
-            if (vitalName === 'Height') {
-                value = convertFromImperial(value, 'Height');
-            }
-            else if (vitalName === 'Weight') {
-                value = convertFromImperial(value, 'Weight');
-            }
-            else if (vitalName === 'Temperature') {
-                value = convertFromImperial(value, 'Temperature');
-            }
-        }
-        return value;
     };
 
     // Helper function to check if item is already added

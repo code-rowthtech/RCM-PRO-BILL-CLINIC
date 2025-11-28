@@ -35,7 +35,8 @@ export const NoteFormFields = memo(({
     isAccordionOpen,
     getValues,
     encounterData,
-    patientVitals
+    patientVitals,
+    externalConsentForms = []
 }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -79,6 +80,13 @@ export const NoteFormFields = memo(({
             }
         }
     }, [encounterData, consentDocuments]);
+
+    // Handle external consent forms from appointment
+    useEffect(() => {
+        if (externalConsentForms?.length > 0 && !encounterData?.data) {
+            setSelectedConsentForms(externalConsentForms);
+        }
+    }, [externalConsentForms, encounterData]);
 
     const quillRefs = useRef({
         Subjective: createRef(),
@@ -159,7 +167,6 @@ export const NoteFormFields = memo(({
         } else {
             const fieldSpecificData = populatedFields[fieldName?.name] || [];
             const fieldContent = getValues ? getValues(fieldName?.name) || '' : '';
-
             handlePrintAutopopulatedFields({
                 populatedFields: { [fieldName?.name]: fieldSpecificData },
                 patientDetails,

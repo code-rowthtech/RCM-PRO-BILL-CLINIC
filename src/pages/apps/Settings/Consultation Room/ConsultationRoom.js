@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
 import Spinner from '../../../../constants/Spinner';
 import { FormInput } from '../../../../components';
 import { FiFileText, FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
+import { encryptMessage } from '../../../../cryptoUtils';
 import {
     getMastersDataAction,
     updateMastersDataAction,
@@ -18,18 +18,11 @@ import { formatDateByUserTimeZone } from '../../../../components/timeZonePipe';
 
 const ConsultationRoom = () => {
     const store = useSelector((state) => state);
-    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
     const {
-        register,
-        handleSubmit,
         reset,
-        watch,
-        setValue,
         formState: { errors },
     } = useForm();
     const dispatch = useDispatch();
-    const nameValue = watch('name');
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState(true);
     const [skip, setSkip] = useState(1);
@@ -40,9 +33,7 @@ const ConsultationRoom = () => {
         setEdit(data);
         setConsultationModal(true);
     };
-
     const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
-
     useEffect(() => {
         dispatch(
             getMastersDataAction({
@@ -95,7 +86,6 @@ const ConsultationRoom = () => {
                                             } me-2`}>
                                         Active
                                     </Button>
-
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
@@ -182,12 +172,9 @@ const ConsultationRoom = () => {
                             <Table responsive className="table-centered table-nowrap mb-0 rounded">
                                 <thead className="table-dark">
                                     <tr>
-                                        <th>S.No.</th>
-                                        <th>Consultation Room Name</th>
-                                        <th>Description</th>
-                                        <th>Created Date</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
+                                        {['S.No.', 'Consultation Room Name', 'Description', 'Created Date', 'Status', 'Action']?.map((data, i) => (
+                                            <th key={i}>{data}</th>
+                                        ))}
                                     </tr>
                                 </thead>
                                 <tbody>

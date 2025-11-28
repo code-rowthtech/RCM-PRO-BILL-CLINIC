@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
+import { Button, Card, Col, Row, Table } from 'react-bootstrap';
 import Spinner from '../../../constants/Spinner';
 import { Link, useNavigate } from 'react-router-dom';
 import { FormInput } from '../../../components';
-import ToastHandle from '../../../helpers/ToastMessage';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPatientsAction, updatePatientsAction } from '../../../redux/patients/actions';
+import { getPatientsAction } from '../../../redux/patients/actions';
 import Paginations from '../../../helpers/Paginations';
 import { IoSearchSharp } from 'react-icons/io5';
 import dummyProfile from '../../../assets/images/dummyProfile.png';
