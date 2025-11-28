@@ -26,10 +26,12 @@ const AppointmentSelectionModal = ({
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        return appointmentDate >= today &&
-            ['booked', 'confirmed', 'arrived'].includes(appointment.status?.toLowerCase());
+        return appointmentDate >= today
+        // &&
+        //     ['booked', 'confirmed', 'arrived'].includes(appointment.status?.toLowerCase());
     });
 
+    console.log(store?.getAppointmentsReducer?.data?.appointments, 'availableAppointmentsavailableAppointments');
     const appointmentOptions = availableAppointments.map((appointment) => ({
         value: appointment._id,
         label: `${appointment.appointmentType?.text || appointment.appointmentType?.coding?.[0]?.display || 'Appointment'} - ${formatDateByUserTimeZone(appointment.start)} - ${appointment.status}`,
