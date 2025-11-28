@@ -85,7 +85,6 @@ const DateEncountersV2 = ({
         createEncounterData,
         updateEncounterData,
         patientVitals,
-        groupedVitals,
         notesFields,
         notesTypeOptions,
         defaultNoteTypeOption,
@@ -226,13 +225,9 @@ const DateEncountersV2 = ({
             dataLoadedRef.current = true;
             processAppointmentSelection(appointmentData);
             const defaults = getAppointmentBasedDefaults();
-
-            // Set appointment-based values - use the actual appointment ID
             if (appointmentData._id) {
                 setSelectedAppointment(appointmentData?._id);
             }
-
-            // Handle consent forms from appointment
             if (appointmentData.consentForms && appointmentData.consentForms.length > 0) {
                 const appointmentConsentForms = appointmentData.consentForms.map(form => ({
                     value: form._id || form.id,
@@ -241,8 +236,6 @@ const DateEncountersV2 = ({
                 }));
                 setSelectedConsentForms(appointmentConsentForms);
             }
-
-            // Handle provider from appointment
             if (appointmentData.providerInfo) {
                 const providerInfo = appointmentData.providerInfo;
                 let providerId = null;
@@ -288,14 +281,12 @@ const DateEncountersV2 = ({
             } else if (defaults.providerId) {
                 setSelectedProvider(defaults.providerId);
             }
-
             if (defaults.startDate) {
                 setValue('startDate', defaults.startDate);
             }
             if (defaults.status) {
                 setValue('status', defaults.status);
             }
-
             // Auto-populate appointment reason in notes if available
             if (defaults.appointmentReason && notesFields) {
                 const reasonField = notesFields.find(field =>
@@ -359,7 +350,6 @@ const DateEncountersV2 = ({
             if (encounterData?.data && Array.isArray(encounterData?.data)) {
                 const newPopulatedFields = {};
                 const newPopulatedFieldIds = {};
-
                 encounterData?.data?.forEach(field => {
                     if (field?.type && field?.content?.value) {
                         setValue(field?.type, field?.content?.value);
