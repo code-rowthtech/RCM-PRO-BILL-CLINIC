@@ -470,27 +470,6 @@ const EncounterSummary = () => {
                                                                 </div>
                                                                 <div className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
                                                                     <p>{medication?.status}</p>
-                                                                    {/* <OverlayTrigger
-                                                                        placement="top"
-                                                                        overlay={<Tooltip id="copyTooltip">Copy to clipboard</Tooltip>}
-                                                                    >
-                                                                        <i
-                                                                            className="bi bi-copy fs-5 text-secondary"
-                                                                            style={{ cursor: 'pointer' }}
-                                                                            onClick={(e) => {
-                                                                                navigator.clipboard.writeText('Text to copy');
-                                                                                const icon = e.currentTarget;
-                                                                                icon.classList.remove('bi-copy', 'text-secondary');
-                                                                                icon.classList.add('bi-check', 'text-secondary');
-
-                                                                                setTimeout(() => {
-                                                                                    icon.classList.remove('bi-check', 'text-success');
-                                                                                    icon.classList.add('bi-copy', 'text-secondary');
-                                                                                }, 2000);
-                                                                            }}
-                                                                        />
-                                                                    </OverlayTrigger> */}
-
                                                                 </div>
                                                             </li>
                                                         ))}

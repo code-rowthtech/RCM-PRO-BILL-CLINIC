@@ -66,6 +66,16 @@ hr {
     align-items: center;
     justify-content: center;
 }
+.encounter-header-buttons {
+    border: none !important;
+    border-radius: 10px;
+    line-height: 10px;
+    font-size: 13px;
+    height: 30px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 .timer-button {
     border: none !important;
