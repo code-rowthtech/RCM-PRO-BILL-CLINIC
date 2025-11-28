@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState, createRef, useMemo, memo } from 'react';
-import { Col, Button, Table, Row, Form, Accordion, Modal } from 'react-bootstrap';
+import React, { useEffect, useRef, useState, memo } from 'react';
+import { Col, Row, Form } from 'react-bootstrap';
 import Select from 'react-select';
-import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
     createEncounterAction,
     getAppointmentsAction,
@@ -13,7 +12,7 @@ import {
     getEncounterNotesFieldsAction,
     updateEncounterAction
 } from '../../../../../../redux/actions';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { encounterClassCodes, encounterTypes } from '../../../../../../utils/DataSets/commonData';
 import { encryptMessage } from '../../../../../../cryptoUtils';
@@ -24,17 +23,12 @@ import EncounterSummaryV2 from './EncounterSummaryV2';
 import EncounterTemplates from '../../Encounter/EncounterTemplates';
 import PastEncounters from '../../Encounter/PastEncounters';
 import ChangeNoteTypeModal from '../../Encounter/ChangeNoteTypeModal';
-import VitalsChart from '../../Encounter/VitalsChart';
 import { getVitalsByPatientIdAction } from '../../../../../../redux/actions';
 import { defaultVitals } from '../../../../../../utils/DataSets/commonData2';
-import { formatDateByUserTimeZone } from '../../../../../../components/timeZonePipe';
-import { MdPrint } from 'react-icons/md';
-import { handlePrintVitals } from '../../../../../../helpers/printVitals';
 import { handlePrintAutopopulatedFields } from '../../../../../../helpers/printAutopopulatedFields';
-import { Trash } from 'lucide-react';
-import { FaCloudUploadAlt, FaEye } from 'react-icons/fa';
 import { useEncounterData } from '../hooks/useEncounterData';
 import { useFieldPopulation } from '../hooks/useFieldPopulation';
+import { useAppointmentIntegration } from '../hooks/useAppointmentIntegration';
 import { NoteFormFields } from './NoteFormFields';
 import { getConsentFormAction } from '../../../../../../redux/settings/action';
 
@@ -56,7 +50,8 @@ const DateEncountersV2 = ({
     expandAllAccordions,
     onPrintRef,
     scrollToAccordion,
-    setScrollToAccordion
+    setScrollToAccordion,
+    appointmentData
 }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -89,9 +84,6 @@ const DateEncountersV2 = ({
         encounterData,
         createEncounterData,
         updateEncounterData,
-        allergyData,
-        problemData,
-        medicationList,
         patientVitals,
         groupedVitals,
         notesFields,
@@ -104,7 +96,7 @@ const DateEncountersV2 = ({
         appointmentOptions
     } = useEncounterData(id, encounterId, encounterAction);
 
-    const consentDocuments = store?.getConsentFormReducer?.data || [];
+    const { processAppointmentSelection, getAppointmentBasedDefaults } = useAppointmentIntegration();
 
     const {
         populatedFields,
@@ -137,7 +129,6 @@ const DateEncountersV2 = ({
                         });
                     }
                 }, 300);
-
                 // Clear the scroll trigger
                 setScrollToAccordion(null);
             }
@@ -219,7 +210,7 @@ const DateEncountersV2 = ({
         if (clinicId) {
             dispatch(getConsentFormAction({ clinicId }));
         }
-    }, [dispatch, store?.Auth?.user?.clinicId])
+    }, [dispatch, id])
 
     // Load encounter data for update
     useEffect(() => {
@@ -229,8 +220,103 @@ const DateEncountersV2 = ({
         }
     }, [encounterAction, dispatch, encounterId]);
 
+    // Auto-populate from appointment data when creating new encounter (only once)
     useEffect(() => {
-        if (encounterAction !== 'updateEncounter' && encounterTypes?.length > 0 && encounterClassCodes?.length > 0) {
+        if (encounterAction === 'createEncounter' && appointmentData && !dataLoadedRef.current) {
+            dataLoadedRef.current = true;
+            processAppointmentSelection(appointmentData);
+            const defaults = getAppointmentBasedDefaults();
+
+            // Set appointment-based values - use the actual appointment ID
+            if (appointmentData._id) {
+                setSelectedAppointment(appointmentData?._id);
+            }
+
+            // Handle consent forms from appointment
+            if (appointmentData.consentForms && appointmentData.consentForms.length > 0) {
+                const appointmentConsentForms = appointmentData.consentForms.map(form => ({
+                    value: form._id || form.id,
+                    label: form.title || form.name || 'Consent Form',
+                    data: form
+                }));
+                setSelectedConsentForms(appointmentConsentForms);
+            }
+
+            // Handle provider from appointment
+            if (appointmentData.providerInfo) {
+                const providerInfo = appointmentData.providerInfo;
+                let providerId = null;
+
+                // Extract provider ID from different possible formats
+                if (providerInfo._id) {
+                    providerId = providerInfo._id;
+                } else if (providerInfo.reference) {
+                    // Extract ID from reference like "Practitioner/123"
+                    const refParts = providerInfo.reference.split('/');
+                    if (refParts.length > 1) {
+                        providerId = refParts[1];
+                    }
+                }
+
+                if (providerId) {
+                    // Check if provider exists in current options
+                    const existingProvider = providerOptions?.find(option => option.value === providerId);
+
+                    if (existingProvider) {
+                        setSelectedProvider(providerId);
+                    } else {
+                        // Search for the provider if not in current list
+                        const providerName = providerInfo.display || providerInfo.name?.[0]?.text || '';
+                        if (providerName) {
+                            dispatch(getDoctorsAction({
+                                status: true,
+                                search: providerName,
+                                page: 1,
+                                limit: 50
+                            })).then(() => {
+                                // Set provider after search completes
+                                setTimeout(() => {
+                                    setSelectedProvider(providerId);
+                                }, 100);
+                            });
+                        } else {
+                            // Fallback: set the provider ID directly
+                            setSelectedProvider(providerId);
+                        }
+                    }
+                }
+            } else if (defaults.providerId) {
+                setSelectedProvider(defaults.providerId);
+            }
+
+            if (defaults.startDate) {
+                setValue('startDate', defaults.startDate);
+            }
+            if (defaults.status) {
+                setValue('status', defaults.status);
+            }
+
+            // Auto-populate appointment reason in notes if available
+            if (defaults.appointmentReason && notesFields) {
+                const reasonField = notesFields.find(field =>
+                    field.name.toLowerCase().includes('reason') ||
+                    field.name.toLowerCase().includes('chief complaint')
+                );
+                if (reasonField) {
+                    setValue(reasonField.name, defaults.appointmentReason);
+                }
+            }
+
+            // Set default encounter type and class - only if valid
+            if (encounterTypes?.length > 0) {
+                const validEncounterType = defaults.encounterType && encounterTypes.find(t => t.code === defaults.encounterType);
+                setValue('type', validEncounterType ? defaults.encounterType : encounterTypes[0]?.code);
+            }
+            if (encounterClassCodes?.length > 0) {
+                setValue('class', encounterClassCodes[0]?.code);
+            }
+        } else if (encounterAction !== 'updateEncounter' && encounterTypes?.length > 0 && encounterClassCodes?.length > 0 && !dataLoadedRef.current) {
+            dataLoadedRef.current = true;
             setValue('type', encounterTypes[0]?.code);
             setValue('class', encounterClassCodes[0]?.code);
             setValue('status', 'arrived');
@@ -238,7 +324,7 @@ const DateEncountersV2 = ({
                 setSelectedProvider(patientDetails.doctorId._id);
             }
         }
-    }, [encounterAction, encounterTypes, encounterClassCodes, setValue, patientDetails?.doctorId?._id, selectedProvider]);
+    }, [encounterAction, appointmentData]);
 
     // Set default note type
     useEffect(() => {
@@ -298,12 +384,12 @@ const DateEncountersV2 = ({
                 setAttachedRecords(encounterData.attachedRecords);
             }
         }
-    }, [encounterAction, encounterData, notesFields, setValue]);
+    }, [encounterAction, encounterData, notesFields]);
 
-    // Reset dataLoadedRef when switching encounters
+    // Reset dataLoadedRef when switching encounters or encounter action changes
     useEffect(() => {
         dataLoadedRef.current = false;
-    }, [encounterId]);
+    }, [encounterId, encounterAction]);
 
     // Visible tabs configuration
     const visibleTabs = settingsDataMainItems?.length > 0
@@ -368,14 +454,14 @@ const DateEncountersV2 = ({
             // Clear selectedFromList after applying templates
             setTimeout(() => setSelectedFromList({}), 100);
         }, 0);
-    }, [selectedFromList, setValue, getValues, setSelectedFromList]);
+    }, [selectedFromList]);
 
     // Save scroll position before loading state changes
     useEffect(() => {
         const handleScroll = () => {
             scrollPositionRef.current = window.scrollY;
         };
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
@@ -484,7 +570,6 @@ const DateEncountersV2 = ({
                 fieldsData.push(fieldData);
             }
         });
-
         const payload = {
             type,
             class: encounterClass,
@@ -496,7 +581,8 @@ const DateEncountersV2 = ({
             attachedRecords,
             period: {
                 start: data?.startDate,
-            }
+            },
+            ...(selectedAppointment && { appointmentId: selectedAppointment })
         };
 
         if (encounterAction === 'updateEncounter') {
@@ -583,9 +669,7 @@ const DateEncountersV2 = ({
                                                 ))}
                                             </Form.Select>
                                         </div>
-                                        {errors.type && (
-                                            <div className="text-danger small mt-0">{errors.type.message}</div>
-                                        )}
+                                        {errors.type && (<div className="text-danger small mt-0">{errors.type.message}</div>)}
                                     </Form.Group>
                                 </Col>
                                 <Col sm={3} className='mt-0'>
@@ -621,9 +705,7 @@ const DateEncountersV2 = ({
                                                 ))}
                                             </Form.Select>
                                         </div>
-                                        {errors.class && (
-                                            <div className="text-danger small mt-0">{errors.class.message}</div>
-                                        )}
+                                        {errors.class && (<div className="text-danger small mt-0">{errors.class.message}</div>)}
                                     </Form.Group>
                                 </Col>
                                 <Col sm={3} className='mt-0'>
@@ -754,8 +836,9 @@ const DateEncountersV2 = ({
                                                 }
                                             }}
                                             onInputChange={(value, { action }) => {
-                                                if (action === 'input-change') {
-                                                    dispatch(getDoctorsAction({ status: true, search: value, page: 1, limit: 10 }));
+                                                if (action === 'input-change' && value.length > 0) {
+                                                    // Increase limit to handle pagination and ensure provider is found
+                                                    dispatch(getDoctorsAction({ status: true, search: value, page: 1, limit: 50 }));
                                                 }
                                             }}
                                             filterOption={null}
@@ -797,7 +880,11 @@ const DateEncountersV2 = ({
                                             className="basic-single"
                                             classNamePrefix="select"
                                             placeholder="Select Appointment"
-                                            value={appointmentOptions?.find(option => option?.value === selectedAppointment) || null}
+                                            value={appointmentOptions?.find(option => option?.value === selectedAppointment) ||
+                                                (selectedAppointment && appointmentData?._id === selectedAppointment ? {
+                                                    value: appointmentData?._id,
+                                                    label: `${appointmentData?.appointmentType?.text || appointmentData?.appointmentType?.coding?.[0]?.display || 'Appointment'} - ${new Date(appointmentData?.start).toLocaleDateString()} - ${appointmentData?.status}`
+                                                } : null)}
                                             onChange={(selectedValue) => {
                                                 setSelectedAppointment(selectedValue?.value);
                                                 setAppointmentError(false);
@@ -865,6 +952,7 @@ const DateEncountersV2 = ({
                                     getValues={getValues}
                                     encounterData={encounterData}
                                     patientVitals={patientVitals}
+                                    externalConsentForms={selectedConsentForms}
                                 />
                             }
                         </Form>

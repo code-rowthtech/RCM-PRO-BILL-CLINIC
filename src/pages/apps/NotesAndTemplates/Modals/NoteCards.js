@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Row, Col, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { IoSettings, IoDocumentTextOutline } from 'react-icons/io5';
 import '../settingtabs.css';
 import { useSelector, useDispatch } from 'react-redux';
 import Spinner from '../../../../constants/Spinner';
-import { getNoteCategoriesAction, updateNoteCategoriesAction } from '../../../../redux/noteCategories/action';
+import { updateNoteCategoriesAction } from '../../../../redux/noteCategories/action';
 import { decryptMessage, encryptMessage } from '../../../../cryptoUtils';
 import { FiFileText } from 'react-icons/fi';
 
@@ -12,9 +12,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [noteTypes, setNoteTypes] = useState([]);
-    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinic_id = decryptMessage(localStorage?.getItem('subClinicLocation')) || '';
-    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const notesCategoriesData = store?.getNoteCategoriesReducer?.data?.data;
     const loading = store?.getNoteCategoriesReducer?.loading;
 
@@ -28,7 +26,6 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
             noteType: note.noteType,
             format: note.format,
             noteType: note.noteType,
-            // title: note.title,
             customTitle: note.title === 'Other' ? note.customTitle : '',
             active: note.active,
             private: note.private,
@@ -36,6 +33,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
         };
         dispatch(updateNoteCategoriesAction({ id, key: encryptMessage(payload) }));
     };
+
     const handleChange = (id, field, value) => {
         const updated = noteTypes.map((note) => (note._id === id ? { ...note, [field]: value } : note));
         setNoteTypes(updated);
@@ -86,17 +84,15 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                                         </strong>{' '}
                                     </div>
                                 </div>
-                                {
-                                    <div>
-                                        <i
-                                            className=" mdi mdi-square-edit-outline text-primary fs-4 cursor-pointer"
-                                            title="Edit"
-                                            onClick={() => {
-                                                handleOpenEditModal(note);
-                                            }}
-                                        />
-                                    </div>
-                                }
+                                {<div>
+                                    <i
+                                        className=" mdi mdi-square-edit-outline text-primary fs-4 cursor-pointer"
+                                        title="Edit"
+                                        onClick={() => {
+                                            handleOpenEditModal(note);
+                                        }}
+                                    />
+                                </div>}
                             </div>
                             <hr className="my-0" />
                             <div className="d-flex align-items-center justify-content-between px-2 py-2 border-bottom small">
@@ -107,7 +103,6 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                                 <strong>Format</strong>
                                 <div>{note?.format}</div>
                             </div>
-
                             <div className="d-flex justify-content-between align-items-center small border-bottom px-2 py-2">
                                 <strong>Private</strong>
                                 <Form.Check
@@ -116,7 +111,6 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                                     onChange={(e) => handleChange(note?._id, 'private', e.target.checked)}
                                 />
                             </div>
-
                             <div className="d-flex justify-content-between align-items-center small border-bottom px-2 py-2">
                                 <strong>Active</strong>
                                 <Form.Check
@@ -125,11 +119,8 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                                     onChange={(e) => handleChange(note?._id, 'active', e.target.checked)}
                                 />
                             </div>
-
                             <div
-                                className="d-flex align-items-center justify-content-between rounded-bottom  small px-2 py-2"
-                            // style={{ backgroundColor: '#5582E51A' }}
-                            >
+                                className="d-flex align-items-center justify-content-between rounded-bottom  small px-2 py-2">
                                 <div className="d-flex align-items-center">
                                     <Form.Check
                                         type="checkbox"

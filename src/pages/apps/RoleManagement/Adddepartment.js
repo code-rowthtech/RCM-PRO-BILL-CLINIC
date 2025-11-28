@@ -172,7 +172,6 @@ const Adddepartment = ({ addDepartmentModal, setAddDesiginationModal, setAddDepa
                         noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
                       }
                     })}
-
                     placeholder="Enter Desigination Name"
                     onInput={(e) => {
                       const value = e.target.value;

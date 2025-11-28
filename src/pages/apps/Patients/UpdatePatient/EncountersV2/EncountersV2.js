@@ -5,11 +5,13 @@ import EncounterListV2 from './components/EncounterListV2';
 import DateEncountersV2 from './components/DateEncountersV2';
 import EncounterHeader from './components/EncounterHeader';
 import EncounterSettingsForm from '../Encounter/EncounterSettings';
+import AppointmentSelectionModal from './components/AppointmentSelectionModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDoctorsAction, getEncounterByIdAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { decryptMessage } from '../../../../../cryptoUtils';
 import { handlePrintEncounters } from '../Encounter/handlePrintEncounter';
 import { useSearchParams } from 'react-router-dom';
+import { useAppointmentIntegration } from './hooks/useAppointmentIntegration';
 
 let decryptedUser = null;
 
@@ -46,8 +48,10 @@ const EncountersV2 = ({
     const [searchNoteType, setSearchNoteType] = useState('');
     const [showSettings, setShowSettings] = useState(false);
     const [expandAllAccordions, setExpandAllAccordions] = useState(false);
+    const [showAppointmentModal, setShowAppointmentModal] = useState(false);
     
     const store = useSelector((state) => state);
+    const { processAppointmentSelection, selectedAppointmentData } = useAppointmentIntegration();
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const id = searchParams.get('id');
     const printRef = useRef();
@@ -58,25 +62,34 @@ const EncountersV2 = ({
 
     useEffect(() => {
         if (createEncounter) {
-            const today = new Date().toISOString().split('T')[0];
-            const existingTodayTab = encounterTabs.find(
-                (tab) => tab.type === 'createEncounter' && tab.title === today
-            );
-
-            if (existingTodayTab) {
-                setNewEncounterModal(true);
-            } else {
-                const newTab = {
-                    id: Date.now(),
-                    title: today,
-                    type: 'createEncounter',
-                };
-                setEncounterTabs([...encounterTabs, newTab]);
-                setActiveTab(newTab.id);
-            }
+            // Show appointment selection modal instead of directly creating encounter
+            setShowAppointmentModal(true);
             setCreateEncounter(false);
         }
-    }, [createEncounter, encounterTabs, setEncounterTabs, setCreateEncounter]);
+    }, [createEncounter, setCreateEncounter]);
+
+    const handleAppointmentSelection = (appointmentData) => {
+        processAppointmentSelection(appointmentData);
+        
+        const today = new Date().toISOString().split('T')[0];
+        const existingTodayTab = encounterTabs.find(
+            (tab) => tab.type === 'createEncounter' && tab.title === today
+        );
+
+        if (existingTodayTab) {
+            setNewEncounterModal(true);
+        } else {
+            const newTab = {
+                id: Date.now(),
+                title: today,
+                type: 'createEncounter',
+                appointmentData: appointmentData
+            };
+            setEncounterTabs([...encounterTabs, newTab]);
+            setActiveTab(newTab.id);
+        }
+        setShowAppointmentModal(false);
+    };
 
     useEffect(() => {
         if (updateEncounter) {
@@ -136,16 +149,7 @@ const EncountersV2 = ({
     const handlePrint = () => {
         const activeTabData = encounterTabs.find(tab => tab.id === activeTab);
 
-        if (activeTabData?.type === 'updateEncounter') {
-            const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
-            const patientDetails = store?.getPatientByIdReducer?.data?.data;
-
-            if (encounterData && patientDetails) {
-                handlePrintEncounters(encounterData, patientDetails);
-            } else {
-                console.warn('Cannot print: Missing encounter data or patient details');
-            }
-        } else if (activeTabData?.type === 'createEncounter') {
+        if (activeTabData?.type === 'updateEncounter' || activeTabData?.type === 'createEncounter') {
             if (printRef.current) {
                 printRef.current();
             } else {
@@ -218,6 +222,7 @@ const EncountersV2 = ({
                                 onPrintRef={printRef}
                                 scrollToAccordion={scrollToAccordion}
                                 setScrollToAccordion={setScrollToAccordion}
+                                appointmentData={tab?.appointmentData}
                             />
                         )}
                     </div>
@@ -258,6 +263,13 @@ const EncountersV2 = ({
                     </div>
                 </Modal.Body>
             </Modal>
+
+            <AppointmentSelectionModal
+                show={showAppointmentModal}
+                onHide={() => setShowAppointmentModal(false)}
+                onAppointmentSelect={handleAppointmentSelection}
+                patientId={id}
+            />
         </div>
     );
 };

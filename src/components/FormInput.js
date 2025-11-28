@@ -161,7 +161,6 @@ const FormInput = ({
                                     ) : (
                                         <Form.Group className={containerClass}>
                                             {label ? <Form.Label className={labelClassName}>{label}</Form.Label> : null}
-
                                             <Form.Control
                                                 type={type}
                                                 placeholder={placeholder}
@@ -178,7 +177,6 @@ const FormInput = ({
                                                 autoComplete={name}>
                                                 {children ? children : null}
                                             </Form.Control>
-
                                             {errors && errors[name] ? (
                                                 <Form.Control.Feedback type="invalid">
                                                     {errors[name]['message']}

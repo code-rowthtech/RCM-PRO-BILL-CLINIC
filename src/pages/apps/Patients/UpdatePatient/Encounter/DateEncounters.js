@@ -1129,7 +1129,6 @@ const DateEncounters = ({
             setUpdateClicked(true);
             dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
         } else {
-            console.log(payload, 'payloadpayloadpayload')
             dispatch(createEncounterAction({ key: encryptMessage(payload) }));
         }
 

@@ -1,35 +1,27 @@
 // @flow
 import React, { useEffect, useState } from 'react';
-import { Form, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 // actions
-import { showRightSidebar, changeSidebarType, getSubClinicAction } from '../redux/actions';
+import { changeSidebarType, getSubClinicAction } from '../redux/actions';
+import { getPatientsAction } from '../redux/patients/actions';
 
 // components
 import ProfileDropdown from '../components/ProfileDropdown';
 
 // images
 import profilePic from '../assets/images/users/avatar-1.jpg';
-import logoSmDark from '../assets/images/logo_sm_dark.png';
-import logoSmLight from '../assets/images/logo_sm.png';
-import { FaUserCircle } from 'react-icons/fa';
-import logo from '../assets/images/logo-light.png';
+import { FaUserCircle, FaChartLine } from 'react-icons/fa';
 
 //constants
 import * as layoutConstants from '../constants/layout';
-import { Button } from 'react-bootstrap';
 import ModalTask from '../pages/apps/Tasks/ModalTask';
-import { MdAddCircleOutline } from 'react-icons/md';
 import { decryptMessage, encryptMessage } from '../cryptoUtils';
+import { Button } from 'react-bootstrap';
 
 const ProfileMenus = [
-    // {
-    //     label: 'Lock Screen',
-    //     icon: 'mdi mdi-lock-outline',
-    //     redirectTo: '/account/lock-screen',
-    // },
     {
         label: 'Logout',
         icon: 'mdi mdi-logout',
@@ -50,11 +42,11 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const navigate = useNavigate();
     const store = useSelector((state) => state);
     const subClinicLocations = store?.getSubClinicsReducer?.data?.clinics;
-    const location = useLocation(); // Get the current location object
+    const location = useLocation();
     const { pathname, search } = location;
     const [taskModal, setTaskModal] = useState(false);
     const [selectedSubClinic, setSelectedSubClinic] = useState(decryptMessage(localStorage.getItem('subClinicLocation')) || '');
-    // Define a mapping of paths to titles
+
     const pathToTitleMap = {
         '/dashboard': 'Dashboard',
         '/dashboard/project': 'Dashboard',
@@ -114,15 +106,15 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const navbarCssClasses = navCssClasses || '';
     const containerCssClasses = !hideLogo ? 'container-fluid ' : 'h-100';
 
-    const { layoutType, leftSideBarType } = useSelector((state) => ({
+    const { layoutType, leftSideBarType, patients, patientsLoading } = useSelector((state) => ({
         layoutType: state.Layout.layoutType,
         leftSideBarType: state.Layout.leftSideBarType,
+        patients: state?.getPatientsReducer?.data?.data,
+        patientsLoading: state?.getPatientsReducer?.loading,
     }));
-
     const handleLeftMenuCallBack = () => {
         setIsopen((prevState) => !prevState);
         if (openLeftMenuCallBack) openLeftMenuCallBack();
-
         switch (layoutType) {
             case layoutConstants.LAYOUT_VERTICAL:
                 if (window.innerWidth >= 768) {
@@ -144,8 +136,14 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     };
 
     useEffect(() => {
-        dispatch(getSubClinicAction())
+        dispatch(getSubClinicAction());
     }, [dispatch]);
+
+    useEffect(() => {
+        if (window.location.pathname !== '/apps/patients/list' && !patients?.length) {
+            dispatch(getPatientsAction({ limit: 1, page: 1 }));
+        }
+    }, [window.location.pathname, patients, dispatch])
 
     const handleCloseTaskModal = () => {
         setTaskModal(false);
@@ -158,11 +156,9 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     {!hideLogo && (
                         <Link to="/" className="topnav-logo">
                             <span className="topnav-logo-lg">
-                                {/* <img src={logo} alt="logo" height="16" /> */}
                                 <FaUserCircle className="rounded-circle fs-1  text-dark" />
                             </span>
                             <span className="topnav-logo-sm">
-                                {/* <img src={topbarDark ? logoSmLight : logoSmDark} alt="logo" height="16" /> */}
                                 <FaUserCircle className="rounded-circle fs-1  text-dark" />
                             </span>
                         </Link>
@@ -205,6 +201,19 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             </select>
                         </li>
                         <li className="notification-list">
+                            <Button
+                                onClick={() => {
+                                    const firstPatientId = patients?.[0]?._id;
+                                    navigate(`/apps/patients/update-patient?id=${firstPatientId}`);
+                                }}
+                                disabled={patientsLoading || patients?.length === 0}
+                                className="custom topbar-action-buttons text-muted border-0 ms-2 px-2 bg-light fw-semibold d-flex align-items-center gap-1"
+                                style={{ height: '28px' }}>
+                                <FaChartLine size={12} />
+                                Patient Chart
+                            </Button>
+                        </li>
+                        <li className="notification-list">
                             <button
                                 onClick={() => setTaskModal(true)}
                                 className="custom topbar-action-buttons text-muted border-0 ms-2 mx-1 px-2 bg-light fw-semibold"
@@ -237,7 +246,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             <button className="button-menu-mobile open-left" onClick={handleLeftMenuCallBack}>
                                 <i className="mdi mdi-menu fs-3 " />
                             </button>
-                            {/* Display the user-friendly page title */}
                             <h5 className="mt-2">{pageTitle}</h5>
                         </div>
                     )}

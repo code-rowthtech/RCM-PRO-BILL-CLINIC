@@ -38,7 +38,7 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                     closeModal();
                     reset();
                 }
-            } catch (error) {}
+            } catch (error) { }
         }
     }, [changeConfirmPasswordSuccess, closeModal, reset]);
 
@@ -72,7 +72,6 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                 </Row>
                 <Form onSubmit={handleSubmit(changePasswordSubmit)}>
                     <Row>
-                        {/* Old Password */}
                         <Col md={12}>
                             <Form.Group className="mb-3 position-relative">
                                 <Form.Label>Old Password</Form.Label>
@@ -96,7 +95,6 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                             </Form.Group>
                         </Col>
 
-                        {/* New Password */}
                         <Col md={12}>
                             <Form.Group className="mb-3 position-relative">
                                 <Form.Label>New Password</Form.Label>
@@ -122,8 +120,8 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                                     onPaste={(e) => e.preventDefault()}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        checkPasswordStrength(value); // Check strength on change
-                                        trigger('newPassword'); // Revalidate newPassword
+                                        checkPasswordStrength(value);
+                                        trigger('newPassword');
                                     }}
                                 />
                                 <span
@@ -132,7 +130,6 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                                     onClick={() => setShowNewPassword(!showNewPassword)}>
                                     {showNewPassword ? <FaEyeSlash /> : <FaEye />}
                                 </span>
-                                {/* Display only one message at a time */}
                                 {errors.newPassword && errors.newPassword.type === 'isRequired' ? (
                                     <span className="text-danger">{errors.newPassword.message}</span>
                                 ) : passwordStrength ? (
@@ -143,7 +140,6 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                             </Form.Group>
                         </Col>
 
-                        {/* Confirm Password */}
                         <Col md={12}>
                             <Form.Group className="mb-2 position-relative">
                                 <Form.Label>Confirm New Password</Form.Label>

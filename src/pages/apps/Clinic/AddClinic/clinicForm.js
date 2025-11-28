@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { Col, Form, Row, Button, Table, Modal, InputGroup, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import React, { useEffect, useState, useRef } from 'react';
+import { Col, Form, Row, Button, Table, Modal, InputGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
@@ -36,10 +36,7 @@ const ClinicForm = ({ clinicId }) => {
     const [searchParams] = useSearchParams();
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
     const updateId = searchParams.get('updateid');
-    // const [selectedState, setSelectedState] = useState(null);
     const [logo, setLogo] = useState(null);
-    // const [accreditationLogo, setAccreditationLogo] = useState(null);
-    // const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showModalPic, setShowModalPic] = useState(false);
@@ -51,8 +48,8 @@ const ClinicForm = ({ clinicId }) => {
         setShowModalPic(true);
     };
     const handleCloseModal = () => {
-        setShowModalPic(false); // Close the modal
-        setModalFileUrl(''); // Reset file URL
+        setShowModalPic(false);
+        setModalFileUrl('');
     };
     useEffect(() => {
         if (showModalPic && modalFileUrl) {
@@ -312,7 +309,6 @@ const ClinicForm = ({ clinicId }) => {
     ];
 
     const contactDetails = ['phone', 'email'];
-    const uses = ['usual', 'old', 'temp', 'secondary', 'official'];
     const identifierOptions = [
         'NPI',
         'TIN',
@@ -329,15 +325,7 @@ const ClinicForm = ({ clinicId }) => {
     ];
 
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
-    const [name, setName] = useState({
-        use: '',
-        text: '',
-        family: '',
-        given: [''],
-        prefix: [''],
-        suffix: [],
-        period: { start: new Date().toISOString() },
-    });
+
     const [addresses, setAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }, // Default address
     ]);
@@ -367,7 +355,6 @@ const ClinicForm = ({ clinicId }) => {
         setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
     };
 
-
     const handleChange = (index, field, value) => {
         const updatedIdentifiers = [...constantIdentifiers];
         updatedIdentifiers[index][field] = value;
@@ -384,7 +371,6 @@ const ClinicForm = ({ clinicId }) => {
         });
     };
 
-    // State for POCs (at least one default POC)
     const [pocs, setPocs] = useState([
         {
             name: {
@@ -414,25 +400,20 @@ const ClinicForm = ({ clinicId }) => {
             return updatedPocs;
         });
     };
-    // Function to handle Telecom (Contact) field changes inside POCs
+
     const handleTelecomChange = (pocIndex, telecomIndex, field, value) => {
-        const updatedPoc = [...pocs]; // Assuming pocList is your state
-        let rawValue = value.replace(/\D/g, ''); // Remove non-numeric characters
-
-        // Limit to 10 digits
+        const updatedPoc = [...pocs];
+        let rawValue = value.replace(/\D/g, '');
         if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
-
-        // Format as (XXX)XXXXXXX
         const formattedValue = rawValue.replace(/(\d{1,3})(\d{0,7})/, (match, p1, p2) => {
             if (p2) return `(${p1})${p2}`;
             return `(${p1}`;
         });
 
-        updatedPoc[pocIndex].telecom[telecomIndex][field] = formattedValue; // Store formatted number
+        updatedPoc[pocIndex].telecom[telecomIndex][field] = formattedValue;
         setPocs(updatedPoc);
     };
 
-    // Function to add a new POC
     const addPoc = () => {
         setPocs([
             ...pocs,
@@ -444,7 +425,6 @@ const ClinicForm = ({ clinicId }) => {
                     given: [''],
                     prefix: [''],
                     suffix: [],
-                    // period: { start: '', end: '' },
                 },
                 email: '',
                 role: '',
@@ -453,7 +433,6 @@ const ClinicForm = ({ clinicId }) => {
         ]);
     };
 
-    // Function to remove a POC (at least one should remain)
     const removePoc = (index) => {
         if (pocs.length > 1) {
             setPocs(pocs.filter((_, i) => i !== index));
@@ -462,12 +441,10 @@ const ClinicForm = ({ clinicId }) => {
 
     const handleIdentifierFileChange = async (e, index) => {
         setSelectedIndex(index);
-
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
-
         try {
-            const url = await handleUpload(selectedFile, setImageLoading); // Upload file
+            const url = await handleUpload(selectedFile, setImageLoading);
             setConstantIdentifiers((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -486,9 +463,9 @@ const ClinicForm = ({ clinicId }) => {
         }
     };
     const formatDateForInput = (dateString) => {
-        if (!dateString) return ''; // Return empty if no date
+        if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
+        return date.toISOString().split('T')[0];
     };
 
     return (
@@ -571,7 +548,6 @@ const ClinicForm = ({ clinicId }) => {
                                             }`}>
                                         <MdVerified />
                                     </span>
-
                                     {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
@@ -602,7 +578,6 @@ const ClinicForm = ({ clinicId }) => {
                                                 const fileName = logoName || 'logo';
                                                 if (fileUrl) {
                                                     try {
-                                                        // Try fetch method first
                                                         const response = await fetch(fileUrl);
                                                         const blob = await response.blob();
                                                         const url = window.URL.createObjectURL(blob);
@@ -618,7 +593,6 @@ const ClinicForm = ({ clinicId }) => {
                                                             'Fetch download failed, trying direct download:',
                                                             error
                                                         );
-                                                        // Fallback to direct download
                                                         const link = document.createElement('a');
                                                         link.href = fileUrl;
                                                         link.download = fileName;
@@ -627,8 +601,6 @@ const ClinicForm = ({ clinicId }) => {
                                                         link.click();
                                                         document.body.removeChild(link);
                                                     }
-
-                                                    // Also open in new tab
                                                     window.open(fileUrl, '_blank');
                                                 }
                                             }}>
@@ -657,8 +629,6 @@ const ClinicForm = ({ clinicId }) => {
                                             </h5>
                                         </Col>
                                     </Row>
-
-                                    {/* Table Header */}
                                     <Row className="fw-bold">
                                         <Col>
                                             <Form.Label>Identifier Type</Form.Label>
@@ -669,7 +639,6 @@ const ClinicForm = ({ clinicId }) => {
                                         <Col className="d-flex align-items-center gap-2">
                                             <Form.Label>Identifier Document</Form.Label>
 
-                                            {/* Tooltip Icon */}
                                             <OverlayTrigger
                                                 placement="top"
                                                 overlay={
@@ -694,10 +663,8 @@ const ClinicForm = ({ clinicId }) => {
                                         </Col>
                                     </Row>
 
-                                    {/* Dynamic Identifier Fields */}
                                     {constantIdentifiers.map((item, index) => (
                                         <Row key={index} className="mb-2">
-                                            {/* Identifier Type */}
                                             <Col>
                                                 <Form.Select
                                                     value={item.type}
@@ -719,8 +686,6 @@ const ClinicForm = ({ clinicId }) => {
                                                     <span className="text-danger">This field is required</span>
                                                 )}
                                             </Col>
-
-                                            {/* Identifier Number */}
                                             <Col>
                                                 <Form.Control
                                                     type="text"
@@ -816,8 +781,6 @@ const ClinicForm = ({ clinicId }) => {
                                                     })}
                                                     onChange={(e) => {
                                                         let value = e.target.value;
-
-                                                        // Enforce length limit only for NPI, CLIA, and NAIC
                                                         if (item.type === 'NPI' || item.type === 'CLIA') {
                                                             value = value.slice(0, 10);
                                                         } else if (item.type === 'NAIC') {
@@ -834,7 +797,6 @@ const ClinicForm = ({ clinicId }) => {
                                                 )}
                                             </Col>
 
-                                            {/* File Upload */}
                                             <Col className="mb-2 position-relative">
                                                 <div
                                                     onClick={() =>
@@ -867,7 +829,6 @@ const ClinicForm = ({ clinicId }) => {
                                                                 e.stopPropagation();
                                                                 if (item?.file?.url) {
                                                                     try {
-                                                                        // Try fetch method first
                                                                         const response = await fetch(item.file.url);
                                                                         const blob = await response.blob();
                                                                         const url = window.URL.createObjectURL(blob);
@@ -883,7 +844,6 @@ const ClinicForm = ({ clinicId }) => {
                                                                             'Fetch download failed, trying direct download:',
                                                                             error
                                                                         );
-                                                                        // Fallback to direct download
                                                                         const link = document.createElement('a');
                                                                         link.href = item.file.url;
                                                                         link.download = item.file.name || 'document';
@@ -892,7 +852,6 @@ const ClinicForm = ({ clinicId }) => {
                                                                         link.click();
                                                                         document.body.removeChild(link);
                                                                     }
-                                                                    // Also open in new tab
                                                                     window.open(item.file.url, '_blank');
                                                                 }
                                                             }}>
@@ -912,7 +871,6 @@ const ClinicForm = ({ clinicId }) => {
                                                 )}
                                             </Col>
 
-                                            {/* Issuing Authority */}
                                             <Col>
                                                 <Form.Select
                                                     value={item.issuingAuthority}
@@ -933,12 +891,12 @@ const ClinicForm = ({ clinicId }) => {
                                                     <span className="text-danger">This field is required</span>
                                                 )}
                                             </Col>
-                                            {/* Expiry Date */}
+
                                             <Col className="position-relative">
                                                 <Form.Control
                                                     type="date"
                                                     value={item?.expiry ? formatDateForInput(item.expiry) : ''}
-                                                    min={new Date().toISOString().split('T')[0]} // Sets min date to today
+                                                    min={new Date().toISOString().split('T')[0]}
                                                     onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                                                 />
                                                 {index >= defaultIdentifiers?.length && (
@@ -1021,16 +979,13 @@ const ClinicForm = ({ clinicId }) => {
                                                 <Form.Group className="mb-2 position-relative">
                                                     <Form.Label className="mb-0">Phone Number</Form.Label>
                                                     <InputGroup>
-                                                        {/* Country Code Prefix */}
                                                         <InputGroup.Text className="ps-3 pe-1 p-0 fw-bold text-black">
                                                             &nbsp;&nbsp;+1
                                                         </InputGroup.Text>
-
-                                                        {/* Phone Input Field */}
                                                         <Form.Control
                                                             type="text"
                                                             placeholder="Phone Number"
-                                                            value={formatDisplayValue(telecom.value)} // Apply formatting
+                                                            value={formatDisplayValue(telecom.value)}
                                                             onChange={(e) =>
                                                                 handleTelecomChange(
                                                                     pocIndex,
@@ -1039,16 +994,14 @@ const ClinicForm = ({ clinicId }) => {
                                                                     e.target.value
                                                                 )
                                                             }
-                                                            maxLength={14} // To accommodate formatted (XXX)XXXXXXX
+                                                            maxLength={14}
                                                             onKeyPress={(event) => {
                                                                 if (!/[0-9]/.test(event.key)) {
-                                                                    event.preventDefault(); // Prevent non-numeric input
+                                                                    event.preventDefault();
                                                                 }
                                                             }}
                                                         />
                                                     </InputGroup>
-
-                                                    {/* Flag Icon */}
                                                     <div
                                                         className="position-absolute"
                                                         style={{ top: '52%', left: '1%' }}>
@@ -1072,7 +1025,6 @@ const ClinicForm = ({ clinicId }) => {
                                 <Button variant="primary" className="custom-buttons" onClick={() => setShowModal(true)}>
                                     {`Change Password`}
                                 </Button>
-
                                 <Button
                                     variant="primary"
                                     type="submit"
@@ -1184,7 +1136,6 @@ const ClinicForm = ({ clinicId }) => {
                             </div>
                         </Modal.Body>
                     </Modal>
-
                     <ChangePasswordModal show={showModal} closeModal={closeModal} />
                 </>
             )}
