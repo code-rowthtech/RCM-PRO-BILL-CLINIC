@@ -150,12 +150,9 @@ const EncounterSummary = () => {
     const handleAddProblemClose = () => setShowAddProblemModal(false);
 
     const handleAddAllergyClose = () => setShowAddAllergyModal(false);
-
     const closeMedicationModal = () => {
         setMedicationModal(false);
     };
-
-
 
     const closeVitalsModal = () => {
         setVitalsModal(false);
@@ -164,9 +161,7 @@ const EncounterSummary = () => {
 
     const getSeverityBadge = (severity) => {
         if (!severity || !severity.code || !severity.display) return null;
-
         const code = severity.code.toLowerCase();
-
         const variantMap = {
             high: 'danger',
             severe: 'danger',
@@ -174,9 +169,7 @@ const EncounterSummary = () => {
             low: 'info',
             mild: 'info',
         };
-
         const variant = variantMap[code] || 'secondary';
-
         return <span className={`ms-2 text-${variant}`}>{severity.display}</span>;
     };
 
@@ -198,7 +191,6 @@ const EncounterSummary = () => {
         if (!vital) return null;
 
         if (vital.component && vital.component.length > 0) {
-            // Handle blood pressure case (no conversion needed)
             const systolic = vital.component.find(c =>
                 c.code?.coding?.[0]?.code === "8480-6"
             )?.valueQuantity?.value;
@@ -210,10 +202,7 @@ const EncounterSummary = () => {
             return { systolic: systolic || '', diastolic: diastolic || '' };
         }
 
-        // Get the stored value (always in imperial units)
         let value = vital.valueQuantity?.value || vital.valueString || '';
-
-        // Convert to metric if needed for display
         if (unitSystem === 'metric') {
             if (vitalName === 'Height') {
                 value = convertFromImperial(value, 'Height');
@@ -330,19 +319,19 @@ const EncounterSummary = () => {
                                                     </div>
                                                 ) : (
                                                     <ul className="list-unstyled pb-0 mb-0">
-                                                        {allergyData.slice(0, 4).map((allergy, index) => (
+                                                        {allergyData?.slice(0, 4)?.map((allergy, index) => (
                                                             <li key={index} className="mb-2 d-flex justify-content-between align-items-start cursor-pointer" onClick={() => window.populateEncounterField?.('Social History', `Allergy: ${allergy.code?.text || ''} (${allergy.clinicalStatus?.text || 'Status not available'})`)}>                                                                <div className="fs-6">
-                                                                <strong title={allergy.code?.text}>
-                                                                    {allergy.code?.text?.length > 30
-                                                                        ? allergy.code?.text.slice(0, 29) + '...'
-                                                                        : allergy.code?.text || 'Unknown Allergy'}
+                                                                <strong title={allergy?.code?.text}>
+                                                                    {allergy?.code?.text?.length > 30
+                                                                        ? allergy?.code?.text?.slice(0, 29) + '...'
+                                                                        : allergy?.code?.text || 'Unknown Allergy'}
                                                                 </strong>
                                                                 <div className="text-muted small">
-                                                                    {allergy.clinicalStatus?.text || 'Status not available'}
+                                                                    {allergy?.clinicalStatus?.text || 'Status not available'}
                                                                 </div>
                                                             </div>
                                                                 <span className="fs-6 fw-semibold text-nowrap">
-                                                                    {getSeverityBadge(allergy.criticality)}
+                                                                    {getSeverityBadge(allergy?.criticality)}
                                                                 </span>
                                                             </li>
                                                         ))}
@@ -368,7 +357,6 @@ const EncounterSummary = () => {
                                     </Accordion.Body>
                                 );
                                 break;
-
                             case 'Problems':
                                 content = (
                                     <Accordion.Body className='p-2'>
@@ -436,7 +424,6 @@ const EncounterSummary = () => {
                                     </Accordion.Body>
                                 );
                                 break;
-
                             case 'Medications':
                                 content = (
                                     <Accordion.Body className='p-2'>
@@ -488,7 +475,6 @@ const EncounterSummary = () => {
                                     </Accordion.Body>
                                 );
                                 break;
-
                             case 'Social History':
                                 content = (
                                     <Accordion.Body className='p-2'>
@@ -540,11 +526,9 @@ const EncounterSummary = () => {
                                     </Accordion.Body>
                                 );
                                 break;
-
                             default:
                                 return null;
                         }
-
                         return (
                             <Accordion.Item
                                 key={menuItem._id}
