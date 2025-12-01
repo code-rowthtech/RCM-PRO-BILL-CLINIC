@@ -57,7 +57,6 @@ const DateEncountersV2 = ({
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const { handleSubmit, register, setValue, formState: { errors }, getValues, reset, control } = useForm();
-
     // Component state
     const [leftTab, setLeftTab] = useState('Summary');
     const [selectedFromList, setSelectedFromList] = useState({});
@@ -361,7 +360,6 @@ const DateEncountersV2 = ({
                         newPopulatedFieldIds[field.type] = field.populatedIds;
                     }
                 });
-
                 // Use the hook's setters
                 Object.keys(newPopulatedFields).forEach(key => {
                     populatedFields[key] = newPopulatedFields[key];
@@ -372,6 +370,9 @@ const DateEncountersV2 = ({
             }
             if (encounterData?.attachedRecords) {
                 setAttachedRecords(encounterData.attachedRecords);
+            }
+            if (encounterData?.appointmentId?._id) {
+                setSelectedAppointment(encounterData.appointmentId._id);
             }
         }
     }, [encounterAction, encounterData, notesFields]);

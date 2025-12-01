@@ -46,7 +46,7 @@ const LabRequestDashboard = ({
         }
     ]);
 
-    const loading = false; // Replace with actual loading state
+    const loading = false;
 
     const getStatusBadge = (status) => {
         const statusConfig = {
@@ -68,7 +68,6 @@ const LabRequestDashboard = ({
             asap: { variant: 'info', text: 'ASAP' },
             stat: { variant: 'danger', text: 'STAT' }
         };
-
         const config = priorityConfig[priority] || { variant: 'secondary', text: priority };
         return <Badge bg={config.variant}>{config.text}</Badge>;
     };
@@ -87,7 +86,6 @@ const LabRequestDashboard = ({
     }, [labRequests, searchTerm, statusFilter, priorityFilter]);
 
     const handleCancelRequest = (requestId) => {
-        // Implement cancel functionality
         console.log('Cancel request:', requestId);
     };
 
@@ -98,13 +96,9 @@ const LabRequestDashboard = ({
                 <Table hover className="table-centered mb-0">
                     <thead className="table-light">
                         <tr>
-                            <th>Test Name</th>
-                            <th>Order Date</th>
-                            <th>Provider</th>
-                            <th>Status</th>
-                            <th>Priority</th>
-                            <th>Reason</th>
-                            <th>Actions</th>
+                            {["Test Name", "Order Date", "Provider", "Status", "Priority", "Reason", "Actions"]?.map((header, index) => (
+                                <th key={index}>{header}</th>
+                            ))}
                         </tr>
                     </thead>
                     <tbody>

@@ -348,7 +348,6 @@ const DateEncounters = ({
     useEffect(() => {
         if (encounterAction === 'updateEncounter' && encounterData && notesFields && !dataLoadedRef.current) {
             dataLoadedRef.current = true;
-
             if (encounterData?.providerId) {
                 setSelectedProvider(encounterData?.providerId?._id);
             }
@@ -370,7 +369,6 @@ const DateEncounters = ({
             if (encounterData?.data && Array.isArray(encounterData?.data)) {
                 const newPopulatedFields = {};
                 const newPopulatedFieldIds = {};
-
                 encounterData?.data?.forEach(field => {
                     if (field?.type && field?.content?.value) {
                         setValue(field?.type, field?.content?.value);
@@ -382,7 +380,6 @@ const DateEncounters = ({
                         newPopulatedFieldIds[field.type] = field.populatedIds;
                     }
                 });
-
                 setPopulatedFields(newPopulatedFields);
                 setPopulatedFieldIds(newPopulatedFieldIds);
             }
@@ -409,7 +406,6 @@ const DateEncounters = ({
     const handleFileUpload = async (files) => {
         const fileArray = Array.from(files);
         const uploadedFiles = [];
-
         for (const file of fileArray) {
             const uploadResult = await handleUpload(file, setUploadLoading);
             if (uploadResult) {
@@ -419,10 +415,8 @@ const DateEncounters = ({
                 });
             }
         }
-
         setAttachedRecords(prev => [...prev, ...uploadedFiles]);
     };
-
 
     const handleNotesTypeChange = (selectedOption) => {
         dispatch(getEncounterNotesFieldsAction({ noteId: selectedOption?.value }));
@@ -438,10 +432,8 @@ const DateEncounters = ({
         handleNotesTypeChange?.(selectedNoteType);
     };
 
-    // Apply template values to form
     useEffect(() => {
         if (!selectedFromList) return;
-
         setTimeout(() => {
             ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach((section) => {
                 const fieldName = section === 'Care Plan' ? 'CarePlan' : section;
@@ -453,7 +445,6 @@ const DateEncounters = ({
         }, 0);
     }, [selectedFromList, setValue]);
 
-    // Save scroll position before loading state changes
     useEffect(() => {
         const handleScroll = () => {
             scrollPositionRef.current = window.scrollY;
@@ -462,7 +453,6 @@ const DateEncounters = ({
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Restore scroll position after loading completes
     useEffect(() => {
         if (!store?.getEncounterNotesFieldsReducer?.loading && scrollPositionRef.current) {
             window.scrollTo(0, scrollPositionRef.current);
@@ -472,8 +462,6 @@ const DateEncounters = ({
     // ========================================================================
     // COMPONENTS
     // ========================================================================
-
-    // Initialize accordion state when fields load
     useEffect(() => {
         if (notesFields) {
             const initialState = {};
@@ -484,7 +472,6 @@ const DateEncounters = ({
         }
     }, [notesFields, expandAllAccordions]);
 
-    // Memoize removePopulatedData to prevent re-renders
     const removePopulatedDataMemo = useCallback((fieldName, dataToRemove) => {
         removePopulatedData(fieldName, dataToRemove);
     }, []);
@@ -501,14 +488,11 @@ const DateEncounters = ({
             Notes: createRef(),
         });
 
-        // Word limit validation for ReactQuill editors
         useEffect(() => {
             SOAP_SECTIONS.forEach(section => {
                 const editor = quillRefs.current[section]?.current?.getEditor?.();
                 if (!editor) return;
-
                 let lastValidDelta = editor.getContents();
-
                 editor.on('text-change', (delta, oldDelta, source) => {
                     if (source !== 'user') return;
                     setTimeout(() => {
@@ -516,7 +500,6 @@ const DateEncounters = ({
                         const text = editor.getText().trim();
                         const words = text.split(/\s+/).filter(Boolean);
                         const longWord = words.find(word => word.length > MAX_WORD_LENGTH);
-
                         if (longWord || words.length > MAX_WORDS) {
                             editor.setContents(lastValidDelta);
                             ToastHandle(
@@ -533,14 +516,12 @@ const DateEncounters = ({
             });
         }, []);
 
-        // Get fields to render based on visibility and exclusions
         const getFieldsToRender = useMemo(() => {
             return (data || [])
                 .filter(field => field.isShown && !excludedFields.includes(field.name))
                 .sort((a, b) => a.order - b.order);
         }, [data, excludedFields]);
 
-        // Render individual field based on type
         const renderField = (field) => {
             const { name, inputType = 'textarea' } = field;
 
@@ -907,7 +888,6 @@ const DateEncounters = ({
                                                                                 if (label && value) parsedData[label] = value;
                                                                             });
                                                                             const values = Object.entries(parsedData).slice(1).map(([_, v]) => v);
-
                                                                             return (
                                                                                 <tr key={index} className="border-bottom">
                                                                                     <td className="py-1" style={{ fontSize: '13px', fontWeight: '400', width: '8%' }}>{index + 1}</td>
@@ -973,6 +953,7 @@ const DateEncounters = ({
                 </Form.Group>
             );
         };
+
         const handlePrintEncounterItems = (fieldName, event) => {
             event.stopPropagation();
             if (fieldName?.name === 'Monitoring Chart (Vitals)' || fieldName?.name?.toLowerCase().includes('vital')) {
@@ -989,7 +970,8 @@ const DateEncounters = ({
                     fieldContent: { [fieldName?.name]: fieldContent }
                 });
             }
-        }
+        };
+
         return (
             <Row
                 className="g-2 px-1 mt-1 scroll-container"
@@ -1029,16 +1011,12 @@ const DateEncounters = ({
     // ========================================================================
 
     const onSubmit = (data) => {
-        // Validate provider selection
         if (!selectedProvider) {
             setProviderError(true);
             return;
         }
-
-        // Build encounter type and class objects
         const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type);
         const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class);
-
         const type = {
             coding: [{
                 system: encounterTypeSelected.system,
@@ -1086,7 +1064,6 @@ const DateEncounters = ({
                     fieldsData.push(fieldData);
                 });
             } else if (name !== 'Attached Records') {
-                // Handle regular fields, exclude Attached Records
                 const value = getValues(name) || '';
                 const fieldData = {
                     type: name,
@@ -1134,9 +1111,6 @@ const DateEncounters = ({
 
     };
 
-    // ========================================================================
-    // RENDER
-    // ========================================================================
     return (
         <div className='px-0 mt-1  row border h-100  mx-1'>
             <Col className={` px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
@@ -1152,7 +1126,6 @@ const DateEncounters = ({
                         </li>
                     ))}
                 </ul>
-
                 <Row className='mx-auto'>
                     <Col sm={12} className='px-md-1 scroll-container ' style={{ height: !expanded ? (isAccordionOpen ? '55vh' : '70vh') : '78vh', overflowX: 'hidden' }}>
                         {leftTab === 'Summary' && <EncounterSummary />}
@@ -1406,7 +1379,7 @@ const DateEncounters = ({
                                                 }),
                                                 menuPortal: (base) => ({
                                                     ...base,
-                                                    zIndex: 9999,  // 👈 ensure it's above sticky headers
+                                                    zIndex: 9999,
                                                 }),
                                             }}
                                         />
