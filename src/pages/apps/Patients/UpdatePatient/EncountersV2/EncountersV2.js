@@ -9,7 +9,6 @@ import AppointmentSelectionModal from './components/AppointmentSelectionModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDoctorsAction, getEncounterByIdAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { decryptMessage } from '../../../../../cryptoUtils';
-import { handlePrintEncounters } from '../Encounter/handlePrintEncounter';
 import { useSearchParams } from 'react-router-dom';
 import { useAppointmentIntegration } from './hooks/useAppointmentIntegration';
 
@@ -27,18 +26,18 @@ if (encryptedData) {
     console.warn("No encrypted user data found in localStorage.");
 }
 
-const EncountersV2 = ({ 
-    encounterTabs, 
-    setEncounterTabs, 
-    setExpanded, 
-    expanded, 
-    createEncounter, 
-    setCreateEncounter, 
-    updateEncounter, 
-    setUpdateEncounter, 
+const EncountersV2 = ({
+    encounterTabs,
+    setEncounterTabs,
+    setExpanded,
+    expanded,
+    createEncounter,
+    setCreateEncounter,
+    updateEncounter,
+    setUpdateEncounter,
     isAccordionOpen,
     scrollToAccordion,
-    setScrollToAccordion 
+    setScrollToAccordion
 }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -49,20 +48,17 @@ const EncountersV2 = ({
     const [showSettings, setShowSettings] = useState(false);
     const [expandAllAccordions, setExpandAllAccordions] = useState(false);
     const [showAppointmentModal, setShowAppointmentModal] = useState(false);
-    
     const store = useSelector((state) => state);
     const { processAppointmentSelection, selectedAppointmentData } = useAppointmentIntegration();
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const id = searchParams.get('id');
     const printRef = useRef();
-
     const toggleCollapse = () => setIsCollapsed(!isCollapsed);
     const closeNewEncounterModal = () => setNewEncounterModal(false);
     const closeSettings = () => setShowSettings(false);
 
     useEffect(() => {
         if (createEncounter) {
-            // Show appointment selection modal instead of directly creating encounter
             setShowAppointmentModal(true);
             setCreateEncounter(false);
         }
@@ -70,12 +66,10 @@ const EncountersV2 = ({
 
     const handleAppointmentSelection = (appointmentData) => {
         processAppointmentSelection(appointmentData);
-        
         const today = new Date().toISOString().split('T')[0];
         const existingTodayTab = encounterTabs.find(
             (tab) => tab.type === 'createEncounter' && tab.title === today
         );
-
         if (existingTodayTab) {
             setNewEncounterModal(true);
         } else {
@@ -137,11 +131,11 @@ const EncountersV2 = ({
 
     useEffect(() => {
         if (!store?.getEncounterNotesTypeReducer?.data?.data) {
-            dispatch(getEncounterNotesTypeAction({ 
-                skip: 1, 
-                search: searchNoteType, 
-                clinicId: clinicId, 
-                userId: decryptedUser?._id 
+            dispatch(getEncounterNotesTypeAction({
+                skip: 1,
+                search: searchNoteType,
+                clinicId: clinicId,
+                userId: decryptedUser?._id
             }));
         }
     }, [dispatch, searchNoteType, store?.getEncounterNotesTypeReducer?.data?.data, clinicId]);
@@ -184,12 +178,10 @@ const EncountersV2 = ({
                 handleReadyForBilling={handleReadyForBilling}
                 onEncounterTabClick={handleEncounterTabClick}
             />
-
             <EncounterSettingsForm
                 showSettings={showSettings}
                 closeSettings={closeSettings}
             />
-
             <div className="col-12">
                 {encounterTabs?.map((tab) => (
                     <div key={tab.id} style={{ display: activeTab === tab.id ? 'block' : 'none' }}>

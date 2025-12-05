@@ -1,6 +1,7 @@
 // @flow
 import React, { useEffect } from 'react';
 import Routes from './routes/Routes';
+// import { useRouteGuard } from './hooks/useRouteGuard';
 
 // setup fake backend
 import { configureFakeBackend } from './helpers';
@@ -110,6 +111,7 @@ function useSelectColorWatcher() {
 
 const App = (props: AppProps): React$Element<any> => {
   useSelectColorWatcher();
+  // useRouteGuard();
 
   return <Routes></Routes>;
 };

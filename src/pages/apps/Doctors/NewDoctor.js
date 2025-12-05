@@ -320,7 +320,6 @@ const NewDoctor = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-
         if (name === 'firstName' || name === 'lastName') {
             setFormData((prev) => {
                 const firstName = name === 'firstName' ? value : prev.name.given;
@@ -371,7 +370,6 @@ const NewDoctor = () => {
         const isEmailValid = formData?.email?.trim()?.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
         const isGenderValid = !!formData?.gender;
         const isPasswordValid = updateId || (formData?.password?.trim()?.length >= 8 && /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password) && formData?.confirmPassword === formData?.password);
-
         return isFirstNameValid && isLastNameValid && isDOBValid && isEmailValid && isGenderValid && isPasswordValid && isPhoneValid;
     }, [formData, updateId]);
 
@@ -423,7 +421,6 @@ const NewDoctor = () => {
                                                 </li>
                                             </ul>
                                         </div>
-
                                         <div className="col-3 col-md-4 d-flex justify-content-end align-items-center gap-md-2 gap-0 px-0">
                                             {activeTab === 'personalDetails' && (
                                                 <>
@@ -757,6 +754,7 @@ const NewDoctor = () => {
                                                                         <div className="position-relative">
                                                                             <Form.Control
                                                                                 type={showPassword ? 'text' : 'password'}
+                                                                                autoComplete='new-password'
                                                                                 onKeyDown={(e) => {
                                                                                     if (e.key === ' ') {
                                                                                         e.preventDefault();

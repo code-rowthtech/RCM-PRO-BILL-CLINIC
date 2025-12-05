@@ -63,5 +63,4 @@ export const formatDateByUserTimeZone = (date, options = {}, displayMode = 'date
     return d.toLocaleString("en-US", formatOptions);
 };
 
-// Optional: Make it globally accessible (so no import needed)
 window.formatDateByUserTimeZone = formatDateByUserTimeZone;

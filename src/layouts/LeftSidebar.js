@@ -27,6 +27,10 @@ type SideBarContentProps = {
 
 /* sidebar content */
 const SideBarContent = ({ hideUserProfile, isCondensed }: SideBarContentProps) => {
+    const store = useSelector((state) => state);
+    const userRole = store?.auth?.user?.role ||
+        JSON.parse(sessionStorage.getItem('hyper_user'))?.role ||
+        localStorage.getItem('userRole');
     return (
         <>
             {!hideUserProfile && (
@@ -37,7 +41,7 @@ const SideBarContent = ({ hideUserProfile, isCondensed }: SideBarContentProps) =
                     </Link>
                 </div>
             )}
-            <AppMenu menuItems={getMenuItems()} isCondensed={isCondensed} />
+            <AppMenu menuItems={getMenuItems(userRole)} isCondensed={isCondensed} />
 
             <div className="clearfix" />
         </>

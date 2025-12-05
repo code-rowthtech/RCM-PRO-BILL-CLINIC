@@ -257,6 +257,7 @@ const DateEncounters = ({
         };
     }, [populatedFields]);
 
+
     // Function to remove populated data from field
     const removePopulatedData = (fieldName, dataToRemove) => {
         const indexToRemove = (populatedFields[fieldName] || []).indexOf(dataToRemove);

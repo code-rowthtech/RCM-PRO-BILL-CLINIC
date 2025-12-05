@@ -45,7 +45,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
     const closeAddModal = () => {
         setAddDepartmentalModal(false);
         setAddDesiginationModal(false);
-        // reset();
     };
 
     useEffect(() => {
@@ -289,7 +288,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                         <Form.Control
                                             type={passwordVisibility.password ? 'text' : 'password'}
                                             placeholder="Password"
-                                            autoComplete="off"
+                                            autoComplete="new-password"
                                             {...register('password', {
                                                 required: dataToEdit ? false : 'Password is required',
                                                 minLength: dataToEdit
@@ -514,7 +513,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                             style={{ fontSize: '0.9rem', cursor: 'pointer' }}
                                             onClick={() => setAddDesiginationModal(true)}></i>
                                     </Form.Label>
-
                                     <Form.Select
                                         {...register('designation', {
                                             required: dataToEdit ? false : 'Designation is required',
@@ -560,12 +558,11 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                             style={{ fontSize: '0.9rem', cursor: 'pointer' }}
                                             onClick={() => setShowModal(true)}></i>
                                     </Form.Label>
-
                                     <Form.Select
                                         {...register('roleId', {
                                             required: dataToEdit ? false : 'Role is required',
                                         })}
-                                        className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}
+                                        className={`text-dark border text-capitalize border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}
                                         disabled={decryptedRolesData?.length === 0}>
                                         <option value="" className="select" hidden>
                                             {decryptedRolesData?.length === 0 ? 'No roles available' : 'Select Role'}
@@ -576,7 +573,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                             </option>
                                         ))}
                                     </Form.Select>
-
                                     {errors.roleId && <span className="text-danger fs-6">{errors.roleId.message}</span>}
                                 </Form.Group>
                             </Col>

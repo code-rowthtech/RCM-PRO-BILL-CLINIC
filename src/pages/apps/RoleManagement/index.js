@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
 import Spinner from '../../../constants/Spinner';
 import { FormInput } from '../../../components';
-import { FiEdit } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
@@ -41,16 +40,14 @@ const RoleManagement = () => {
 
     useEffect(() => {
         dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: skip, search: '' }));
-        dispatch(
-            getRoleDataAction({
-                clinicId: clinicId,
-                limit: 10,
-                search: '',
-                createdById: '',
-                page: '',
-                status: true,
-            })
-        );
+        dispatch(getRoleDataAction({
+            clinicId: clinicId,
+            limit: 10,
+            search: '',
+            createdById: '',
+            page: '',
+            status: true,
+        }));
     }, [dispatch]);
 
     const handleSearchChange = (e) => {
@@ -113,7 +110,6 @@ const RoleManagement = () => {
                                     Inactive
                                 </Button>
                             </Col>
-
                             <Col md={6} sm={6} xs={6} className="text-end">
                                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end">
                                     <Col xs="auto" className="d-flex gap-2">
@@ -191,28 +187,11 @@ const RoleManagement = () => {
                                     style={{ height: roleData?.length === 0 ? '40vh' : 'auto' }}>
                                     <thead className="text-white">
                                         <tr>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>
-                                                Sr. No.
-                                            </th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>
-                                                Name
-                                            </th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>
-                                                Phone
-                                            </th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>
-                                                Username
-                                            </th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>
-                                                Joining Date
-                                            </th>
-
-                                            <th className="text-white" style={{ fontSize: '13px' }}>
-                                                Status
-                                            </th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>
-                                                Action
-                                            </th>
+                                            {['Sr. No.', 'Name', 'Phone', 'Username', 'Joining Date', 'Status', 'Action']?.map((header, idx) => (
+                                                <th key={idx} className="text-white" style={{ fontSize: '13px' }}>
+                                                    {header}
+                                                </th>
+                                            ))}
                                         </tr>
                                     </thead>
                                     <tbody>

@@ -797,12 +797,10 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 label: form?.title,
                 data: form
             })) || [];
-
             if (!inputValue) {
                 callback(options);
                 return;
             }
-
             const filteredOptions = options.filter((option) =>
                 option.label.toLowerCase().includes(inputValue.toLowerCase())
             );
@@ -842,7 +840,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     <Form.Label className="mb-0">
                                         Patient <span className="text-danger">*</span>
                                     </Form.Label>
-
                                     <div style={{ position: 'relative' }}>
                                         <AsyncSelect
                                             loadOptions={loadPatientOptions}

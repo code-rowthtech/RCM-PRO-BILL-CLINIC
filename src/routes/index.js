@@ -82,13 +82,13 @@ const NotesTemplates = React.lazy(() => import('../pages/apps/NotesAndTemplates/
 const RoleManagement = React.lazy(() => import('../pages/apps/RoleManagement/index'));
 const RoleSetting = React.lazy(() => import('../pages/apps/Settings/Role/RoleSetting'));
 const AuditReport = React.lazy(() => import('../pages/apps/AuditReport/index'));
-const Permissions = React.lazy(() => import('../pages/apps/Permissions/index'))
-const Roles = React.lazy(() => import('../pages/apps/Roles/index'))
+const Permissions = React.lazy(() => import('../pages/apps/Permissions/index'));
+const Roles = React.lazy(() => import('../pages/apps/Roles/index'));
 // pages
-
 const ErrorPageNotFound = React.lazy(() => import('../pages/error/PageNotFound'));
 const ErrorPageNotFoundAlt = React.lazy(() => import('../pages/error/PageNotFoundAlt'));
 const ServerError = React.lazy(() => import('../pages/error/ServerError'));
+const NotAuthorized = React.lazy(() => import('../pages/error/NotAuthorized'));
 
 // - other
 const Invoice = React.lazy(() => import('../pages/other/Invoice'));
@@ -98,62 +98,6 @@ const Starter = React.lazy(() => import('../pages/other/Starter'));
 const PreLoader = React.lazy(() => import('../pages/other/PreLoader'));
 const Timeline = React.lazy(() => import('../pages/other/Timeline'));
 const LogoutModel = React.lazy(() => import('../components/LogoutModel'));
-
-
-// const Landing = React.lazy(() => import('../pages/landing'));
-
-// // uikit
-// const Accordions = React.lazy(() => import('../pages/uikit/Accordions'));
-// const Alerts = React.lazy(() => import('../pages/uikit/Alerts'));
-// const Avatars = React.lazy(() => import('../pages/uikit/Avatars'));
-// const Badges = React.lazy(() => import('../pages/uikit/Badges'));
-// const Breadcrumbs = React.lazy(() => import('../pages/uikit/Breadcrumb'));
-// const Buttons = React.lazy(() => import('../pages/uikit/Buttons'));
-// const Cards = React.lazy(() => import('../pages/uikit/Cards'));
-// const Carousels = React.lazy(() => import('../pages/uikit/Carousel'));
-// const Dropdowns = React.lazy(() => import('../pages/uikit/Dropdowns'));
-// const EmbedVideo = React.lazy(() => import('../pages/uikit/EmbedVideo'));
-// const Grid = React.lazy(() => import('../pages/uikit/Grid'));
-// const ListGroups = React.lazy(() => import('../pages/uikit/ListGroups'));
-// const Modals = React.lazy(() => import('../pages/uikit/Modals'));
-// const Notifications = React.lazy(() => import('../pages/uikit/Notifications'));
-// const Offcanvases = React.lazy(() => import('../pages/uikit/Offcanvas'));
-// const Paginations = React.lazy(() => import('../helpers/Paginations'));
-// const Popovers = React.lazy(() => import('../pages/uikit/Popovers'));
-// const Progress = React.lazy(() => import('../pages/uikit/Progress'));
-// const Ribbons = React.lazy(() => import('../pages/uikit/Ribbons'));
-// const Spinners = React.lazy(() => import('../pages/uikit/Spinners'));
-// const Tabs = React.lazy(() => import('../pages/uikit/Tabs'));
-// const Tooltips = React.lazy(() => import('../pages/uikit/Tooltips'));
-// const Typography = React.lazy(() => import('../pages/uikit/Typography'));
-// const DragDrop = React.lazy(() => import('../pages/uikit/DragDrop'));
-// const RangeSliders = React.lazy(() => import('../pages/uikit/RangeSliders'));
-// const Ratings = React.lazy(() => import('../pages/uikit/Ratings'));
-
-// icons
-
-// forms
-// const BasicForms = React.lazy(() => import('../pages/forms/Basic'));
-// const FormValidation = React.lazy(() => import('../pages/forms/Validation'));
-// const FormWizard = React.lazy(() => import('../pages/forms/Wizard'));
-// const FileUpload = React.lazy(() => import('../pages/forms/FileUpload'));
-// const Editors = React.lazy(() => import('../pages/forms/Editors'));
-
-// charts
-// const ApexChart = React.lazy(() => import('../pages/charts/Apex'));
-// const BriteChart = React.lazy(() => import('../pages/charts/Brite'));
-// const ChartJs = React.lazy(() => import('../pages/charts/ChartJs'));
-
-// tables
-// const BasicTables = React.lazy(() => import('../pages/tables/Basic'));
-// const AdvancedTables = React.lazy(() => import('../pages/tables/Advanced'));
-
-// widgets
-// const Widgets = React.lazy(() => import('../pages/uikit/Widgets'));
-
-// maps
-// const GoogleMaps = React.lazy(() => import('../pages/maps/GoogleMaps'));
-// const VectorMaps = React.lazy(() => import('../pages/maps/VectorMaps'));
 
 const loading = () => <div className=""></div>;
 
@@ -213,7 +157,7 @@ const AllRoutes = () => {
                         { path: 'confirm', element: <LoadComponent component={Confirm} /> },
                         { path: 'forget-password', element: <LoadComponent component={ForgetPassword} /> },
                         { path: 'reset-password/:token', element: <LoadComponent component={ResetPassword} /> },
-                        // { path: 'sign-Up', element: <LoadComponent component={SignUp} /> },
+                        // {path: 'sign-Up', element: <LoadComponent component={SignUp} /> },
                         { path: 'lock-screen', element: <LoadComponent component={LockScreen} /> },
                         { path: 'set-password/:token', element: <LoadComponent component={SetPassword} /> },
                         { path: 'verify-password/:token', element: <LoadComponent component={VerifyPassword} /> },
@@ -238,10 +182,13 @@ const AllRoutes = () => {
                     path: 'maintenance',
                     element: <LoadComponent component={Maintenance} />,
                 },
+                {
+                    path: 'not-authorized',
+                    element: <LoadComponent component={NotAuthorized} />,
+                },
             ],
         },
         {
-            // auth protected routes
             path: '/',
             element: <PrivateRoute component={Layout} />,
             children: [
@@ -546,9 +493,7 @@ const AllRoutes = () => {
                                     ),
                                 }
                             ],
-
                         },
-
                         {
                             path: 'subscriptions',
                             children: [
@@ -558,7 +503,6 @@ const AllRoutes = () => {
                                 },
                             ],
                         },
-
                         {
                             path: 'patients',
                             children: [

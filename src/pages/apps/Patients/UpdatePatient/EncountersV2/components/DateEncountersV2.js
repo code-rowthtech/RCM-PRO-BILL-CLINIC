@@ -88,7 +88,6 @@ const DateEncountersV2 = ({
         notesTypeOptions,
         defaultNoteTypeOption,
         settingsDataMainItems,
-        doctorDetails,
         providerOptions,
         appointmentsData,
         appointmentOptions
@@ -112,12 +111,8 @@ const DateEncountersV2 = ({
             const accordionIndex = notesFields.findIndex(field =>
                 field.name.toLowerCase().includes(targetField.toLowerCase())
             );
-
             if (accordionIndex !== -1) {
-                // Open the accordion
                 setAccordionState(prev => ({ ...prev, [accordionIndex]: true }));
-
-                // Scroll to the accordion after a short delay
                 setTimeout(() => {
                     const accordionElement = document.querySelector(`[data-accordion-index="${accordionIndex}"]`);
                     if (accordionElement) {
@@ -127,7 +122,6 @@ const DateEncountersV2 = ({
                         });
                     }
                 }, 300);
-                // Clear the scroll trigger
                 setScrollToAccordion(null);
             }
         }
@@ -513,13 +507,15 @@ const DateEncountersV2 = ({
 
             if (name === 'Notes (SOAP)') {
                 // Handle SOAP notes specially
-                ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach(section => {
+                ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'].forEach(section => {
                     const value = getValues(section) || '';
+                    const fieldName = section === 'Care Plan' ? 'CarePlan' : section;
+                    const actualValue = getValues(fieldName) || '';
                     const fieldData = {
                         type: section,
                         content: {
                             type: inputType === 'text-editor' ? 'html' : 'text',
-                            value: value
+                            value: actualValue
                         }
                     };
                     if (populatedFieldIds[section]?.length > 0) {
@@ -613,7 +609,6 @@ const DateEncountersV2 = ({
                 </Row>
             </Col>
 
-            {/* Main Content Column */}
             <Col className='px-0 border-start pb-2' sm={isCollapsed ? 12 : 8}>
                 <div className={`px-1 h-100 ${store?.getEncounterByIdReducer?.loading ? 'd-flex align-items-center justify-content-center p-5' : ''}`}>
                     {store?.getEncounterByIdReducer?.loading ?
@@ -828,7 +823,6 @@ const DateEncountersV2 = ({
                                             }}
                                             onInputChange={(value, { action }) => {
                                                 if (action === 'input-change' && value.length > 0) {
-                                                    // Increase limit to handle pagination and ensure provider is found
                                                     dispatch(getDoctorsAction({ status: true, search: value, page: 1, limit: 50 }));
                                                 }
                                             }}

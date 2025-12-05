@@ -9,28 +9,18 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
                 pages.push(i);
             }
         } else {
-            // Always show first page
             pages.push(1);
-
-            // Show left ellipsis if currentPage > 3
             if (currentPage > 3) {
                 pages.push('...');
             }
-
-            // Show middle pages
             const start = Math.max(2, currentPage - 1);
             const end = Math.min(totalPages - 1, currentPage + 1);
-
             for (let i = start; i <= end; i++) {
                 pages.push(i);
             }
-
-            // Show right ellipsis if currentPage < totalPages - 2
             if (currentPage < totalPages - 2) {
                 pages.push('...');
             }
-
-            // Always show last page
             pages.push(totalPages);
         }
 
@@ -45,7 +35,6 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
                     </li>
                 );
             }
-
             return (
                 <li key={`page-${page}-${index}`} className={`page-item fw-semibold ms-1 fs-5`}>
                     <button
@@ -73,11 +62,7 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
                         <i className="bi bi-chevron-left"></i>
                     </button>
                 </li>
-
-                {/* Page Numbers */}
                 {renderPageButtons()}
-
-                {/* Next Button */}
                 <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                     <button
                         className="page-link border-0 btn"

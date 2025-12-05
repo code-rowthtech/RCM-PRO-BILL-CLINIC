@@ -1,8 +1,33 @@
 import MENU_ITEMS from '../constants/menu';
 
-const getMenuItems = () => {
-    // NOTE - You can fetch from server and return here as well
-    return MENU_ITEMS;
+
+const canAccess = (item, role) => {
+    if (!item.role) return true; // no restriction
+    if (!role) return false;
+
+    return item.role.includes(role);
+};
+
+const filterMenuByRole = (items, role) => {
+    if (!items) return [];
+
+    return items
+        .map(item => {
+            if (!canAccess(item, role)) return null;
+
+            const newItem = { ...item };
+
+            if (item.children) {
+                newItem.children = filterMenuByRole(item.children, role);
+            }
+
+            return newItem;
+        })
+        .filter(Boolean);
+};
+
+const getMenuItems = (role) => {
+    return filterMenuByRole(MENU_ITEMS, role);
 };
 
 const findAllParent = (menuItems, menuItem) => {

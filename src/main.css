@@ -815,10 +815,7 @@ table {
         0 3px 6px rgba(0, 0, 0, 0.16),
         0 3px 6px rgba(0, 0, 0, 0.23);
 }
-/* 
-.accordion-item {
-    outline: none !important;
-} */
+
 .accordion-button:focus {
     box-shadow: none !important;
 }
@@ -834,20 +831,6 @@ table {
     justify-content: center;
     align-items: center;
 }
-
-/* .navbar-custom {
-    margin-top: 50px;
-    height: 100px!important;
-}
-
-
-
-.logo.logo-light {
-    margin-top: 60px !important;
-}
-.content {
-    margin-top: 65px !important;
-} */
 
 .navbar-custom-top {
     background-color: #313a46 !important;
@@ -902,18 +885,9 @@ table {
     transition-duration: 0.5s !important;
 }
 
-/* .lowerMenu {
-    height: 22vh;
-    display: flex;
-    flex-direction: column-reverse;
-} */
 .mainLogo {
     height: 8px;
 }
-
-/* .media_mob {
-    height: 78vh;
-} */
 
 .patient-menu-container {
     box-shadow:
@@ -1047,32 +1021,6 @@ tbody tr:hover {
     background-color: #e8f0fec1 !important;
 }
 
-/* .form-select:required:invalid {
-    color: #0908084f !important;
-    font-weight: 550 !important;
-    padding: 6px !important;
-    font-size: 12px !important;
-    background-color: #e8f0fe !important;
-    border: 0px !important;
-}
-
-.form-select:required:valid {
-    color: black !important;
-    font-weight: 550 !important;
-    padding: 6px !important;
-    font-size: 12px !important;
-    background-color: #e8f0fe !important;
-    border: 0px !important;
-} */
-
-/*.form-select[data-has-value='true'] {
-    color: black !important;
-    font-weight: 550 !important;
-    padding: 6px !important;
-    font-size: 12px;
-    background-color: #e8f0fe !important;
-    border: 0px !important;
-} */
 .notes-scroll::-webkit-scrollbar {
     width: 2px;
     height: 2px; /* In case of horizontal scroll, too */
@@ -1125,28 +1073,9 @@ tbody tr:hover {
     border: 0px !important;
 }
 
-/* .form-select:invalid {
-    color: red !important;
-}
-.form-select {
-    color: black !important;
-} */
-
 option {
     color: black !important;
 }
-
-/* .input[type='date'].placeholder {
-    color: red !important;
-}
-
-.input[type='date'].filled {
-    color: green !important;
-}
-
-.form-control[type='date'].filled {
-    color: purple !important;
-} */
 .css-19bb58m {
     padding-top: 6px !important;
 }
@@ -1164,87 +1093,17 @@ option {
     background-color: transparent !important;
 }
 
-/* .expanded-document {
-    position: relative;
-    width: 95%;
-    margin: 0 auto;
-    transform-origin: top center;
-} */
-
-/* Optional: Add overlay effect when a document is expanded */
-/* .expanded-document::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 99;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.expanded-document {
-    position: relative;
-    z-index: 111;
-}
-
-.expanded-document::before {
-    opacity: 0;
-}
-
-.modal-enter {
-    opacity: 0;
-    transform: scale(0.9);
-}
-.modal-enter-active {
-    opacity: 1;
-    transform: scale(1);
-    transition:
-        opacity 300ms,
-        transform 300ms;
-}
-.modal-exit {
-    opacity: 1;
-}
-.modal-exit-active {
-    opacity: 0;
-    transform: scale(0.9);
-    transition:
-        opacity 300ms,
-        transform 300ms;
-}
-
-.modal-overlay.opening {
-    opacity: 0;
-}
-.modal-overlay.closing {
-    opacity: 1;
-}
-.modal-content.opening {
-    transform: translate(var(--original-x), var(--original-y));
-    width: var(--original-width);
-    height: var(--original-height);
-}
-.modal-content.closing {
-    transform: translate(var(--original-x), var(--original-y));
-    width: var(--original-width);
-    height: var(--original-height);
-} */
-
 /* Thin scrollbar for WebKit browsers */
 .thin-scrollbar::-webkit-scrollbar {
-    width: 1px; /* Change to 2px or 1px for even thinner */
+    width: 1px;
 }
 
 .thin-scrollbar::-webkit-scrollbar-track {
-    background: transparent; /* or use a color like #f1f1f1 */
+    background: transparent;
 }
 
 .thin-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.4); /* Customize thumb color */
+    background-color: rgba(0, 0, 0, 0.4);
     border-radius: 0px;
 }
 
@@ -1253,8 +1112,6 @@ option {
     scrollbar-width: thin;
     scrollbar-color: #e8eaed transparent;
 }
-
-/* CSS FOR TABLES WITH FIXED HEADERS LIKE THE DOCUMENTS ADDITION TIME */
 
 .table-scroll {
     display: block;

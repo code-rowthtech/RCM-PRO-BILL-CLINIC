@@ -682,18 +682,6 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Documents' && (
                                                 <PatientDocs isAccordionOpen={isAccordionOpen} />
                                             )}
-                                            {/* {selectedMainTab === 'Encounter' && (
-                                                <Encounter
-                                                    expanded={expanded}
-                                                    setExpanded={setExpanded}
-                                                    isAccordionOpen={isAccordionOpen}
-                                                    encounterTabs={encounterTabs}
-                                                    createEncounter={createEncounter}
-                                                    setCreateEncounter={setCreateEncounter}
-                                                    setEncounterTabs={setEncounterTabs}
-                                                    setSelectedMainTab={setSelectedMainTab}
-                                                />
-                                            )} */}
                                             {selectedMainTab === 'Encounter' && (
                                                 <EncountersV2
                                                     expanded={expanded}

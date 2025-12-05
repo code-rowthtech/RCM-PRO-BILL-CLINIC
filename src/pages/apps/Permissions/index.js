@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import PageTitle from '../../../components/PageTitle';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import { FormInput } from '../../../components';
 import { Link } from 'react-router-dom';
 import AddPermissions from './Modal/addPermissions';
 import { useDispatch, useSelector } from 'react-redux';
 import { deletePermissionAction, getPermissionAction, updatePermissionAction } from '../../../redux/actions';
-import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
-import Loader from '../../../components/Loader';
+import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 import Paginations from '../../../helpers/Paginations';
 const Permissions = () => {
@@ -24,7 +22,9 @@ const Permissions = () => {
     const handleClosemodal = () => {
         setShowModal(false);
     };
+
     const dispatch = useDispatch();
+
     useEffect(() => {
         dispatch(getPermissionAction({ search: search, limit: 10, skip: skip }));
         if (store?.createPermissionsDataReducer?.data?.success === true) {
@@ -43,10 +43,12 @@ const Permissions = () => {
         setDeleteModal(false);
         setDeleteId(null);
     }
+
     const openDeleteModal = (data) => {
         setDeleteModal(true);
         setDeleteId(data?._id);
     }
+
     const handleDelete = () => {
         const payload = {
             id: deleteId
@@ -70,12 +72,6 @@ const Permissions = () => {
     }
     return (
         <div>
-            {/* <PageTitle
-                breadCrumbItems={[
-                    { label: 'Permissions', path: '/apps/Permissions/list', active: true },
-                ]}
-                title={'Permissions'}
-            /> */}
             <Row className='mt-2'>
                 <Col xs={12}>
                     <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
@@ -94,11 +90,9 @@ const Permissions = () => {
                                     <Table responsive className="table-centered table-nowrap mb-0">
                                         <thead>
                                             <tr key={''}>
-                                                <th>Permission</th>
-                                                <th>Description</th>
-                                                <th>Created By</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
+                                                {['Permission', 'Description', 'Created By', 'Status', 'Action']?.map((header, index) => (
+                                                    <th key={index}>{header}</th>
+                                                ))}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -136,9 +130,6 @@ const Permissions = () => {
                                                                     onClick={() => handleToggleUpdate(data)} checked={data?.status === 'active'} />
                                                             </td>
                                                             <td>
-                                                                {/* <Link to="#" className="action-icon">
-                                                                <i className="mdi mdi-square-edit-outline"></i>
-                                                            </Link> */}
                                                                 <Link to="#" className="action-icon" onClick={() => openDeleteModal(data)}>
                                                                     <i className="mdi mdi-delete"></i>
                                                                 </Link>
@@ -163,22 +154,13 @@ const Permissions = () => {
                 </Col>
             </Row>
             <Modal show={deleteModal} onHide={closeDeleteModal}>
-                <Modal.Header
-                    onHide={closeDeleteModal}
-                    closeButton
-                    className={'modal-colored-header pb-0 border-0 text-center'}>
-                </Modal.Header>
+                <Modal.Header onHide={closeDeleteModal} closeButton className={'modal-colored-header pb-0 border-0 text-center'} />
                 <Modal.Body>
                     <h4 className="mt-0 text-center">Delete Permission</h4>
-                    <p>
-                        Are you sure you want to remove the selected permissions?
-                        This action cannot be undone.
-                    </p>
+                    <p> Are you sure you want to remove the selected permissions? This action cannot be undone.</p>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={closeDeleteModal} className='custom-buttons'>
-                        Cancel
-                    </Button>
+                    <Button onClick={closeDeleteModal} className='custom-buttons'>Cancel</Button>
                     <Button onClick={handleDelete} className='custom-buttons' disabled={store?.deletePermissionsDataReducer?.loading}>
                         {store?.deletePermissionsDataReducer?.loading ?
                             <Spinner className="spinner-border-sm " />

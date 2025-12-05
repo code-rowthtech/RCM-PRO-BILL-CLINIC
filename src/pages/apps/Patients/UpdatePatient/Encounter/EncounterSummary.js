@@ -543,7 +543,6 @@ const EncounterSummary = () => {
                         );
                     })}
                 </Accordion>
-
             </Col>
         </Row>
     );

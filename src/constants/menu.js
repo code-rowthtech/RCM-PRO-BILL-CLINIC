@@ -1,3 +1,5 @@
+import { useSelector } from "react-redux";
+
 const MENU_ITEMS = [
     // { key: 'navigation', label: 'Navigation', isTitle: true },
     {
@@ -6,6 +8,7 @@ const MENU_ITEMS = [
         isTitle: false,
         icon: 'uil-home-alt',
         url: '/dashboard/project',
+        role: ['clinic']
     },
 
     {
@@ -13,6 +16,7 @@ const MENU_ITEMS = [
         label: 'Appointments',
         icon: 'uil-schedule',
         url: '/apps/appointments/list',
+        role: ['clinic', 'receptionist']
     },
     // {
     //     key: 'transaction',
@@ -32,18 +36,21 @@ const MENU_ITEMS = [
         label: 'Provider',
         icon: 'dripicons-medical',
         url: '/apps/providers/list',
+        role: ['clinic', 'receptionist']
     },
     {
         key: 'schedule',
         label: 'Provider Schedule',
         icon: 'uil-clock',
         url: '/apps/schedule/list',
+        role: ['clinic', 'receptionist']
     },
     {
         key: 'patients',
         label: 'Patients',
         icon: 'uil uil-user',
         url: '/apps/patients/list',
+        role: ['clinic', 'receptionist']
     },
     // {
     //     key: 'diagnosis',
@@ -56,34 +63,26 @@ const MENU_ITEMS = [
         label: 'User Management',
         url: '/apps/role-management/list',
         icon: 'uil uil-users-alt',
+        role: ['clinic']
     },
-
-    // {
-    //     key: 'apps-crm',
-    //     label: 'Practice',
-    //     url: '/apps/crm/addPractice',
-    //     isTitle: false,
-    //     // badge: { variant: 'danger', text: 'New' },
-    //     icon: 'uil-user',
-    // },
     {
         key: 'apps-crm-v2',
-        // label: 'Practice V2 (New)',
         label: 'Practice',
         url: '/apps/crm/addPracticeV2',
         isTitle: false,
-        // badge: { variant: 'success', text: 'New' },
         icon: 'uil-user-plus',
+        role: ['clinic']
     },
     {
         key: 'tasks',
         label: 'Tasks',
         icon: 'bi bi-clipboard2-plus-fill',
         url: '/apps/tasks',
+        role: ['clinic', 'receptionist']
     },
     {
         key: 'notes-and-templates',
-        label: 'Notes and Templates',
+        label: 'Notes & Templates',
         icon: 'bi bi-journal-plus',
         url: '/apps/notes-and-templates/list',
         children: [
@@ -100,6 +99,7 @@ const MENU_ITEMS = [
                 url: '/apps/notes-and-templates/note-templates',
             },
         ],
+        role: ['clinic', 'receptionist']
     },
     {
         key: 'setting',
@@ -168,29 +168,27 @@ const MENU_ITEMS = [
             //     parentKey: 'setting',
             // },
         ],
+        role: ['clinic', 'receptionist']
     },
     {
         key: 'auditReport',
         label: 'Audit Report',
         url: '/apps/audit-report/list',
         icon: 'uil uil-graph-bar',
+        role: ['clinic']
     },
     {
         label: 'Billing',
         icon: 'uil uil-money-bill',
         redirectTo: '#',
+        role: ['clinic']
     },
     {
         label: 'Help & Support',
         icon: 'uil uil-question-circle', // Unicons equivalent of help/support
         redirectTo: '#',
+        role: ['clinic']
     }
-    // {
-    //     key: 'logout',
-    //     label: 'Logout',
-    //     icon: 'uil uil-sign-out-alt',
-    //     // url: '/apps/logout/logout-model',
-    // },
 ];
 
 export default MENU_ITEMS;

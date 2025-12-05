@@ -103,7 +103,6 @@ const AddHoliday = () => {
                             </Button>
                         </div>
                     </div>
-
                     <div className="px-">
                         {store?.getDoctorsReducer?.loading ? (
                             <div className="d-flex justify-content-center align-items-center h-100">
