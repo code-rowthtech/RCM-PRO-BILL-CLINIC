@@ -1,16 +1,42 @@
-# Ignore compiled output, dependencies, and sensitive files
+# Dependencies and builds
+node_modules/
+build/
+dist/
+coverage/
+*.log
+.eslintcache
 
-# Node.js dependencies
-node_modules
-
-# Environment variables
+# Environment and credential files
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
+.aws/
+.codex/
+.agents/
 
-# Dependency lock files
-yarn.lock
-package-lock.json
+# Private integrations and local records
+private/
+backups/
+exports/
+uploads/
+*.sql
+*.sqlite
+*.sqlite3
+*.db
 
-# Optional: Exclude package.json if not necessary
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local automation
 branch_structure.json
 temp_auto_push.bat
 temp_interactive_push.bat

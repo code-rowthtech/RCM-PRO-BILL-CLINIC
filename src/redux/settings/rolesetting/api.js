@@ -1,19 +1,6 @@
-import { APICore } from '../../../helpers/api/apiCore';
-import * as URL from '../../../helpers/api/apiEndpoints';
+// Backend implementation excluded from the public showcase.
+import { unavailable } from '../../../helpers/showcase';
 
-const api = new APICore();
-
-export function createRoleDataApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.addRoleData, data);
-}
-
-export function getRoleDataApi(params: any): any {
-    const { data } = params;
-    return api.get(`${URL.getRoleData}?search=${data?.search}&clinicId=${data?.clinicId}&createdById=${data?.createdById}&status=${data?.status}&page=${data?.page}&limit=${data?.limit}`);
-}
-
-export function updateRoleDataApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.updateRoleData, data)
-}
+export const createRoleDataApi = unavailable;
+export const getRoleDataApi = unavailable;
+export const updateRoleDataApi = unavailable;

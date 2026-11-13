@@ -1,3 +1,4 @@
+import { unavailable } from '../../../helpers/showcase';
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Card, Col, Form, Modal, Row, InputGroup, Table } from "react-bootstrap";
 import { useForm } from "react-hook-form";
@@ -101,7 +102,7 @@ const ReferringDoctor = ({ patientId }) => {
             const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
-                const response = await fetch(url);
+                const response = await unavailable(url);
                 if (!response.ok) {
                     throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
                 }

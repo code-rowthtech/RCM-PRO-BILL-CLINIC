@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { createVitalsAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';

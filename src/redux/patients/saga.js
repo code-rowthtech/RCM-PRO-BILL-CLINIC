@@ -3,7 +3,7 @@ import { PatientsActionTypes } from './constants';
 import { createInsuranceApi, createPatientsApi, createResponsiblePartyApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi, getPatientsByAppointmentApi, getResponsiblePartyApi, updateInsuranceApi, updatePatientsApi, updateResponsiblePartyApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
-import { createResponsibleParty } from '../../helpers/api/apiEndpoints';
+
 /**
  * Login the user
  * @param {*} payload - username and password

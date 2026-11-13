@@ -1,35 +1,9 @@
-import { APICore } from '../../helpers/api/apiCore';
-import * as URL from '../../helpers/api/apiEndpoints';
+// Backend implementation excluded from the public showcase.
+import { unavailable } from '../../helpers/showcase';
 
-const api = new APICore();
-
-export function getDoctorsApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getDoctor, data);
-}
-
-export function getDoctorsRolesApi(params: any): any {
-    const { data } = params;
-    return api.get(`${URL.getDoctorRoles}?search=${data?.search}&clinicId=${data?.clinicId}`);
-}
-
-export function getDoctorsDetailApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getDoctorDetails, data);
-}
-
-export function createDoctorApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.createDoctor, data);
-}
-
-export function createDoctorDetailApi(params: any): any {
-    const { data } = params;
-    return api.update(URL.createDoctorDetail, data);
-}
-
-export function addReferringDoctorApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.addReferringDoctor, data);
-}
-
+export const getDoctorsApi = unavailable;
+export const getDoctorsRolesApi = unavailable;
+export const getDoctorsDetailApi = unavailable;
+export const createDoctorApi = unavailable;
+export const createDoctorDetailApi = unavailable;
+export const addReferringDoctorApi = unavailable;

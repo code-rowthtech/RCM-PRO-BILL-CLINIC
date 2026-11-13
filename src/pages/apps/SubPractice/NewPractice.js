@@ -1,3 +1,4 @@
+import { unavailable } from '../../../helpers/showcase';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
@@ -115,7 +116,7 @@ const NewPractice = () => {
         const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(addressToSearch)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
         try {
-            const response = await fetch(url);
+            const response = await unavailable(url);
             if (!response.ok) {
                 throw new Error(`Error fetching data: ${response.status}`);
             }
@@ -132,7 +133,7 @@ const NewPractice = () => {
             const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
-                const response = await fetch(url);
+                const response = await unavailable(url);
 
                 if (!response.ok) {
                     throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);

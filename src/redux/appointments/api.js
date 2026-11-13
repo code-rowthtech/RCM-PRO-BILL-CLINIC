@@ -1,36 +1,9 @@
-import { decryptMessage } from '../../cryptoUtils';
-import { APICore } from '../../helpers/api/apiCore';
-import * as URL from '../../helpers/api/apiEndpoints';
+// Backend implementation excluded from the public showcase.
+import { unavailable } from '../../helpers/showcase';
 
-const api = new APICore();
-
-export function createAppointmentApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.createAppointment, data);
-}
-
-export function rescheduleAppointmentApi(params: any): any {
-    const { data } = params;
-    return api.update(`${URL.rescheduleAppointment}${data?.id}`, data);
-}
-
-export function getPractitionerScheduleApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getPractitionerSchedule, data);
-}
-
-export function getAppointmentsApi(params: any): any {
-    const { data } = params;
-    return api.get(`${URL.getAppointments}${data?.clinicId}?doctorId=${data?.doctorId || ''}`);
-}
-
-export function getAppointmentByIdApi(params: any): any {
-    const { data } = params;
-    return api.get(`${URL.getAppointmentById}${data?.id}`);
-}
-
-export function getPractitionerSlotsApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getPractitionerSlots, data);
-}
-
+export const createAppointmentApi = unavailable;
+export const rescheduleAppointmentApi = unavailable;
+export const getPractitionerScheduleApi = unavailable;
+export const getAppointmentsApi = unavailable;
+export const getAppointmentByIdApi = unavailable;
+export const getPractitionerSlotsApi = unavailable;

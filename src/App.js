@@ -2,8 +2,6 @@
 import React from 'react';
 import Routes from './routes/Routes';
 
-// setup fake backend
-import { configureFakeBackend } from './helpers';
 
 // Themes
 
@@ -16,8 +14,7 @@ import './assets/scss/Saas.scss';
 // For Creative demo import Creative.scss
 // import './assets/scss/Creative.scss';
 
-// configure fake backend
-configureFakeBackend();
+
 
 type AppProps = {};
 

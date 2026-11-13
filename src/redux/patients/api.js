@@ -1,64 +1,15 @@
-import { APICore } from '../../helpers/api/apiCore';
-import * as URL from '../../helpers/api/apiEndpoints';
+// Backend implementation excluded from the public showcase.
+import { unavailable } from '../../helpers/showcase';
 
-const api = new APICore();
-
-export function getPatientsApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getPatients, data);
-}
-
-export function getPatientsByAppointmentApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getPatientsByAppointment, data);
-}
-
-export function getPatientByIdApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getPatientById, data);
-}
-
-export function createPatientsApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.createPatients, data);
-}
-
-export function createResponsiblePartyApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.createResponsibleParty, data);
-}
-export function getResponsiblePartyApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getResponsibleParty, data);
-}
-
-export function getResponsiblePartyByIdApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getResponsiblePartyById, data);
-}
-
-export function updateResponsiblePartyApi(params: any): any {
-    const { data } = params;
-    return api.update(URL.updateResponsibleParty, data);
-}
-
-export function updatePatientsApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.updatePatients, data);
-}
-
-export function createInsuranceApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.createInsurance, data);
-}
-
-export function getInsuranceByIdApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.getInsuranceById, data);
-}
-
-export function updateInsuranceApi(params: any): any {
-    const { data } = params;
-    return api.create(URL.updateInsurance, data);
-}
-
+export const getPatientsApi = unavailable;
+export const getPatientsByAppointmentApi = unavailable;
+export const getPatientByIdApi = unavailable;
+export const createPatientsApi = unavailable;
+export const createResponsiblePartyApi = unavailable;
+export const getResponsiblePartyApi = unavailable;
+export const getResponsiblePartyByIdApi = unavailable;
+export const updateResponsiblePartyApi = unavailable;
+export const updatePatientsApi = unavailable;
+export const createInsuranceApi = unavailable;
+export const getInsuranceByIdApi = unavailable;
+export const updateInsuranceApi = unavailable;

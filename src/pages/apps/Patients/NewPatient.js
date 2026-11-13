@@ -12,7 +12,7 @@ import { encryptMessage } from "../../../cryptoUtils";
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { getCitiesAction, getDoctorsAction, getStatesByCountryAction, getSubClinicCitiesAction, stateEmptydAction } from "../../../redux/actions";
 import Responsiblle from "./Responsible";
-import { getResponsibleParty } from "../../../helpers/api/apiEndpoints";
+
 import Select from 'react-select';
 import Insurance from "./Insurance/Insurance";
 import Demographicdetails from "./Demographic";

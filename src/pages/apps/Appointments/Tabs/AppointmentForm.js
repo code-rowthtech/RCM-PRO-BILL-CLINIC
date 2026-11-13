@@ -18,7 +18,7 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { duration } from 'moment/moment';
 import PatientDetails from '../../Patients/UpdatePatient/PatientDetails';
 import NewPatient from '../../Patients/NewPatient';
-import { rescheduleAppointment } from '../../../../helpers/api/apiEndpoints';
+
 import Spinner from '../../../../constants/Spinner';
 import DatePicker from 'react-date-picker';
 

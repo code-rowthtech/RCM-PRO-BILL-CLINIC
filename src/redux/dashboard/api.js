@@ -1,10 +1,4 @@
-import { APICore } from '../../helpers/api/apiCore';
-import * as URL from '../../helpers/api/apiEndpoints';
+// Backend implementation excluded from the public showcase.
+import { unavailable } from '../../helpers/showcase';
 
-const api = new APICore();
-
-export function getAnalyticsApi(params: any): any {
-    const { data } = params;
-    return api.get(URL.getAnalytics, data);
-}
-
+export const getAnalyticsApi = unavailable;

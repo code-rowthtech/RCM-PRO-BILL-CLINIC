@@ -1,3 +1,4 @@
+import { unavailable } from '../../../../helpers/showcase';
 import React, { useEffect, useState } from 'react'
 import { Col, Form, Row, Button, Table, Modal, InputGroup, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -84,7 +85,7 @@ const WorkersCamp = ({ patientId, activeTab }) => {
             const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
-                const response = await fetch(url);
+                const response = await unavailable(url);
 
                 if (!response.ok) {
                     throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);

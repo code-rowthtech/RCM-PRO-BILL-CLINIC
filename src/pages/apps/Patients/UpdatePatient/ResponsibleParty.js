@@ -1,3 +1,4 @@
+import { unavailable } from '../../../../helpers/showcase';
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { BiEdit } from "react-icons/bi";
@@ -86,7 +87,7 @@ const ResponsibleParty = ({ patientId }) => {
         const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(addressToSearch)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
         try {
-            const response = await fetch(url);
+            const response = await unavailable(url);
             if (!response.ok) {
                 throw new Error(`Error fetching data: ${response.status}`);
             }
